@@ -25,7 +25,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  */
 class ModuleFormdata extends Backend
 {
@@ -55,9 +55,20 @@ class ModuleFormdata extends Backend
 	{
 		parent::__construct();
 
-		// Types of form fields with storable data
-		$this->arrFFstorable = array('hidden','text','password','textarea','select','efgLookupSelect','calendar','conditionalselect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');
+		$this->loadDataContainer('tl_form_field');
 
+		// Types of form fields with storable data
+		$this->arrFFstorable = array(
+			'sessionText', 'sessionOption', 'sessionCalculator', 
+			'hidden','text','calendar','password','textarea',
+			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
+			'radio','efgLookupRadio',
+			'checkbox','efgLookupCheckbox',
+			'upload'
+		);
+
+		//$arrFFignore = array('fieldset','condition','submit','efgFormPaginator','captcha','headline','explanation','html');
+		//$this->arrFFstorable = array_diff(array_keys($GLOBALS['TL_FFL']), $arrFFignore);
 	}
 
 	public function generate()
@@ -95,7 +106,7 @@ class ModuleFormdata extends Backend
 	{
 		if ( !$this->arrStoreForms)
 		{
-			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.storeFormdata=? ORDER BY f.title")
+			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND (f.storeFormdata=?) ORDER BY f.title")
 										->execute("1");
 			while ($objForms->next())
 			{
@@ -122,14 +133,14 @@ class ModuleFormdata extends Backend
 	{
 		$this->intFormId = $dc->id;
 
-		$this->objForm = $this->Database->prepare("SELECT id,title,formID,allowTags,storeValues,storeFormdata,sendConfirmationMail,confirmationMailText,efgStoreValues FROM tl_form WHERE id=?")
+		$this->objForm = $this->Database->prepare("SELECT id,title,formID,allowTags,storeValues,storeFormdata,sendConfirmationMail,confirmationMailText,sendFormattedMail,efgStoreValues FROM tl_form WHERE id=?")
 						->execute($this->intFormId)
 						->fetchAssoc();
 		$this->updateConfig();
 	}
 
 	/**
-	 * Create DCA for each Formular
+	 * Callback edit button
 	 * @return array
 	 */
 	public function callbackEditButton($row, $href, $label, $title, $icon, $attributes, $strTable, $arrRootIds, $arrChildRecordIds, $blnCircularReference, $strPrevious, $strNext)
@@ -156,7 +167,7 @@ class ModuleFormdata extends Backend
 	 */
 	private function updateConfig()
 	{
-
+
 		$this->import('String');
 
 		$arrStoreForms = $this->getStoreForms();
@@ -210,7 +221,7 @@ class ModuleFormdata extends Backend
 			$arrFields = array();
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
-			$objFields = $this->Database->prepare("SELECT id,pid,type,name,label,value,options,efgLookupOptions,multiple,mSize,mandatory,rgxp,maxlength,extensions,size,storeFile,uploadFolder,useHomeDir,efgMultiSRC,efgImageSortBy,efgImagePerRow,efgImageSize,efgImageFullsize,efgImageMargin".($this->Database->fieldExists('conditionField', 'tl_form_field') ? ', conditionField' : '')." FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
+			$objFields = $this->Database->prepare("SELECT id,pid,type,name,label,value,options,efgLookupOptions,multiple,mSize,mandatory,rgxp,maxlength,extensions,size,storeFile,uploadFolder,useHomeDir,efgMultiSRC,efgImageMultiple,efgImageSortBy,efgImagePerRow,efgImageSize,efgImageFullsize,efgImageMargin".($this->Database->fieldExists('conditionField', 'tl_form_field') ? ', conditionField' : '')." FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 								->execute($this->objForm['id']);
 			if ($objFields->numRows)
 			{

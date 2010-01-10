@@ -25,9 +25,9 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  */
-class FormData extends Controller
+class FormData extends Frontend
 {
 	/**
 	 * Items in tl_form, all forms marked to store data in tl_formdata
@@ -37,6 +37,7 @@ class FormData extends Controller
 
 	protected $arrFormsDcaKey = null;
 	protected $arrFormdataDetailsKey = null;
+
 	/**
 	 * Types of form fields with storable data
 	 * @var array
@@ -50,33 +51,26 @@ class FormData extends Controller
 
 	public function __construct()
 	{
+		parent::__construct();
 
 		$this->import('Database');
 		$this->import('String');
 
-		$this->arrFFstorable = array('hidden','text','calendar','password','textarea','select', 'conditionalselect','efgLookupSelect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');
+		// Types of form fields with storable data
+		$this->arrFFstorable = array(
+			'sessionText', 'sessionOption', 'sessionCalculator', 
+			'hidden','text','calendar','password','textarea',
+			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
+			'radio','efgLookupRadio',
+			'checkbox','efgLookupCheckbox',
+			'upload'
+		);
+		
+		//$arrFFignore = array('fieldset','condition','submit','efgFormPaginator','captcha','headline','explanation','html');
+		//$this->arrFFstorable = array_diff(array_keys($GLOBALS['TL_FFL']), $arrFFignore);
 
 		$this->getStoreForms();
 
-		parent::__construct();
-	}
-
-	/**
-	 * Set an object property
-	 * @param string
-	 * @return mixed
-	 */
-	public function __set($strKey, $varValue)
-	{
-		switch ($strKey)
-		{
-			case 'FdDcaKey':
-				$this->strFdDcaKey = $varValue;
-				break;
-			default:
-				$this->arrData[$strKey] = $varValue;
-				break;
-		}
 	}
 
 	/**
@@ -84,6 +78,7 @@ class FormData extends Controller
 	 * @param string
 	 * @return mixed
 	 */
+
 	public function __get($strKey)
 	{
 		switch ($strKey)
@@ -97,12 +92,8 @@ class FormData extends Controller
 			case 'arrStoreForms':
 				return $this->arrStoreForms;
 				break;
-			default:
-				return $this->arrData[$strKey];
-				break;
 		}
 	}
-
 
 	/**
 	 * Autogenerate an alias if it has not been set yet
@@ -206,64 +197,136 @@ class FormData extends Controller
 
 		$this->getSearchableListingPages();
 
+		$arrProcessed = array();
+
 		if (is_array($this->arrSearchableListingPages) && count($this->arrSearchableListingPages)>0)
 		{
+			$this->loadDataContainer('fd_feedback');
+
 			foreach ($this->arrSearchableListingPages as $pageId => $arrParams)
 			{
+
 				if (is_array($arrRoot) && count($arrRoot) > 0 && !in_array($pageId, $arrRoot))
 				{
 					continue;
 				}
 
-				$strForm = '';
-				if (is_array($arrParams) && strlen($arrParams['list_formdata']))
+				// do not add if list condition contains insert tags
+				if (strlen($arrParams['list_where']))
 				{
+					if (strpos($arrParams['list_where'], '{{') !== false)
+					{
+						continue;
+					}
+				}
+				// do not add if no listing details fields are defined
+				if (!strlen($arrParams['list_info']))
+				{
+					continue;
+				}
+
+				if (!strlen($arrParams['list_formdata']))
+				{
+					continue;
+				}
+
+				if (!isset($arrProcessed[$pageId]))
+				{
+
+					$arrProcessed[$pageId] = false;
+
+					$strForm = '';
 					$strFormsKey = substr($arrParams['list_formdata'], strlen('fd_'));
 					if (isset($this->arrFormsDcaKey[$strFormsKey]))
 					{
 						$strForm = $this->arrFormsDcaKey[$strFormsKey];
 					}
-				}
 
-				$pageAlias = (strlen($arrParams['alias']) ? $arrParams['alias'] : null);
+					$pageAlias = (strlen($arrParams['alias']) ? $arrParams['alias'] : null);
 
-				if (strlen($strForm))
-				{
-					$strFormdataDetailsKey = 'details';
-					if (strlen($arrParams['formdataDetailsKey']))
+					if (strlen($strForm))
 					{
-						$strFormdataDetailsKey = $arrParams['formdataDetailsKey'];
-					}
+						$strFormdataDetailsKey = 'details';
+						if (strlen($arrParams['formdataDetailsKey']))
+						{
+							$strFormdataDetailsKey = $arrParams['formdataDetailsKey'];
+						}
 
-					if (VERSION == '2.5' && intval(BUILD) <= 9)
-					{
-						$domain = '';
-					}
-					else
-					{
 						// Determine domain
 						if (intval($pageId)>0)
 						{
 							$domain = $this->Environment->base;
 							$objParent = $this->getPageDetails($pageId);
+
 							if (strlen($objParent->domain))
 							{
 								$domain = ($this->Environment->ssl ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
 							}
 						}
+						$arrProcessed[$pageId] = $domain . $this->generateFrontendUrl($objParent->row(), '/'.$strFormdataDetailsKey.'/%s');
 					}
 
+					if ($arrProcessed[$pageId] === false)
+					{
+						continue;
+					}
+
+					$strUrl = $arrProcessed[$pageId];
+
+					/*
 					$objData = $this->Database->prepare("SELECT id,alias FROM tl_formdata WHERE form=?")
 								->execute($strForm);
+					*/
+
+					// prepare conditions
+					$strQuery = "SELECT id,alias FROM tl_formdata f";
+					$strWhere = " WHERE form=?";
+
+					if (strlen($arrParams['list_where']))
+					{
+						$arrListWhere = array();
+						$arrListConds = preg_split('/(\sAND\s|\sOR\s)/si', $arrParams['list_where'], -1, PREG_SPLIT_DELIM_CAPTURE);
+
+						foreach ($arrListConds as $strListCond)
+						{
+							if (preg_match('/\sAND\s|\sOR\s/si', $strListCond))
+							{
+								$arrListWhere[] = $strListCond;
+							}
+							else
+							{
+								$arrListCond = preg_split('/([\s!=><]+)/', $strListCond, -1, PREG_SPLIT_DELIM_CAPTURE);
+								$strCondField = $arrListCond[0];
+
+								unset($arrListCond[0]);
+								if (in_array($strCondField, $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']))
+								{
+									$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id ) ' . implode('', $arrListCond);
+								}
+								if (in_array($strCondField, $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields']))
+								{
+									$arrListWhere[] = $strCondField . implode('', $arrListCond);
+								}
+							}
+						}
+						$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) .')' : '';
+						$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
+					}
+
+					$strQuery .=  $strWhere;
+
+					// add details pages to the indexer
+					$objData = $this->Database->prepare($strQuery)
+							->execute($strForm);
+
 					while ($objData->next())
 					{
-						$strUrl = $domain . $this->generateFrontendUrl(array('id'=>$pageId, 'alias'=>$pageAlias), '/'.$strFormdataDetailsKey.'/%s');
-						$strUrl = sprintf($strUrl, ((strlen($objData->alias) && !$GLOBALS['TL_CONFIG']['disableAlias']) ? $objData->alias : $objData->id));
-						$arrPages[] = $strUrl;
+						$arrPages[] = sprintf($strUrl, ((strlen($objData->alias) && !$GLOBALS['TL_CONFIG']['disableAlias']) ? $objData->alias : $objData->id));
 					}
+
 				}
 
-			}
+			} // foreach arrSearchableListingPages
 
 		}
 
@@ -326,18 +389,19 @@ class FormData extends Controller
 	{
 		if (!$this->arrSearchableListingPages)
 		{
-			// get all pages containig listing formdata
-			$objListingPages = $this->Database->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
-									->execute("module", "formdatalisting", '', time(), '', time(), 1);
+			// get all pages containig listing formdata with details page
+			$objListingPages = $this->Database->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
+									->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
 			while ($objListingPages->next())
 			{
 				$strFormdataDetailsKey = 'details';
 				if (strlen($objListingPages->efg_DetailsKey)) {
 					$strFormdataDetailsKey = $objListingPages->efg_DetailsKey;
 				}
-				$this->arrSearchableListingPages[$objListingPages->id] = array('formdataDetailsKey' => $strFormdataDetailsKey, 'alias' => $objListingPages->alias, 'protected' => $objListingPages->protected, 'list_formdata' => $objListingPages->list_formdata);
+				$this->arrSearchableListingPages[$objListingPages->id] = array('formdataDetailsKey' => $strFormdataDetailsKey, 'alias' => $objListingPages->alias, 'protected' => $objListingPages->protected, 'list_formdata' => $objListingPages->list_formdata, 'list_where' => $objListingPages->list_where, 'list_fields' => $objListingPages->list_fields, 'list_info' => $objListingPages->list_info, 'efg_list_acces' => $objListingPages->efg_list_access);
 			}
 		}
+
 		return $this->arrSearchableListingPages;
 	}
 
@@ -417,6 +481,7 @@ class FormData extends Controller
 			return false;
 		}
 	}
+
 
 	/*
 	 * Prepare post value for tl_formdata / tl_formdata_details DB record
@@ -502,6 +567,8 @@ class FormData extends Controller
 				break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
+				case 'countryselect':
+				case 'fp_preSelectMenu':
 				case 'select':
 					$strSep = '';
 					$strVal = '';
@@ -582,7 +649,7 @@ class FormData extends Controller
 				case 'textarea':
 				default:
 					$strVal = $varSubmitted;
-					if (strlen($strVal) && in_array($arrField['rgxp'], array('date', 'time', 'datim')))
+					if (is_string($strVal) && strlen($strVal) && in_array($arrField['rgxp'], array('date', 'time', 'datim')))
 					{
 						$objDate = new Date($strVal, $GLOBALS['TL_CONFIG'][$arrField['rgxp'] . 'Format']);
 						$strVal = $objDate->tstamp;
@@ -594,13 +661,26 @@ class FormData extends Controller
 				break;
 			}
 
-			return $this->String->decodeEntities($strVal);
-			//return $strVal;
+			if (is_array($strVal))
+			{
+				foreach ($strVal as $k=>$value)
+				{
+					$strVal[$k] = $this->String->decodeEntities($value);
+				}
+				$strVal = serialize($strVal);
+			}
+			else
+			{
+				$strVal = $this->String->decodeEntities($strVal);
+			}
+
+			return $strVal;
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return $varSubmitted;
+			//return (is_array($varSubmitted) ? implode('|', $varSubmitted) : $varSubmitted);
+			return (is_array($varSubmitted) ? serialize($varSubmitted) : $varSubmitted);
 		}
 
 	}
@@ -652,7 +732,7 @@ class FormData extends Controller
 						}
 					}
 
-					if ( $strVal == '')
+					if ($strVal == '')
 					{
 						$strVal = $varSubmitted;
 					}
@@ -672,6 +752,8 @@ class FormData extends Controller
 				break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
+				case 'countryselect':
+				case 'fp_preSelectMenu':
 				case 'select':
 					$strSep = '';
 					$strVal = '';
@@ -706,8 +788,13 @@ class FormData extends Controller
 				break;
 				case 'efgImageSelect':
 					$strVal = '';
-					if (strlen($varSubmitted))
+					if (is_string($varSubmitted) && strlen($varSubmitted))
 					{
+						$strVal = $varSubmitted;
+					}
+					elseif (is_array($varSubmitted))
+					{
+						//$strVal = implode(', ', $varSubmitted);
 						$strVal = $varSubmitted;
 					}
 				break;
@@ -727,12 +814,12 @@ class FormData extends Controller
 				break;
 			}
 
-			return $this->String->decodeEntities($strVal);
+			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($strVal) : $strVal;
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return $this->String->decodeEntities($varSubmitted);
+			return (is_string($varSubmitted) && strlen($varSubmitted)) ? $this->String->decodeEntities($varSubmitted) : $varSubmitted;
 		}
 
 	}
@@ -842,6 +929,8 @@ class FormData extends Controller
 				break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
+				case 'countryselect':	
+				case 'fp_preSelectMenu':
 				case 'select':
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
 
@@ -894,9 +983,12 @@ class FormData extends Controller
 				break;
 				case 'efgImageSelect':
 					$strVal = '';
-					if (strlen($varValue))
+					$arrSel = array();
+
+					$arrSel = deserialize($varValue, true);
+					if (count($arrSel))
 					{
-						$strVal = $varValue;
+						$strVal = $arrSel;
 					}
 				break;
 				case 'upload':
@@ -914,13 +1006,12 @@ class FormData extends Controller
 					$strVal = $varValue;
 				break;
 			}
-
-			return $this->String->decodeEntities($strVal);
+			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($strVal) : $strVal;
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return $this->String->decodeEntities($varValue);
+			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($varValue) : $varValue;
 		}
 
 	}
@@ -1022,6 +1113,8 @@ class FormData extends Controller
 				break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
+				case 'countryselect':
+				case 'fp_preSelectMenu':
 				case 'select':
 					if ($arrField['options'])
 					{
@@ -1055,6 +1148,12 @@ class FormData extends Controller
 								$varVal[$k] = $sNewVal;
 							}
 						}
+					}
+				break;
+				case 'efgImageSelect':
+					if (strlen($varVal))
+					{
+						$varVal = deserialize($varValue);
 					}
 				break;
 				case 'upload':
@@ -1204,6 +1303,9 @@ class FormData extends Controller
 				if ($sqlLookupTable == 'tl_calendar_events')
 				{
 
+					//$sqlLookupWhere = (strlen($strLookupWhere) ? " AND ( " . $strLookupWhere . " ) " : "");
+					$sqlLookupWhere = (strlen($strLookupWhere) ? "(" . $strLookupWhere . ")" : "");
+
 					$strReferer = $this->getReferer();
 
 					// if form is placed on an events detail page, automatically add restriction to event(s)
@@ -1211,11 +1313,11 @@ class FormData extends Controller
 					{
 						if (is_numeric($this->Input->get('events')))
 						{
-							$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.id=".intval($this->Input->get('events'))." ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=".intval($this->Input->get('events'))." ";
 						}
 						elseif (is_string($this->Input->get('events')))
 						{
-							$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.alias='".$this->Input->get('events')."' ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$this->Input->get('events')."' ";
 						}
 					}
 					// if linked from event reader page
@@ -1232,17 +1334,20 @@ class FormData extends Controller
 
 						if (is_numeric($strEvents))
 						{
-							$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.id=".intval($strEvents)." ";
+							//$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.id=".intval($strEvents)." ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=".intval($strEvents)." ";
 						}
 						elseif (is_string($strEvents))
 						{
 							$strEvents = str_replace('.html', '', $strEvents);
-							$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.alias='".$strEvents."' ";
+							// $strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.alias='".$strEvents."' ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$strEvents."' ";
 						}
 
 					}
 
-					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($strLookupWhere) ? " AND (" . $strLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder : "");
+					//$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($strLookupWhere) ? " AND (" . $strLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder : "");
+					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
 
 					$objEvents = $this->Database->prepare($sqlLookup)->execute();
 
@@ -1357,12 +1462,12 @@ class FormData extends Controller
 										}
 
 									}
-								}
+								} // while endTime < intEnd
 
-							}
+							} // if recurring
 
-						}
-					}
+						} // while
+					} // if objEvents->numRows
 
 					// set options
 					$arrOptions = $arrEvents;
@@ -1422,6 +1527,18 @@ class FormData extends Controller
 				$arrOptions = $arrTempOptions;
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
+			
+			// countryselect... 
+			case 'countryselect':
+				$arrCountries = $this->getCountries();
+				$arrTempOptions = array();
+				foreach($arrCountries as $strKey => $strVal)
+				{
+					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
+				}
+				$arrOptions = $arrTempOptions;
+			break;
+			
 			default:
 				$arrOptions = deserialize($arrField['options']);
 			break;

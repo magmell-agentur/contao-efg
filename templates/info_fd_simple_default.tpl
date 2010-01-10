@@ -1,5 +1,5 @@
 
-<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<div class="<?php echo $this->class; ?> listing block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
@@ -7,8 +7,13 @@
 <div class="single_record">
 
 <?php foreach ($this->listItem as $fields): ?>
-<div class="field <?php echo $fields['class']?>"><?php echo $fields['label']; ?>:&nbsp;<?php if ($fields['type']=='file' && $fields['src']):?><?php if ($fields['display']=='image'): ?><img src="<?php echo $this->getImage($fields['src'], 160, null); ?>" alt="<?php echo urldecode(basename($fields['src'])); ?>" title="<?php echo urldecode(basename($fields['src'])); ?>" /> <?php else: ?><img src="<?php echo $fields['icon']; ?>" alt="<?php echo $fields['linkTitle']; ?>" />&nbsp;<a href="<?php echo $fields['href']; ?>"><?php echo $fields['linkTitle'] . $fields['size']; ?></a><?php endif; ?>
-<?php else: echo $fields['content'].'&nbsp;'; endif;?></div>
+<div class="field <?php echo $fields['class']?>"><?php echo $fields['label']; ?>:&nbsp;<?php if ($fields['type']=='file' && $fields['multiple']):?>
+<?php foreach ($fields['content'] as $file): ?>
+<?php if ($file['display']=='image'): ?><img src="<?php echo $this->getImage($file['src'], 160, null); ?>" alt="<?php echo urldecode(basename($file['src'])); ?>" title="<?php echo urldecode(basename($file['src'])); ?>" /> <?php else: ?><img src="<?php echo $file['icon']; ?>" alt="<?php echo $file['linkTitle']; ?>" />&nbsp;<a href="<?php echo $file['href']; ?>"><?php echo $file['linkTitle'] . $file['size']; ?></a><?php endif; ?>
+<?php endforeach; ?>
+<?php elseif ($fields['type']=='file' && $fields['src']):?><?php if ($fields['display']=='image'): ?><img src="<?php echo $this->getImage($fields['src'], 160, null); ?>" alt="<?php echo urldecode(basename($fields['src'])); ?>" title="<?php echo urldecode(basename($fields['src'])); ?>" /> <?php else: ?><img src="<?php echo $fields['icon']; ?>" alt="<?php echo $fields['linkTitle']; ?>" />&nbsp;<a href="<?php echo $fields['href']; ?>"><?php echo $fields['linkTitle'] . $fields['size']; ?></a><?php endif; ?>
+<?php else: echo $fields['content'].'&nbsp;'; endif;?>
+</div>
 <?php endforeach; ?>
 
 <?php if ($this->editAllowed): ?>

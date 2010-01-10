@@ -26,7 +26,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  */
 class ModuleFormdataListing extends Module
 {
@@ -166,11 +166,13 @@ class ModuleFormdataListing extends Module
 			$this->list_layout = 'list_default';
 		}
 
-		$this->arrOwnerFields = array('fd_member', 'fd_user');
+		$this->arrOwnerFields = array('fd_member', 'fd_user','fd_member_group', 'fd_user_group');
 
 		$this->getMembers();
 		$this->getUsers();
-
+		$this->getMemberGroups();
+		$this->getUserGroups();
+		
 		$this->import('FrontendUser', 'Member');
 		$this->import('FormData');
 
@@ -555,7 +557,8 @@ class ModuleFormdataListing extends Module
 				}
 				else
 				{
-					include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
+					//include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
+					include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 				}
 			}
 		}
@@ -981,7 +984,7 @@ class ModuleFormdataListing extends Module
 
 				if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 				{
-					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS ' . $field;
+					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				}
 			}
 		}
@@ -1084,7 +1087,14 @@ class ModuleFormdataListing extends Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+
+		//$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = $this->generateFrontendUrl($objPage->row());
+		if ($strUrl == '/' || $strUrl == '//')
+		{
+			$strUrl = '';
+		}
+
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -1106,7 +1116,6 @@ class ModuleFormdataListing extends Module
 				}
 			}
 		}
-
 
 		/**
 		 * Prepare data arrays
@@ -1331,7 +1340,6 @@ class ModuleFormdataListing extends Module
 
 				$j = 0;
 
-				//foreach ($arrRows[$i] as $k=>$v)
 				foreach ($arrListFields as $intKey => $strVal)
 				{
 
@@ -1351,7 +1359,7 @@ class ModuleFormdataListing extends Module
 					$strLinkDetails = '';
 					if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 					{
-						$strLinkDetails = str_replace($strUrlSuffix, '', $strUrl) . '/'.$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
+						$strLinkDetails = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 					}
 					else
 					{
@@ -1363,7 +1371,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkEdit = str_replace($strUrlSuffix, '', $strUrl) . '/'.$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=edit' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkEdit = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=edit' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
@@ -1376,7 +1384,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkDelete = str_replace($strUrlSuffix, '', $strUrl) . '/'.$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkDelete = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
@@ -1389,7 +1397,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkExport = str_replace($strUrlSuffix, '', $strUrl) . '/'.$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkExport = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
@@ -1401,8 +1409,8 @@ class ModuleFormdataListing extends Module
 					(
 						'id' => $arrRows[$i]['id'],
 						'alias' => $arrRows[$i]['alias'],
-						'content' => ($value ? $value : '&nbsp;'),
-						'raw' => $this->String->decodeEntities($v),
+						'content' => ($value ? $value : ''),
+						'raw' => deserialize($this->String->decodeEntities($v)),
 						'class' => 'col_' . $j . (($j == 0) ? ' col_first' : '') . (($j == $intLastCol) ? ' col_last' : ''),
 						'link_details' => $strLinkDetails,
 						'link_edit' => $strLinkEdit,
@@ -1417,7 +1425,7 @@ class ModuleFormdataListing extends Module
 							'name' => $k,
 							'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
 							'content' => $value,
-							'raw' => $this->String->decodeEntities($v),
+							'raw' => deserialize($this->String->decodeEntities($v)),
 							'class' => 'field_' . $j . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
 							'record_class' => str_replace('row_', 'record_', $class),
 							'link_details' => $strLinkDetails,
@@ -1426,18 +1434,21 @@ class ModuleFormdataListing extends Module
 							'link_export' => $strLinkExport
 					);
 
+
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 					{
+
+						$value = $arrListItems[$i][$k]['raw'];
 
 						if (is_dir(TL_ROOT .'/' . $value))
 						{
 							$arrTd[$class][count($arrTd[$class])-1]['content'] = '&nbsp;';
 							$arrListItems[$i][$k]['content'] = '&nbsp;';
 						}
+						// single file
 						elseif (strlen($value) && is_file(TL_ROOT . '/' . $value) )
 						{
 							$objFile = new File($value);
-
 							if (!in_array($objFile->extension, $allowedDownload) )
 							{
 								$arrTd[$class][count($arrTd[$class])-1]['content'] = '&nbsp;';
@@ -1476,6 +1487,68 @@ class ModuleFormdataListing extends Module
 								}
 							}
 						}
+
+
+						// multiple files
+						elseif (is_array($value))
+						{
+							$arrTemp = array();
+							$keyTemp = -1;
+
+							$arrTd[$class][count($arrTd[$class])-1]['type'] = 'file';
+							$arrListItems[$i][$k]['type'] = 'file';
+
+							foreach ($value as $kF => $strFile)
+							{
+								if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
+									$objFile = new File($strFile);
+
+									if (!in_array($objFile->extension, $allowedDownload) )
+									{
+										unset($arrListItems[$i][$k]['raw'][$kF]);
+										continue;
+									}
+									else
+									{
+										$keyTemp++;
+
+										$arrTemp[$keyTemp]['src'] = $this->urlEncode($strFile);
+
+										if ( substr($objFile->mime, 0, 6) == 'image/' )
+										{
+											$arrTemp[$keyTemp]['display'] = 'image';
+										}
+										else
+										{
+											$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
+
+											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+											$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
+											$href = ampersand($href);
+
+											$arrTemp[$keyTemp]['display'] = 'download';
+											$arrTemp[$keyTemp]['size'] = $size;
+											$arrTemp[$keyTemp]['href'] = $href;
+											$arrTemp[$keyTemp]['linkTitle'] = basename($objFile->basename);
+											$arrTemp[$keyTemp]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+
+										}
+									}
+
+								}
+							}
+
+							$arrTd[$class][count($arrTd[$class])-1]['content'] = $arrTemp;
+							$arrListItems[$i][$k]['content'] = $arrTemp;
+
+							$arrTd[$class][count($arrTd[$class])-1]['multiple'] = true;
+							$arrTd[$class][count($arrTd[$class])-1]['number_of_items'] = count($arrTemp);
+							$arrListItems[$i][$k]['multiple'] = true;
+							$arrListItems[$i][$k]['number_of_items'] = count($arrTemp);
+
+							unset($arrTemp);
+						}
+
 					}
 
 					$j++;
@@ -1490,8 +1563,6 @@ class ModuleFormdataListing extends Module
 			$this->Template->arrEditAllowed = $arrEditAllowed;
 			$this->Template->arrDeleteAllowed = $arrDeleteAllowed;
 			$this->Template->arrExportAllowed = $arrExportAllowed;
-
-
 
 			/**
 			 * Pagination
@@ -1682,6 +1753,14 @@ class ModuleFormdataListing extends Module
 						if ($v == 'fd_user')
 						{
 							$strVal = $this->arrUsers[intval($row[$v])];
+						}
+						if ($v == 'fd_member_group')
+						{
+							$strVal = $this->arrMemberGroups[intval($row[$v])];
+						}
+						if ($v == 'fd_user_group')
+						{
+							$strVal = $this->arrUserGroups[intval($row[$v])];
 						}
 					}
 
@@ -1924,7 +2003,7 @@ class ModuleFormdataListing extends Module
 			}
 			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 			{
-				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS ' . $field;
+				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				$strSep = ', ';
 			}
 		}
@@ -1937,6 +2016,7 @@ class ModuleFormdataListing extends Module
 									->limit(1)
 									->execute($this->intRecordId);
 
+									
 		if ($objRecord->numRows < 1)
 		{
 			return;
@@ -2000,27 +2080,28 @@ class ModuleFormdataListing extends Module
 			(
 				'label' => (strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $this->formatValue($k, $v),
-				'raw' => $this->String->decodeEntities($v)
+				'raw' => deserialize($this->String->decodeEntities($v))
 			);
 
 			$arrItem[$k] = array(
 				'name'=>$k,
 				'label'=>(strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $this->formatValue($k, $v),
-				'raw' => $this->String->decodeEntities($v),
+				'raw' => deserialize($this->String->decodeEntities($v)),
 				'class' => str_replace('row_', 'field_', $class)
 			);
 
 
 			if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 			{
-
 				if (is_dir(TL_ROOT .'/' . $arrFields[$class]['content']))
 				{
 					$arrFields[$class]['content'] = '&nbsp;';
 					$arrItem[$k]['content'] = '&nbsp;';
 				}
-				elseif (strlen($arrFields[$class]['content']) && is_file(TL_ROOT . '/' . $arrFields[$class]['content']) )
+				// single file
+				//elseif (strlen($arrFields[$class]['content']) && is_file(TL_ROOT . '/' . $arrFields[$class]['content']) )
+				elseif (strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
 				{
 					$objFile = new File($arrFields[$class]['content']);
 
@@ -2062,6 +2143,68 @@ class ModuleFormdataListing extends Module
 						}
 					}
 				}
+
+				// multiple files
+				elseif (is_array($arrFields[$class]['raw']))
+				{
+					$arrTemp = array();
+					$keyTemp = -1;
+
+					$arrFields[$class]['type'] = 'file';
+					$arrItem[$k]['type'] = 'file';
+
+					foreach ($arrFields[$class]['raw'] as $kF => $strFile)
+					{
+						if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
+							$objFile = new File($strFile);
+
+							if (!in_array($objFile->extension, $allowedDownload) )
+							{
+								unset($arrFields[$class]['raw'][$kF]);
+								continue;
+							}
+							else
+							{
+								$keyTemp++;
+
+								$arrTemp[$keyTemp]['src'] = $this->urlEncode($strFile);
+
+								if ( substr($objFile->mime, 0, 6) == 'image/' )
+								{
+									$arrTemp[$keyTemp]['display'] = 'image';
+								}
+								else
+								{
+									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
+
+									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
+									$href = ampersand($href);
+
+									$arrTemp[$keyTemp]['display'] = 'download';
+									$arrTemp[$keyTemp]['size'] = $size;
+									$arrTemp[$keyTemp]['href'] = $href;
+									$arrTemp[$keyTemp]['linkTitle'] = basename($objFile->basename);
+									$arrTemp[$keyTemp]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+
+								}
+							}
+
+						}
+					}
+
+					$arrFields[$class]['content'] = $arrTemp;
+					$arrItem[$k]['content'] = $arrTemp;
+
+					$arrFields[$class]['multiple'] = true;
+					$arrFields[$class]['number_of_items'] = count($arrTemp);
+					$arrItem[$k]['multiple'] = true;
+					$arrItem[$k]['number_of_items'] = count($arrTemp);
+
+					unset($arrTemp);
+				}
+
+
 			}
 
 		}
@@ -2190,7 +2333,7 @@ class ModuleFormdataListing extends Module
 			}
 			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 			{
-				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS ' . $field;
+				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field .'`';
 				$strSep = ', ';
 			}
 		}
@@ -2477,6 +2620,14 @@ class ModuleFormdataListing extends Module
 						{
 							$strVal = $this->arrUsers[intval($row[$v])];
 						}
+						if ($v == 'fd_member_group')
+						{
+							$strVal = $this->arrMemberGroups[intval($row[$v])];
+						}
+						if ($v == 'fd_user_group')
+						{
+							$strVal = $this->arrUserGroups[intval($row[$v])];
+						}
 					}
 
 					if (strlen($strVal))
@@ -2636,7 +2787,7 @@ class ModuleFormdataListing extends Module
 			$this->list_edit_layout = 'edit_fd_default';
 
 
-		// get the form and the owner of record
+		// get the form
 		$objCheckRecord = $this->Database->prepare("SELECT form FROM tl_formdata WHERE id=?")
 								->limit(1)
 								->execute($this->intRecordId);
@@ -2644,8 +2795,6 @@ class ModuleFormdataListing extends Module
 		{
 			$strForm = $objCheckRecord->form;
 		}
-
-		// get form
 		if (strlen($strForm))
 		{
 			$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE title=?")
@@ -2688,7 +2837,7 @@ class ModuleFormdataListing extends Module
 			}
 			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 			{
-				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS ' . $field;
+				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				$strSep = ', ';
 			}
 
@@ -2708,13 +2857,15 @@ class ModuleFormdataListing extends Module
 		}
 		$_SESSION['EFP']['LISTING_MOD']['id'] = $intListingId;
 
-		$arrRow = $objRecord->fetchAssoc();
+		// $arrRow = $objRecord->fetchAssoc();
+
+
 		$count = -1;
 
 
 		if ($objFormElement->numRows == 1)
 		{
-			$this->Template->editform = $this->generateEditForm($objFormElement, $arrRow);
+			$this->Template->editform = $this->generateEditForm($objFormElement, $objRecord);
 		}
 	}
 
@@ -2822,7 +2973,8 @@ class ModuleFormdataListing extends Module
 	 * Generate frontend editing form
 	 * @return string
 	 */
-	public function generateEditForm($objFormElement, $arrRecord)
+	// public function generateEditForm($objFormElement, $arrRecord)
+	public function generateEditForm($objFormElement, $objRecord)
 	{
 		if (TL_MODE == 'BE')
 		{
@@ -2832,146 +2984,10 @@ class ModuleFormdataListing extends Module
 		$strClass = $this->findContentElement($objFormElement->type);
 		$objFormElement->typePrefix = 'ce_';
 
-		$this->EditForm = new EfgForm($objFormElement);
+		$this->EditForm = new ExtendedForm($objFormElement);
+		$this->EditForm->objEditRecord = $objRecord;
 
-		$hasUpload = false;
-		$doNotSubmit = false;
-		$arrSubmitted = array();
-
-		$this->loadDataContainer('tl_form_field');
-		$formId = strlen($this->EditForm->formID) ? 'auto_'.$this->EditForm->formID : 'auto_form_'.$this->EditForm->id;
-
-		$objTemplate = new FrontendTemplate('form');
-
-		$objTemplate->fields = '';
-		$objTemplate->hidden = '';
-		$objTemplate->formSubmit = $formId;
-		$objTemplate->tableless = $this->EditForm->tableless ? true : false;
-		$objTemplate->method = ($this->EditForm->method == 'GET') ? 'get' : 'post';
-
-		// Get all form fields
-		$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting")
-									->execute($this->EditForm->id);
-
-		$row = 0;
-		$max_row = $objFields->numRows;
-
-		while ($objFields->next())
-		{
-
-			$strClass = $GLOBALS['TL_FFL'][$objFields->type];
-			// Continue if the class is not defined
-			if (!$this->classFileExists($strClass))
-			{
-				continue;
-			}
-
-			$arrData = $objFields->row();
-
-			$strFieldName = $objFields->name;
-			$varFieldValue = $arrRecord[$strFieldName];
-
-			// prepare options array
-			$arrData['options'] = $this->FormData->prepareDcaOptions($arrData);
-
-			// set rgxp 'date' for field type 'calendar'
-			if ($arrData['type'] == 'calendar')
-			{
-				$arrData['rgxp'] = 'date';
-			}
-
-			// prepare value
-			$varFieldValue = $this->FormData->prepareDbValForWidget($varFieldValue, $arrData);
-
-			$arrData['allowTags'] = $this->EditForm->allowTags;
-			// 2008-04-16, tom, added to allow HTML-Tags (Class widget checks 'allowHtml' not 'allowTags' ?)
-			$arrData['allowHtml'] =  $this->EditForm->allowTags;
-			$arrData['rowClass'] = 'row_'.$row . (($row == 0) ? ' row_first' : (($row == ($max_row - 1)) ? ' row_last' : '')) . ((($row % 2) == 0) ? ' even' : ' odd');
-			$arrData['tableless'] = $this->EditForm->tableless;
-
-			$objWidget = new $strClass($arrData);
-			$objWidget->required = $objFields->mandatory ? true : false;
-			$objWidget->value = $varFieldValue;
-
-			// Validate input
-			if ($this->Input->post('FORM_SUBMIT') == $formId)
-			{
-				$objWidget->validate();
-
-				// HOOK: validate form field callback
-				if (array_key_exists('validateFormField', $GLOBALS['TL_HOOKS']) && is_array($GLOBALS['TL_HOOKS']['validateFormField']))
-				{
-					foreach ($GLOBALS['TL_HOOKS']['validateFormField'] as $callback)
-					{
-						$this->import($callback[0]);
-						$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId);
-					}
-				}
-
-				if ($objWidget->hasErrors())
-				{
-					$doNotSubmit = true;
-				}
-
-				// Store current value in the session
-				elseif ($objWidget->submitInput())
-				{
-					$arrSubmitted[$objFields->name] = $objWidget->value;
-					$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
-				}
-
-				unset($_POST[$objFields->name]);
-			}
-
-			if ($objWidget instanceof FormFileUpload)
-			{
-				$hasUpload = true;
-			}
-
-			if ($objWidget instanceof FormHidden)
-			{
-				$objTemplate->hidden .= $objWidget->parse();
-				continue;
-			}
-
-			$objTemplate->fields .= $objWidget->parse();
-			++$row;
-		}
-
-		// Process form data
-		if ($this->Input->post('FORM_SUBMIT') == $formId && !$doNotSubmit)
-		{
-			$this->EditForm->processFormData($arrSubmitted);
-		}
-
-		$strAttributes = '';
-		$arrAttributes = deserialize($this->attributes, true);
-
-		if (strlen($arrAttributes[1]))
-		{
-			$strAttributes .= ' class="' . $arrAttributes[1] . '"';
-		}
-
-		$objTemplate->hasError = $doNotSubmit;
-		$objTemplate->attributes = $strAttributes;
-		$objTemplate->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
-		$objTemplate->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
-		$objTemplate->action = ampersand(urldecode($this->Environment->request), ENCODE_AMPERSANDS);
-
-		// Get target URL
-		if ($objTemplate->method == 'GET')
-		{
-			$objNextPage = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($objTemplate->jumpTo);
-
-			if ($objNextPage->numRows)
-			{
-				$objTemplate->action = $this->generateFrontendUrl($objNextPage->fetchAssoc());
-			}
-		}
-
-		return $objTemplate->parse();
+		return $this->EditForm->generate();
 
 	}
 
@@ -3035,6 +3051,14 @@ class ModuleFormdataListing extends Module
 			if ($k == 'fd_user')
 			{
 				$value = $this->arrUsers[$value];
+			}
+			if ($k == 'fd_member_group')
+			{
+				$value = $this->arrMemberGroups[$value];
+			}
+			if ($k == 'fd_user_group')
+			{
+				$value = $this->arrUserGroups[$value];
 			}
 		}
 
@@ -3105,8 +3129,6 @@ class ModuleFormdataListing extends Module
 		if (!$this->arrUsers)
 		{
 			$users = array();
-
-			// Get all users
 			$objUsers = $this->Database->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
 								->execute();
 			$users[] = '-';
@@ -3123,6 +3145,53 @@ class ModuleFormdataListing extends Module
 		}
 	}
 
+	/**
+	 * get all member groups (FE)
+	 */
+	protected function getMemberGroups()
+	{
+		if (!$this->arrMemberGroups)
+		{
+			$groups = array();
+			$objGroups = $this->Database->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
+								->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrMemberGroups = $groups;
+		}
+	}
+
+	/**
+	 * get all user groups (BE)
+	 */
+	protected function getUserGroups()
+	{
+		if (!$this->arrUserGroups)
+		{
+			$groups = array();
+			$objGroups = $this->Database->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
+								->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrUserGroups = $groups;
+		}
+	}	
 
 	/**
 	 * Convert encoding

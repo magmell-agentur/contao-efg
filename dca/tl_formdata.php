@@ -18,7 +18,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.11.0
+ * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,ip,date,alias;published,be_notes;fd_member,fd_user'
+		'default'                     => 'form,ip,date,alias;published,be_notes;fd_member,fd_user,fd_member_group,fd_user_group'
 	),
 
 	// Fields
@@ -157,12 +157,29 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
 		),
+		'fd_member_group' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'],
+			'exclude'                 => true,
+			'inputType'               => 'select',
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'options_callback'        => array('tl_formdata', 'getMemberGroupsSelect'),
+		),
+		'fd_user_group' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user_group'],
+			'exclude'                 => true,
+			'inputType'               => 'select',
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'options_callback'        => array('tl_formdata', 'getUserGroupsSelect'),
+		),
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['published'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class' => 'clr'),
 			// 'default'                 => '1'
 		),
 		'alias' => array
@@ -418,9 +435,6 @@ class tl_formdata extends Backend
 	}
 
 
-// TODO: checken, ob per options_callback duchgaengig funzt
-// .. dann in DC_FormData ~Zeile 2160 und 2180 umsellen
-// .. und templates/master/... anpassen
 	/**
 	 * Return all members as array for dropdown
 	 * @return array
@@ -445,6 +459,7 @@ class tl_formdata extends Backend
 		return $items;
 	}
 
+	
 	/**
 	 * Return all users as array for dropdown
 	 * @return array
@@ -469,7 +484,54 @@ class tl_formdata extends Backend
 		return $items;
 	}
 
+	/**
+	 * Return all member groups as array for dropdown
+	 * @return array
+	 */
+	public function getMemberGroupsSelect()
+	{
+		$items = array();
 
+		// Get all member groups
+		$objItems = $this->Database->prepare("SELECT id,`name` FROM tl_member_group ORDER BY `name` ASC")
+							->execute("1");
+		//$items[0] = '-';
+		if ($objItems->numRows)
+		{
+			while ($objItems->next())
+			{
+				$k = $objItems->id;
+				$v = $objItems->name;
+				$items[$k] = $v;
+			}
+		}
+		return $items;
+	}
+	
+	/**
+	 * Return all user groups as array for dropdown
+	 * @return array
+	 */
+	public function getUserGroupsSelect()
+	{
+		$items = array();
+
+		// Get all user groups
+		$objItems = $this->Database->prepare("SELECT id,`name` FROM tl_user_group ORDER BY `name` ASC")
+							->execute("1");
+		//$items[0] = '-';
+		if ($objItems->numRows)
+		{
+			while ($objItems->next())
+			{
+				$k = $objItems->id;
+				$v = $objItems->name;
+				$items[$k] = $v;
+			}
+		}
+		return $items;
+	}
+	
 }
 
 ?>

@@ -3,28 +3,44 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * This is the formdata configuration file.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    efg 
- * @license    LGPL 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
+ * @license    LGPL
  * @filesource
- * @version    1.12.0
+ * @version    1.12.1
  */
 
 
 <?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
 <?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
+
+/**
+* to fix height of style class w50 in backend
+*/
+if (TL_MODE == 'BE')
+{
+	$GLOBALS['TL_CSS'][] = 'system/modules/efg/html/w50_fix.css'; 
+}
+
+
+/**
+ * Use class ExtendedForm
+ */
+$GLOBALS['FE_MOD']['application']['form'] = 'ExtendedForm';
+$GLOBALS['TL_CTE']['includes']['form'] = 'ExtendedForm';
+
 
 
 /**
@@ -32,10 +48,10 @@
  * BACK END MODULES
  * -------------------------------------------------------------------------
  *
- * Back end modules are stored in a global array called "BE_MOD". Each module 
- * has certain properties like an icon, an optional callback function and one 
+ * Back end modules are stored in a global array called "BE_MOD". Each module
+ * has certain properties like an icon, an optional callback function and one
  * or more tables. Each module belongs to a particular group.
- * 
+ *
  */
 
 <?php if ($this->arrStoreForms && count($this->arrStoreForms) > 0): ?>
@@ -65,24 +81,24 @@ $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
  * -------------------------------------------------------------------------
  * FRONT END MODULES
  * -------------------------------------------------------------------------
- * 
+ *
  */
 
 array_insert($GLOBALS['FE_MOD']['application'], count($GLOBALS['FE_MOD']['application']), array
 (
 	'formdatalisting' => 'ModuleFormdataListing'
 ));
- 
+
 /**
  * -------------------------------------------------------------------------
  * HOOKS
  * -------------------------------------------------------------------------
  *
- * Hooking allows you to register one or more callback functions that are 
- * called on a particular event in a specific order. Thus, third party 
+ * Hooking allows you to register one or more callback functions that are
+ * called on a particular event in a specific order. Thus, third party
  * extensions can add functionality to the core system without having to
  * modify the source code.
- * 
+ *
  */
 
 $GLOBALS['TL_HOOKS']['processFormData'][] = array('Efp', 'processSubmittedData');
@@ -90,6 +106,6 @@ $GLOBALS['TL_HOOKS']['processFormData'][] = array('Efp', 'processSubmittedData')
 $GLOBALS['TL_HOOKS']['outputTemplate'][] = array('Efp', 'processConfirmationContent');
 <?php else: ?>
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('Efp', 'processConfirmationContent');
-<?php endif; ?> 
+<?php endif; ?>
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = array('FormData', 'getSearchablePages');
 ?>

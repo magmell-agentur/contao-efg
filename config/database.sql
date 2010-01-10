@@ -44,12 +44,17 @@ CREATE TABLE `tl_form` (
 CREATE TABLE `tl_form_field` (
   `efgLookupOptions` text NULL,
   `efgMultiSRC` text NULL,
+  `efgImageMultiple` char(1) NOT NULL default '',
   `efgImageUseHomeDir` char(1) NOT NULL default '',
   `efgImageSortBy` varchar(32) NOT NULL default '',
   `efgImagePerRow` smallint(5) unsigned NOT NULL default '0',
   `efgImageSize` varchar(255) NOT NULL default '',
   `efgImageFullsize` char(1) NOT NULL default '',
   `efgImageMargin` varchar(255) NOT NULL default '',
+  `efgAddBackButton` char(1) NOT NULL default '',
+  `efgBackSlabel` varchar(255) NOT NULL default '',
+  `efgBackImageSubmit` char(1) NOT NULL default '',
+  `efgBackSingleSRC` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `pid` (`pid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -88,6 +93,8 @@ CREATE TABLE `tl_formdata` (
   `tstamp` int(10) unsigned NOT NULL default '0',
   `fd_member` int(10) unsigned NOT NULL default '0',
   `fd_user` int(10) unsigned NOT NULL default '0',
+  `fd_member_group` int(10) unsigned NOT NULL default '0',
+  `fd_user_group` int(10) unsigned NOT NULL default '0',
   `form` varchar(64) NOT NULL default '',
   `ip` varchar(15) NOT NULL default '',
   `date` int(10) unsigned NOT NULL default '0',

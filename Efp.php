@@ -26,7 +26,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  */
 class Efp extends Frontend
 {
@@ -85,12 +85,12 @@ class Efp extends Frontend
 	}
 
 
-/**
- * Optional confirmation mail, optional store data in backend
- * @param array	Submitted data
- * @param array	Form configuration
- * @param array Files uploaded
- */
+	/**
+	 * Optional confirmation mail, optional store data in backend
+	 * @param array	Submitted data
+	 * @param array	Form configuration
+	 * @param array Files uploaded
+	 */
 	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false) {
 
 		// Form config
@@ -181,15 +181,26 @@ class Efp extends Frontend
 
 			$arrFormFields = $this->FormData->getFormfieldsAsArray($arrForm['id']);
 
-			$arrHookFields = array_merge($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'], $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']);
+			$arrBaseFields = array();
+			$arrDetailFields = array();
+			if (count($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields']))
+			{
+				$arrBaseFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'];
+			}
+			if (count($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']))
+			{
+				$arrDetailFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields'];
+			}
+			$arrHookFields = array_merge($arrBaseFields, $arrDetailFields);
+
 			$arrToSave = array();
 			foreach($arrSubmitted as $k => $varVal)
 			{
-				if (in_array($k, array('id')))
+				if (in_array($k, array('id')) )
 				{
 					continue;
 				}
-				elseif ( in_array($k, $arrHookFields) || in_array($k, array('FORM_SUBMIT','MAX_FILE_SIZE')) )
+				elseif ( in_array($k, $arrHookFields) || in_array($k, array_keys($arrFormFields)) || in_array($k, array('FORM_SUBMIT','MAX_FILE_SIZE')) )
 				{
 					$arrToSave[$k] = $varVal;
 				}
@@ -212,11 +223,9 @@ class Efp extends Frontend
 
 		}
 
-
 		// Formdata storage
 		if ($arrForm['storeFormdata'] && count($arrSubmitted)>0 )
 		{
-
 			$blnStoreOptionsValue = ($arrForm['efgStoreValues']=="1" ? true : false);
 
 			// if frontend editing, get old record
@@ -226,7 +235,6 @@ class Efp extends Frontend
 				$arrOldFormdata = $arrOldData['fd_base'];
 				$arrOldFormdataDetails = $arrOldData['fd_details'];
 			}
-
 
 			// Prepare record tl_formdata
 			if ($arrFormFields['name'])
@@ -493,13 +501,29 @@ class Efp extends Frontend
 						{
 							if ( $strType == 'efgImageSelect' )
 							{
-								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!strlen($strVal) &&  $blnSkipEmpty)
+								$strVal = '';
+								$varVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varTxt = array();
+								$varHtml = array();
+								if (is_string($varVal)) $varVal = array($varVal);
+								if (count($varVal))
+								{
+									foreach ($varVal as $strVal)
+									{
+										if (strlen($strVal))
+										{
+											$varTxt[] = $this->Environment->base . $strVal;
+											$varHtml[] = '<img src="' . $strVal . '" />';
+										}
+									}
+								}
+								if (!count($varTxt) &&  $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
-								$messageText = str_replace($tag, $strLabel . $this->Environment->base . $strVal, $messageText);
-			 					$messageHtml = str_replace($tag, ((strlen($strVal)) ? $strLabel .'<img src="' . $strVal . '">' : ''), $messageHtml);
+
+								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
+			 					$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType=='upload')
 							{
@@ -562,7 +586,7 @@ class Efp extends Frontend
 
  					break;
 				}
-			}
+			} // foreach tags
 
 			// Replace standard insert tags
 			if (strlen($messageText))
@@ -650,9 +674,7 @@ class Efp extends Frontend
             		$confEmail->sendTo($recipient);
 				}
 			}
-
 		} // End confirmation mail
-
 
 
 		// Information (formatted) Mail
@@ -743,13 +765,29 @@ class Efp extends Frontend
 						{
 							if ( $strType == 'efgImageSelect' )
 							{
-								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!strlen($strVal) && $blnSkipEmpty)
+								$strVal = '';
+								$varVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varTxt = array();
+								$varHtml = array();
+								if (is_string($varVal)) $varVal = array($varVal);
+								if (count($varVal))
+								{
+									foreach ($varVal as $strVal)
+									{
+										if (strlen($strVal))
+										{
+											$varTxt[] = $this->Environment->base . $strVal;
+											$varHtml[] = '<img src="' . $strVal . '" />';
+										}
+									}
+								}
+								if (!count($varTxt) &&  $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
-								$messageText = str_replace($tag, $strLabel . $this->Environment->base . $strVal, $messageText);
-			 					$messageHtml = str_replace($tag, ((strlen($strVal)) ? $strLabel . '<img src="' . $strVal . '">' : ''), $messageHtml);
+
+								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
+			 					$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType=='upload')
 							{
@@ -931,6 +969,14 @@ class Efp extends Frontend
 
  		if ( $arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']))
 		{
+			$blnSkipEmpty = false;
+
+			$objSkip = $this->Database->prepare("SELECT confirmationMailSkipEmpty FROM tl_form WHERE id=?")->execute($arrSubmitted['_formId_']);
+			if ($objSkip->confirmationMailSkipEmpty == 1)
+			{
+				$blnSkipEmpty = true;
+			}
+
 			$this->import('FormData');
 			$arrFormFields = $this->FormData->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
 
@@ -939,6 +985,7 @@ class Efp extends Frontend
 			preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
+	 		// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
 	 			$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
@@ -959,14 +1006,30 @@ class Efp extends Frontend
  						$arrField = $arrFormFields[$strKey];
  						$strType = $arrField['type'];
 
+						$strLabel = '';
+						$strVal = '';
+						if ($arrTagParams && strlen($arrTagParams['label']))
+						{
+							$strLabel = $arrTagParams['label'];
+						}
+
 						$strVal = $arrSubmitted[$strKey];
+						if (is_array($strVal))
+						{
+							$strVal = implode(', ', $strVal);
+						}
 
 						if (strlen($strVal))
 						{
 							$strVal = nl2br($strVal);
 						}
 
-						$strContent = str_replace($tag, $strVal, $strContent);
+						if (!strlen($strVal) && $blnSkipEmpty)
+						{
+							$strLabel = '';
+						}
+
+						$strContent = str_replace($tag, $strLabel . $strVal, $strContent);
 					break;
 				}
 			}

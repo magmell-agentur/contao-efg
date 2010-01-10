@@ -27,7 +27,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  */
 class EfgFormGallery extends ContentElement
 {
@@ -50,8 +50,8 @@ class EfgFormGallery extends ContentElement
 
 		$this->widget = $widget;
 		$this->import('Input');
-
 		$this->multiSRC = $widget->efgMultiSRC; //  $arrConfig['efgMultiSRC'];
+		$this->efgImageMultiple = $widget->efgImageMultiple;
 		$this->efgImageUseHomeDir = $widget->efgImageUseHomeDir;
 		$this->size = $widget->efgImageSize; // $arrConfig['efgImageSize'];
 		$this->fullsize = $widget->efgImageFullsize; // $arrConfig['efgImageFullsize'];
@@ -68,6 +68,14 @@ class EfgFormGallery extends ContentElement
 	{
 		switch ($strKey)
 		{
+
+			case 'efgImageMultiple':
+				$this->efgImageMultiple = strlen($varValue) ? true : false;
+				break;
+			case 'efgImageUseHomeDir':
+				$this->efgImageUseHomeDir = strlen($varValue) ? true : false;
+				break;
+
 			case 'multiSRC':
 				$this->multiSRC = $varValue;
 				break;
@@ -262,6 +270,8 @@ class EfgFormGallery extends ContentElement
 		$this->Template->lightboxId = 'lb' . $this->id;
 		$this->Template->fullsize = (TL_MODE == 'FE') ? true : false;
 
+		$this->Template->multiple = ($this->efgImageMultiple) ? true : false;
+
 		$rowcount = 0;
 		$colwidth = floor(100/$this->perRow);
 
@@ -323,6 +333,16 @@ class EfgFormGallery extends ContentElement
 					$imgSize = ' ' . $imgSize[3];
 				}
 
+				$blnChecked = false;
+				if ($this->efgImageMultiple)
+				{
+					$blnChecked = (is_array($this->widget->value) && in_array($images[($i+$j)]['src'], $this->widget->value));
+				}
+				else
+				{
+					$blnChecked = ($this->widget->value == $images[($i+$j)]['src']);
+				}
+
 				$body['row_' . $rowcount . $class_tr . $class_eo][$j] = array
 				(
 					'hasImage' => true,
@@ -340,7 +360,8 @@ class EfgFormGallery extends ContentElement
 					'optId' => 'opt_' . $this->widget->id . '_' . ($i+$j),
 					'optName' => $this->widget->name,
 					'srcFile' => $images[($i+$j)]['src'],
-					'checked' => ($this->widget->value == $images[($i+$j)]['src']) ? 'checked="checked"' : ''
+					//'checked' => ($this->widget->value == $images[($i+$j)]['src']) ? 'checked="checked"' : ''
+					'checked' => ($blnChecked) ? 'checked="checked"' : ''
 				);
 			}
 

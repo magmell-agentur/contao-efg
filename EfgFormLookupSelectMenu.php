@@ -65,6 +65,7 @@ class EfgFormLookupSelectMenu extends Widget
 					$this->arrAttributes['size'] = $varValue;
 				}
 				break;
+				
 			case 'efgLookupOptions':
 				$this->import('Database');
 				$this->import('String');
@@ -74,6 +75,7 @@ class EfgFormLookupSelectMenu extends Widget
 				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
+				
 			case 'multiple':
 				if (strlen($varValue))
 				{
@@ -101,6 +103,7 @@ class EfgFormLookupSelectMenu extends Widget
 	 */
 	public function generate()
 	{
+		
 		$strOptions = '';
 		$strClass = 'select';
 		$strReferer = $this->getReferer();

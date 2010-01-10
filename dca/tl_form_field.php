@@ -17,7 +17,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.11.0
+ * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
@@ -39,16 +39,27 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgMultiSRC'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC'],
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'mandatory'=>true)
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'mandatory'=>true, 'extensions' => 'gif,jpg,png')
 );
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['mandatory']['eval']['tl_class'] = 'w50 cbx';
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMultiple'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageMultiple'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class' => 'w50 cbx')
+);
+
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageUseHomeDir'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir'],
 	'exclude'                 => true,
-	'inputType'               => 'checkbox'
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class' => 'w50 m12 cbx')
 );
-
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
 (
@@ -56,7 +67,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'meta'),
-	'reference'               => &$GLOBALS['TL_LANG']['tl_form_field']
+	'reference'               => &$GLOBALS['TL_LANG']['tl_form_field'],
+	'eval'                    => array('tl_class' => 'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSize'] = array
@@ -64,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSize'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageSize'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('multiple'=>true, 'size'=>2, 'rgxp'=>'digit')
+	'eval'                    => array('multiple'=>true, 'size'=>2, 'rgxp'=>'digit', 'tl_class' => 'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImagePerRow'] = array
@@ -73,7 +85,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImagePerRow'] = array
 	'default'                 => 4,
 	'exclude'                 => true,
 	'inputType'               => 'select',
-	'options'                 => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+	'options'                 => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+	'eval'                    => array('tl_class' => 'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMargin'] = array
@@ -82,14 +95,48 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMargin'] = array
 	'exclude'                 => true,
 	'inputType'               => 'trbl',
 	'options'                 => array('px', '%', 'em', 'pt', 'pc', 'in', 'cm', 'mm'),
-	'eval'                    => array('includeBlankOption'=>true)
+	'eval'                    => array('includeBlankOption'=>true, 'tl_class' => 'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageFullsize'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageFullsize'],
 	'exclude'                 => true,
-	'inputType'               => 'checkbox'
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class' => 'w50 m12 cbx')
+);
+
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgAddBackButton'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('submitOnChange'=>true)
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'],
+	'exclude'                 => true,
+	'inputType'               => 'text',
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('submitOnChange'=>true)
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackSingleSRC'],
+	'exclude'                 => true,
+	'inputType'               => 'fileTree',
+	'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true,'extensions' => 'gif,jpg,png', 'mandatory'=>true, 'tl_class'=>'clr')
 );
 
 
@@ -97,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageFullsize'] = array
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 {
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
-		array('efgLookupSelect' => 'type,name;label,mandatory;efgLookupOptions;multiple;accesskey,class;addSubmit')
+		array('efgLookupSelect' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory,multiple;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
 }
 // add field type efgLookupSelect to available form field 'type'
@@ -112,7 +159,7 @@ if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 {
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
-		array('efgLookupCheckbox' => 'type,name;label,mandatory;efgLookupOptions;accesskey,class;addSubmit')
+		array('efgLookupCheckbox' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
 }
 // add field type efgLookupCheckbox to available form field 'type'
@@ -127,7 +174,7 @@ if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 {
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
-		array('efgLookupRadio' => 'type,name;label,mandatory;efgLookupOptions;accesskey,class;addSubmit')
+		array('efgLookupRadio' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
 }
 // add field type efgLookupRadio to available form field 'type'
@@ -142,7 +189,7 @@ if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 {
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
-		array('efgImageSelect' => 'name,type;label,mandatory;efgMultiSRC,efgImageUseHomeDir;efgImageSortBy,efgImageSize,efgImageFullsize,efgImagePerRow,efgImageMargin;accesskey,class;addSubmit')
+		array('efgImageSelect' => '{type_legend},type,name,label;{options_legend},efgMultiSRC,efgImageUseHomeDir,efgImageFullsize,efgImageSize,efgImageMargin,efgImagePerRow,efgImageSortBy;{fconfig_legend},mandatory,efgImageMultiple;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
 }
 
@@ -154,17 +201,41 @@ if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
 	);
 }
 
+// add palette for field type efgFormPaginator
+if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
+{
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
+		array('efgFormPaginator' => '{type_legend},type,slabel;{image_legend:hide},imageSubmit;{backbutton_legend},efgAddBackButton;{expert_legend:hide},class,accesskey')
+	);
+	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgAddBackButton';
+	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgBackImageSubmit';
+	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgAddBackButton'] = 'efgBackSlabel,efgBackImageSubmit';
+	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgBackImageSubmit'] = 'efgBackSingleSRC';
+}
+
+// add field type efgFormPaginator to available form field 'type'
+if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
+{
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('submit', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
+		'efgFormPaginator'
+	);
+}
+
+
 // add backend form fields
 $GLOBALS['BE_FFL']['efgLookupOptionWizard'] = 'EfgLookupOptionWizard';
 $GLOBALS['BE_FFL']['efgLookupSelect'] = 'EfgFormLookupSelectMenu';
 $GLOBALS['BE_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['BE_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
-$GLOBALS['BE_FFL']['efgImageSelectWizard'] = 'EfgImageSelectWizard';
+//$GLOBALS['BE_FFL']['efgImageSelectWizard'] = 'EfgImageSelectWizard';
+$GLOBALS['BE_FFL']['efgFormPaginator'] = 'EfgFormPaginator';
+
 
 // add front end form fields
 $GLOBALS['TL_FFL']['efgLookupSelect'] = 'EfgFormLookupSelectMenu';
 $GLOBALS['TL_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['TL_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
 $GLOBALS['TL_FFL']['efgImageSelect'] = 'EfgFormImageSelect';
+$GLOBALS['TL_FFL']['efgFormPaginator'] = 'EfgFormPaginator';
 
 ?>
