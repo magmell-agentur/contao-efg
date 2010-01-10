@@ -27,7 +27,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.11.0
+ * @version    1.12.0
  */
 class EfgFormGallery extends ContentElement
 {

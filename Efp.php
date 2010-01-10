@@ -12,11 +12,8 @@
  * visit the project website http://www.typolight.org.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th.kuhn@addcom.de>
- * @package    efg
- * @version    1.6
- * @license    LGPL
+ * @copyright  Leo Feyer 2007
+ * @author     Leo Feyer
  * @filesource
  */
 
@@ -28,8 +25,8 @@
  *
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
- * @package    Controller
- * @version    1.11.0
+ * @package    efg
+ * @version    1.12.0
  */
 class Efp extends Frontend
 {
@@ -175,7 +172,7 @@ class Efp extends Frontend
 		// Types of form fields with storable data
 		$arrFFstorable = $this->FormData->arrFFstorable;
 
-		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail']) && count($arrSubmitted)>0 )
+		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0 )
 		{
 			$timeNow = time();
 
@@ -183,24 +180,8 @@ class Efp extends Frontend
 			$this->loadDataContainer('tl_formdata_details');
 
 			$arrFormFields = $this->FormData->getFormfieldsAsArray($arrForm['id']);
-		}
-
-		// Formdata storage
-		if ($arrForm['storeFormdata'] && count($arrSubmitted)>0 )
-		{
-
-			$blnStoreOptionsValue = ( $arrForm['efgStoreValues']=="1" ? true : false);
-
-			// if frontend editing, get old record
-			if ($intOldId > 0)
-			{
-				$arrOldData = $this->FormData->getFormdataAsArray($intOldId);
-				$arrOldFormdata = $arrOldData['fd_base'];
-				$arrOldFormdataDetails = $arrOldData['fd_details'];
-			}
 
 			$arrHookFields = array_merge($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'], $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']);
-
 			$arrToSave = array();
 			foreach($arrSubmitted as $k => $varVal)
 			{
@@ -228,6 +209,24 @@ class Efp extends Frontend
 					}
 				}
 			}
+
+		}
+
+
+		// Formdata storage
+		if ($arrForm['storeFormdata'] && count($arrSubmitted)>0 )
+		{
+
+			$blnStoreOptionsValue = ($arrForm['efgStoreValues']=="1" ? true : false);
+
+			// if frontend editing, get old record
+			if ($intOldId > 0)
+			{
+				$arrOldData = $this->FormData->getFormdataAsArray($intOldId);
+				$arrOldFormdata = $arrOldData['fd_base'];
+				$arrOldFormdataDetails = $arrOldData['fd_details'];
+			}
+
 
 			// Prepare record tl_formdata
 			if ($arrFormFields['name'])
@@ -299,6 +298,12 @@ class Efp extends Frontend
 					if ($blnStoreOptionsValue && in_array($strType, array('checkbox', 'radio', 'select')))
 					{
 						$arrField['eval']['efgStoreValues'] = true;
+					}
+
+					// set rgxp 'date' for field type 'calendar'
+					if ($arrField['type'] == 'calendar')
+					{
+						$arrField['rgxp'] = 'date';
 					}
 
 					$strVal = $this->FormData->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
@@ -374,7 +379,7 @@ class Efp extends Frontend
 
 		} // end form data storage
 
-		// store data in session to display on thank you page
+		// store data in session to display on confirmation page
 		unset($_SESSION['EFP']['FORMDATA']);
 		foreach ($arrFormFields as $k => $arrField)
 		{
@@ -388,7 +393,6 @@ class Efp extends Frontend
 			$_SESSION['EFP']['FORMDATA'][$k] = $strVal;
 		}
 		$_SESSION['EFP']['FORMDATA']['_formId_'] = $arrForm['id'];
-
 		// end store data in session
 
 
@@ -449,9 +453,9 @@ class Efp extends Frontend
 				}
 			}
 
-			// Replace tags in messageText and messageHtml
+			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject, $tags);
+ 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
@@ -524,7 +528,9 @@ class Efp extends Frontend
 							}
 							else
 							{
+
 								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
 								if (!strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -615,6 +621,7 @@ class Efp extends Frontend
 			$fp = fopen('efg_mail_debug.txt', 'ab');
 			fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
 			fwrite($fp, "\n confirmation Mail:");
+			fwrite($fp, "\n -------------------------\n");
 			fwrite($fp, "\n sender=".$sender);
 			fwrite($fp, "\n mail to=".$recipient);
 			fwrite($fp, "\n subject=".$subject);
@@ -699,9 +706,9 @@ class Efp extends Frontend
 				}
 			}
 
-			// Replace tags in messageText and messageHtml
+			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject, $tags);
+ 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 	 		foreach ($tags[0] as $tag)
@@ -877,6 +884,7 @@ class Efp extends Frontend
 			fwrite($fp, $messageHtml);
 			fclose($fp);
 			*/
+
 
 			// Send e-mail
 			if (count($arrRecipient)>0)
