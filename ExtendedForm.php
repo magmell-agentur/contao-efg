@@ -158,7 +158,6 @@ class ExtendedForm extends Form
 			return parent::compile();
 		}
 
-
 		$this->blnAllowSkipRequired = false; // allow form submission, if ALL required fields are empty
 		$this->arrWidgetsFailedValidation = array(); // validation result of required widgets
 
@@ -184,6 +183,7 @@ class ExtendedForm extends Form
 		}
 		elseif (!strlen($_POST['FORM_SUBMIT']))
 		{
+			
 			unset($_SESSION['EFP'][$formId]['render_page']);
 			unset($_SESSION['EFP'][$formId]['completed']);
 		}
@@ -191,6 +191,7 @@ class ExtendedForm extends Form
 		// if ($this->Input->post('FORM_SUBMIT') == $formId && strlen($_POST['FORM_PAGE']))
 		if ($this->Input->post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
 		{
+			
 			$intActivePage = (int) $_POST['FORM_PAGE'];
 			$intGoto = 0;
 
@@ -252,8 +253,9 @@ class ExtendedForm extends Form
 
 		while ($objFields->next())
 		{
-			if ($this->blnMultipage || $this->blnEditform)
+			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 			{
+		
 				// skip fields outside range of active page
 				$intFieldSorting = (int) $objFields->sorting;
 				if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage-1)]['sorting'])
@@ -269,6 +271,7 @@ class ExtendedForm extends Form
 				{
 					continue;
 				}
+				
 			}
 
 
@@ -529,7 +532,7 @@ class ExtendedForm extends Form
 		// Process form data
 		if ($this->Input->post('FORM_SUBMIT') == $formId && !$doNotSubmit)
 		{
-			if (!$this->blnMultipage && !$this->blnEditform)
+			if ($this->intTotalPages == 1 || (!$this->blnMultipage && !$this->blnEditform))
 			{
 				$this->processFormData($arrSubmitted);
 			}
