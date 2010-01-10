@@ -27,9 +27,9 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.11.0
+ * @version    1.12.0
  */
-class EfgForm extends Hybrid
+class EfgForm extends Form
 {
 
 	/**
@@ -64,7 +64,6 @@ class EfgForm extends Hybrid
 	 */
 	public function generate()
 	{
-
 		$str = parent::generate();
 
 		if (TL_MODE == 'BE')
@@ -90,7 +89,6 @@ class EfgForm extends Hybrid
 	 */
 	public function processFormData($arrSubmitted)
 	{
-
 		// Send form data via e-mail
 		if ($this->sendViaEmail)
 		{
@@ -111,7 +109,7 @@ class EfgForm extends Hybrid
 				$v = deserialize($v);
 
 				// Skip empty fields
-				if (!is_array($v) && !strlen($v) && $this->skipEmpty)
+				if ($this->skipEmpty && !is_array($v) && !strlen($v))
 				{
 					continue;
 				}
@@ -174,7 +172,7 @@ class EfgForm extends Hybrid
 			// Fallback to default subject
 			if (!strlen($email->subject))
 			{
-				$email->subject = $this->subject;
+				$email->subject = $this->replaceInsertTags($this->subject);
 			}
 
 			// Send copy to sender
@@ -284,6 +282,7 @@ class EfgForm extends Hybrid
 	/**
 	 * Get the maximum file size that is allowed for file uploads
 	 */
+/*
 	private function getMaxFileSize()
 	{
 		$this->Template->maxFileSize = $GLOBALS['TL_CONFIG']['maxFileSize'];
@@ -296,12 +295,13 @@ class EfgForm extends Hybrid
 			$this->Template->maxFileSize = $objMaxSize->maxlength;
 		}
 	}
-
+*/
 
 	/**
 	 * Initialize the form in the current session
 	 * @param string
 	 */
+/*
 	private function initializeSession($formId)
 	{
 		if ($this->Input->post('FORM_SUBMIT') != $formId)
@@ -332,6 +332,7 @@ class EfgForm extends Hybrid
 			}
 		}
 	}
+*/
 }
 
 ?>

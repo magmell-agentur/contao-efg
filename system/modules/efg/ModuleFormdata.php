@@ -3,29 +3,29 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn 
- * @package    efg 
- * @license    LGPL 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn
+ * @package    efg
+ * @license    LGPL
  * @filesource
  */
 
 /**
- * Class ModuleFormdata 
+ * Class ModuleFormdata
  *
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    Controller
- * @version    1.11.0
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
+ * @version    1.12.0
  */
 class ModuleFormdata extends Backend
 {
@@ -42,7 +42,7 @@ class ModuleFormdata extends Backend
 	 */
 	protected $arrData = array();
 
-	protected $arrStoreForms = null; 
+	protected $arrStoreForms = null;
 
 	protected $arrFormsDcaKey = null;
 
@@ -54,15 +54,15 @@ class ModuleFormdata extends Backend
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Types of form fields with storable data
-		$this->arrFFstorable = array('hidden','text','password','textarea','select','efgLookupSelect','conditionalselect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');		
-		
+		$this->arrFFstorable = array('hidden','text','password','textarea','select','efgLookupSelect','calendar','conditionalselect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');
+
 	}
 
 	public function generate()
 	{
-		
+
 		$this->getStoreForms();
 
 		if ($this->Input->get('do') && $this->Input->get('do') != "feedback")
@@ -71,22 +71,22 @@ class ModuleFormdata extends Backend
 			{
 				$session = $this->Session->getData();
 				$session['filter']['tl_feedback']['form'] = $this->arrStoreForms[$this->Input->get('do')]['title'];
-							
+
 				$this->Session->setData($session);
-			}				
+			}
 		}
 
-		if ( $this->Input->get('act') == "" ) 
+		if ( $this->Input->get('act') == "" )
 		{
 			return $this->objDc->showAll();
-		} 
-		else 
+		}
+		else
 		{
 			$act = $this->Input->get('act');
 			return $this->objDc->$act();
 		}
 	}
-		
+
 
 	/*
 	 * Get all Forms marked to store data in database
@@ -95,22 +95,22 @@ class ModuleFormdata extends Backend
 	{
 		if ( !$this->arrStoreForms)
 		{
-			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.storeFormdata=?")
+			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.storeFormdata=? ORDER BY f.title")
 										->execute("1");
 			while ($objForms->next())
 			{
 				if (strlen($objForms->formID)) {
 					$varKey = $objForms->formID;
 				}
-				else 
+				else
 				{
 					$varKey = str_replace('-', '_', standardize($objForms->title));
 				}
 				$this->arrStoreForms[$varKey] = $objForms->row();
-				$this->arrFormsDcaKey[$varKey] = $objForms->title;  
-			}		
+				$this->arrFormsDcaKey[$varKey] = $objForms->title;
+			}
 		}
-		
+
 		return $this->arrStoreForms;
 	}
 
@@ -143,27 +143,27 @@ class ModuleFormdata extends Backend
 
 		$strDcaKey = array_search($row['form'], $this->arrFormsDcaKey);
 		if ($strDcaKey)
-		{			
+		{
 			$return .= '<a href="'.$this->addToUrl($href.'&amp;do=fd_'.$strDcaKey.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 		}
-	
+
 		return $return;
 	}
-	
+
 
 	/**
-	 * Update efg/config.php, dca-files 
+	 * Update efg/config.php, dca-files
 	 */
 	private function updateConfig()
 	{
-		
+
 		$this->import('String');
 
 		$arrStoreForms = $this->getStoreForms();
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('master/efg_config');
-		$tplConfig->arrForm = $this->objForm; 
+		$tplConfig->arrForm = $this->objForm;
 		$tplConfig->arrStoreForms = $arrStoreForms;
 
 		$objConfig = new File('system/modules/efg/config/config.php');
@@ -179,12 +179,12 @@ class ModuleFormdata extends Backend
 		$arrModLangs = scan(TL_ROOT . '/system/modules/efg/languages');
 
 		$arrLanguages = $this->getLanguages();
-		
+
 		foreach ($arrModLangs as $strModLang)
 		{
 			if (array_key_exists($strModLang, $arrLanguages))
 			{
-				//$this->loadLanguageFile('tl_efg_modules.php');				
+				//$this->loadLanguageFile('tl_efg_modules.php');
 				$strFile = sprintf('%s/system/modules/%s/languages/%s/%s.php', TL_ROOT, 'efg', $strModLang, 'tl_efg_modules');
 				if (file_exists($strFile))
 				{
@@ -194,9 +194,9 @@ class ModuleFormdata extends Backend
 				$tplMod = 'tplMod_' . $strModLang;
 				//$tplMod = $this->newTemplate('master/efg_'.$strModLang.'_modules');
 				$tplMod = $this->newTemplate('master/efg_modules');
-				$tplMod->arrForm = $this->objForm; 
+				$tplMod->arrForm = $this->objForm;
 				$tplMod->arrStoreForms = $arrStoreForms;
-	
+
 				$objMod = 'objMod_' . $strModLang;
 				$objMod = new File('system/modules/efg/languages/'.$strModLang.'/modules.php');
 				$objMod->write($tplMod->parse());
@@ -230,7 +230,7 @@ class ModuleFormdata extends Backend
 					}
 				}
 			}
-			
+
 			$strFormKey = ( isset($this->objForm['formID']) && strlen($this->objForm['formID']) ) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
 			$tplDca = 'tplDca_' . $strFormKey;
 			$tplDca = $this->newTemplate('master/efg_dca_formdata');
@@ -244,7 +244,7 @@ class ModuleFormdata extends Backend
 			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']) )
 			{
 				$blnBackendMail = true;
-			}	
+			}
 			$tplDca->blnBackendMail = $blnBackendMail;
 
 			$objDca = 'objDca_' . $strFormKey;
@@ -252,7 +252,7 @@ class ModuleFormdata extends Backend
 			$objDca->write($tplDca->parse());
 			$objDca->close();
 		}
-		
+
 		// overall dca/fd_feedback.php
 		// Get all form fields of all storing forms
 		if (count($arrStoreForms)>0)
@@ -292,7 +292,7 @@ class ModuleFormdata extends Backend
 			$objDca = new File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
-		
+
 		}
 	}
 
@@ -311,8 +311,8 @@ class ModuleFormdata extends Backend
 
 		return $objTemplate;
 	}
-	
-	
+
+
 }
 
 ?>

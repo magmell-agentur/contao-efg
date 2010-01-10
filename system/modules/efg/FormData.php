@@ -24,8 +24,8 @@
  *
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
- * @package    Controller
- * @version    1.11.0
+ * @package    efg
+ * @version    1.12.0
  */
 class FormData extends Controller
 {
@@ -54,7 +54,7 @@ class FormData extends Controller
 		$this->import('Database');
 		$this->import('String');
 
-		$this->arrFFstorable = array('hidden','text','password','textarea','select', 'conditionalselect','efgLookupSelect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');
+		$this->arrFFstorable = array('hidden','text','calendar','password','textarea','select', 'conditionalselect','efgLookupSelect','radio','efgLookupRadio','checkbox','efgLookupCheckbox','upload','efgImageSelect');
 
 		$this->getStoreForms();
 
@@ -578,6 +578,7 @@ class FormData extends Controller
 				case 'password':
 				case 'hidden':
 				case 'text':
+				case 'calendar':
 				case 'textarea':
 				default:
 					$strVal = $varSubmitted;
@@ -1074,6 +1075,7 @@ class FormData extends Controller
 				case 'password':
 				case 'hidden':
 				case 'text':
+				case 'calendar':
 				case 'textarea':
 				default:
 					if ($arrField['rgxp'] && in_array($arrField['rgxp'], array('date', 'datim', 'time')))

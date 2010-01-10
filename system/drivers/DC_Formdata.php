@@ -484,7 +484,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 <div class="tl_panel_bottom">
 
 <div class="tl_submit_panel tl_subpanel">
-<input type="image" name="btfilter" id="btfilter" src="system/themes/' . $this->getTheme() . '/images/ok.gif" class="tl_img_submit" alt="apply changes" value="apply changes" />
+<input type="image" name="btfilter" id="btfilter" src="system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" alt="apply changes" value="apply changes" />
 </div>' . $strLimit . '
 
 <div class="clear"></div>
@@ -5044,7 +5044,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			{
 				$submit = '
 <div class="tl_submit_panel tl_subpanel">
-<input type="image" name="filter" id="filter" src="system/themes/' . $this->getTheme() . '/images/ok.gif" class="tl_img_submit" alt="apply changes" value="apply changes" />
+<input type="image" name="filter" id="filter" src="system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" alt="apply changes" value="apply changes" />
 </div>';
 			}
 

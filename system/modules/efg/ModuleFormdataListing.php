@@ -26,7 +26,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.11.0
+ * @version    1.12.0
  */
 class ModuleFormdataListing extends Module
 {
@@ -111,6 +111,8 @@ class ModuleFormdataListing extends Module
 
 	protected $intRecordId = null;
 	protected $strDetailKey = 'details';
+
+	protected $arrDetailKeys = array();
 
 	// convert UTF8 to cp1251 on CSV-/XLS-Export
 	protected $blnExportUTF8Decode = true;
@@ -576,12 +578,9 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->editable = true;
 				}
-				if ( ($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') )
+				elseif ( ($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id)>0 )
 				{
-					if (intval($this->Member->id)>0)
-					{
-						$this->Template->editable = true;
-					}
+					$this->Template->editable = true;
 				}
 			}
 
@@ -592,12 +591,9 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->deletable = true;
 				}
-				if ( ($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') )
+				elseif ( ($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id)>0 )
 				{
-					if (intval($this->Member->id)>0)
-					{
-						$this->Template->deletable = true;
-					}
+					$this->Template->deletable = true;
 				}
 			}
 
@@ -608,12 +604,9 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->exportable = true;
 				}
-				if ( ($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') )
+				elseif ( ($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id)>0 )
 				{
-					if (intval($this->Member->id)>0)
-					{
-						$this->Template->exportable = true;
-					}
+					$this->Template->exportable = true;
 				}
 			}
 
@@ -957,7 +950,6 @@ class ModuleFormdataListing extends Module
 		/**
 		 * Get the selected records
 		 */
-
 		$arrListFields = trimsplit(',', $this->list_fields);
 
 		$intLastCol = -1;
@@ -1010,13 +1002,16 @@ class ModuleFormdataListing extends Module
 		// Order by
 		if ( strlen($this->Input->get('order_by')) )
 		{
-			if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']=='digit')
+			if (in_array($this->Input->get('order_by'), $arrListFields) && (in_array($this->Input->get('order_by'), $this->arrBaseFields) || in_array($this->Input->get('order_by'), $this->arrDetailFields)))
 			{
-				$strQuery .= " ORDER BY CAST(" . $this->Input->get('order_by') . ' AS SIGNED) ' . $this->Input->get('sort');
-			}
-			else
-			{
-				$strQuery .= " ORDER BY " . $this->Input->get('order_by') . ' ' . $this->Input->get('sort');
+				if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']=='digit')
+				{
+					$strQuery .= " ORDER BY CAST(" . $this->Input->get('order_by') . ' AS SIGNED) ' . $this->Input->get('sort');
+				}
+				else
+				{
+					$strQuery .= " ORDER BY " . $this->Input->get('order_by') . ' ' . $this->Input->get('sort');
+				}
 			}
 		}
 		elseif ($this->list_sort)
@@ -1118,7 +1113,7 @@ class ModuleFormdataListing extends Module
 		 */
 		$arrTh = array();
 		$arrTd = array();
-		//$arrFields = trimsplit(',', $this->list_fields);
+
 		$arrFields = $arrListFields;
 
 		$intRowCounter = -1;
@@ -1126,7 +1121,6 @@ class ModuleFormdataListing extends Module
 
 		$intRowCounter++;
 
-		//$ignoreFields = array('id','alias','tstamp','sorting','ip','published');
 		$ignoreFields = array('id','pid','sorting');
 
 		// THEAD
@@ -1268,7 +1262,6 @@ class ModuleFormdataListing extends Module
 
 			// also store as list of items
 			$arrListItems = array();
-
 			$arrEditAllowed = array();
 			$arrDeleteAllowed = array();
 			$arrExportAllowed = array();
@@ -1348,7 +1341,6 @@ class ModuleFormdataListing extends Module
 					$arrItem = array();
 
 					// do not display some special fields
-					// if ( !in_array($k, $arrFields) || in_array($k, $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'password' )
 					if ( in_array($k, $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'password' )
 					{
 						continue;
@@ -2097,7 +2089,7 @@ class ModuleFormdataListing extends Module
 	{
 
 		/**
-		 * Prepare URL
+		 * Prepare URL
 		 */
 		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
 		$strUrlParams = '';
@@ -2882,8 +2874,15 @@ class ModuleFormdataListing extends Module
 			// prepare options array
 			$arrData['options'] = $this->FormData->prepareDcaOptions($arrData);
 
+			// set rgxp 'date' for field type 'calendar'
+			if ($arrData['type'] == 'calendar')
+			{
+				$arrData['rgxp'] = 'date';
+			}
+
 			// prepare value
 			$varFieldValue = $this->FormData->prepareDbValForWidget($varFieldValue, $arrData);
+
 			$arrData['allowTags'] = $this->EditForm->allowTags;
 			// 2008-04-16, tom, added to allow HTML-Tags (Class widget checks 'allowHtml' not 'allowTags' ?)
 			$arrData['allowHtml'] =  $this->EditForm->allowTags;
