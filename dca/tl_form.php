@@ -3,22 +3,22 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * This is the extended data container array for table tl_form.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    efg 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
  * @version    1.11.0
- * @license    LGPL 
+ * @license    LGPL
  * @filesource
  */
 
@@ -52,6 +52,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['useFormValues'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50 m12')
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['useFieldNames'] = array
@@ -60,6 +61,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['useFieldNames'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50 m12')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['efgAliasField'] = array
 (
@@ -86,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipientField'] = arra
 	'filter'                  => false,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_form', 'getEmailFormFields'),
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>64)
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipient'] = array
 (
@@ -94,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipient'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255)
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 (
@@ -103,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 	'filter'                  => false,
 	'inputType'               => 'text',
 	'load_callback'           => array('tl_extform', 'setMailSender'),
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
 (
@@ -111,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailText'] = array
 (
@@ -152,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailRecipient'] = array
 	'exclude'                 => true,
 	'search'                  => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'rgxp'=>'extnd')
+	'eval'                    => array('mandatory'=>true, 'rgxp'=>'extnd', 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSubject'] = array
 (
@@ -160,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSubject'] = array
 	'exclude'                 => true,
 	'search'                  => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'decodeEntities'=>true)
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'decodeEntities'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailText'] = array
@@ -191,21 +193,21 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSkipEmpty'] = array
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendFormattedMail';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendConfirmationMail';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'storeFormdata';
-$GLOBALS['TL_DCA']['tl_form']['palettes']['default'] =  str_replace(array('storeValues', 'sendViaEmail'), array('storeValues;storeFormdata', 'sendViaEmail;sendFormattedMail;sendConfirmationMail'), $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] );
+$GLOBALS['TL_DCA']['tl_form']['palettes']['default'] =  str_replace(array('storeValues', 'sendViaEmail'), array('storeValues;{efgStoreFormdata_legend:hide},storeFormdata', 'sendViaEmail;{efgSendFormattedMail_legend:hide},sendFormattedMail;{efgSendConfirmationMail_legend:hide},sendConfirmationMail'), $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] );
 
 // Subpalettes
-array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']), 
+array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
 	array('sendFormattedMail' => 'formattedMailRecipient,formattedMailSubject,formattedMailText,formattedMailTemplate,formattedMailSkipEmpty')
 );
-array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']), 
+array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
 	array('sendConfirmationMail' => 'confirmationMailRecipientField,confirmationMailRecipient,confirmationMailSender,confirmationMailSubject,confirmationMailText,confirmationMailTemplate,confirmationMailSkipEmpty')
 );
-array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']), 
+array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
 	array('storeFormdata' => 'efgAliasField,efgStoreValues,useFormValues,useFieldNames')
 );
 
 // PanelLayout
-$GLOBALS['TL_DCA']['tl_form']['list']['sorting']['panelLayout'] = 'filter;search,limit';
+// $GLOBALS['TL_DCA']['tl_form']['list']['sorting']['panelLayout'] = 'filter;search,limit';
 
 
 /**
@@ -239,7 +241,7 @@ class tl_ext_form extends Backend
 			$v = $objFields->label;
 			$v = strlen($v) ? $v.' ['.$k.']' : $k;
 			$fields[$k] =$v;
-		}		
+		}
 
 		return $fields;
 	}
@@ -264,11 +266,11 @@ class tl_ext_form extends Backend
 			$v = $objFields->label;
 			$v = strlen($v) ? $v.' ['.$k.']' : $k;
 			$fields[$k] =$v;
-		}		
+		}
 
 		return $fields;
 	}
-	
+
 }
 
 ?>
