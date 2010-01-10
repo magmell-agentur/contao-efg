@@ -2,10 +2,10 @@
 /**
  * TL_ROOT/system/modules/efg/languages/nl/tl_form_field.php 
  * 
- * TYPOlight extension: efg 1.10.4 stable 
+ * TYPOlight extension: efg 1.12.0 stable 
  * Dutch translation file 
  * 
- * Copyright : (c) 2008 Thomas Kuhn 
+ * Copyright : (c) 2009 Thomas Kuhn 
  * License   : GNU LGPL V3 
  * Author    : Thomas Kuhn (tom) 
  * Translator: Just Schimmelpenninck (justs) 
@@ -32,6 +32,8 @@ $GLOBALS['TL_LANG']['tl_form_field']['lookup_where']['0'] = "Voorwaarde";
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_where']['1'] = "Als u bepaalde records wilt uitsluiten, dan kunt u hier de voorwaarde opgeven (bv. <em>published='1'</em> of <em>type!='admin'</em>).";
 $GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC']['0'] = "Bronbestanden";
 $GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC']['1'] = "Kies één of meer bestanden of mappen (bestanden in een gekozen map worden automatisch allemaal meegenomen).";
+$GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir']['0'] = "Gebruik de home directory als bron";
+$GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir']['1'] = "Als een gebruiker is ingelogd, gebruik dan zijn home directory als bron i.p.v. de 'Bronbestanden' zoals hierboven bedoeld.";
 $GLOBALS['TL_LANG']['tl_form_field']['efgImageSortBy']['0'] = "Sorteer op";
 $GLOBALS['TL_LANG']['tl_form_field']['efgImageSortBy']['1'] = "Selecteer de sorteervolgorde.";
 $GLOBALS['TL_LANG']['tl_form_field']['efgImageSize']['0'] = "Afbeeldingsbreedte en -hoogte";
