@@ -3,22 +3,22 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * Language file for table tl_formdata (en).
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    efg 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
  * @version    1.11.0
- * @license    LGPL 
+ * @license    LGPL
  * @filesource
  */
 
@@ -64,5 +64,12 @@ $GLOBALS['TL_LANG']['tl_formdata']['fe_link_delete']  = array('Delete', 'Delete 
 $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export']  = array('CSV Export', 'Export record as CSV file');
 
 $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'] = 'Do you really want to delete entry?';
+
+/**
+ * legends
+ */
+$GLOBALS['TL_LANG']['tl_formdata']['fdNotes_legend'] = "Notes";
+$GLOBALS['TL_LANG']['tl_formdata']['fdOwner_legend'] = "Owner";
+$GLOBALS['TL_LANG']['tl_formdata']['fdDetails_legend'] = "Details";
 
 ?>

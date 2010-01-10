@@ -28,7 +28,7 @@ if (!defined('TL_ROOT'))
  * @copyright  Thomas Kuhn
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    Controller
- * @version    1.11.0
+ * @version    1.12.0
 */
 class EfgLookupOptionWizard extends Widget {
 
@@ -157,7 +157,7 @@ class EfgLookupOptionWizard extends Widget {
 		ksort($this->arrDbStruct);
 
 		// Make sure there is at least an empty array
-		if (!is_array($this->varValue) || !$this->varValue['lookup_field']) {
+		if (!is_array($this->varValue) || !$this->varValue['lookup_field']) {
 			$this->varValue = array (
 				array (
 					''

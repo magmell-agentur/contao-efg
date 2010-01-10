@@ -3,22 +3,22 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * This file modifies the data container array of table tl_module.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    efg 
- * @version    1.11.0
- * @license    LGPL 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
+ * @version    1.12.0
+ * @license    LGPL
  * @filesource
  */
 
@@ -26,7 +26,8 @@
 /**
  * Add palettes to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = 'name,type,headline;list_formdata,efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;list_layout,list_fields,list_where,list_sort,perPage;efg_list_searchtype,list_search;list_info_layout,list_info,efg_DetailsKey;efg_iconfolder,align,space,cssID';
+
+$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info,efg_list_searchtype,list_search;;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,align,space,cssID';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
 
@@ -40,7 +41,23 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_formdata'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_module', 'getFormdataTables'),
-	'eval'                    => array('mandatory' => true, 'maxlength' => 64, 'includeBlankOption' => true, 'submitOnChange' => true)
+	'eval'                    => array('mandatory' => true, 'maxlength' => 64, 'includeBlankOption' => true, 'submitOnChange' => true, 'tl_class'=>'w50')
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['list_where'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_where'],
+	'exclude'                 => true,
+	'inputType'               => 'text',
+	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['list_sort'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_sort'],
+	'exclude'                 => true,
+	'inputType'               => 'text',
+	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
 
 
@@ -49,8 +66,10 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_fields'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255)
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50')
 );
+
+
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_searchtype'] = array
 (
@@ -67,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_search'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_search'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255)
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
@@ -75,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_info'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255)
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_access'] = array
@@ -85,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_list_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true)
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_edit_access'] = array
@@ -95,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_edit_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_edit_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true)
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_delete_access'] = array
@@ -105,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_delete_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_delete_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true)
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_export_access'] = array
@@ -115,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_export_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_export_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true)
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_DetailsKey'] = array
@@ -124,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_DetailsKey'] = array
 	'exclude'                 => false,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('default' => 'details', 'maxlength'=>64)
+	'eval'                    => array('default' => 'details', 'maxlength'=>64, 'tl_class'=>'w50')
 );
 
 
@@ -133,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_iconfolder'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'trailingSlash'=>false)
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'trailingSlash'=>false, 'tl_class'=>'w50')
 );
 
 
@@ -158,19 +177,22 @@ class tl_ext_module extends Backend
 			$GLOBALS['TL_LANG']['tl_module']['list_fields'] = $GLOBALS['TL_LANG']['tl_module']['efg_list_fields'];
 			$GLOBALS['TL_LANG']['tl_module']['list_search'] = $GLOBALS['TL_LANG']['tl_module']['efg_list_search'];
 			$GLOBALS['TL_LANG']['tl_module']['list_info'] = $GLOBALS['TL_LANG']['tl_module']['efg_list_info'];
-			
+
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['inputType'] = 'checkboxWizard';
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['mandatory'] = false;
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['options_callback'] = array('tl_ext_module', 'optionsListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['load_callback'][] = array('tl_ext_module', 'onloadListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['inputType'] = 'checkboxWizard';
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['options_callback'] = array('tl_ext_module', 'optionsSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['load_callback'][] = array('tl_ext_module', 'onloadSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['inputType'] = 'checkboxWizard';
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['options_callback'] = array('tl_ext_module', 'optionsInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['load_callback'][] = array('tl_ext_module', 'onloadInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
@@ -183,14 +205,14 @@ class tl_ext_module extends Backend
 	 * Return all formdata tables as array
 	 * @return array
 	 */
-	
+
 	public function getFormdataTables(DC_Table $dc)
 	{
 		if (is_null($this->arrFormdataTables) || is_null($this->arrFormdataFields))
 		{
 			$this->arrFormdataTables = array();
 			$this->arrFormdataTables['fd_feedback'] = $GLOBALS['TL_LANG']['MOD']['feedback'][0];
-			
+
 			// all forms marked to store data
 			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID,ff.type,ff.name,ff.label FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND storeFormdata=? ORDER BY title")
 										->execute("1");
@@ -199,14 +221,14 @@ class tl_ext_module extends Backend
 				if (strlen($objForms->formID)) {
 					$varKey = 'fd_' . $objForms->formID;
 				}
-				else 
+				else
 				{
 					$varKey = 'fd_' . str_replace('-', '_', standardize($objForms->title));
 				}
 				$this->arrFormdataTables[$varKey] = $objForms->title;
-				$this->arrFormdataFields['fd_feedback'][$objForms->name] = $objForms->label; 
-				$this->arrFormdataFields[$varKey][$objForms->name] = $objForms->label; 
-			}		
+				$this->arrFormdataFields['fd_feedback'][$objForms->name] = $objForms->label;
+				$this->arrFormdataFields[$varKey][$objForms->name] = $objForms->label;
+			}
 		}
 
 		$this->loadLanguageFile('tl_formdata');
@@ -235,7 +257,7 @@ class tl_ext_module extends Backend
 
 	public function getFieldsOptionsArray($strField)
 	{
-		$arrReturn = array();		
+		$arrReturn = array();
 		if (count($GLOBALS['TL_DCA']['tl_formdata']['fields']))
 		{
 			$GLOBALS['TL_DCA']['tl_module']['fields'][$strField]['inputType'] = 'CheckboxWizard';
@@ -284,11 +306,11 @@ class tl_ext_module extends Backend
 		{
 			$GLOBALS['TL_DCA']['tl_module']['fields'][$strField]['eval']['multiple'] = true;
 			$varValue = explode(',', $varValue);
-			
+
 		}
 		return $varValue;
 	}
-	
+
 }
 
 ?>

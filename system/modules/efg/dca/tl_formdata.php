@@ -4,28 +4,28 @@
 /**
  * TYPOlight webCMS
  *
- * The TYPOlight webCMS is an accessible web content management system that 
- * specializes in accessibility and generates W3C-compliant HTML code. It 
- * provides a wide range of functionality to develop professional websites 
- * including a built-in search engine, form generator, file and user manager, 
- * CSS engine, multi-language support and many more. For more information and 
- * additional TYPOlight applications like the TYPOlight MVC Framework please 
+ * The TYPOlight webCMS is an accessible web content management system that
+ * specializes in accessibility and generates W3C-compliant HTML code. It
+ * provides a wide range of functionality to develop professional websites
+ * including a built-in search engine, form generator, file and user manager,
+ * CSS engine, multi-language support and many more. For more information and
+ * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
  * This is the data container array for table tl_feedback.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
- * @package    efg 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @package    efg
  * @version    1.11.0
- * @license    LGPL 
+ * @license    LGPL
  * @filesource
  */
 
 
 /**
- * Table tl_formdata 
+ * Table tl_formdata
  */
 $GLOBALS['TL_DCA']['tl_formdata'] = array
 (
@@ -44,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			(
 				array('tl_formdata', 'loadDCA'),
 				array('tl_formdata', 'checkPermission')
-			) 	
+			)
 	),
 	// List
 	'list' => array
@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'fields'                  => array('date DESC'),
 			'flag'                    => 8,
 			'panelLayout'             => 'sort,filter;search,limit',
-			
+
 		),
 		'label' => array
 		(
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,date,ip,pid;fd_member,fd_user;published,alias,be_notes'
+		'default'                     => 'form,ip,date,alias;published,be_notes;fd_member,fd_user'
 	),
 
 	// Fields
@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'filter'                  => true,
-			'sorting'                 => true
+			'sorting'                 => true,
 		),
 		'date' => array
 		(
@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
-			'eval'                    => array('rgxp' => 'datim')
+			'eval'                    => array('rgxp' => 'datim', 'tl_class'=>'w50')
 		),
 		'ip' => array
 		(
@@ -138,14 +138,15 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'exclude'                 => true,
 			'search'                  => false,
 			'sorting'                 => false,
-			'filter'                  => false
+			'filter'                  => false,
+			'eval'                    => array('tl_class'=>'w50')
 		),
 		'fd_member' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true),
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMembersSelect'),
 		),
 		'fd_user' => array
@@ -153,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true),
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
 		),
 		'published' => array
@@ -196,8 +197,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
  * Class tl_formdata
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn 
+ * @copyright  Thomas Kuhn 2007
+ * @author     Thomas Kuhn
  * @package    Controller
  */
 class tl_formdata extends Backend
@@ -216,16 +217,16 @@ class tl_formdata extends Backend
 	 */
 	function loadDCA(DC_Formdata $dca, $varFormKey = '')
 	{
-		
+
 		$strModule = 'efg';
 		$strName = 'feedback';
-		$strFileName = 'tl_formdata'; 	
+		$strFileName = 'tl_formdata';
 
 		if ( $varFormKey != '' && is_string($varFormKey))
 		{
 			$strFileName = $varFormKey;
 		}
-		else 
+		else
 		{
 			$strFileName = ($this->Input->get('do') == 'feedback' ? 'fd_feedback' : $this->Input->get('do'));
 		}
@@ -241,38 +242,38 @@ class tl_formdata extends Backend
 
 					if (file_exists($strFile))
 					{
-						$strName = $varFormKey; 
+						$strName = $varFormKey;
 						include_once($strFile);
-						
-						// now replace standard dca tl_formdata by form-dependent dca  
+
+						// now replace standard dca tl_formdata by form-dependent dca
 						if (is_array($GLOBALS['TL_DCA'][$strName]) && count($GLOBALS['TL_DCA'][$strName]) > 0)
 						{
 							$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
 							unset($GLOBALS['TL_DCA'][$strName]);
 						}
 					}
-				}  
+				}
 			}
 		}
-		else 
+		else
 		{
 			if ( array_key_exists($this->Input->get('do'), $GLOBALS['BE_MOD']['formdata']) )
 			{
 				$strFile = sprintf('%s/system/modules/%s/dca/%s.php', TL_ROOT, $strModule, $strFileName);
-	
+
 				if (file_exists($strFile))
 				{
-					$strName = $this->Input->get('do'); 
+					$strName = $this->Input->get('do');
 					include_once($strFile);
-					
-					// now replace standard dca tl_formdata by form-dependent dca  
+
+					// now replace standard dca tl_formdata by form-dependent dca
 					if (is_array($GLOBALS['TL_DCA'][$strName]) && count($GLOBALS['TL_DCA'][$strName]) > 0)
 					{
 						$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
 						unset($GLOBALS['TL_DCA'][$strName]);
 					}
 				}
-			}  
+			}
 		}
 		include(TL_ROOT . '/system/config/dcaconfig.php');
 
@@ -288,7 +289,7 @@ class tl_formdata extends Backend
 
 		$arrFields = array_keys($GLOBALS['TL_DCA']['tl_formdata']['fields']);
 		// check/set restrictions
-		foreach ($arrFields as $strField) 
+		foreach ($arrFields as $strField)
 		{
 			if ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField]['exclude'] == true)
 			{
@@ -303,7 +304,7 @@ class tl_formdata extends Backend
 
 	/**
 	 * Autogenerate an alias if it has not been set yet
-	 * alias is created from formdata content related to first form field of type text not using rgxp=email 
+	 * alias is created from formdata content related to first form field of type text not using rgxp=email
 	 * @param mixed
 	 * @param object
 	 * @return string
@@ -361,7 +362,7 @@ class tl_formdata extends Backend
 		{
 			$strSql = "SELECT id,title FROM tl_form";
 			$objForms = $this->Database->prepare($strSql)->execute();
-			
+
 			while ($objForms->next())
 			{
 				$this->arrData[$objForms->id]['title'] = $objForms->title;
@@ -369,7 +370,7 @@ class tl_formdata extends Backend
 		}
 
 
-		$strRet .= '<div class="fd_wrap"><div class="fd_head"><div class="cte_type unpublished">'; 
+		$strRet .= '<div class="fd_wrap"><div class="fd_head"><div class="cte_type unpublished">';
 		$strRet .= '<strong>' . date($GLOBALS['TL_CONFIG']['datimFormat'], $arrRow['date']) . '</strong>';
 		$strRet .= '<span style="color:#b3b3b3; padding-left:3px;">[' . $this->arrData[$arrRow['pid']]['title'] . ']</span>';
 		$strRet .= '<span style="border:solid 1px blue">#' . $this->arrData[$arrRow['alias']] . '#</span>';
@@ -443,7 +444,7 @@ class tl_formdata extends Backend
 		}
 		return $items;
 	}
-	
+
 	/**
 	 * Return all users as array for dropdown
 	 * @return array
@@ -467,8 +468,8 @@ class tl_formdata extends Backend
 		}
 		return $items;
 	}
-	
-	
+
+
 }
 
 ?>

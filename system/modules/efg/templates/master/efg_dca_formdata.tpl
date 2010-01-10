@@ -19,7 +19,7 @@
  * @package    efg
  * @license    LGPL
  * @filesource
- * @version    1.11.0
+ * @version    1.12.0
  */
 
 <?php $this->import('String'); ?>
@@ -67,6 +67,15 @@ $arrListDefaults = array(
 		'eval'           => 'null',
 	),
 	'select' => array
+	(
+		'exclude'        => 'false',
+		'search'         => 'true',
+		'sorting'        => 'true',
+		'filter'         => 'true',
+		'flag'           => 'null',
+		'eval'           => 'null',
+	),
+	'calendar' => array
 	(
 		'exclude'        => 'false',
 		'search'         => 'true',
@@ -180,7 +189,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'mode'                    => 2,
 			'fields'                  => array('date DESC'),
 			'flag'                    => 8,
-			'panelLayout'             => 'sort,filter;search,limit',
+			'panelLayout'             => 'filter;search,sort,limit',
 		),
 		'label' => array
 		(
@@ -263,14 +272,14 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				'href'                => 'act=mail',
 				'icon'                => 'system/modules/efg/html/mail.gif'
 			)
-<?php endif; ?>			
+<?php endif; ?>
 		)
 	),
 
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,date,ip,pid;fd_member,fd_user;alias,published,be_notes;<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
+		'default'                     => 'form,alias,date,ip,published;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
 
 	// Base fields in table tl_formdata
@@ -285,6 +294,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => <?php echo ($this->arrForm['key'] == 'feedback' ? 'true' : 'false' ); ?>,
 			'sorting'                 => <?php echo ($this->arrForm['key'] == 'feedback' ? 'true' : 'false' ); ?>,
 			'options_callback'        => array('tl_formdata', 'getFormsSelect'),
+			'eval'                    => array('tl_class'=> 'w50')
 		),
 		'date' => array
 		(
@@ -295,7 +305,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
-			'eval'                    => array('rgxp' => 'datim'),
+			'eval'                    => array('rgxp' => 'datim', 'tl_class'=>'w50'),
 		),
 		'ip' => array
 		(
@@ -304,14 +314,15 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'sorting'                 => false,
-			'filter'                  => false
+			'filter'                  => false,
+			'eval'                    => array('tl_class'=>'w50'),
 		),
 		'fd_member' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true),
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMembersSelect'),
 		),
 		'fd_user' => array
@@ -319,7 +330,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true),
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
 		),
 		'published' => array
@@ -329,6 +340,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
 			// 'default'                 => '1'
+			'eval'                    => array('tl_class'=>'m12')
+
 		),
 		'alias' => array
 		(
@@ -336,7 +349,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'unique'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>64),
+			'eval'                    => array('rgxp'=>'alnum', 'unique'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>64, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
 				array('tl_formdata', 'generateAlias')
@@ -370,7 +383,11 @@ endforeach; ?>),
 <?php foreach ($this->arrFields as $varKey => $varVals): ?>
 // '<?php echo $varKey; ?>'
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>', '<?php echo '[' . $varKey .'] ' .str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>');
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = '<?php echo ( ($varVals['type']=='upload' && $varVals['storeFile']) || ($varVals['type']=='efgImageSelect') ? "fileTree" : $varVals['type']); ?>';
+<?php if (($varVals['type']=='upload' && $varVals['storeFile']) || $varVals['type']=='efgImageSelect'): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = 'fileTree';
+<?php else: ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = '<?php echo ($varVals['type'] == 'calendar') ? 'text' : $varVals['type']; ?>';
+<?php endif; ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['exclude'] = <?php echo $arrListDefaults[$varVals['type']]['exclude']; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['search'] = <?php echo (($varVals['rgxp']=='date' || $varVals['rgxp']=='datim')? 'false' : $arrListDefaults[$varVals['type']]['search']); ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['sorting'] = <?php echo $arrListDefaults[$varVals['type']]['sorting']; ?>;
@@ -473,6 +490,13 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['c
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['rows'] = <?php echo $arrSize[0]; ?>;
 <?php endif; ?>
 <?php endif; ?>
+<?php if ($varVals['type'] == 'calendar'): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['rgxp'] = 'date';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['flag'] = 5;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['maxlength'] = 10;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['datepicker'] = "<?php echo $this->getDatePickerString(); ?>";
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['tl_class'] = 'wizard';
+<?php endif; ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['ff_id'] = <?php echo $varVals['id']; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['f_id'] = <?php echo $varVals['pid']; ?>;
 <?php endforeach; ?>
@@ -512,7 +536,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 		$strKey = 'unpublished';
 
 		$strRowLabel .= '<div class="fd_wrap">';
-		$strRowLabel .= '<div class="fd_head">' . date($GLOBALS['TL_CONFIG']['datimFormat'], $arrRow['date']) . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
+		$strRowLabel .= '<div class="fd_head">' . $arrRow['date'] . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
 		$strRowLabel .= '<div class="fd_notes">' . $arrRow['be_notes'] . '</div>';
 		$strRowLabel .= '<div class="mark_links">';
 <?php foreach ($this->arrFields as $varKey => $varVals): ?>
