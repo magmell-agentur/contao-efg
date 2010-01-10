@@ -1,5 +1,5 @@
 
-<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<div class="<?php echo $this->class; ?> ce_table listing block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
@@ -92,20 +92,28 @@
 <table cellpadding="2" cellspacing="0" border="0" class="all_records" summary="">
 <!-- indexer::stop -->
 <thead>
-  <tr><?php foreach ($this->thead as $col): ?> 
+  <tr>
+<?php foreach ($this->thead as $col): ?>
     <th class="head<?php echo $col['class']; ?>"><a href="<?php echo $col['href']; ?>" title="<?php echo $col['title']; ?>"><?php echo $col['link']; ?></a></th>
-    <?php endforeach; if ($this->details || $this->editable || $this->deletable || $this->exportable): ?> 
-    <th class="head col_last">&nbsp;</th><?php endif; ?> 
+<?php endforeach; if ($this->details || $this->editable || $this->deletable || $this->exportable): ?>
+    <th class="head col_last">&nbsp;</th>
+<?php endif; ?>
   </tr>
 </thead>
 <!-- indexer::continue -->
-<tbody><?php foreach ($this->tbody as $class=>$row): ?> 
-  <tr class="<?php echo $class; ?>"><?php foreach ($row as $col): ?> 
-    <td class="body <?php echo $col['class']; ?>"><?php if ($col['type']=='file' && $col['src']): ?><?php if ($col['display']=='image'): ?> <img src="<?php echo($this->getImage($col['src'], 80, null)); ?>" alt="<?php echo urldecode(basename($col['src'])); ?>" title="<?php echo urldecode(basename($col['src'])); ?>" /> <?php else: ?><img src="<?php echo $col['icon']; ?>" alt="<?php echo $col['linkTitle']; ?>" />&nbsp;<a href="<?php echo $col['href']; ?>"><?php echo $col['linkTitle'] . $col['size']; ?></a>
-    <?php endif; ?>
-    <?php else: echo $col['content']; endif;?>&nbsp;</td><?php endforeach; if ($this->details || $this->editable || $this->deletable || $this->exportable): ?> 
-    <td class="body <?php echo $this->col_last; ?> col_last"><?php if($this->details):?>&nbsp;<a href="<?php echo $col['link_details']; ?>" title="<?php echo $this->textlink_details[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/details.gif" alt="<?php echo $this->textlink_details[1]; ?>" title="<?php echo $this->textlink_details[1]; ?>"/></a><?php endif; ?><?php if ($this->arrEditAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_edit']; ?>" title="<?php echo $this->textlink_edit[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/edit.gif" alt="<?php echo $this->textlink_edit[1]; ?>" title="<?php echo $this->textlink_edit[1]; ?>"/></a><?php endif; ?><?php if ($this->arrDeleteAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_delete']; ?>" onclick="if (!confirm('<?php echo $this->text_confirmDelete; ?>')) return false;" title="<?php echo $this->textlink_delete[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/delete.gif" alt="<?php echo $this->textlink_delete[1]; ?>" title="<?php echo $this->textlink_delete[1]; ?>"/></a><?php endif; ?><?php if ($this->arrExportAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_export']; ?>" title="<?php echo $this->textlink_export[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/exportCSV.gif" alt="<?php echo $this->textlink_export[1]; ?>" title="<?php echo $this->textlink_export[1]; ?>"/></a>&nbsp;<?php endif; ?></td><?php endif; ?>
-  </tr><?php endforeach; ?> 
+<tbody>
+<?php foreach ($this->tbody as $class=>$row): ?>
+  <tr class="<?php echo $class; ?>">
+<?php foreach ($row as $col): ?>
+    <td class="body <?php echo $col['class']; ?>">
+<?php if ($col['type']=='file' && $col['multiple']): ?><?php foreach ($col['content'] as $file): ?><?php if ($file['display']=='image'): ?><img src="<?php echo($this->getImage($file['src'], 80, null)); ?>" alt="<?php echo urldecode(basename($file['src'])); ?>" title="<?php echo urldecode(basename($file['src'])); ?>" /><?php else: ?><img src="<?php echo $file['icon']; ?>" alt="<?php echo $file['linkTitle']; ?>" />&nbsp;<a href="<?php echo $file['href']; ?>"><?php echo $file['linkTitle'] . $file['size']; ?></a><?php endif; ?><br /><?php endforeach; ?>
+<?php elseif ($col['type']=='file' && $col['src']): ?><?php if ($col['display']=='image'): ?><img src="<?php echo($this->getImage($col['src'], 80, null)); ?>" alt="<?php echo urldecode(basename($col['src'])); ?>" title="<?php echo urldecode(basename($col['src'])); ?>" /><?php else: ?><img src="<?php echo $col['icon']; ?>" alt="<?php echo $col['linkTitle']; ?>" />&nbsp;<a href="<?php echo $col['href']; ?>"><?php echo $col['linkTitle'] . $col['size']; ?></a><?php endif; ?>
+<?php else: echo $col['content']; endif;?></td>
+<?php endforeach; if ($this->details || $this->editable || $this->deletable || $this->exportable): ?>
+    <td class="body <?php echo $this->col_last; ?> col_last"><?php if($this->details):?>&nbsp;<a href="<?php echo $col['link_details']; ?>" title="<?php echo $this->textlink_details[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/details.gif" alt="<?php echo $this->textlink_details[1]; ?>" title="<?php echo $this->textlink_details[1]; ?>"/></a><?php endif; ?><?php if ($this->arrEditAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_edit']; ?>" title="<?php echo $this->textlink_edit[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/edit.gif" alt="<?php echo $this->textlink_edit[1]; ?>" title="<?php echo $this->textlink_edit[1]; ?>"/></a><?php endif; ?><?php if ($this->arrDeleteAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_delete']; ?>" onclick="if (!confirm('<?php echo $this->text_confirmDelete; ?>')) return false;" title="<?php echo $this->textlink_delete[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/delete.gif" alt="<?php echo $this->textlink_delete[1]; ?>" title="<?php echo $this->textlink_delete[1]; ?>"/></a><?php endif; ?><?php if ($this->arrExportAllowed[$col['id']]): ?>&nbsp;<a href="<?php echo $col['link_export']; ?>" title="<?php echo $this->textlink_export[1]; ?>"><img src="<?php echo $this->iconFolder; ?>/exportCSV.gif" alt="<?php echo $this->textlink_export[1]; ?>" title="<?php echo $this->textlink_export[1]; ?>"/></a>&nbsp;<?php endif; ?></td>
+<?php endif; ?>
+  </tr>
+<?php endforeach; ?>
 </tbody>
 </table>
 

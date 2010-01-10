@@ -28,7 +28,7 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    Controller
- * @version    1.12.0
+ * @version    1.12.1
  */
 class DC_Formdata extends DataContainer implements listable, editable
 {
@@ -176,6 +176,10 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 	protected $arrUsers = null;
 
+	protected $arrMemberGroups = null;
+
+	protected $arrUserGroups = null;
+	
 	// convert UTF8 to cp1251 on CSV-/XLS-Export
 	protected $blnExportUTF8Decode = true;
 
@@ -189,6 +193,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$this->intId = $this->Input->get('id');
 
 		$this->import('String');
+		$this->loadDataContainer('tl_form_field');
 		$this->import('FormData');
 
 		// in Backend: Check BE User, Admin...
@@ -239,12 +244,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','published','alias','be_notes');
-		$this->arrOwnerFields = array('fd_member','fd_user');
+		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes');
+		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
 		$this->getUsers();
-
+		$this->getMemberGroups();
+		$this->getUserGroups();
+		
 		// Check whether the table is defined
 		if (!strlen($strTable) || !count($GLOBALS['TL_DCA'][$strTable]))
 		{
@@ -605,6 +612,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 			elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox'
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupCheckbox'
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'select'
+					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fp_preSelectMenu'
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect')
 					&& $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
@@ -624,6 +632,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 				if ($i == 'fd_user')
 				{
 					$row[$i] = $this->arrUsers[intval($value)];
+				}
+				if ($i == 'fd_member_group')
+				{
+					$row[$i] = $this->arrMemberGroups[intval($value)];
+				}
+				if ($i == 'fd_user_group')
+				{
+					$row[$i] = $this->arrUserGroups[intval($value)];
 				}
 			}
 
@@ -702,7 +718,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					$count = 0;
 					$return .= '
   <tr>
-    <td colspan="2" style="padding:0px;"><div style="margin-bottom:26px; line-height:24px; border-bottom:1px dotted #cccccc;"> </div></td>
+    <td colspan="2" style="padding:0px;"><div style="margin-bottom:26px; line-height:24px; border-bottom:1px dotted #cccccc;">Â </div></td>
   </tr>';
 
 					foreach ($arrRow as $i=>$v)
@@ -1486,6 +1502,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		$arrSubmitted = $objRow->fetchAssoc();
+		$arrFiles = array();
 
 		// Form
 		$intFormId = 0;
@@ -1588,7 +1605,7 @@ class DC_Formdata extends DataContainer implements listable, editable
  		preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml, $tags);
 
 
- 		// Replace tags of type {‎{form::<form field name>}}
+ 		// Replace tags of type {â€Ž{form::<form field name>}}
  		foreach ($tags[0] as $tag)
  		{
  			$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
@@ -1618,32 +1635,64 @@ class DC_Formdata extends DataContainer implements listable, editable
 						$strLabel = $arrTagParams['label'];
 					}
 
-					if ( in_array($strType, $arrFFstorable) )
+					if (in_array($strType, $arrFFstorable))
 					{
-						if ( $strType == 'efgImageSelect' )
+						if ($strType == 'efgImageSelect')
 						{
-							//$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-							$strVal = trim($this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]));
-							$strVal = $this->formatValue($strKey, $strVal);
+							$varText = '';
+							$varHtml = '';
 
-							if (strlen($strVal)==0 &&  $blnSkipEmpty)
+							$varVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
+							foreach ($varVal as $k => $strVal)
+							{
+								if (strlen($strVal))
+								{
+									$varText[] = $this->Environment->base . $strVal;
+									$varHtml[] = '<img src="' . $strVal . '" />';
+								}
+							}
+							if (is_array($varText))
+							{
+								$varText = implode(', ', $varText);
+								$varHtml = implode(', ', $varHtml);
+							}
+
+							if (!strlen($varText) && $blnSkipEmpty)
 							{
 								$strLabel = '';
 							}
-							$messageText = str_replace($tag, $strLabel . ((strlen($strVal)) ? $this->Environment->base . $strVal : ''), $messageText);
-		 					$messageHtml = str_replace($tag, ((strlen($strVal)) ? $strLabel .'<img src="' . $strVal . '">' : ''), $messageHtml);
+
+							$messageText = str_replace($tag, $strLabel . $varText, $messageText);
+		 					$messageHtml = str_replace($tag, $strLabel . $varHtml, $messageHtml);
+
+		 					unset($varText);
+		 					unset($varHtml);
 						}
 						elseif ($strType=='upload')
 						{
+
+
+							if (strlen($arrSubmitted[$strKey]))
+							{
+								if (!array_key_exists($strKey, $arrFiles))
+								{
+									$objFile = new File($arrSubmitted[$strKey]);
+									if ($objFile->size)
+									{
+										$arrFiles[$strKey] = array('tmp_name' => $objFile->value, 'file'=>$objFile->value,  'name' => $objFile->basename, 'mime' => $objFile->mime);
+									}
+								}
+							}
+
 							if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
 							{
-								if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
+								if (array_key_exists($strKey, $arrFiles) && strlen($arrFiles[$strKey]['name']))
 								{
-									if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
+									if (!count($attachments) || !in_array($arrFiles[$strKey]['file'], $attachments))
 									{
-										$attachments[$arrFiles[$strKey]['tmp_name']] = array('name'=>$arrFiles[$strKey]['name'], 'file'=>$arrFiles[$strKey]['tmp_name'], 'mime'=>$arrFiles[$strKey]['type']);
+										$attachments[] = $arrFiles[$strKey]['file'];
 									}
-
 								}
 								$strVal = '';
 							}
@@ -1659,6 +1708,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 							}
 							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 		 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+
 						}
 						else
 						{
@@ -1924,6 +1974,14 @@ $return .= '
 			if ($k == 'fd_user')
 			{
 				$value = $this->arrUsers[$value];
+			}
+			if ($k == 'fd_member_group')
+			{
+				$value = $this->arrMemberGroups[$value];
+			}
+			if ($k == 'fd_user_group')
+			{
+				$value = $this->arrUserGroups[$value];
 			}
 		}
 
@@ -2242,6 +2300,7 @@ $return .= '
 					// prepare values of special fields like rado, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
 
+					
 					// render inputType hidden as inputType text in Backend
 					if ($strInputType == 'hidden')
 					{
@@ -2249,9 +2308,8 @@ $return .= '
 					}
 
 					// field types radio, select, multi checkbox
-					if ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+					if ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || $strInputType=='countryselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
 					{
-
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
 						{
 							if ($this->strField == 'fd_user')
@@ -2264,7 +2322,7 @@ $return .= '
 						}
 						elseif (!is_array($this->varValue))
 						{
-
+							
 							// foreignKey fields
 							if ($strInputType == 'select' && strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']))
 							{
@@ -3468,6 +3526,7 @@ window.addEvent(\'domready\', function()
 			$varValue = $objDate->tstamp;
 		}
 
+
 		// Convert checkbox, radio, select, conditionalselect to store the values instead of keys
 		if ( ($arrData['inputType']=='checkbox' && $arrData['eval']['multiple']) || $arrData['inputType']=='radio' || $arrData['inputType']=='select' || $arrData['inputType']=='conditionalselect')
 		{
@@ -4161,7 +4220,7 @@ window.addEvent(\'domready\', function()
 		if ($GLOBALS['TL_DCA'][$table]['list']['label']['maxCharacters'] > 0 && $GLOBALS['TL_DCA'][$table]['list']['label']['maxCharacters'] < strlen(strip_tags($label)))
 		{
 			$this->import('String');
-			$label = trim($this->String->substrHtml($label, $GLOBALS['TL_DCA'][$table]['list']['label']['maxCharacters'])) . ' …';
+			$label = trim($this->String->substrHtml($label, $GLOBALS['TL_DCA'][$table]['list']['label']['maxCharacters'])) . ' â€¦';
 		}
 
 		$label = preg_replace('/\(\) ?|\[\] ?|\{\} ?|<> ?/i', '', $label);
@@ -4772,6 +4831,16 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 							$args[$k] = $this->arrUsers[$row[$v]];
 							$arrRowFormatted[$v] = $args[$k];
 						}
+						if ($v == 'fd_member_group')
+						{
+							$args[$k] = $this->arrMemberGroups[$row[$v]];
+							$arrRowFormatted[$v] = $args[$k];
+						}
+						if ($v == 'fd_user_group')
+						{
+							$args[$k] = $this->arrUserGroups[$row[$v]];
+							$arrRowFormatted[$v] = $args[$k];
+						}
 					}
 
 					else
@@ -4821,7 +4890,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters']) && $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] < strlen($label))
 				{
 					$this->import('String');
-					$label = trim($this->String->substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
+					$label = trim($this->String->substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' â€¦';
 				}
 
 				// Remove empty brackets (), [], {}, <> and empty tags from label
@@ -5318,18 +5387,19 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 					if (in_array($strProcField, $this->arrDetailFields) )
 					{
 						//$sqlDetailFields .= ", (SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id) AS `" . $strProcField . "`";
-						$sqlDetailFields .= ", (SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id) AS `" . $strProcField ."`";
 						$arrProcedure[$kProc] = "(SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id)=?";
 					}
 
 				}
 				$sqlWhere = " WHERE " . implode(' AND ', $arrProcedure);
 			}
-			$sqlSelect = "SELECT COUNT(*) AS total ". $sqlDetailFields ." FROM " . $this->strTable . " f";
+			//$sqlSelect = "SELECT COUNT(*) AS total ". $sqlDetailFields ." FROM " . $this->strTable . " f";
+			$sqlSelect = "SELECT COUNT(*) AS total FROM " . $this->strTable . " f";
 			$sqlQuery = $sqlSelect . $sqlWhere;
 
 			$objTotal = $this->Database->prepare($sqlQuery)
 									   ->execute($this->values);
+
 			$total = $objTotal->total;
 
 			// Build options
@@ -5783,9 +5853,15 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 	public function export($sMode='csv')
 	{
 
+if (strlen($this->Input->get('expmode')))
+{
+	$sMode = $this->Input->get('expmode');
+}
+
 		$return = '';
 
 		$blnCustomXlsExport = false;
+		$blnCustomExport = false;
 		$arrHookData = array();
 		$arrHookDataColumns = array();
 
@@ -5798,8 +5874,13 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			}
 			else
 			{
-				include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
+				// include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
+				include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 			}
+		}
+		elseif ($sMode!='csv')
+		{
+			$blnCustomExport = true;
 		}
 
 		// filter or search for values
@@ -5886,16 +5967,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		$useFormValues = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
 		$useFieldNames = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
-		if ($sMode=='xls')
-		{
-			if (!$blnCustomXlsExport)
-			{
-				$xls = new xlsexport();
-				$strXlsSheet = "Export";
-				$xls->addworksheet($strXlsSheet);
-			}
-		}
-		else // defaults to csv
+		if ($sMode=='csv')
 		{
 			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
 			header('Content-Transfer-Encoding: binary');
@@ -5903,6 +5975,15 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 			header('Pragma: public');
 			header('Expires: 0');
+		}
+		elseif ($sMode=='xls')
+		{
+			if (!$blnCustomXlsExport)
+			{
+				$xls = new xlsexport();
+				$strXlsSheet = "Export";
+				$xls->addworksheet($strXlsSheet);
+			}
 		}
 
 		// List records
@@ -5942,7 +6023,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 				if ($intRowCounter == 0)
 				{
-
 					if ($sMode == 'xls')
 					{
 						if (!$blnCustomXlsExport)
@@ -5997,7 +6077,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 							echo $strExpSep . $strExpEncl . $strName . $strExpEncl;
 							$strExpSep = ";";
 						}
-						if ($sMode=='xls')
+						elseif ($sMode=='xls')
 						{
 							if (!$blnCustomXlsExport)
 							{
@@ -6008,6 +6088,10 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 							{
 								$arrHookDataColumns[$v] = $strName;
 							}
+						}
+						elseif ($blnCustomExport)
+						{
+							$arrHookDataColumns[$v] = $strName;
 						}
 
 					}
@@ -6183,6 +6267,14 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						{
 							$strVal = $this->arrUsers[intval($row[$v])];
 						}
+						if ($v == 'fd_member_group')
+						{
+							$strVal = $this->arrMemberGroups[intval($row[$v])];
+						}
+						if ($v == 'fd_user_group')
+						{
+							$strVal = $this->arrUserGroups[intval($row[$v])];
+						}
 					}
 
 					if (strlen($strVal))
@@ -6203,7 +6295,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 						$strExpSep = ";";
 					}
-					if ($sMode=='xls')
+					elseif ($sMode=='xls')
 					{
 						if (!$blnCustomXlsExport)
 						{
@@ -6213,6 +6305,10 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						{
 							$arrHookData[$intRowCounter][$v] = $strVal;
 						}
+					}
+					elseif ($blnCustomExport)
+					{
+						$arrHookData[$intRowCounter][$v] = $strVal;
 					}
 
 				}
@@ -6243,6 +6339,14 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				}
 			}
 		}
+		elseif ($blnCustomExport)
+		{
+			foreach ($GLOBALS['TL_HOOKS']['efgExport'] as $key => $callback)
+			{
+				$this->import($callback[0]);
+				$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData, $sMode);
+			}
+		}
 		exit;
 	}
 
@@ -6251,6 +6355,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 	{
 		$this->export('xls');
 	}
+
 
 	/**
 	 * Convert encoding
@@ -6331,6 +6436,58 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		}
 	}
 
-}
+	/**
+	 * get all member groups (FE)
+	 */
+	protected function getMemberGroups()
+	{
+		if (!$this->arrMemberGroups)
+		{
+			$groups = array();
 
+			// Get all member groups
+			$objGroups = $this->Database->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
+								->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrMemberGroups = $groups;
+		}
+	}
+
+	/**
+	 * get all user groups (BE)
+	 */
+	protected function getUserGroups()
+	{
+		if (!$this->arrUserGroups)
+		{
+			$groups = array();
+
+			// Get all user groups
+			$objGroups = $this->Database->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
+								->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrUserGroups = $groups;
+		}
+	}
+	
+	
+}
 ?>

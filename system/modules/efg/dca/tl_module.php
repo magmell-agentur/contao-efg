@@ -17,20 +17,23 @@
  * @copyright  Thomas Kuhn 2007
  * @author     Thomas Kuhn <th_kuhn@gmx.net>
  * @package    efg
- * @version    1.12.0
+ * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
+
+/**
+* to fix height of style class w50 in backend
+*/
+$GLOBALS['BE_MOD']['design']['modules']['stylesheet'] = 'system/modules/efg/html/w50_fix.css';
 
 
 /**
  * Add palettes to tl_module
  */
-
-$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info,efg_list_searchtype,list_search;;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,align,space,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,align,space,cssID';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
-
 
 /**
  * Add fields to tl_module
@@ -60,16 +63,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_sort'] = array
 	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
 
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_fields'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50" style="height:auto'),
 );
-
-
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_searchtype'] = array
 (
@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_searchtype'] = array
 	'inputType'               => 'select',
 	'options'                 => array('dropdown', 'singlefield', 'multiplefields'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_list_searchtype'],
-	'eval'                    => array('mandatory'=>false, 'includeBlankOption'=>true, 'helpwizard'=>true)
+	'eval'                    => array('mandatory'=>false, 'includeBlankOption'=>true, 'helpwizard'=>true,  'tl_class'=>'w50" style="height:auto')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_search'] = array
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_search'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_search'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_info'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_access'] = array
@@ -146,7 +146,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_DetailsKey'] = array
 	'eval'                    => array('default' => 'details', 'maxlength'=>64, 'tl_class'=>'w50')
 );
 
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_iconfolder'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'],
@@ -180,19 +179,19 @@ class tl_ext_module extends Backend
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['inputType'] = 'checkboxWizard';
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['mandatory'] = false;
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class']);
+			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['options_callback'] = array('tl_ext_module', 'optionsListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['load_callback'][] = array('tl_ext_module', 'onloadListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['inputType'] = 'checkboxWizard';
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class']);
+			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['options_callback'] = array('tl_ext_module', 'optionsSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['load_callback'][] = array('tl_ext_module', 'onloadSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['inputType'] = 'checkboxWizard';
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class']);
+			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['options_callback'] = array('tl_ext_module', 'optionsInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['load_callback'][] = array('tl_ext_module', 'onloadInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
@@ -205,7 +204,6 @@ class tl_ext_module extends Backend
 	 * Return all formdata tables as array
 	 * @return array
 	 */
-
 	public function getFormdataTables(DC_Table $dc)
 	{
 		if (is_null($this->arrFormdataTables) || is_null($this->arrFormdataFields))

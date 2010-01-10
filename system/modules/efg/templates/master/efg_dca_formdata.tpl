@@ -19,7 +19,7 @@
  * @package    efg
  * @license    LGPL
  * @filesource
- * @version    1.12.0
+ * @version    1.12.1
  */
 
 <?php $this->import('String'); ?>
@@ -93,6 +93,15 @@ $arrListDefaults = array(
 		'flag'           => 'null',
 		'eval'           => 'null',
 	),
+	'countryselect' => array
+	(
+		'exclude'        => 'false',
+		'search'         => 'true',
+		'sorting'        => 'true',
+		'filter'         => 'true',
+		'flag'           => 'null',
+		'eval'           => 'null',
+	),
 	'efgLookupSelect' => array
 	(
 		'exclude'        => 'false',
@@ -151,7 +160,7 @@ $arrListDefaults = array(
 	(
 		'exclude'        => 'false',
 		'search'         => 'true',
-		'sorting'        => 'true',
+		'sorting'        => 'false',
 		'filter'         => 'false',
 		'flag'           => 'null',
 		'eval'           => 'null',
@@ -279,7 +288,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,alias,date,ip,published;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
+		'default'                     => 'form,alias,date,ip,published;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
 
 	// Base fields in table tl_formdata
@@ -333,15 +342,30 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
 		),
+		'fd_member_group' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'],
+			'exclude'                 => true,
+			'inputType'               => 'select',
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'options_callback'        => array('tl_formdata', 'getMemberGroupsSelect'),
+		),
+		'fd_user_group' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user_group'],
+			'exclude'                 => true,
+			'inputType'               => 'select',
+			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'options_callback'        => array('tl_formdata', 'getUserGroupsSelect'),
+		),
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['published'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'clr'),
 			// 'default'                 => '1'
-			'eval'                    => array('tl_class'=>'m12')
-
 		),
 		'alias' => array
 		(
@@ -368,7 +392,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','published','alias','be_notes'),
+		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes'),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . $varKey . "'"; $strSep = ',';
 endforeach; ?>),
@@ -385,22 +409,36 @@ endforeach; ?>),
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>', '<?php echo '[' . $varKey .'] ' .str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>');
 <?php if (($varVals['type']=='upload' && $varVals['storeFile']) || $varVals['type']=='efgImageSelect'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = 'fileTree';
+<?php elseif ($varVals['type'] == 'calendar'): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = 'text';
+<?php elseif ($varVals['type'] == 'fp_preSelectMenu'): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = 'select';
+<?php elseif ($varVals['type'] == 'countryselect'): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = 'select';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['options'] = $this->getCountries();
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['includeBlankOption'] = true;
 <?php else: ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = '<?php echo ($varVals['type'] == 'calendar') ? 'text' : $varVals['type']; ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['inputType'] = '<?php echo $varVals['type']; ?>';
 <?php endif; ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['exclude'] = <?php echo $arrListDefaults[$varVals['type']]['exclude']; ?>;
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['search'] = <?php echo (($varVals['rgxp']=='date' || $varVals['rgxp']=='datim')? 'false' : $arrListDefaults[$varVals['type']]['search']); ?>;
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['sorting'] = <?php echo $arrListDefaults[$varVals['type']]['sorting']; ?>;
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['filter'] = <?php echo $arrListDefaults[$varVals['type']]['filter']; ?>;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['exclude'] = <?php echo (isset($arrListDefaults[$varVals['type']]['exclude']) ? $arrListDefaults[$varVals['type']]['exclude'] : 'false'); ?>;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['search'] = <?php echo (($varVals['rgxp']=='date' || $varVals['rgxp']=='datim') ? 'false' : (isset($arrListDefaults[$varVals['type']]['search']) ? $arrListDefaults[$varVals['type']]['search'] : 'false')); ?>;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['sorting'] = <?php echo (isset($arrListDefaults[$varVals['type']]['sorting']) ? $arrListDefaults[$varVals['type']]['sorting'] : 'false'); ?>;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['filter'] = <?php echo (isset($arrListDefaults[$varVals['type']]['filter']) ? $arrListDefaults[$varVals['type']]['filter'] : 'false'); ?>;
 <?php if (strlen($varVals['value'])): ?>
+<?php if ($varVals['type']=='countryselect'): $arrCountries = $this->getCountries(); ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['default'] = '<?php echo $this->String->decodeEntities($arrCountries[$varVals['value']]); ?>';
+<?php else: ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['default'] = '<?php echo $this->String->decodeEntities($varVals['value']); ?>';
+<?php endif; ?>
 <?php endif; ?>
 <?php switch($varVals['type']):
 	case 'checkbox':
 	case 'radio':
 	case 'select':
 	case 'conditionalselect':
-		$arrOpts = deserialize($varVals['options']); $blnInGroup=false; $strGroupKey=''; $strGroupLabel=''; ?>
+	case 'countryselect':
+	case 'fp_preSelectMenu': $arrOpts = deserialize($varVals['options']); $blnInGroup=false; $strGroupKey=''; $strGroupLabel=''; ?>
+<?php if (is_array($arrOpts)): ?>		
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php  if ($arrOpt['group']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $varKey; ?>'];
@@ -426,6 +464,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['options']
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['default'][] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['label']))?>';
 <?php endif; ?>
 <?php endforeach; ?>
+<?php endif; ?>
 <?php if ($varVals['type'] == 'checkbox' && count($arrOpts)>1 && !$arrVals['multiple']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['multiple'] = true;
 <?php endif; unset($arrOpts); ?>
@@ -456,7 +495,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['f
 	break;
 	case 'efgImageSelect': ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['files'] = true;
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['fieldType'] = 'radio';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['extensions'] = 'gif,jpg,png';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['fieldType'] = '<?php echo ($varVals['efgImageMultiple']) ? "checkbox" : "radio"; ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $varKey; ?>']['eval']['multiple'] = <?php if ($varVals['efgImageMultiple']): ?>true<?php else: ?>false<?php endif; ?>;
 <?php
 	break;
 endswitch; ?>

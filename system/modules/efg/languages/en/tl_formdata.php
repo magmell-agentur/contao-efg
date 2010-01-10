@@ -33,6 +33,8 @@ $GLOBALS['TL_LANG']['tl_formdata']['be_notes']  = array('Notes', 'Notes, todos e
 $GLOBALS['TL_LANG']['tl_formdata']['published'] = array('Published', 'You can use this option as display condition when using a list module.');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_member'] = array('Member', 'Member as owner of this record');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_user']   = array('User', 'User as owner of this record');
+$GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'] = array('Member group', 'Member group as owner of this record');
+$GLOBALS['TL_LANG']['tl_formdata']['fd_user_group']   = array('User group', 'User group as owner of this record');
 $GLOBALS['TL_LANG']['tl_formdata']['alias']     = array('Alias', 'An alias is a unique reference to the record which can be called instead of the record ID.');
 
 

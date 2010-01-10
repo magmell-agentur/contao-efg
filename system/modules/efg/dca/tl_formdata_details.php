@@ -11,13 +11,13 @@
  * additional TYPOlight applications like the TYPOlight MVC Framework please 
  * visit the project website http://www.typolight.org.
  *
- * This is the data container array for table tl_feedback.
+ * This is the data container array for table tl_formdata_details.
  *
  * PHP version 5
  * @copyright  Thomas Kuhn 2007 
  * @author     Thomas Kuhn <th_kuhn@gmx.net> 
  * @package    efg 
- * @version    1.11.0
+ * @version    1.12.1
  * @license    LGPL 
  * @filesource
  */
@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 	(
 		'value' => array
 		(
-			'label'                   => array('value', 'value des feedback_data datensatzes'),
+			'label'                   => array('Value', 'Wert des tl_formdata_details-Datensatzes'),
 			'inputType'               => 'text',
 			'exclude'                 => false,
 			'search'                  => false,
