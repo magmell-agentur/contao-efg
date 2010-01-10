@@ -2,10 +2,10 @@
 /**
  * TL_ROOT/system/modules/efg/languages/nl/tl_formdata.php 
  * 
- * TYPOlight extension: efg 1.10.4 stable 
+ * TYPOlight extension: efg 1.12.0 stable 
  * Dutch translation file 
  * 
- * Copyright : (c) 2008 Thomas Kuhn 
+ * Copyright : (c) 2009 Thomas Kuhn 
  * License   : GNU LGPL V3 
  * Author    : Thomas Kuhn (tom) 
  * Translator: Just Schimmelpenninck (justs) 
@@ -68,5 +68,8 @@ $GLOBALS['TL_LANG']['tl_formdata']['fe_link_delete']['1'] = "Wis record";
 $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export']['0'] = "CSV Export";
 $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export']['1'] = "Exporteer record als een CSV bestand";
 $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'] = "Wilt u de invoer werkelijk wissen?";
+$GLOBALS['TL_LANG']['tl_formdata']['fdNotes_legend'] = "Aantekeningen";
+$GLOBALS['TL_LANG']['tl_formdata']['fdOwner_legend'] = "Eigenaar";
+$GLOBALS['TL_LANG']['tl_formdata']['fdDetails_legend'] = "Details";
  
 ?>

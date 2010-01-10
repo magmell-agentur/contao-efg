@@ -2,10 +2,10 @@
 /**
  * TL_ROOT/system/modules/efg/languages/nl/tl_form.php 
  * 
- * TYPOlight extension: efg 1.10.4 stable 
+ * TYPOlight extension: efg 1.12.0 stable 
  * Dutch translation file 
  * 
- * Copyright : (c) 2008 Thomas Kuhn 
+ * Copyright : (c) 2009 Thomas Kuhn 
  * License   : GNU LGPL V3 
  * Author    : Thomas Kuhn (tom) 
  * Translator: Just Schimmelpenninck (justs) 
@@ -45,5 +45,8 @@ $GLOBALS['TL_LANG']['tl_form']['formattedMailText']['0'] = "Mailtekst";
 $GLOBALS['TL_LANG']['tl_form']['formattedMailText']['1'] = "Tekst van de mail. U kan gebruik maken van standaard insert tags en tags zoals form::NAME_OF_FORMFIELD .";
 $GLOBALS['TL_LANG']['tl_form']['formattedMailTemplate']['0'] = "HTML-sjabloon voor e-mail";
 $GLOBALS['TL_LANG']['tl_form']['formattedMailTemplate']['1'] = "Als de e-mail verstuurd moet worden als HTML-mail, kies dan een HTML-sjabloon uit het bestandssysteem.";
+$GLOBALS['TL_LANG']['tl_form']['efgStoreFormdata_legend'] = "(EFG) Bewaar formuliergegevens";
+$GLOBALS['TL_LANG']['tl_form']['efgSendFormattedMail_legend'] = "(EFG) Verstuur via e-mail";
+$GLOBALS['TL_LANG']['tl_form']['efgSendConfirmationMail_legend'] = "(EFG) Verstuur bevestiging via e-mail";
  
 ?>

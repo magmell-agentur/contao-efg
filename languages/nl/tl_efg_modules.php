@@ -2,10 +2,10 @@
 /**
  * TL_ROOT/system/modules/efg/languages/nl/tl_efg_modules.php 
  * 
- * TYPOlight extension: efg 1.10.4 stable 
+ * TYPOlight extension: efg 1.12.0 stable 
  * Dutch translation file 
  * 
- * Copyright : (c) 2008 Thomas Kuhn 
+ * Copyright : (c) 2009 Thomas Kuhn 
  * License   : GNU LGPL V3 
  * Author    : Thomas Kuhn (tom) 
  * Translator: Just Schimmelpenninck (justs) 
