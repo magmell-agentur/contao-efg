@@ -173,7 +173,7 @@ class ModuleFormdata extends Backend
 		$arrStoreForms = $this->getStoreForms();
 
 		// config/config.php
-		$tplConfig = $this->newTemplate('master/efg_config');
+		$tplConfig = $this->newTemplate('efg_internal_config');
 		$tplConfig->arrForm = $this->objForm;
 		$tplConfig->arrStoreForms = $arrStoreForms;
 
@@ -203,8 +203,7 @@ class ModuleFormdata extends Backend
 				}
 
 				$tplMod = 'tplMod_' . $strModLang;
-				//$tplMod = $this->newTemplate('master/efg_'.$strModLang.'_modules');
-				$tplMod = $this->newTemplate('master/efg_modules');
+				$tplMod = $this->newTemplate('efg_internal_modules');
 				$tplMod->arrForm = $this->objForm;
 				$tplMod->arrStoreForms = $arrStoreForms;
 
@@ -244,7 +243,7 @@ class ModuleFormdata extends Backend
 
 			$strFormKey = ( isset($this->objForm['formID']) && strlen($this->objForm['formID']) ) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
 			$tplDca = 'tplDca_' . $strFormKey;
-			$tplDca = $this->newTemplate('master/efg_dca_formdata');
+			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
 			$tplDca->arrForm = $this->objForm;
 			$tplDca->arrStoreForms = $arrStoreForms;
@@ -293,7 +292,7 @@ class ModuleFormdata extends Backend
 
 			$strFormKey = 'feedback';
 			$tplDca = 'tplDca_' . $strFormKey;
-			$tplDca = $this->newTemplate('master/efg_dca_formdata');
+			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->arrForm = array('key' => 'feedback', 'title'=>"Feedback");
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrAllFields;
