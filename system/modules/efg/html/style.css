@@ -1,4 +1,5 @@
 /* TYPOlight efg style sheet */
+.header_csv_import{padding:2px 0 3px 20px;background-image:url("importCSV.gif");background-position:left center;background-repeat:no-repeat;}
 .header_csv_export{padding:2px 0 3px 20px;background-image:url("exportCSV.gif");background-position:left center;background-repeat:no-repeat;}
 .header_xls_export{padding:2px 0 3px 20px;background-image:url("exportEXCEL.gif");background-position:left center;background-repeat:no-repeat;}
 .cte_type { margin:0px 0px 6px 0px; }
