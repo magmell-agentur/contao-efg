@@ -227,6 +227,13 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 		'global_operations' => array
 		(
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
+			'import' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['import'],
+				'href'                => 'key=import',
+				'class'               => 'header_csv_import',
+				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+			),
 			'export' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['export'],
@@ -388,11 +395,16 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => false,
 			'filter'                  => false,
 			'eval'                    => array('rte' => 'tinyMCE', 'cols' => 80,'rows' => 5, 'style' => 'height: 80px'),
-		)
+		),
+//		'importSource' => array
+//		(
+//			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['importSource'],
+//			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv')
+//		)
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes'),
+		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes' /*,'importSource'*/),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . $varKey . "'"; $strSep = ',';
 endforeach; ?>),
