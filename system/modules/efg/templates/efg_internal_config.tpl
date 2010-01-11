@@ -42,7 +42,6 @@ $GLOBALS['FE_MOD']['application']['form'] = 'ExtendedForm';
 $GLOBALS['TL_CTE']['includes']['form'] = 'ExtendedForm';
 
 
-
 /**
  * -------------------------------------------------------------------------
  * BACK END MODULES
@@ -70,6 +69,7 @@ $GLOBALS['BE_MOD']['formdata']['feedback'] = array
 $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
 	(
 		'tables'     => array('tl_formdata', 'tl_formdata_details'),
+		'import'     => array('FormData', 'importCsv'),
 		'icon'       => 'system/modules/efg/html/formdata.gif',
 		'stylesheet' => 'system/modules/efg/html/style.css'
 	);
