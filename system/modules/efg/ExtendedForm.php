@@ -165,7 +165,6 @@ class ExtendedForm extends Form
 		$strMode = '';
 		$intActivePage = 1;
 
-
 		$this->Template = new FrontendTemplate($this->strTemplate);
 
 		$this->loadLanguageFile('tl_form');
@@ -173,7 +172,6 @@ class ExtendedForm extends Form
 		// render a previous completed page
 		if (strlen($_SESSION['EFP'][$formId]['render_page']))
 		{
-
 			$intActivePage = (int) $_SESSION['EFP'][$formId]['render_page'];
 			$this->intActivePage = (int) $_SESSION['EFP'][$formId]['render_page'];
 
@@ -183,7 +181,6 @@ class ExtendedForm extends Form
 		}
 		elseif (!strlen($_POST['FORM_SUBMIT']))
 		{
-			
 			unset($_SESSION['EFP'][$formId]['render_page']);
 			unset($_SESSION['EFP'][$formId]['completed']);
 		}
@@ -191,7 +188,6 @@ class ExtendedForm extends Form
 		// if ($this->Input->post('FORM_SUBMIT') == $formId && strlen($_POST['FORM_PAGE']))
 		if ($this->Input->post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
 		{
-			
 			$intActivePage = (int) $_POST['FORM_PAGE'];
 			$intGoto = 0;
 
@@ -215,17 +211,13 @@ class ExtendedForm extends Form
 					$_SESSION['EFP'][$formId]['render_page'] = $intGoto;
 					$this->reload();
 				}
-				
 			}
-
 
 			if ($intActivePage < 1) $intActivePage = 1;
 			if ($intActivePage > $this->intTotalPages) $intActivePage = $this->intTotalPages;
 
 			$this->intActivePage = $intActivePage;
-
 		}
-
 
 		$this->Template->fields = '';
 		$this->Template->hidden = '';
@@ -255,7 +247,6 @@ class ExtendedForm extends Form
 		{
 			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 			{
-		
 				// skip fields outside range of active page
 				$intFieldSorting = (int) $objFields->sorting;
 				if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage-1)]['sorting'])
@@ -271,9 +262,7 @@ class ExtendedForm extends Form
 				{
 					continue;
 				}
-				
 			}
-
 
 			// unset session values if no FORM_SUBMIT to avoid wrong validation against session values
 			if ($strMode != 'reload' && strlen($objFields->name))
@@ -306,7 +295,7 @@ class ExtendedForm extends Form
 				$arrData['formTotalPages'] = $this->intTotalPages;
 			}
 
-			// Increase the row count if its a password field
+			// Increase the row count if it is a password field
 			if ($objFields->type == 'password')
 			{
 				++$row;
@@ -318,29 +307,33 @@ class ExtendedForm extends Form
 			$objWidget = new $strClass($arrData);
 			$objWidget->required = $objFields->mandatory ? true : false;
 
-
 			if ($objWidget->required)
 			{
 				$this->arrWidgetsFailedValidation[$objFields->name] = 0;
 			}
 
-			//if ($strMode=='reload')
 			if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
 			{
 
 				// frontend editing
 				if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 				{
+
+					if (is_array($objWidget->options))
+					{
+						$arrData['options'] = $objWidget->options;
+					}
+
 					// prepare options array
 					$arrData['options'] = $this->FormData->prepareDcaOptions($arrData);
-			
+
 					// set rgxp 'date' for field type 'calendar'
 					if ($arrData['type'] == 'calendar')
 					{
 						$arrData['rgxp'] = 'date';
 					}
 
-					// prepare value
+					// prepare value 
 					$varFieldValue = $this->FormData->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
 					$objWidget->value = $varFieldValue;
 				}
@@ -365,7 +358,6 @@ class ExtendedForm extends Form
 
 			}
 
-
 			// HOOK: load form field callback
 			if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
 			{
@@ -378,7 +370,7 @@ class ExtendedForm extends Form
 					}
 				}
 			}
-
+			
 			// Validate input
 			if ($this->Input->post('FORM_SUBMIT') == $formId)
 			{
@@ -422,11 +414,8 @@ class ExtendedForm extends Form
 										$this->Files->chmod($strDstFile, 0644);
 									}
 								}
-
 							}
-
 						}
-
 						else
 						{
 							$objWidget->validate();
@@ -437,7 +426,6 @@ class ExtendedForm extends Form
 					{
 						$objWidget->validate();
 					}
-
 
 					// HOOK: validate form field callback
 					if (isset($GLOBALS['TL_HOOKS']['validateFormField']) && is_array($GLOBALS['TL_HOOKS']['validateFormField']))
@@ -454,15 +442,12 @@ class ExtendedForm extends Form
 
 				if ($objWidget->hasErrors())
 				{
-
 					if($objWidget->required)
 					{
 						$this->arrWidgetsFailedValidation[$objFields->name] = 1;
 					}
 					$doNotSubmit = true;
-
 				}
-
 				// Store current value in the session
 				elseif ($objWidget->submitInput())
 				{
@@ -506,7 +491,6 @@ class ExtendedForm extends Form
 					// add info about uploaded file to upload input
 					if (isset($_SESSION['FILES'][$objFields->name]) && $_SESSION['FILES'][$objFields->name]['uploaded'])
 					{
-
 						$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
 
 						++ $row;
@@ -515,11 +499,10 @@ class ExtendedForm extends Form
 				}
 			} // objWidget instanceof uploadable
 
-			
 			$this->Template->fields .= $objWidget->parse();
 
 			++$row;
-		}
+		} // while $objFields
 
 		if ($doNotSubmit && $this->blnAllowSkipRequired)
 		{

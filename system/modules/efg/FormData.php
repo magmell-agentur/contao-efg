@@ -65,9 +65,11 @@ class FormData extends Frontend
 			'checkbox','efgLookupCheckbox',
 			'upload'
 		);
-		
-		//$arrFFignore = array('fieldset','condition','submit','efgFormPaginator','captcha','headline','explanation','html');
-		//$this->arrFFstorable = array_diff(array_keys($GLOBALS['TL_FFL']), $arrFFignore);
+
+		if (is_array($GLOBALS['EFG']['storable_fields']) && count($GLOBALS['EFG']['storable_fields']))
+		{
+			$this->arrFFstorable = array_unique(array_merge($this->arrFFstorable, $GLOBALS['EFG']['storable_fields']));
+		}
 
 		$this->getStoreForms();
 
@@ -78,7 +80,6 @@ class FormData extends Frontend
 	 * @param string
 	 * @return mixed
 	 */
-
 	public function __get($strKey)
 	{
 		switch ($strKey)
@@ -91,6 +92,9 @@ class FormData extends Frontend
 				break;
 			case 'arrStoreForms':
 				return $this->arrStoreForms;
+				break;
+			case 'arrFormsDcaKey':
+				return $this->arrFormsDcaKey;
 				break;
 		}
 	}
@@ -339,8 +343,9 @@ class FormData extends Frontend
 	/*
 	 * Get all forms marked to store data in tl_formdata
 	 */
-	private function getStoreForms()
+	public function getStoreForms()
 	{
+		
 		if (!$this->arrStoreForms)
 		{
 			// get all forms marked to store data
@@ -501,7 +506,6 @@ class FormData extends Frontend
 		$strType = $arrField['type'];
 		$strVal = '';
 
-
 		if ( in_array($strType, $this->arrFFstorable) )
 		{
 
@@ -543,6 +547,10 @@ class FormData extends Frontend
 					if ( $strVal == '')
 					{
 						$strVal = $varSubmitted;
+						if (is_array($strVal))
+						{
+							$strVal = implode('|', $strVal);
+						}
 					}
 				break;
 				case 'efgLookupRadio':
@@ -572,6 +580,7 @@ class FormData extends Frontend
 				case 'select':
 					$strSep = '';
 					$strVal = '';
+
 					$arrOptions = $this->prepareDcaOptions($arrField);
 
 					// select multiple
@@ -582,7 +591,7 @@ class FormData extends Frontend
 							if (in_array($mxVal['value'], $varSubmitted))
 							{
 								//$strVal .= $strSep . $arrOptions[$o]['label'];
-								if (($strType=='select' || $strType=='conditionalselect' ) && $arrField['eval']['efgStoreValues'])
+								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
 								{
 									$strVal .= $strSep . $arrOptions[$o]['value'];
 								}
@@ -603,7 +612,7 @@ class FormData extends Frontend
 							if ($mxVal['value'] == $varSubmitted)
 							{
 								//$strVal = $arrOptions[$o]['label'];
-								if (($strType=='select' || $strType=='conditionalselect' ) && $arrField['eval']['efgStoreValues'])
+								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
 								{
 									$strVal = $arrOptions[$o]['value'];
 								}
@@ -690,11 +699,11 @@ class FormData extends Frontend
 	 * @param mixed post value
 	 * @param array form field properties
 	 * @param mixed file
+	 * @param boolean skip empty values (do not return label of selected option if its value is empty)
 	 * @return mixed
 	 */
-	public function preparePostValForMail($varSubmitted='', $arrField=false, $varFile=false)
+	public function preparePostValForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmpty=false)
 	{
-
 		if (!is_array($arrField))
 		{
 			return false;
@@ -702,6 +711,11 @@ class FormData extends Frontend
 
 		$strType = $arrField['type'];
 		$strVal = '';
+		
+		if (isset($arrField['efgMailSkipEmpty']))
+		{
+			$blnSkipEmpty = $arrField['efgMailSkipEmpty'];
+		}
 
 		if ( in_array($strType, $this->arrFFstorable) )
 		{
@@ -725,9 +739,14 @@ class FormData extends Frontend
 					}
 					foreach ($arrOptions as $o => $mxVal)
 					{
+						if ($blnSkipEmpty && !strlen($mxVal['value']))
+						{
+							continue;
+						}
+
 						if (in_array($mxVal['value'], $arrSel))
 						{
-							$strVal .= $strSep . $arrOptions[$o]['label'];
+							$strVal .= $strSep . $mxVal['label'];
 							$strSep = ', ';
 						}
 					}
@@ -745,7 +764,6 @@ class FormData extends Frontend
 					{
 						if ($mxVal['value'] == $varSubmitted)
 						{
-							//$strVal = $arrOptions[$o]['label'];
 							$strVal = $mxVal['label'];
 						}
 					}
@@ -764,9 +782,13 @@ class FormData extends Frontend
 					{
 						foreach ($arrOptions as $o => $mxVal)
 						{
+							if ($blnSkipEmpty && !strlen($mxVal['value']))
+							{
+								continue;
+							}
+							
 							if (in_array($mxVal['value'], $varSubmitted))
 							{
-								//$strVal .= $strSep . $arrOptions[$o]['label'];
 								$strVal .= $strSep . $mxVal['label'];
 								$strSep = ', ';
 							}
@@ -778,9 +800,13 @@ class FormData extends Frontend
 					{
 						foreach ($arrOptions as $o => $mxVal)
 						{
+							if ($blnSkipEmpty && !strlen($mxVal['value']))
+							{
+								continue;
+							}
+							
 							if ($mxVal['value'] == $varSubmitted)
 							{
-								//$strVal = $arrOptions[$o]['label'];
 								$strVal = $mxVal['label'];
 							}
 						}
@@ -901,7 +927,7 @@ class FormData extends Frontend
 				case 'efgLookupRadio':
 				case 'radio':
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
-
+					
 					$strVal = (is_array($varValue) ? $varValue[0] : $varValue);
 
 					if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
@@ -1043,7 +1069,7 @@ class FormData extends Frontend
 				case 'checkbox':
 					if ($arrField['options'])
 					{
-						$arrOptions = $arrField['options'];
+						$arrOptions = deserialize($arrField['options']);
 					}
 					else
 					{
@@ -1079,7 +1105,7 @@ class FormData extends Frontend
 				case 'radio':
 					if ($arrField['options'])
 					{
-						$arrOptions = $arrField['options'];
+						$arrOptions = deserialize($arrField['options']);
 					}
 					else
 					{
@@ -1118,7 +1144,7 @@ class FormData extends Frontend
 				case 'select':
 					if ($arrField['options'])
 					{
-						$arrOptions = $arrField['options'];
+						$arrOptions = deserialize($arrField['options']);
 					}
 					else
 					{
@@ -1239,13 +1265,16 @@ class FormData extends Frontend
 			$strType = 'efgLookupRadio';
 		}
 
+		$arrOptions = array();
+		
 		switch ($strType)
 		{
 
 			case 'efgLookupCheckbox':
 			case 'efgLookupRadio':
 			case 'efgLookupSelect':
-				// get efgLookupOptions: array('lookup_field' => TABLENAME.FIELDNAME, 'lookup_val_field' => TABLENAME.FIELDNAME, 'lookup_where' => CONDITION)
+				
+				// get efgLookupOptions: array('lookup_field' => TABLENAME.FIELDNAME, 'lookup_val_field' => TABLENAME.FIELDNAME, 'lookup_where' => CONDITION, 'lookup_sort' => ORDER BY)
 				$arrLookupOptions = deserialize($arrField['efgLookupOptions']);
 				$strLookupField = $arrLookupOptions['lookup_field'];
 				$strLookupValField = (strlen($arrLookupOptions['lookup_val_field'])) ? $arrLookupOptions['lookup_val_field'] : null;
@@ -1264,31 +1293,44 @@ class FormData extends Frontend
 				$sqlLookupIdField = 'id';
 				$sqlLookupWhere = (strlen($strLookupWhere) ? " WHERE " . $strLookupWhere : "");
 				$sqlLookupOrder = $arrLookupField[0] . '.' . $arrLookupField[1];
+				if (strlen($arrLookupOptions['lookup_sort']))
+				{
+					$sqlLookupOrder = $arrLookupOptions['lookup_sort'];
+				}
 
 				$arrOptions = array();
 
 				// handle lookup formdata
 				if (substr($sqlLookupTable, 0, 3) == 'fd_')
 				{
-
 					// load formdata specific dca
-					if (!isset($GLOBALS['TL_DCA']['tl_formdata'])) {
-						$this->loadDataContainer($sqlLookupTable);
-					}
-
-					$strFormKey = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterValue'];
+					//if (!isset($GLOBALS['TL_DCA']['tl_formdata'])) {
+					//$this->loadDataContainer($sqlLookupTable);
+					//}
+					
 					$strFormKey = $this->arrFormsDcaKey[substr($sqlLookupTable, 3)];
 
 					$sqlLookupTable = 'tl_formdata f, tl_formdata_details fd';
 					$sqlLookupIdField = 'f.id';
 					$sqlLookupWhere = " WHERE (f.id=fd.pid AND f.form='".$strFormKey."' AND ff_name='".$arrLookupField[1]."')";
 
+					$arrDetailFields = array();
+					if (strlen($strLookupWhere) || strlen($arrLookupOptions['lookup_sort']))
+					{
+						$objDetailFields = $this->Database->prepare("SELECT DISTINCT(ff.`name`) FROM tl_form f, tl_form_field ff WHERE f.storeFormdata=? AND (f.id=ff.pid) AND ff.`type` IN ('".implode("','", $this->arrFFstorable)."')")
+														->execute('1');
+						if ($objDetailFields->numRows)
+						{
+							$arrDetailFields = $objDetailFields->fetchEach('name');
+						}	
+					}
+					
 					if (strlen($strLookupWhere))
 					{
 						// special treatment for fields in tl_formdata_details
 						$arrPattern = array();
 						$arrReplace = array();
-						foreach($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields'] as $strDetailField)
+						foreach($arrDetailFields as $strDetailField)
 						{
 							$arrPattern[] = '/\b' . $strDetailField . '\b/i';
 							$arrReplace[] = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$strDetailField.'\'))';
@@ -1296,14 +1338,48 @@ class FormData extends Frontend
 						$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : " WHERE ") . "(" .preg_replace($arrPattern, $arrReplace, $strLookupWhere) .")";
 					}
 					$sqlLookupField = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\') ) AS `'. $arrLookupField[1] .'`';
-					$sqlLookupOrder = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\'))';
+					
+					if (strlen($arrLookupOptions['lookup_sort']))
+					{
+						// special treatment for fields in tl_formdata_details
+						$arrPattern = array();
+						$arrReplace = array();
+						foreach($arrDetailFields as $strDetailField)
+						{
+							$arrPattern[] = '/\b' . $strDetailField . '\b/i';
+							$arrReplace[] = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$strDetailField.'\'))';
+						}
+						$sqlLookupOrder = preg_replace($arrPattern, $arrReplace, str_replace($arrLookupField[0].'.', '', $arrLookupOptions['lookup_sort']));
+					}
+					else 
+					{				
+						$sqlLookupOrder = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\'))';
+					}	
+
 				} // end lookup formdata
 
 				// handle lookup calendar events
 				if ($sqlLookupTable == 'tl_calendar_events')
 				{
+					
+					//$sqlLookupOrder = 'startTime ASC';
+					$sqlLookupOrder = '';
 
-					//$sqlLookupWhere = (strlen($strLookupWhere) ? " AND ( " . $strLookupWhere . " ) " : "");
+					// handle order (max. 2 fields)  
+					// .. default startTime ASC
+					$arrSortKeys = array(array('field'=>'startTime', 'order'=>'ASC'),array('field'=>'startTime', 'order'=>'ASC'));
+					if (strlen($arrLookupOptions['lookup_sort']))
+					{
+						$sqlLookupOrder = $arrLookupOptions['lookup_sort'];
+						$arrSortOn = trimsplit(',', $arrLookupOptions['lookup_sort']);
+						$arrSortKeys = array();
+						foreach ($arrSortOn as $strSort)
+						{
+							$arrSortPar = explode(' ', $strSort);
+							$arrSortKeys[] = array('field'=>$arrSortPar[0], 'order'=> (strtoupper($arrSortPar[1])=='DESC'? 'DESC' : 'ASC')); 
+						}
+					}
+					
 					$sqlLookupWhere = (strlen($strLookupWhere) ? "(" . $strLookupWhere . ")" : "");
 
 					$strReferer = $this->getReferer();
@@ -1334,19 +1410,16 @@ class FormData extends Frontend
 
 						if (is_numeric($strEvents))
 						{
-							//$strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.id=".intval($strEvents)." ";
 							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=".intval($strEvents)." ";
 						}
 						elseif (is_string($strEvents))
 						{
 							$strEvents = str_replace('.html', '', $strEvents);
-							// $strLookupWhere = (strlen($strLookupWhere)) ? " AND " : "" . " tl_calendar_events.alias='".$strEvents."' ";
 							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$strEvents."' ";
 						}
 
 					}
 
-					//$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($strLookupWhere) ? " AND (" . $strLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder : "");
 					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
 
 					$objEvents = $this->Database->prepare($sqlLookup)->execute();
@@ -1392,11 +1465,27 @@ class FormData extends Frontend
 
 							if ($sqlLookupValField)
 							{
-								$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								if (count($arrSortKeys)>=2)
+								{
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+								}								
+								else
+								{
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+								}
 							}
 							else
 							{
-								$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								if (count($arrSortKeys)>=2)
+								{
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+								}								
+								else
+								{
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+								}
 							}
 
 							// Recurring events
@@ -1454,11 +1543,27 @@ class FormData extends Frontend
 
 										if ($sqlLookupValField)
 										{
-											$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											if (count($arrSortKeys)>=2)
+											{
+												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+											}								
+											else
+											{
+												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+											}
 										}
 										else
 										{
-											$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											if (count($arrSortKeys)>=2)
+											{
+												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+											}								
+											else
+											{
+												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));							
+											}
 										}
 
 									}
@@ -1467,17 +1572,57 @@ class FormData extends Frontend
 							} // if recurring
 
 						} // while
+						
+						// sort events
+						foreach ($arrEvents as $k => $arr)
+						{
+							if ($arrSortKeys[1]['order']=='DESC')
+							{
+								krsort($arrEvents[$k]);
+							}
+							else
+							{
+								ksort($arrEvents[$k]);
+							}
+						}	
+						if ($arrSortKeys[0]['order']=='DESC')
+						{
+							krsort($arrEvents);
+						}
+						else 
+						{
+							ksort($arrEvents);
+						}
+
+						// set options
+						foreach ($arrEvents as $k1 => $arr1)
+						{
+							foreach ($arr1 as $k2 => $arr2)
+							{
+								foreach ($arr2 as $k3 => $arr3)
+								{
+									$arrOptions[] = $arr3;
+								}				
+							}
+						}
+
+						if ( count($arrOptions) == 1 )
+						{
+							$blnDoNotAddEmptyOption = true;
+						}
+
+						// include blank option to input type select
+						if ( $strType == 'efgLookupSelect' )
+						{
+							if ( !$blnDoNotAddEmptyOption )
+							{
+								array_unshift($arrOptions, array('value'=>'', 'label'=>'-'));								
+							}
+						}
+						
 					} // if objEvents->numRows
 
-					// set options
-					$arrOptions = $arrEvents;
-					// sort events on key
-					ksort($arrOptions);
-
-					if ( count($arrOptions) == 1 )
-					{
-						$blnDoNotAddEmptyOption = true;
-					}
+					return $arrOptions;
 
 				} // end handle calendar events
 
@@ -1494,14 +1639,12 @@ class FormData extends Frontend
 						$arrOptions = array();
 						while ($arrOpt = $objOptions->fetchAssoc())
 						{
-							//$arrOptions['~'.$arrOpt['id']. (($sqlLookupValField) ? '::'.$arrOpt[$sqlLookupValField] : '') . '~'] = $arrOpt[$arrLookupField[1]];
 							if ($sqlLookupValField)
 							{
 								$arrOptions[$arrOpt[$sqlLookupValField]] = $arrOpt[$arrLookupField[1]];
 							}
 							else
 							{
-								//$arrOptions['~'.$arrOpt['id'].'~'] = $arrOpt[$arrLookupField[1]];
 								$arrOptions[$arrOpt['id']] = $arrOpt[$arrLookupField[1]];
 							}
 						}
@@ -1509,6 +1652,7 @@ class FormData extends Frontend
 
 				} // end normal lookup table
 
+				
 				$arrTempOptions = array();
 				// include blank option to input type select
 				if ( $strType == 'efgLookupSelect' )
@@ -1527,8 +1671,9 @@ class FormData extends Frontend
 				$arrOptions = $arrTempOptions;
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
-			
+// #####################			
 			// countryselect... 
+/*				
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
@@ -1538,15 +1683,148 @@ class FormData extends Frontend
 				}
 				$arrOptions = $arrTempOptions;
 			break;
+*/				
 			
 			default:
-				$arrOptions = deserialize($arrField['options']);
+				if ($arrField['options']) 
+				{
+					$arrOptions = deserialize($arrField['options']);
+				}
+				else
+				{
+					$strClass = $GLOBALS['TL_FFL'][$arrField['type']];
+					if ($this->classFileExists($strClass))
+					{
+						$objWidget = new $strClass($arrField);
+						if ($objWidget instanceof FormSelectMenu || $objWidget instanceof FormCheckbox || $objWidget instanceof FormRadioButton)
+						{						
+
+							// HOOK: load form field callback
+							if (isset($GLOBALS['TL_HOOKS']['loadFormField']) && is_array($GLOBALS['TL_HOOKS']['loadFormField']))
+							{
+								foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
+								{
+									$this->import($callback[0]);
+									$objWidget = $this->$callback[0]->$callback[1]($objWidget, $arrField['pid']);
+								}
+							}
+						
+							$arrOptions = $objWidget->options;
+						}						
+					}
+				}
 			break;
 		} // end switch $arrField['type']
 
 		return $arrOptions;
 
 	}
+	
+	
+	
+	public function importCsv()
+	{
+		if ($this->Input->get('key') != 'import')
+		{
+			return '';
+		}
+
+		
+		// Import Csv
+		if ($this->Input->post('FORM_SUBMIT') == 'tl_formdata_import')
+		{
+
+			if (!$this->Input->post('source') || $this->Input->post('source')=='')
+			{
+				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['ERR']['all_fields'];
+				$this->reload();
+			}
+
+			$strCsvFile = $this->Input->post('source');
+			$objFile = new File($strCsvFile);
+
+			if ($objFile->extension != 'csv')
+			{
+				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension);
+				continue;
+			}
+
+			// Get separator
+			switch ($this->Input->post('separator'))
+			{
+				case 'semicolon':
+					$strSeparator = ';';
+					break;
+
+				case 'tabulator':
+					$strSeparator = '\t';
+					break;
+
+				case 'linebreak':
+					$strSeparator = '\n';
+					break;
+
+				default:
+					$strSeparator = ',';
+					break;
+			}
+
+			$strFile = $objFile->getContent();
+			$arrRecipients = trimsplit($strSeparator, $strFile);
+			$arrRecipients = array_unique($arrRecipients);
+			$time = time();
+
+			foreach ($arrRecipients as $strRecipient)
+			{
+//				$this->Database->prepare("DELETE FROM tl_newsletter_recipients WHERE pid=? AND email=?")->execute($this->Input->get('id'), $strRecipient);
+//				$this->Database->prepare("INSERT INTO tl_newsletter_recipients SET pid=?, tstamp=?, email=?, active=?")->execute($this->Input->get('id'), $time, $strRecipient, 1);
+			}
+
+			setcookie('BE_PAGE_OFFSET', 0, 0, '/');
+			$this->redirect(str_replace('&key=import', '', $this->Environment->request));
+		}
+
+		$objTree = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['source'], 'source', null, 'source', 'tl_formdata'));
+
+		// Return form
+		return '
+<div id="tl_buttons">
+<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+</div>
+
+<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'.$this->getMessages().'
+
+<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
+<div class="tl_formbody_edit">
+<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import" />
+
+<div class="tl_tbox block">
+  <h3><label for="separator">'.$GLOBALS['TL_LANG']['MSC']['separator'][0].'</label></h3>
+  <select name="separator" id="separator" class="tl_select" onfocus="Backend.getScrollOffset();">
+    <option value="comma">'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
+    <option value="semicolon">'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
+    <option value="tabulator">'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
+    <option value="linebreak">'.$GLOBALS['TL_LANG']['MSC']['linebreak'].'</option>
+  </select>'.(strlen($GLOBALS['TL_LANG']['MSC']['separator'][1]) ? '
+  <p class="tl_help">'.$GLOBALS['TL_LANG']['MSC']['separator'][1].'</p>' : '').'
+  <h3><label for="source">'.$GLOBALS['TL_LANG']['tl_formdata']['source'][0].'</label> <a href="typolight/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); this.blur(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>
+'.$objTree->generate().(strlen($GLOBALS['TL_LANG']['tl_formdata']['source'][1]) ? '
+  <p class="tl_help">'.$GLOBALS['TL_LANG']['tl_formdata']['source'][1].'</p>' : '').'
+</div>
+
+</div>
+
+<div class="tl_formbody_submit">
+
+<div class="tl_submit_container">
+<input type="submit" name="save" id="save" class="tl_submit" alt="import form data" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_newsletter_recipients']['import'][0]).'" />
+</div>
+
+</div>
+</form>';
+		
+	}
+	
 
 	public function parseInsertTagParams($strTag='')
 	{

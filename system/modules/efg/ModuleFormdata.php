@@ -57,7 +57,11 @@ class ModuleFormdata extends Backend
 
 		$this->loadDataContainer('tl_form_field');
 
+		$this->import('FormData');		
+		
 		// Types of form fields with storable data
+		$this->arrFFstorable = $this->FormData->arrFFstorable;
+		/*
 		$this->arrFFstorable = array(
 			'sessionText', 'sessionOption', 'sessionCalculator', 
 			'hidden','text','calendar','password','textarea',
@@ -66,7 +70,7 @@ class ModuleFormdata extends Backend
 			'checkbox','efgLookupCheckbox',
 			'upload'
 		);
-
+		*/
 		//$arrFFignore = array('fieldset','condition','submit','efgFormPaginator','captcha','headline','explanation','html');
 		//$this->arrFFstorable = array_diff(array_keys($GLOBALS['TL_FFL']), $arrFFignore);
 	}
@@ -74,15 +78,17 @@ class ModuleFormdata extends Backend
 	public function generate()
 	{
 
-		$this->getStoreForms();
+		//$this->getStoreForms();
 
 		if ($this->Input->get('do') && $this->Input->get('do') != "feedback")
 		{
-			if ($this->arrStoreForms[$this->Input->get('do')])
+			//if ($this->arrStoreForms[$this->Input->get('do')])
+			if ($this->FormData->arrStoreForms[$this->Input->get('do')])
 			{
 				$session = $this->Session->getData();
-				$session['filter']['tl_feedback']['form'] = $this->arrStoreForms[$this->Input->get('do')]['title'];
-
+				//$session['filter']['tl_feedback']['form'] = $this->arrStoreForms[$this->Input->get('do')]['title'];
+				$session['filter']['tl_feedback']['form'] = $this->FormData->arrStoreForms[$this->Input->get('do')]['title'];
+				
 				$this->Session->setData($session);
 			}
 		}
@@ -102,6 +108,7 @@ class ModuleFormdata extends Backend
 	/*
 	 * Get all Forms marked to store data in database
 	 */
+/*	
 	public function getStoreForms()
 	{
 		if ( !$this->arrStoreForms)
@@ -120,11 +127,12 @@ class ModuleFormdata extends Backend
 				$this->arrStoreForms[$varKey] = $objForms->row();
 				$this->arrFormsDcaKey[$varKey] = $objForms->title;
 			}
+			
 		}
 
 		return $this->arrStoreForms;
 	}
-
+*/
 
 	/**
 	 * Create DCA files
@@ -145,14 +153,17 @@ class ModuleFormdata extends Backend
 	 */
 	public function callbackEditButton($row, $href, $label, $title, $icon, $attributes, $strTable, $arrRootIds, $arrChildRecordIds, $blnCircularReference, $strPrevious, $strNext)
 	{
+		/*
 		if (!$this->arrStoreForms)
 		{
 			$this->getStoreForms();
 		}
+		*/
 
 		$return = '';
-
-		$strDcaKey = array_search($row['form'], $this->arrFormsDcaKey);
+		
+		//$strDcaKey = array_search($row['form'], $this->arrFormsDcaKey);
+		$strDcaKey = array_search($row['form'], $this->FormData->arrFormsDcaKey);
 		if ($strDcaKey)
 		{
 			$return .= '<a href="'.$this->addToUrl($href.'&amp;do=fd_'.$strDcaKey.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
@@ -167,10 +178,10 @@ class ModuleFormdata extends Backend
 	 */
 	private function updateConfig()
 	{
-
 		$this->import('String');
 
-		$arrStoreForms = $this->getStoreForms();
+		//$arrStoreForms = $this->getStoreForms();
+		$arrStoreForms = $this->FormData->arrStoreForms;
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
@@ -293,7 +304,8 @@ class ModuleFormdata extends Backend
 			$strFormKey = 'feedback';
 			$tplDca = 'tplDca_' . $strFormKey;
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
-			$tplDca->arrForm = array('key' => 'feedback', 'title'=>"Feedback");
+			// $tplDca->arrForm = array('key' => 'feedback', 'title'=>"Feedback");
+			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->objForm['title']);
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrAllFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
