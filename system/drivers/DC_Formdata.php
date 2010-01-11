@@ -244,7 +244,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes');
+		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','importSource');
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
@@ -348,7 +348,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 			$this->arrSqlDetails = array();
 			foreach ($this->arrDetailFields as $strFName)
 			{
-				$this->arrSqlDetails[] = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' .$strFName. '\' AND pid=f.id) AS `' . $strFName .'`';
+				$this->arrSqlDetails[$strFName] = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' .$strFName. '\' AND pid=f.id) AS `' . $strFName .'`';
 			}
 		}
 
@@ -527,7 +527,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$strFormFilter = ($this->strTable == 'tl_formdata' && strlen($this->strFormKey) ? $this->sqlFormFilter : '');
 		$table_alias = ($this->strTable == 'tl_formdata' ? ' f' : '');
 
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , $this->arrSqlDetails) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ( $sqlWhere != '')
 		{
@@ -794,7 +794,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 		{
 			if (isset($v['default']))
 			{
-				// tom, 2007-09-27, default values of base fields only
 				if (!in_array($k, $this->arrBaseFields))
 				{
 					continue;
@@ -1483,7 +1482,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 
 		// Get current record
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , $this->arrSqlDetails) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ( $sqlWhere != '')
 		{
@@ -1554,12 +1553,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$messageText = '';
 		$messageHtml = '';
 		$messageHtmlTmpl = '';
-		$recipient  = '';
+		$strRecipient  = '';
+		$arrRecipient = array();
 		$sender = '';
 		$senderName = '';
 		$attachments = array();
 
 		$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
+		$blnStoreOptionsValues = ($arrForm['efgStoreValues']) ? true : false;
 
 		$dirImages = '';
 
@@ -1576,16 +1577,51 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		$recipientFieldName = $arrForm['confirmationMailRecipientField'];
-		$recipient = $arrSubmitted[$recipientFieldName];
-		if (is_array($recipient))
+
+		if (strlen($recipientFieldName) && $arrSubmitted[$recipientFieldName])
 		{
-			$recipient = implode(',' , $recipient);
-		}
-		if ($this->Input->get('recipient'))
-		{
-			$recipient = $this->Input->get('recipient');
+			$varRecipient = $arrSubmitted[$recipientFieldName];
+			// handle efg option 'save options of values' for field types radio, select, checkbox
+			if (in_array($arrFormFields[$recipientFieldName]['type'], array('radio', 'select', 'checkbox')))
+			{
+				if (!$blnStoreOptionsValues)
+				{	
+					$arrRecipient = $this->FormData->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
+					if (count($arrRecipient))
+					{
+						$varRecipient = implode(', ', $arrRecipient);
+					}			
+					unset($arrRecipient);
+				}
+			}
+			$varRecipient = str_replace('|', ',', $varRecipient);
 		}
 
+		if (strlen($varRecipient) || strlen($arrForm['confirmationMailRecipient']))
+		{
+			$arrRecipient = array_unique(array_merge(trimsplit(',', $varRecipient), trimsplit(',', $arrForm['confirmationMailRecipient'])));
+		}
+		
+		if ($this->Input->get('recipient'))
+		{
+			$arrRecipient = array_unique(trimsplit(',', $this->Input->get('recipient')));
+		}
+
+		if (is_array($arrRecipient))
+		{
+			$strRecipient = implode(', ', $arrRecipient);
+			
+			// handle insert tag {{user::email}} in recipient fields  
+			if (!is_bool(strpos($strRecipient, "{{user::email}}")) && $arrSubmitted['fd_member'] > 0)
+			{
+				$objUser = $this->Database->prepare("SELECT `email` FROM `tl_member` WHERE id=?")
+									->limit(1)
+									->execute($arrSubmitted['fd_member']);
+									
+				$arrRecipient = array_map("str_replace", array_fill(0, count($arrRecipient), "{{user::email}}"), array_fill(0, count($arrRecipient), $objUser->email), $arrRecipient);
+				$strRecipient = implode(', ', $arrRecipient);						
+			}			
+		}
 
 		$subject = $arrForm['confirmationMailSubject'];
 		$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
@@ -1600,12 +1636,12 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 		}
 
-		// Replace tags in messageText and messageHtml
+		// Replace tags in messageText, messageHtml ...
  		$tags = array();
- 		preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml, $tags);
+ 		preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
 
- 		// Replace tags of type {â€Ž{form::<form field name>}}
+ 		// Replace tags of type {{form::<form field name>}}
  		foreach ($tags[0] as $tag)
  		{
  			$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
@@ -1672,7 +1708,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 						elseif ($strType=='upload')
 						{
 
-
 							if (strlen($arrSubmitted[$strKey]))
 							{
 								if (!array_key_exists($strKey, $arrFiles))
@@ -1698,7 +1733,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 							}
 							else
 							{
-								//$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$strVal = $this->formatValue($strKey, $strVal);
 							}
@@ -1712,7 +1746,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 						}
 						else
 						{
-							//$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
@@ -1807,31 +1840,51 @@ class DC_Formdata extends DataContainer implements listable, editable
 			$this->Session->set('fd_mail_send', null);
 			$blnSend = true;
 
-			// USED TO DEBUG ONLY
-			/*
-			$fp = fopen('../efg_mail_debug_be.txt', 'ab');
-			fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
-			fwrite($fp, "\n confirmation Mail:");
-			fwrite($fp, "\n sender=".$sender);
-			fwrite($fp, "\n mail to=".$recipient);
-			fwrite($fp, "\n subject=".$subject);
-			fwrite($fp, "\n plain text:\n");
-			fwrite($fp, $messageText);
-			fwrite($fp, "\n html text:\n");
-			fwrite($fp, $messageHtml);
-			fclose($fp);
-			*/
-
 			if ($blnSend)
 			{
-				$confEmail->sendTo($recipient);
+				// Send e-mail
+				if (count($arrRecipient)>0)
+				{
+					$arrSentTo = array();
+					foreach ($arrRecipient as $recipient)
+					{
+						if(strlen($recipient))
+						{
+	        		        $recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
+	        		        $recipientName = '';
+	                		if (strpos($recipient, '<') > 0) {
+								preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
+	                    		$recipientName = trim($parts[1]);
+	                    		$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+	                		}
+	            		}
 
-				$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], $recipient);
+						// USED TO DEBUG ONLY
+						/*
+						$fp = fopen('../efg_mail_debug_be.txt', 'ab');
+						fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
+						fwrite($fp, "\n confirmation Mail:");
+						fwrite($fp, "\n sender=".$sender);
+						fwrite($fp, "\n mail to=".$recipient);
+						fwrite($fp, "\n subject=".$subject);
+						fwrite($fp, "\n plain text:\n");
+						fwrite($fp, $messageText);
+						fwrite($fp, "\n html text:\n");
+						fwrite($fp, $messageHtml);
+						fclose($fp);
+						*/
+
+	            		$confEmail->sendTo($recipient);
+						
+						$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient));
+					}
+				}
+
 				$url = $this->Environment->base . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', $this->Environment->request);
+				
 			}
 
 		}
-
 
 		$strToken = md5(uniqid('', true));
 		$this->Session->set('fd_mail_send', $strToken);
@@ -1860,7 +1913,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
   <tr class="row_1">
     <td class="col_0"><label for="ctrl_formdata_recipient">' . $GLOBALS['TL_LANG']['tl_formdata']['mail_recipient'][0]. '</label></td>
-    <td class="col_1"><input name="recipient" type="ctrl_recipient" class="tl_text" value="' . $recipient . '" '.($blnSend ? 'disabled="disabled"' : '').'/></td>
+    <td class="col_1"><input name="recipient" type="ctrl_recipient" class="tl_text" value="' . $strRecipient . '" '.($blnSend ? 'disabled="disabled"' : '').'/></td>
   </tr>
 
   <tr class="row_2">
@@ -2137,19 +2190,18 @@ $return .= '
 
 			$this->reload();
 		}
-
+ 
 		// Get current record
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , $this->arrSqlDetails) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ( $sqlWhere != '')
 		{
 			$sqlQuery .= $sqlWhere;
 		}
-
+ 
 		$objRow = $this->Database->prepare($sqlQuery)
 								 ->limit(1)
 								 ->execute($this->intId);
-
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
@@ -2178,6 +2230,7 @@ $return .= '
 
 		if (count($boxes))
 		{
+	
 			foreach ($boxes as $k=>$v)
 			{
 				$eCount = 1;
@@ -2297,9 +2350,8 @@ $return .= '
 					}
 
 
-					// prepare values of special fields like rado, select and checkbox
+					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
-
 					
 					// render inputType hidden as inputType text in Backend
 					if ($strInputType == 'hidden')
@@ -2428,7 +2480,7 @@ $return .= '
 							} // foreignKey field
 
 							$arrValues = explode('|', $this->varValue);
-
+							
 							if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['efgStoreValues'])
 							{
 								$this->varValue = $arrValues;
@@ -2493,7 +2545,7 @@ $return .= '
 
 						// tom, 2007-09-27, bugfix:
 						// .. not if value is empty or does not exist at all
-						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exisits
+						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
 						if (strlen($arrVals[0]) && strlen($this->varValue))
 						{
 							$this->varValue = $arrVals[0];
@@ -2507,8 +2559,8 @@ $return .= '
 					// field type efgLookupSelect
 					if ( $strInputType=='efgLookupSelect' )
 					{
-
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
 						{
@@ -2970,7 +3022,7 @@ window.addEvent(\'domready\', function()
 					}
 
 
-					// prepare values of special fields like rado, select and checkbox
+					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
 
 					// render inputType hidden as inputType text in Backend
@@ -4662,7 +4714,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			$this->values[] = $this->Input->get('id');
 		}
 
-		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , $this->arrSqlDetails) : '') ." FROM " . $this->strTable . $table_alias;
+		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 
 		$sqlWhere = '';
 
@@ -5169,8 +5221,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters')
 		{
 
-			//$session['search'][$this->strTable]['value'] = '';
-			//$session['search'][$this->strTable]['field'] = $this->Input->post('tl_field', true);
 			$session['search'][$strSessionKey]['value'] = '';
 			$session['search'][$strSessionKey]['field'] = $this->Input->post('tl_field', true);
 
@@ -5180,13 +5230,12 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $this->Input->post('tl_field', true) .'\' AND pid=f.id)';
 				try
 				{
-					$this->Database->prepare("SELECT * ".(count($this->arrSqlDetails) > 0 ? ','.implode(', ', $this->arrSqlDetails) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
+					$this->Database->prepare("SELECT * ".(count($this->arrSqlDetails) > 0 ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
 								   ->limit(1)
 								   ->execute($this->Input->postRaw('tl_value'));
 
 					$session['search'][$strSessionKey]['value'] = $this->Input->postRaw('tl_value');
 				}
-
 				catch (Exception $e)
 				{
 					// Nothing to do here
@@ -5197,11 +5246,8 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		}
 
 		// Set search value from session
-		//elseif (strlen($session['search'][$this->strTable]['value']))
 		elseif (strlen($session['search'][$strSessionKey]['value']))
 		{
-			//$this->procedure[] = "CAST(".$session['search'][$this->strTable]['field']." AS CHAR) REGEXP ?";
-			//$this->values[] = $session['search'][$this->strTable]['value'];
 			$sqlSearchField = $session['search'][$strSessionKey]['field'];
 			if (in_array($sqlSearchField, $this->arrDetailFields) )
 			{
@@ -5215,15 +5261,12 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 		foreach ($searchFields as $field)
 		{
-			//$option_label = strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0] : $GLOBALS['TL_LANG']['MSC'][$field];
-			//$options_sorter[$option_label] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$this->strTable]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';
 			$option_label = strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0] : $GLOBALS['TL_LANG']['MSC'][$field];
 			$options_sorter[$option_label] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$strSessionKey]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';
 		}
 
 		// Sort by option values
 		uksort($options_sorter, 'strcasecmp');
-		//$active = strlen($session['search'][$this->strTable]['value']) ? true : false;
 		$active = strlen($session['search'][$strSessionKey]['value']) ? true : false;
 
 		return '
@@ -5381,19 +5424,16 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				$arrProcedure = $this->procedure;
 				foreach ($arrProcedure as $kProc => $vProc)
 				{
-					//$strProcField = substr($vProc, 0, strpos($vProc, '='));
 					$arrParts = preg_split('/[\s=><\!]/si', $vProc);
 					$strProcField = $arrParts[0];
 					if (in_array($strProcField, $this->arrDetailFields) )
 					{
-						//$sqlDetailFields .= ", (SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id) AS `" . $strProcField . "`";
 						$arrProcedure[$kProc] = "(SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id)=?";
 					}
 
 				}
 				$sqlWhere = " WHERE " . implode(' AND ', $arrProcedure);
 			}
-			//$sqlSelect = "SELECT COUNT(*) AS total ". $sqlDetailFields ." FROM " . $this->strTable . " f";
 			$sqlSelect = "SELECT COUNT(*) AS total FROM " . $this->strTable . " f";
 			$sqlQuery = $sqlSelect . $sqlWhere;
 
@@ -5853,10 +5893,10 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 	public function export($sMode='csv')
 	{
 
-if (strlen($this->Input->get('expmode')))
-{
-	$sMode = $this->Input->get('expmode');
-}
+		if (strlen($this->Input->get('expmode')))
+		{
+			$sMode = $this->Input->get('expmode');
+		}
 
 		$return = '';
 
@@ -5907,13 +5947,114 @@ if (strlen($this->Input->get('expmode')))
 			$this->values[] = $this->Input->get('id');
 		}
 
-		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , $this->arrSqlDetails) : '') ." FROM " . $this->strTable . $table_alias;
+		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 
 		$sqlWhere = '';
 
+		// changed in v1.12.2: search and filter from session instead of just exporting CURRENT IDS only
+		/*
 		if (isset($session['CURRENT']['IDS']) && count($session['CURRENT']['IDS'])>0 )
 		{
 			$sqlWhere = " WHERE id IN (" . implode(',', $session['CURRENT']['IDS']) . ") ";
+		}
+		*/
+		// Set search value from session
+		$strSessionKey = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
+		if (strlen($session['search'][$strSessionKey]['value']))
+		{
+			$sqlSearchField = $session['search'][$strSessionKey]['field'];
+			if (in_array($sqlSearchField, $this->arrDetailFields) )
+			{
+				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $session['search'][$strSessionKey]['field'] .'\' AND pid=f.id)';
+			}
+			$this->procedure[] = "CAST(".$sqlSearchField." AS CHAR) REGEXP ?";
+			$this->values[] = $session['search'][$strSessionKey]['value'];
+		}
+
+		// Set filter from session
+		$arrFilterFields = array();
+		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
+		{
+			if ($v['filter'] )
+			{
+				$arrFilterFields[] = $k;
+			}
+		}
+		if (count($arrFilterFields))
+		{
+			foreach ($arrFilterFields as $field)
+			{
+				if (isset($session['filter'][$strSessionKey][$field]))
+				{
+					$sqlFilterField = $field;
+					if (in_array($field, $this->arrDetailFields))
+					{
+						$sqlFilterField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $field .'\' AND pid=f.id)';  
+					}
+
+					// Sort by day
+					if (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'], array(5, 6)))
+					{
+						if ($session['filter'][$strSessionKey][$field] == '')
+						{
+							$this->procedure[] = $sqlFilterField . "=''";
+						}
+						else
+						{
+							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
+							$this->values[] = $objDate->dayBegin;
+							$this->values[] = $objDate->dayEnd;
+						}
+					}
+
+					// Sort by month
+					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'], array(7, 8)))
+					{
+						if ($session['filter'][$strSessionKey][$field] == '')
+						{
+							$this->procedure[] = $sqlFilterField . "=''";
+						}
+						else
+						{
+							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
+							$this->values[] = $objDate->monthBegin;
+							$this->values[] = $objDate->monthEnd;
+						}
+					}
+
+					// Sort by year
+					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'], array(9, 10)))
+					{
+						if ($session['filter'][$strSessionKey][$field] == '')
+						{
+							$this->procedure[] = $sqlFilterField . "=''";
+						}
+						else
+						{
+							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
+							$this->values[] = $objDate->yearBegin;
+							$this->values[] = $objDate->yearEnd;
+						}
+					}
+
+					// Manual filter
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['multiple'])
+					{
+						$this->procedure[] = $sqlFilterField . ' LIKE ?';
+						$this->values[] = '%"' . $session['filter'][$strSessionKey][$field] . '"%';
+					}
+
+					// Other sort algorithm
+					else
+					{
+						$this->procedure[] = $sqlFilterField . '=?';
+						$this->values[] = $session['filter'][$strSessionKey][$field];
+					}
+				}
+			}
 		}
 
 		if (count($this->procedure))
@@ -5935,7 +6076,7 @@ if (strlen($this->Input->get('expmode')))
 		{
 			$query .= $sqlWhere;
 		}
-
+// TODO: Fix order by
 		if (is_array($orderBy) && strlen($orderBy[0]))
 		{
 			foreach ( $orderBy as $o => $strVal)
@@ -5956,7 +6097,6 @@ if (strlen($this->Input->get('expmode')))
 		}
 
 		$objRowStmt = $this->Database->prepare($query);
-
 		$objRow = $objRowStmt->execute($this->values);
 
 		$intRowCounter = -1;
