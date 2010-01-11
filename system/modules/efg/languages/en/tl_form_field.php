@@ -35,7 +35,7 @@ $GLOBALS['TL_LANG']['tl_form_field']['efgLookupOptions'] = array('Options from d
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_field'] = array('Database field (label)', 'Please choose the database field where the available options (label) should be taken from.');
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_val_field'] = array('Database field (value)', 'Please choose the database field where the available options (value) should be taken from.');
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_where'] = array('Condition', 'If you want to exclude certain records, you can enter a condition here (e.g. <em>published=\'1\'</em> or <em>type!=\'admin\'</em>).');
-$GLOBALS['TL_LANG']['tl_form_field']['list_sort'] = array('Order by', 'Here you can enter a comma seperated list of fields to sort the results by.');
+$GLOBALS['TL_LANG']['tl_form_field']['lookup_sort'] = array('Order by', 'Here you can enter a comma seperated list of fields to sort the results by (e.g.  <em>title ASC</em> or <em>city ASC, gender DESC</em>). If you don\'t specify a sorting, records are sorted according to the label field.');
 
 $GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC'] = array('Source files', 'Please select one or more files or folders (files in a folder will be included automatically).');
 $GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir'] = array('Use home directory as source', 'If there is a logged in user, use his home directory as source instead of the \'source files\' defined above.');

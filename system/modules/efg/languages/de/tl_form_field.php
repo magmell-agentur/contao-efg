@@ -31,7 +31,7 @@ $GLOBALS['TL_LANG']['tl_form_field']['lookup_val_field']['1'] = "Wählen Sie, au
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_where']['0'] = "Bedingung";
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_where']['1'] = "Um bestimmte Datensätze auszuschließen, können Sie hier eine Bedingung eingeben (z.B. <em>published='1'</em> oder <em>type!='admin'</em>).";
 $GLOBALS['TL_LANG']['tl_form_field']['lookup_sort']['0'] = "Sortieren nach";
-$GLOBALS['TL_LANG']['tl_form_field']['lookup_sort']['1'] = "Hier können Sie eine kommagetrennte Liste der Felder eingeben, nach denen die Ergebnisse sortiert werden sollen.";
+$GLOBALS['TL_LANG']['tl_form_field']['lookup_sort']['1'] = "Hier können Sie eine kommagetrennte Liste der Felder eingeben, nach denen die Ergebnisse sortiert werden sollen (z.B. <em>title ASC</em> oder <em>city ASC, gender DESC</em>). Wenn Sie keine Sortierung angeben, werden die Datensätze anhand des label-Feldes sortiert, oder anhand des Datums (bei Terminen, Quelltabelle tl_calendar_events).";
 $GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC']['0'] = "Quelldateien";
 $GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC']['1'] = "Bitte wählen Sie alle Bilder und/oder Ordner, die in das Formularelement eingefügt werden sollen. Wenn Sie einen Ordner auswählen, werden alle darin enthaltenen Dateien automatisch eingefügt.";
 $GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir']['0'] = "Quelldateien aus Benutzerverzeichnis";
