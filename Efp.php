@@ -171,6 +171,7 @@ class Efp extends Frontend
 
 		// Types of form fields with storable data
 		$arrFFstorable = $this->FormData->arrFFstorable;
+		
 
 		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0 )
 		{
@@ -389,13 +390,15 @@ class Efp extends Frontend
 
 		// store data in session to display on confirmation page
 		unset($_SESSION['EFP']['FORMDATA']);
+		$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
+		
 		foreach ($arrFormFields as $k => $arrField)
 		{
 			$strType = $arrField['type'];
 			$strVal = '';
-			if ( in_array($strType, $arrFFstorable) )
+			if (in_array($strType, $arrFFstorable))
 			{
-				$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$k], $arrField, $arrFiles[$k]);
+				$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$k], $arrField, $arrFiles[$k], $blnSkipEmpty);
 			}
 
 			$_SESSION['EFP']['FORMDATA'][$k] = $strVal;
@@ -487,6 +490,8 @@ class Efp extends Frontend
 						}
 
  						$arrField = $arrFormFields[$strKey];
+ 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
+
  						$strType = $arrField['type'];
 
 						$strLabel = '';
@@ -497,7 +502,7 @@ class Efp extends Frontend
 							$strLabel = $arrTagParams['label'];
 						}
 
-						if ( in_array($strType, $arrFFstorable) )
+						if (in_array($strType, $arrFFstorable) )
 						{
 							if ( $strType == 'efgImageSelect' )
 							{
@@ -552,9 +557,7 @@ class Efp extends Frontend
 							}
 							else
 							{
-
 								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-
 								if (!strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -568,7 +571,6 @@ class Efp extends Frontend
 									$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li)([^>]*)(>)/si', "\\1\\2\\3\\4\n", $strVal);
 								}
 			 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
-
 			 				}
 						}
 
@@ -606,7 +608,7 @@ class Efp extends Frontend
 			// replace insert tags in sender
 			if (strlen($sender))
 			{
-				// 2008-09-20 tom: Controller->replaceInserTags seems not to work if string to parse contains insert tag only, so add space and trim result
+				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
 				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
 			}
 
@@ -751,6 +753,8 @@ class Efp extends Frontend
 						}
 
  						$arrField = $arrFormFields[$strKey];
+ 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
+
  						$strType = $arrField['type'];
 
 						$strLabel = '';
@@ -1034,7 +1038,7 @@ class Efp extends Frontend
 				}
 			}
 
-			unset($_SESSION['EFP']['FORMDATA']);
+			// unset($_SESSION['EFP']['FORMDATA']);
 
 		}
 

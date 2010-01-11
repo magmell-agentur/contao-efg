@@ -557,7 +557,6 @@ class ModuleFormdataListing extends Module
 				}
 				else
 				{
-					//include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
 					include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 				}
 			}
@@ -777,7 +776,32 @@ class ModuleFormdataListing extends Module
 						$arrConds = array();
 						foreach (trimsplit(',', urldecode($this->Input->get('search'))) as $field)
 						{
-							if (in_array($field, $this->arrBaseFields))
+							if (in_array($field, $this->arrOwnerFields))
+							{
+								if ($field == "fd_member")
+								{
+									$prop = 'arrMembers';
+								} 
+								elseif ($field == "fd_member_group")
+								{
+									$prop = 'arrMemberGroups';
+								}
+								elseif ($field == "fd_user")
+								{
+									$prop = 'arrUsers';
+								}
+								elseif ($field == "fd_user_group")
+								{
+									$prop = 'arrUserGroups';
+								}
+								
+								$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
+								if (count($arrMatches))
+								{
+									$arrConds[] = $field ." IN(".implode(",", array_keys($arrMatches)).")";
+								}
+							}
+							elseif (in_array($field, $this->arrBaseFields))
 							{
 								$arrConds[] = $field . " LIKE ?";
 							}
@@ -809,7 +833,32 @@ class ModuleFormdataListing extends Module
 						{
 							if (in_array($field, $arrSearchFields) && strlen($for))
 							{
-								if (in_array($field, $this->arrBaseFields))
+								if (in_array($field, $this->arrOwnerFields))
+								{
+									if ($field == "fd_member")
+									{
+										$prop = 'arrMembers';
+									} 
+									elseif ($field == "fd_member_group")
+									{
+										$prop = 'arrMemberGroups';
+									}
+									elseif ($field == "fd_user")
+									{
+										$prop = 'arrUsers';
+									}
+									elseif ($field == "fd_user_group")
+									{
+										$prop = 'arrUserGroups';
+									}
+									
+									$arrMatches = $this->array_filter_like($this->$prop, urldecode($for));
+									if (count($arrMatches))
+									{
+										$arrConds[] = $field ." IN(".implode(",", array_keys($arrMatches)).")";
+									}
+								}
+								elseif (in_array($field, $this->arrBaseFields))
 								{
 									$arrConds[] = $field . " LIKE ?";
 									$arrKeywords[] = '%' . urldecode($for) . '%';
@@ -861,7 +910,33 @@ class ModuleFormdataListing extends Module
 					{
 						$varKeyword = '%' . $this->Input->get('for') . '%';
 
-						if (in_array($this->Input->get('search'), $this->arrBaseFields))
+						if (in_array($this->Input->get('search'), $this->arrOwnerFields))
+						{
+							$field = $this->Input->get('search');
+							if ($field == "fd_member")
+							{
+								$prop = 'arrMembers';
+							} 
+							elseif ($field == "fd_member_group")
+							{
+								$prop = 'arrMemberGroups';
+							}
+							elseif ($field == "fd_user")
+							{
+								$prop = 'arrUsers';
+							}
+							elseif ($field == "fd_user_group")
+							{
+								$prop = 'arrUserGroups';
+							}
+							
+							$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
+							if (count($arrMatches))
+							{
+								$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $field ." IN(".implode(",", array_keys($arrMatches)).")";
+							}
+						}
+						elseif (in_array($this->Input->get('search'), $this->arrBaseFields))
 						{
 							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $this->Input->get('search') . " LIKE ?";
 						}
@@ -2857,12 +2932,6 @@ class ModuleFormdataListing extends Module
 		}
 		$_SESSION['EFP']['LISTING_MOD']['id'] = $intListingId;
 
-		// $arrRow = $objRecord->fetchAssoc();
-
-
-		$count = -1;
-
-
 		if ($objFormElement->numRows == 1)
 		{
 			$this->Template->editform = $this->generateEditForm($objFormElement, $objRecord);
@@ -3263,6 +3332,26 @@ class ModuleFormdataListing extends Module
 
 		return $strBuffer;
 
+	}
+
+	private function array_filter_like($arrInput, $varSearch)
+	{
+		$arrRet = array(-1 => "-");
+		
+		if (!is_array($arrInput) || !count($arrInput))
+		{
+			return $arrRet;
+		}
+		
+		foreach ($arrInput as $k=>$v)
+		{
+			if (!is_bool(mb_stripos($v, $varSearch)))
+			{
+				$arrRet[$k] = $v;
+			}
+		}
+		
+		return $arrRet;
 	}
 
 }

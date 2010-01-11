@@ -65,13 +65,12 @@ class EfgFormLookupSelectMenu extends Widget
 					$this->arrAttributes['size'] = $varValue;
 				}
 				break;
-				
 			case 'efgLookupOptions':
 				$this->import('Database');
 				$this->import('String');
 				$this->import('FormData');
+				
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
-
 				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
@@ -96,7 +95,27 @@ class EfgFormLookupSelectMenu extends Widget
 		}
 	}
 
+	
+	/**
+	 * Return a parameter
+	 * @return string
+	 * @throws Exception
+	 */
+	public function __get($strKey)
+	{
+		switch ($strKey)
+		{
+			case 'options':
+				return $this->arrOptions;
+				break;
 
+			default:
+				return parent::__get($strKey);
+				break;
+		}
+	}
+	
+	
 	/**
 	 * Generate the widget and return it as string
 	 * @return string
