@@ -6076,7 +6076,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		{
 			$query .= $sqlWhere;
 		}
-// TODO: Fix order by
+
 		if (is_array($orderBy) && strlen($orderBy[0]))
 		{
 			foreach ( $orderBy as $o => $strVal)
