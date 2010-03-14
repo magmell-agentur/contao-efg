@@ -171,7 +171,7 @@ class Efp extends Frontend
 
 		// Types of form fields with storable data
 		$arrFFstorable = $this->FormData->arrFFstorable;
-		
+
 
 		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0 )
 		{
@@ -391,7 +391,7 @@ class Efp extends Frontend
 		// store data in session to display on confirmation page
 		unset($_SESSION['EFP']['FORMDATA']);
 		$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
-		
+
 		foreach ($arrFormFields as $k => $arrField)
 		{
 			$strType = $arrField['type'];
@@ -1037,9 +1037,7 @@ class Efp extends Frontend
 					break;
 				}
 			}
-
 			// unset($_SESSION['EFP']['FORMDATA']);
-
 		}
 
 		return $strContent;

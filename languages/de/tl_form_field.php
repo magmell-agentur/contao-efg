@@ -59,10 +59,13 @@ $GLOBALS['TL_LANG']['FFL']['efgFormPaginator']['1'] = "Schaltflächen und Seiten
 
 $GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton']['0'] = "Zurück-Schaltfläche erstellen";
 $GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton']['1'] = "Eine Schaltfläche erstellen, die zur vorherigen Formular-Seite führt.";
+$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues']['0'] = "Formulareingaben bei 'Zurück' erhalten";
+$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues']['1'] = "Eingaben im Frontend-Formular auch bei 'Zurück' zwischenspeichern für die Vorbelegung bei erneutem Aufruf dieser Formular-Seite.";
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel']['0'] = "Bezeichnung der Zurück-Schaltfläche";
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel']['1'] = "Bitte geben Sie die Bezeichnung der Zurück-Schaltfläche ein.";
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'] = $GLOBALS['TL_LANG']['tl_form_field']['imageSubmit'];
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSingleSRC'] = $GLOBALS['TL_LANG']['tl_form_field']['singleSRC'];
 
 $GLOBALS['TL_LANG']['tl_form_field']['backbutton_legend'] = "Zurück-Schaltfläche";
+
 ?>

@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgAddBackButton'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'w50')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
@@ -128,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr')
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
@@ -137,6 +137,14 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
 	'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true,'extensions' => 'gif,jpg,png', 'mandatory'=>true, 'tl_class'=>'clr')
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackStoreSessionValues'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50')
 );
 
 
@@ -209,7 +217,7 @@ if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 	);
 	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgAddBackButton';
 	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgBackImageSubmit';
-	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgAddBackButton'] = 'efgBackSlabel,efgBackImageSubmit';
+	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgAddBackButton'] = 'efgBackStoreSessionValues,efgBackSlabel,efgBackImageSubmit';
 	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgBackImageSubmit'] = 'efgBackSingleSRC';
 }
 

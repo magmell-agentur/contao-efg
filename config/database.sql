@@ -55,6 +55,7 @@ CREATE TABLE `tl_form_field` (
   `efgBackSlabel` varchar(255) NOT NULL default '',
   `efgBackImageSubmit` char(1) NOT NULL default '',
   `efgBackSingleSRC` varchar(255) NOT NULL default '',
+  `efgBackStoreSessionValues` char(1) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `pid` (`pid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
