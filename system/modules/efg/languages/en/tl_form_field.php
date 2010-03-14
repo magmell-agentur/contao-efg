@@ -56,9 +56,11 @@ $GLOBALS['TL_LANG']['tl_form_field']['meta']      = 'Meta file (meta.txt)';
 $GLOBALS['TL_LANG']['FFL']['efgFormPaginator'] = array('Submit field and page break', 'buttons and page break for a multipage form.');
 
 $GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'] = array('Add a back button', 'Create a back button as link to previous form page.');
+$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'] = array('Save form input on \'back\'', 'Store data in frontend form on submitting \'back\' to populate fields if this page is recalled.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'] = array('Back button label','Please enter the label of the back button.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'] = $GLOBALS['TL_LANG']['tl_form_field']['imageSubmit'];
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSingleSRC'] = $GLOBALS['TL_LANG']['tl_form_field']['singleSRC'];
 
 $GLOBALS['TL_LANG']['tl_form_field']['backbutton_legend'] = "Back button";
+
 ?>

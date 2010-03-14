@@ -135,7 +135,7 @@ class ExtendedForm extends Form
 		}
 
 		// Check multipage
-		$objPaginators = $this->Database->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
+		$objPaginators = $this->Database->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
 									->execute($this->id, 'efgFormPaginator');
 		if ($objPaginators->numRows)
 		{
@@ -368,7 +368,7 @@ class ExtendedForm extends Form
 				// populate field
 				if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
 				{
-					if ($strMode == 'back')
+					if ($strMode == 'back' && strlen($this->arrPaginators[($this->intActivePage-1)]['efgBackStoreSessionValues']))
 					{
 						unset($_SESSION['FORM_DATA'][$objFields->name]);
 						$objWidget->value = $this->Input->post($objFields->name);
