@@ -78,7 +78,6 @@ class ExtendedForm extends Form
 	 */
 	protected $objEditRecord = null;
 
-
 	/**
 	 * validation result of required widgets
 	 * @var array
@@ -114,7 +113,6 @@ class ExtendedForm extends Form
 	 */
 	protected function compile()
 	{
-
 		$hasUpload = false;
 		$doNotSubmit = false;
 		$arrSubmitted = array();
@@ -122,8 +120,7 @@ class ExtendedForm extends Form
 		$this->loadDataContainer('tl_form_field');
 		$formId = strlen($this->formID) ? 'auto_'.$this->formID : 'auto_form_'.$this->id;
 
-
-		$arrUnset = array('FORM_ACT', 'FORM_NEXT', 'FORM_BACK');
+		$arrUnset = array('FORM_NEXT', 'FORM_BACK');
 		foreach ($arrUnset as $strKey)
 		{
 			unset($_SESSION['FORM_DATA'][$strKey]);
@@ -166,7 +163,6 @@ class ExtendedForm extends Form
 		$intActivePage = 1;
 
 		$this->Template = new FrontendTemplate($this->strTemplate);
-
 		$this->loadLanguageFile('tl_form');
 
 		// render a previous completed page
@@ -174,9 +170,7 @@ class ExtendedForm extends Form
 		{
 			$intActivePage = (int) $_SESSION['EFP'][$formId]['render_page'];
 			$this->intActivePage = (int) $_SESSION['EFP'][$formId]['render_page'];
-
 			$strMode = 'reload';
-
 			unset($_SESSION['EFP'][$formId]['render_page']);
 		}
 		elseif (!strlen($_POST['FORM_SUBMIT']))
@@ -185,7 +179,6 @@ class ExtendedForm extends Form
 			unset($_SESSION['EFP'][$formId]['completed']);
 		}
 
-		// if ($this->Input->post('FORM_SUBMIT') == $formId && strlen($_POST['FORM_PAGE']))
 		if ($this->Input->post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
 		{
 			$intActivePage = (int) $_POST['FORM_PAGE'];
@@ -193,11 +186,9 @@ class ExtendedForm extends Form
 
 			if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']) )
 			{
-// TODO:
-// .. auch bei 'back' sollen Werte in session gespeichert werden
-				$intActivePage = ((int) $_POST['FORM_PAGE'] - 1);
+				$intActivePage = ((int) $_POST['FORM_PAGE']);
 				$doNotValidate = true;
-//$strMode = 'back';
+				$strMode = 'back';
 			}
 
 			// .. "jump to" page per input type submit like FORM_STEP[2]
@@ -230,8 +221,6 @@ class ExtendedForm extends Form
 
 		if ($this->blnMultipage || $this->blnEditform)
 		{
-			$this->Template->hidden .=  sprintf('<input type="%s" name="%s" value="%s" />',
-												'hidden', 'FORM_ACT', 'post');
 			$this->Template->hidden .=  sprintf('<input type="%s" name="%s" value="%s" />',
 												'hidden', 'FORM_PAGE', $this->intActivePage);
 		}
@@ -348,7 +337,6 @@ class ExtendedForm extends Form
 						$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
 						// unset($_SESSION['FORM_DATA'][$objFields->name]);
 					}
-					// unset value in session
 					else
 					{
 						//unset($_SESSION['FORM_DATA'][$objFields->name]);
@@ -380,20 +368,17 @@ class ExtendedForm extends Form
 				// populate field
 				if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
 				{
-					if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
+					if ($strMode == 'back')
+					{
+						unset($_SESSION['FORM_DATA'][$objFields->name]);
+						$objWidget->value = $this->Input->post($objFields->name);
+					}
+					elseif ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
 					{
 						$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
 						unset($_SESSION['FORM_DATA'][$objFields->name]);
 					}
 				}
-
-// TODO: auch bei 'back' sollen Werte in Session gespeichert werden
-/*
-if ($strMode == 'back')
-{
-	$objWidget->value = $this->Input->post($objFields->name);
-}
-*/
 
 				if (!$doNotValidate)
 				{
@@ -450,7 +435,6 @@ if ($strMode == 'back')
 
 				}
 
-
 				if ($objWidget->hasErrors())
 				{
 					if($objWidget->required)
@@ -460,7 +444,8 @@ if ($strMode == 'back')
 					$doNotSubmit = true;
 				}
 				// Store current value in the session
-				elseif ($objWidget->submitInput())
+				// elseif ($objWidget->submitInput())
+				elseif ($objWidget->submitInput() || $strMode == 'back')
 				{
 					$arrSubmitted[$objFields->name] = $objWidget->value;
 					$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
@@ -504,7 +489,7 @@ if ($strMode == 'back')
 					{
 						$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
 
-						++ $row;
+						++$row;
 						continue;
 					}
 				}
@@ -540,17 +525,14 @@ if ($strMode == 'back')
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
 					$this->reload();
 				}
-// TODO: auch bei 'back' sollen Daten gespeichert werden,
-// .. somit nach submit ein reload auf vorige form page
-/*
-elseif ($strMode == 'back' && $this->intActivePage < $this->intTotalPages && (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x'])))
-{
-	//var_dump($_SESSION['FORM_DATA']);
-	$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] - 1);
-	$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
-	$this->reload();
-}
-*/
+				// if posted 'back'
+				elseif ($strMode == 'back' && $this->intActivePage <= $this->intTotalPages
+						&& (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x'])))
+				{
+					$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] - 1);
+					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
+					$this->reload();
+				}
 
 				// last page completed, process form
 				else
@@ -560,7 +542,6 @@ elseif ($strMode == 'back' && $this->intActivePage < $this->intTotalPages && (st
 						unset($_SESSION['EFP'][$formId]['render_page']);
 						unset($_SESSION['EFP'][$formId]['completed']);
 						unset($_SESSION['FORM_DATA']['FORM_PAGE']);
-						unset($_SESSION['FORM_DATA']['FORM_ACT']);
 						unset($_SESSION['FORM_DATA']['FORM_NEXT']);
 						unset($_SESSION['FORM_DATA']['FORM_BACK']);
 
