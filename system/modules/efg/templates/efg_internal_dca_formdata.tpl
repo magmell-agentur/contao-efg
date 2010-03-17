@@ -206,9 +206,11 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
 			'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
-	<?php endforeach; ?></div>',
+	<?php endforeach; ?>
+	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			/*
 			'label_callback'          => array('tl_fd_<?php echo str_replace('-', '_', $this->strFormKey); ?>','getRowLabel')
 			*/
@@ -217,9 +219,11 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			/*
 			 'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span></div>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row"><div class="fd_label"><?php echo str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>: </div><div class="fd_value">%s </div></div>
-	<?php endforeach; ?></div>',
+	<?php endforeach; ?>
+	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			*/
 			'label_callback'          => array('tl_fd_feedback','getRowLabel')
 <?php endif; ?>
