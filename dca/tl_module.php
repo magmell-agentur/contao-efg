@@ -303,7 +303,10 @@ class tl_ext_module extends Backend
 		if (isset($GLOBALS['TL_DCA']['tl_module']['fields'][$strField]))
 		{
 			$GLOBALS['TL_DCA']['tl_module']['fields'][$strField]['eval']['multiple'] = true;
-			$varValue = explode(',', $varValue);
+			if (is_string($varValue))
+			{
+				$varValue = explode(',', $varValue);
+			}
 
 		}
 		return $varValue;
