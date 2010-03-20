@@ -620,6 +620,38 @@ class Efp extends Frontend
             }
 			$confEmail->subject = $subject;
 
+
+			// Thanks to Torben Schwellnus
+			// check if we want custom attachments...
+			if ($arrForm['addConfirmationMailAttachments'])
+			{
+				// check if we have custom attachments...
+				if($arrForm['confirmationMailAttachments'])
+				{
+					$arrCustomAttachments = deserialize($arrForm['confirmationMailAttachments'], true);
+					// did the saved value result in an array?
+					if(is_array($arrCustomAttachments))
+					{
+						foreach ($arrCustomAttachments as $strFile)
+						{
+							// does the file really exist?
+							if(is_file($strFile))
+							{
+								// can we read the file?
+								if(is_readable($strFile))
+								{
+									$objFile = new File($strFile);
+									if ($objFile->size)
+									{
+										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			if (is_array($attachments) && count($attachments)>0)
 			{
 				foreach ($attachments as $strFile => $varParams)
