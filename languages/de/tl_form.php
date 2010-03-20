@@ -39,6 +39,11 @@ $GLOBALS['TL_LANG']['tl_form']['confirmationMailText']['0'] = "Text der Bestäti
 $GLOBALS['TL_LANG']['tl_form']['confirmationMailText']['1'] = "Bitte geben Sie hier den Text der Bestätigungs-E-Mail ein. Neben den allgemeinen Insert-Tags werden Tags der Form form::FORMULARFELDNAME unterstützt.";
 $GLOBALS['TL_LANG']['tl_form']['confirmationMailTemplate']['0'] = "HTML-Vorlage für die Bestätigungs-E-Mail";
 $GLOBALS['TL_LANG']['tl_form']['confirmationMailTemplate']['1'] = "Wenn die Bestätigungs-E-Mail als HTML-E-Mail versendet werden soll, wählen Sie hier die HTML-Vorlage aus dem Dateisystem.";
+$GLOBALS['TL_LANG']['tl_form']['addConfirmationMailAttachments']['0'] = "Dateien an Bestätigungs-E-Mail anhängen";
+$GLOBALS['TL_LANG']['tl_form']['addConfirmationMailAttachments']['1'] = "Der Bestätigungs-E-Mail können hier Dateien zum Versand angehängt werden.";
+$GLOBALS['TL_LANG']['tl_form']['confirmationMailAttachments']['0'] = "Dateianhänge";
+$GLOBALS['TL_LANG']['tl_form']['confirmationMailAttachments']['1'] = "Bitte wählen Sie hier die anzuhängenden Dateien aus.";
+
 $GLOBALS['TL_LANG']['tl_form']['sendFormattedMail']['0'] = "Per E-Mail versenden (formatierter Text / HTML)";
 $GLOBALS['TL_LANG']['tl_form']['sendFormattedMail']['1'] = "Der Inhalt der Nachricht kann frei angegeben werden, unter Verwendung von Insert-Tags. Die Nachricht kann auch als HTML-E-Mail versendet werden.";
 $GLOBALS['TL_LANG']['tl_form']['formattedMailText']['0'] = "Text der E-Mail";
@@ -51,4 +56,5 @@ $GLOBALS['TL_LANG']['tl_form']['formattedMailTemplate']['1'] = "Wenn die E-Mail 
 $GLOBALS['TL_LANG']['tl_form']['efgStoreFormdata_legend'] = '(EFG) Formular-Daten speichern';
 $GLOBALS['TL_LANG']['tl_form']['efgSendFormattedMail_legend'] = '(EFG) Per E-Mail versenden';
 $GLOBALS['TL_LANG']['tl_form']['efgSendConfirmationMail_legend'] = '(EFG) Bestätigung per E-Mail versenden';
+
 ?>
