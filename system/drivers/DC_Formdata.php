@@ -179,7 +179,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 	protected $arrMemberGroups = null;
 
 	protected $arrUserGroups = null;
-	
+
 	// convert UTF8 to cp1251 on CSV-/XLS-Export
 	protected $blnExportUTF8Decode = true;
 
@@ -251,7 +251,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$this->getUsers();
 		$this->getMemberGroups();
 		$this->getUserGroups();
-		
+
 		// Check whether the table is defined
 		if (!strlen($strTable) || !count($GLOBALS['TL_DCA'][$strTable]))
 		{
@@ -1585,12 +1585,12 @@ class DC_Formdata extends DataContainer implements listable, editable
 			if (in_array($arrFormFields[$recipientFieldName]['type'], array('radio', 'select', 'checkbox')))
 			{
 				if (!$blnStoreOptionsValues)
-				{	
+				{
 					$arrRecipient = $this->FormData->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
 					if (count($arrRecipient))
 					{
 						$varRecipient = implode(', ', $arrRecipient);
-					}			
+					}
 					unset($arrRecipient);
 				}
 			}
@@ -1601,7 +1601,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		{
 			$arrRecipient = array_unique(array_merge(trimsplit(',', $varRecipient), trimsplit(',', $arrForm['confirmationMailRecipient'])));
 		}
-		
+
 		if ($this->Input->get('recipient'))
 		{
 			$arrRecipient = array_unique(trimsplit(',', $this->Input->get('recipient')));
@@ -1610,17 +1610,17 @@ class DC_Formdata extends DataContainer implements listable, editable
 		if (is_array($arrRecipient))
 		{
 			$strRecipient = implode(', ', $arrRecipient);
-			
-			// handle insert tag {{user::email}} in recipient fields  
+
+			// handle insert tag {{user::email}} in recipient fields
 			if (!is_bool(strpos($strRecipient, "{{user::email}}")) && $arrSubmitted['fd_member'] > 0)
 			{
 				$objUser = $this->Database->prepare("SELECT `email` FROM `tl_member` WHERE id=?")
 									->limit(1)
 									->execute($arrSubmitted['fd_member']);
-									
+
 				$arrRecipient = array_map("str_replace", array_fill(0, count($arrRecipient), "{{user::email}}"), array_fill(0, count($arrRecipient), $objUser->email), $arrRecipient);
-				$strRecipient = implode(', ', $arrRecipient);						
-			}			
+				$strRecipient = implode(', ', $arrRecipient);
+			}
 		}
 
 		$subject = $arrForm['confirmationMailSubject'];
@@ -1811,6 +1811,38 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 		$confEmail->subject = $subject;
 
+		// Thanks to Torben Schwellnus
+		// check if we want custom attachments...
+		if ($arrForm['addConfirmationMailAttachments'])
+		{
+			// check if we have custom attachments...
+			if($arrForm['confirmationMailAttachments'])
+			{
+				$arrCustomAttachments = deserialize($arrForm['confirmationMailAttachments'], true);
+
+				// did the saved value result in an array?
+				if(is_array($arrCustomAttachments))
+				{
+					foreach ($arrCustomAttachments as $strFile)
+					{
+						// does the file really exist?
+						if(is_file(TL_ROOT .'/' .$strFile))
+						{
+							// can we read the file?
+							if(is_readable(TL_ROOT .'/' .$strFile))
+							{
+								$objFile = new File($strFile);
+								if ($objFile->size)
+								{
+									$attachments[] = $objFile->value;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		if (is_array($attachments) && count($attachments)>0)
 		{
 			foreach ($attachments as $attachment)
@@ -1875,13 +1907,13 @@ class DC_Formdata extends DataContainer implements listable, editable
 						*/
 
 	            		$confEmail->sendTo($recipient);
-						
+
 						$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient));
 					}
 				}
 
 				$url = $this->Environment->base . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', $this->Environment->request);
-				
+
 			}
 
 		}
@@ -1925,8 +1957,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		{
   	$return .= '
   <tr class="row_3">
-    <td class="col_0">' . $GLOBALS['TL_LANG']['tl_formdata']['attachments'] . '</td>
-    <td class="col_1">' . implode(', ', $attachments) . '</td>
+    <td class="col_0" style="vertical-align:top">' . $GLOBALS['TL_LANG']['tl_formdata']['attachments'] . '</td>
+    <td class="col_1">' . implode(',<br/> ', $attachments) . '</td>
   </tr>';
 		}
 
@@ -2190,7 +2222,7 @@ $return .= '
 
 			$this->reload();
 		}
- 
+
 		// Get current record
 		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
@@ -2198,7 +2230,7 @@ $return .= '
 		{
 			$sqlQuery .= $sqlWhere;
 		}
- 
+
 		$objRow = $this->Database->prepare($sqlQuery)
 								 ->limit(1)
 								 ->execute($this->intId);
@@ -2230,7 +2262,7 @@ $return .= '
 
 		if (count($boxes))
 		{
-	
+
 			foreach ($boxes as $k=>$v)
 			{
 				$eCount = 1;
@@ -2352,7 +2384,7 @@ $return .= '
 
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
-					
+
 					// render inputType hidden as inputType text in Backend
 					if ($strInputType == 'hidden')
 					{
@@ -2374,7 +2406,7 @@ $return .= '
 						}
 						elseif (!is_array($this->varValue))
 						{
-							
+
 							// foreignKey fields
 							if ($strInputType == 'select' && strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']))
 							{
@@ -2480,7 +2512,7 @@ $return .= '
 							} // foreignKey field
 
 							$arrValues = explode('|', $this->varValue);
-							
+
 							if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['efgStoreValues'])
 							{
 								$this->varValue = $arrValues;
@@ -2560,7 +2592,7 @@ $return .= '
 					if ( $strInputType=='efgLookupSelect' )
 					{
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
-						
+
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
 						{
@@ -5989,7 +6021,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 					$sqlFilterField = $field;
 					if (in_array($field, $this->arrDetailFields))
 					{
-						$sqlFilterField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $field .'\' AND pid=f.id)';  
+						$sqlFilterField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $field .'\' AND pid=f.id)';
 					}
 
 					// Sort by day
@@ -6627,7 +6659,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			$this->arrUserGroups = $groups;
 		}
 	}
-	
-	
+
+
 }
 ?>
