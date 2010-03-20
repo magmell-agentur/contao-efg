@@ -299,7 +299,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,alias,date,ip,published;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
+		'default'                     => 'form,alias,date,ip,published,confirmationMailSent,confirmationMailDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
 
 	// Base fields in table tl_formdata
@@ -390,6 +390,23 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				array('tl_formdata', 'generateAlias')
 			)
 		),
+		'confirmationMailSent' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailSent'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true)
+		),
+		'confirmationMailDate' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailDate'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 8,
+			'inputType'               => 'text',
+			'eval'                    => array('tl_class'=>'w50', 'rgxp'=>'datim')
+		),
 		'be_notes' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['be_notes'],
@@ -408,7 +425,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes' /*,'importSource'*/),
+		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationMailSent','confirmationMailDate' /*,'importSource'*/),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . $varKey . "'"; $strSep = ',';
 endforeach; ?>),

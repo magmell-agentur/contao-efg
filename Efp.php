@@ -422,15 +422,15 @@ class Efp extends Frontend
 
 			$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
-            $sender = $arrForm['confirmationMailSender'];
-            if(strlen($sender)){
-                $sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-                if (strpos($sender, '<')>0) {
+			$sender = $arrForm['confirmationMailSender'];
+			if(strlen($sender)){
+				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
+				if (strpos($sender, '<')>0) {
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
-                    $sender = $parts[2];
-                    $senderName = trim($parts[1]);
-                }
-            }
+					$sender = $parts[2];
+					$senderName = trim($parts[1]);
+				}
+			}
 
 			$recipientFieldName = $arrForm['confirmationMailRecipientField'];
 			$varRecipient = $arrSubmitted[$recipientFieldName];
@@ -613,11 +613,11 @@ class Efp extends Frontend
 			}
 
 			$confEmail = new Email();
-            $confEmail->from = $sender;
-            if (strlen($senderName))
-            {
-                $confEmail->fromName = $senderName;
-            }
+			$confEmail->from = $sender;
+			if (strlen($senderName))
+			{
+				$confEmail->fromName = $senderName;
+			}
 			$confEmail->subject = $subject;
 
 
@@ -691,25 +691,37 @@ class Efp extends Frontend
 			*/
 
 			// Send e-mail
+
+			$blnConfirmationSent = false;
 			if (count($arrRecipient)>0)
 			{
 				foreach ($arrRecipient as $recipient)
 				{
 					if(strlen($recipient))
 					{
-        		        $recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
-        		        $recipientName = '';
-                		if (strpos($recipient, '<')>0) {
+						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
+						$recipientName = '';
+						if (strpos($recipient, '<')>0)
+						{
 							preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
-                    		$recipientName = trim($parts[1]);
-                    		$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
-                		}
-            		}
-            		$confEmail->sendTo($recipient);
+							$recipientName = trim($parts[1]);
+							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+						}
+					}
+					$confEmail->sendTo($recipient);
+					$blnConfirmationSent = true;
 				}
 			}
-		} // End confirmation mail
 
+			if ($blnConfirmationSent && isset($intNewId) && intval($intNewId)>0)
+			{
+				$arrUpd = array('confirmationMailSent' => '1', 'confirmationMailDate' => $timeNow);
+				$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
+								->set($arrUpd)
+								->execute($intNewId);
+			}
+
+		} // End confirmation mail
 
 		// Information (formatted) Mail
 		if ($arrForm['sendFormattedMail'])
@@ -728,14 +740,15 @@ class Efp extends Frontend
 
 			// Set the admin e-mail as "from" address
 			$sender = $GLOBALS['TL_ADMIN_EMAIL'];
-            if(strlen($sender)){
-                $sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-                if (strpos($sender, '<')>0) {
+			if(strlen($sender)){
+				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
+				if (strpos($sender, '<')>0)
+				{
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
-                    $sender = $parts[2];
-                    $senderName = trim($parts[1]);
-                }
-            }
+					$sender = $parts[2];
+					$senderName = trim($parts[1]);
+				}
+			}
 
 			$varRecipient = $arrForm['formattedMailRecipient'];
 			if (is_array($varRecipient))
@@ -865,8 +878,8 @@ class Efp extends Frontend
 									$strVal = nl2br($strVal);
 									$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li)([^>]*)(>)/si', "\\1\\2\\3\\4\n", $strVal);
 								}
-			 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
-			 				}
+								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+							}
 						}
 
 						// replace insert tags in subject
@@ -908,11 +921,11 @@ class Efp extends Frontend
 			}
 
 			$infoEmail = new Email();
-            $infoEmail->from = $sender;
-            if (strlen($senderName))
-            {
-                $infoEmail->fromName = $senderName;
-            }
+			$infoEmail->from = $sender;
+			if (strlen($senderName))
+			{
+				$infoEmail->fromName = $senderName;
+			}
 			$infoEmail->subject = $subject;
 
 			// Get "reply to" address, if form contains field named 'email'
@@ -967,16 +980,17 @@ class Efp extends Frontend
 				{
 					if(strlen($recipient))
 					{
-        		        $recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
-        		        $recipientName = '';
-                		if (strpos($recipient, '<')>0) {
+						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
+						$recipientName = '';
+						if (strpos($recipient, '<')>0)
+						{
 							preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
-                    		$recipientName = trim($parts[1]);
-                    		$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
-                		}
-            		}
+							$recipientName = trim($parts[1]);
+							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+						}
+					}
 					$infoEmail->sendTo($recipient);
-            	}
+				}
 			}
 
 		} // End information mail

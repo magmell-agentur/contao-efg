@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,ip,date,alias;published,be_notes;fd_member,fd_user,fd_member_group,fd_user_group'
+		'default'                     => 'form,ip,date,alias;published,confirmationMailSent,confirmationMailDate;be_notes;fd_member,fd_user,fd_member_group,fd_user_group'
 	),
 
 	// Fields
@@ -193,6 +193,23 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			(
 				array('tl_formdata', 'generateAlias')
 			)
+		),
+		'confirmationMailSent' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailSent'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true)
+		),
+		'confirmationMailDate' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailDate'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 8,
+			'inputType'               => 'text',
+			'eval'                    => array('tl_class'=>'w50', 'rgxp'=>'datim')
 		),
 		'be_notes' => array
 		(
@@ -459,7 +476,7 @@ class tl_formdata extends Backend
 		return $items;
 	}
 
-	
+
 	/**
 	 * Return all users as array for dropdown
 	 * @return array
@@ -507,7 +524,7 @@ class tl_formdata extends Backend
 		}
 		return $items;
 	}
-	
+
 	/**
 	 * Return all user groups as array for dropdown
 	 * @return array
@@ -531,7 +548,7 @@ class tl_formdata extends Backend
 		}
 		return $items;
 	}
-	
+
 }
 
 ?>

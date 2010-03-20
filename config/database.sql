@@ -101,6 +101,8 @@ CREATE TABLE `tl_formdata` (
   `form` varchar(64) NOT NULL default '',
   `ip` varchar(15) NOT NULL default '',
   `date` int(10) unsigned NOT NULL default '0',
+  `confirmationMailSent` char(1) NOT NULL default '',
+  `confirmationMailDate` varchar(10) NOT NULL default '',
   `published` char(1) NOT NULL default '',
   `alias` varchar(64) NOT NULL default '',
   `be_notes` text NULL,
