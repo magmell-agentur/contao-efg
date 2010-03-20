@@ -895,8 +895,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$this->set['tstamp'] = time();
 
 		$this->Database->prepare("UPDATE " . $this->strTable . " %s WHERE id=?")
-					   ->set($this->set)
-					   ->execute($this->intId);
+						->set($this->set)
+						->execute($this->intId);
 
 		// Empty clipboard
 		$arrClipboard = $this->Session->get('CLIPBOARD');
@@ -918,8 +918,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		$objRow = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-								 ->limit(1)
-								 ->execute($this->intId);
+								->limit(1)
+								->execute($this->intId);
 
 		// Copy values if the record contains data
 		if ($objRow->numRows)
@@ -1083,7 +1083,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 				{
 					$newPID = $pid;
 					$objSorting = $this->Database->prepare("SELECT MIN(sorting) AS `sorting` FROM " . $this->strTable . " WHERE pid=?")
-												 ->execute($pid);
+												->execute($pid);
 
 					// Select sorting value of the first record
 					if ($objSorting->numRows)
@@ -1102,8 +1102,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 							while ($objNewSorting->next())
 							{
 								$this->Database->prepare("UPDATE " . $this->strTable . " SET sorting=? WHERE id=?")
-											   ->limit(1)
-											   ->execute(($count++*128), $objNewSorting->id);
+												->limit(1)
+												->execute(($count++*128), $objNewSorting->id);
 							}
 						}
 
@@ -1119,8 +1119,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 				elseif ($pid > 0)
 				{
 					$objSorting = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-												 ->limit(1)
-												 ->execute($pid);
+												->limit(1)
+												->execute($pid);
 
 					// Set parent ID of the current record as new parent ID
 					if ($objSorting->numRows)
@@ -1132,7 +1132,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 						if (is_numeric($newPID))
 						{
 							$objNextSorting = $this->Database->prepare("SELECT MIN(sorting) AS `sorting` FROM " . $this->strTable . " WHERE pid=? AND sorting>?")
-											  				 ->execute($newPID, $curSorting);
+															->execute($newPID, $curSorting);
 
 							// Select sorting value of the next record
 							if (!is_null($objNextSorting->sorting))
@@ -1195,8 +1195,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 			if (is_numeric($pid))
 			{
 				$objParentRecord = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-												  ->limit(1)
-												  ->execute($pid);
+												->limit(1)
+												->execute($pid);
 
 				// Insert into the parent record
 				if ($insertInto)
@@ -1225,8 +1225,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 			if ($this->intId)
 			{
 				$objCurrentRecord = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-												   ->limit(1)
-											 	   ->execute($this->intId);
+													->limit(1)
+													->execute($this->intId);
 
 				// Select current record
 				if ($objCurrentRecord->numRows)
@@ -1234,7 +1234,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					$curSorting = $objCurrentRecord->sorting;
 
 					$objNextSorting = $this->Database->prepare("SELECT MIN(sorting) AS `sorting` FROM " . $this->strTable . " WHERE sorting>?")
-													 ->execute($curSorting);
+													->execute($curSorting);
 
 					// Select sorting value of the next record
 					if ($objNextSorting->numRows)
@@ -1251,7 +1251,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 							while ($objNewSorting->next())
 							{
 								$this->Database->prepare("UPDATE " . $this->strTable . " SET sorting=? WHERE id=?")
-											   ->execute(($count++*128), $objNewSorting->id);
+												->execute(($count++*128), $objNewSorting->id);
 
 								if ($objNewSorting->sorting == $curSorting)
 								{
@@ -1304,8 +1304,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		if ($this->strTable == 'tl_undo')
 		{
 			$this->Database->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
-						   ->limit(1)
-						   ->execute($this->intId);
+							->limit(1)
+							->execute($this->intId);
 
 			$this->redirect($this->getReferer());
 		}
@@ -1339,8 +1339,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 			foreach ($fields as $k=>$v)
 			{
 				$objSave = $this->Database->prepare("SELECT * FROM " . $table . " WHERE id=?")
-										  ->limit(1)
-										  ->execute($v);
+										->limit(1)
+										->execute($v);
 
 				if ($objSave->numRows)
 				{
@@ -1352,7 +1352,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		$objUndoStmt = $this->Database->prepare("INSERT INTO tl_undo (tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?)")
-									  ->execute(time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
+									->execute(time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
 
 		if ($objUndoStmt->affectedRows)
 		{
@@ -1362,8 +1362,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 				foreach ($fields as $k=>$v)
 				{
 					$this->Database->prepare("DELETE FROM " . $table . " WHERE id=?")
-								   ->limit(1)
-								   ->execute($v);
+									->limit(1)
+									->execute($v);
 				}
 			}
 
@@ -1490,8 +1490,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		$objRow = $this->Database->prepare($sqlQuery)
-								 ->limit(1)
-								 ->execute($this->intId);
+								->limit(1)
+								->execute($this->intId);
 
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
@@ -1882,14 +1882,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 					{
 						if(strlen($recipient))
 						{
-	        		        $recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
-	        		        $recipientName = '';
-	                		if (strpos($recipient, '<') > 0) {
+							$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
+							$recipientName = '';
+							if (strpos($recipient, '<') > 0)
+							{
 								preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
-	                    		$recipientName = trim($parts[1]);
-	                    		$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
-	                		}
-	            		}
+								$recipientName = trim($parts[1]);
+								$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+							}
+						}
 
 						// USED TO DEBUG ONLY
 						/*
@@ -1906,7 +1907,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 						fclose($fp);
 						*/
 
-	            		$confEmail->sendTo($recipient);
+						$confEmail->sendTo($recipient);
 
 						$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient));
 					}
@@ -2129,8 +2130,8 @@ $return .= '
 			$this->log('Undone '.$query, 'DC_Table undo()', TL_GENERAL);
 
 			$this->Database->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
-						   ->limit(1)
-						   ->execute($this->intId);
+							->limit(1)
+							->execute($this->intId);
 		}
 
 		$this->redirect($this->getReferer());
@@ -2154,10 +2155,10 @@ $return .= '
 			if ($row[0]['pid'] == $row[1]['pid'])
 			{
 				$this->Database->prepare("UPDATE " . $this->strTable . " SET sorting=? WHERE id=?")
-							   ->execute($row[0]['sorting'], $row[1]['id']);
+								->execute($row[0]['sorting'], $row[1]['id']);
 
 				$this->Database->prepare("UPDATE " . $this->strTable . " SET sorting=? WHERE id=?")
-							   ->execute($row[1]['sorting'], $row[0]['id']);
+								->execute($row[1]['sorting'], $row[0]['id']);
 			}
 		}
 
@@ -2197,8 +2198,8 @@ $return .= '
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['enableVersioning'] && $this->Input->post('FORM_SUBMIT') == 'tl_version' && strlen($this->Input->post('version')))
 		{
 			$objData = $this->Database->prepare("SELECT * FROM tl_version WHERE fromTable=? AND pid=? AND version=?")
-									  ->limit(1)
-									  ->execute($this->strTable, $this->intId, $this->Input->post('version'));
+									->limit(1)
+									->execute($this->strTable, $this->intId, $this->Input->post('version'));
 
 			if ($objData->numRows)
 			{
@@ -2207,14 +2208,14 @@ $return .= '
 				if (is_array($data))
 				{
 					$this->Database->prepare("UPDATE " . $objData->fromTable . " %s WHERE id=?")
-								   ->set($data)
-								   ->execute($this->intId);
+									->set($data)
+									->execute($this->intId);
 
 					$this->Database->prepare("UPDATE tl_version SET active='' WHERE pid=?")
-								   ->execute($this->intId);
+									->execute($this->intId);
 
 					$this->Database->prepare("UPDATE tl_version SET active=1 WHERE pid=? AND version=?")
-								   ->execute($this->intId, $this->Input->post('version'));
+									->execute($this->intId, $this->Input->post('version'));
 
 					$this->log(sprintf('Version %s of record ID %s (table %s) has been restored', $this->Input->post('version'), $this->intId, $this->strTable), 'DC_Table edit()', TL_GENERAL);
 				}
@@ -2797,7 +2798,7 @@ $return .= '
 
 			// Set current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
 			$this->Database->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE " . implode(' AND ', $this->procedure))
-						   ->execute($arrValues);
+							->execute($arrValues);
 
 			// Redirect
 			if (isset($_POST['saveNclose']))
@@ -3003,8 +3004,8 @@ window.addEvent(\'domready\', function()
 
 				// Get field values
 				$objValue = $this->Database->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
-										   ->limit(1)
-										   ->execute($this->intId);
+											->limit(1)
+											->execute($this->intId);
 
 				foreach ($this->strPalette as $v)
 				{
@@ -6108,7 +6109,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		{
 			$query .= $sqlWhere;
 		}
-// TODO: Fix order by
+
 		if (is_array($orderBy) && strlen($orderBy[0]))
 		{
 			foreach ( $orderBy as $o => $strVal)
