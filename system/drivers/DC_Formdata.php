@@ -244,7 +244,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','importSource');
+		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationMailSent','confirmationMailDate','importSource');
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
@@ -1872,6 +1872,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 			$this->Session->set('fd_mail_send', null);
 			$blnSend = true;
 
+			$blnConfirmationSent = false;
 			if ($blnSend)
 			{
 				// Send e-mail
@@ -1908,12 +1909,22 @@ class DC_Formdata extends DataContainer implements listable, editable
 						*/
 
 						$confEmail->sendTo($recipient);
+						$blnConfirmationSent = true;
 
 						$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient));
 					}
 				}
 
 				$url = $this->Environment->base . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', $this->Environment->request);
+
+				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
+				{
+					$arrUpd = array('confirmationMailSent' => '1', 'confirmationMailDate' => time());
+					$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
+									->set($arrUpd)
+									->execute($this->intId);
+				}
+
 
 			}
 
@@ -1922,13 +1933,24 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$strToken = md5(uniqid('', true));
 		$this->Session->set('fd_mail_send', $strToken);
 
+		$strHint = '';
+
+		if (strlen($objRow->confirmationMailSent))
+		{
+			if (!$blnSend)
+			{
+				$dateConfirmation = new Date($objRow->confirmationMailDate);
+				$strHint .= '<div class="tl_message"><p class="tl_info">'. sprintf($GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'], $dateConfirmation->date, $dateConfirmation->time) .'</p></div>';
+			}
+		}
+
 		// Preview Mail
 		$return = '
 <div id="tl_buttons">
 <a href="'.$this->getReferer(ENCODE_AMPERSANDS).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
-<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages().'
+<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages(). $strHint .'
 
 <form action="'.ampersand($this->Environment->script, ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
 <div class="tl_formbody_edit fd_mail_send">
