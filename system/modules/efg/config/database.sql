@@ -26,6 +26,8 @@ CREATE TABLE `tl_form` (
   `confirmationMailText` text NULL,
   `confirmationMailTemplate` varchar(255) NOT NULL default '',
   `confirmationMailSkipEmpty` char(1) NOT NULL default '',
+  `addConfirmationMailAttachments` char(1) NOT NULL default '',
+  `confirmationMailAttachments` blob NULL,
   `formattedMailText` text NULL,
   `formattedMailTemplate` varchar(255) NOT NULL default '',
   `formattedMailSkipEmpty` char(1) NOT NULL default '',
