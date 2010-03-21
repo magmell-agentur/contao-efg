@@ -50,8 +50,8 @@ $GLOBALS['TL_LANG']['tl_formdata']['show']   = array('Record details', 'Show det
 $GLOBALS['TL_LANG']['tl_formdata']['mail']   = array('Send confirmation mail', 'Send confirmation mail for record ID %s');
 $GLOBALS['TL_LANG']['tl_formdata']['mail_sent'] = "Mail has been sent to %s";
 $GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'] = "For this record a confirmation mail has been sent on %s at %s";
-$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailSent'] = array('Confirmation mail sent', 'Confirmation mail has been sent for this record');
-$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailDate'] = array('Confirmation mail sent on', 'At this time confirmation mail has been sent');
+$GLOBALS['TL_LANG']['tl_formdata']['confirmationSent'] = array('Confirmation mail sent', 'Confirmation mail has been sent for this record');
+$GLOBALS['TL_LANG']['tl_formdata']['confirmationDate'] = array('Confirmation mail sent on', 'At this time confirmation mail has been sent');
 $GLOBALS['TL_LANG']['tl_formdata']['import'] = array('CSV import', 'Import records from a CSV file');
 $GLOBALS['TL_LANG']['tl_formdata']['export'] = array('CSV export', 'Export records to a CSV file');
 $GLOBALS['TL_LANG']['tl_formdata']['exportxls'] = array('Excel export', 'Export records to a MS Excel file');
@@ -75,6 +75,7 @@ $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'] = 'Do you really want to 
 /**
  * legends
  */
+$GLOBALS['TL_LANG']['tl_formdata']['confirmation_legend'] = "Confirmation mail";
 $GLOBALS['TL_LANG']['tl_formdata']['fdNotes_legend'] = "Notes";
 $GLOBALS['TL_LANG']['tl_formdata']['fdOwner_legend'] = "Owner";
 $GLOBALS['TL_LANG']['tl_formdata']['fdDetails_legend'] = "Details";

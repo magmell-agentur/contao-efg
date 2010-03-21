@@ -172,7 +172,7 @@ class ModuleFormdataListing extends Module
 		$this->getUsers();
 		$this->getMemberGroups();
 		$this->getUserGroups();
-		
+
 		$this->import('FrontendUser', 'Member');
 		$this->import('FormData');
 
@@ -781,7 +781,7 @@ class ModuleFormdataListing extends Module
 								if ($field == "fd_member")
 								{
 									$prop = 'arrMembers';
-								} 
+								}
 								elseif ($field == "fd_member_group")
 								{
 									$prop = 'arrMemberGroups';
@@ -794,7 +794,7 @@ class ModuleFormdataListing extends Module
 								{
 									$prop = 'arrUserGroups';
 								}
-								
+
 								$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
 								if (count($arrMatches))
 								{
@@ -838,7 +838,7 @@ class ModuleFormdataListing extends Module
 									if ($field == "fd_member")
 									{
 										$prop = 'arrMembers';
-									} 
+									}
 									elseif ($field == "fd_member_group")
 									{
 										$prop = 'arrMemberGroups';
@@ -851,7 +851,7 @@ class ModuleFormdataListing extends Module
 									{
 										$prop = 'arrUserGroups';
 									}
-									
+
 									$arrMatches = $this->array_filter_like($this->$prop, urldecode($for));
 									if (count($arrMatches))
 									{
@@ -916,7 +916,7 @@ class ModuleFormdataListing extends Module
 							if ($field == "fd_member")
 							{
 								$prop = 'arrMembers';
-							} 
+							}
 							elseif ($field == "fd_member_group")
 							{
 								$prop = 'arrMemberGroups';
@@ -929,7 +929,7 @@ class ModuleFormdataListing extends Module
 							{
 								$prop = 'arrUserGroups';
 							}
-							
+
 							$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
 							if (count($arrMatches))
 							{
@@ -2091,7 +2091,7 @@ class ModuleFormdataListing extends Module
 									->limit(1)
 									->execute($this->intRecordId);
 
-									
+
 		if ($objRecord->numRows < 1)
 		{
 			return;
@@ -3260,7 +3260,7 @@ class ModuleFormdataListing extends Module
 			}
 			$this->arrUserGroups = $groups;
 		}
-	}	
+	}
 
 	/**
 	 * Convert encoding
@@ -3337,12 +3337,12 @@ class ModuleFormdataListing extends Module
 	private function array_filter_like($arrInput, $varSearch)
 	{
 		$arrRet = array(-1 => "-");
-		
+
 		if (!is_array($arrInput) || !count($arrInput))
 		{
 			return $arrRet;
 		}
-		
+
 		foreach ($arrInput as $k=>$v)
 		{
 			if (!is_bool(mb_stripos($v, $varSearch)))
@@ -3350,7 +3350,7 @@ class ModuleFormdataListing extends Module
 				$arrRet[$k] = $v;
 			}
 		}
-		
+
 		return $arrRet;
 	}
 
