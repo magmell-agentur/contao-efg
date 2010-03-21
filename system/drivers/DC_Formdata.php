@@ -244,7 +244,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate','importSource');
+		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate' /*,'importSource'*/);
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
