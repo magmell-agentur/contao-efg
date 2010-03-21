@@ -419,11 +419,13 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => false,
 			'eval'                    => array('rte' => 'tinyMCE', 'cols' => 80,'rows' => 5, 'style' => 'height: 80px'),
 		),
-//		'importSource' => array
-//		(
-//			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['importSource'],
-//			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv')
-//		)
+/*		
+		'importSource' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['importSource'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv')
+		)
+*/		
 	),
 	'tl_formdata' => array
 	(
