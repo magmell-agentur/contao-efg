@@ -231,6 +231,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 		'global_operations' => array
 		(
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
+			/*
 			'import' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['import'],
@@ -238,6 +239,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				'class'               => 'header_csv_import',
 				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			),
+			*/
 			'export' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['export'],
@@ -299,7 +301,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,alias,date,ip,published,confirmationMailSent,confirmationMailDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
+		'default'                     => 'form,alias,date,ip,published;{confirmation_legend},confirmationSent,confirmationDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
 
 	// Base fields in table tl_formdata
@@ -390,17 +392,17 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				array('tl_formdata', 'generateAlias')
 			)
 		),
-		'confirmationMailSent' => array
+		'confirmationSent' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailSent'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationSent'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true)
 		),
-		'confirmationMailDate' => array
+		'confirmationDate' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailDate'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationDate'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
@@ -425,7 +427,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationMailSent','confirmationMailDate' /*,'importSource'*/),
+		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate' /*,'importSource'*/),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . $varKey . "'"; $strSep = ',';
 endforeach; ?>),
@@ -611,6 +613,9 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 
 		$strRowLabel .= '<div class="fd_wrap">';
 		$strRowLabel .= '<div class="fd_head">' . $arrRow['date'] . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
+<?php if (count($this->arrFields) > 10): ?>
+		$strRowLabel .= '<div class="limit_height h64 block">';
+<?php endif; ?>
 		$strRowLabel .= '<div class="fd_notes">' . $arrRow['be_notes'] . '</div>';
 		$strRowLabel .= '<div class="mark_links">';
 <?php foreach ($this->arrFields as $varKey => $varVals): ?>
@@ -622,6 +627,9 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 			$strRowLabel .= '</div>';
 		}
 <?php endforeach; ?>
+<?php if (count($this->arrFields) > 10): ?>
+		$strRowLabel .= '</div>';
+<?php endif; ?>
 		$strRowLabel .= '</div></div>';
 
 		return $strRowLabel;

@@ -715,7 +715,7 @@ class Efp extends Frontend
 
 			if ($blnConfirmationSent && isset($intNewId) && intval($intNewId)>0)
 			{
-				$arrUpd = array('confirmationMailSent' => '1', 'confirmationMailDate' => $timeNow);
+				$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => $timeNow);
 				$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
 								->set($arrUpd)
 								->execute($intNewId);

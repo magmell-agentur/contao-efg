@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,ip,date,alias;published,confirmationMailSent,confirmationMailDate;be_notes;fd_member,fd_user,fd_member_group,fd_user_group'
+		'default'                     => 'form,ip,date,alias;published,confirmationSent,confirmationDate;be_notes;fd_member,fd_user,fd_member_group,fd_user_group'
 	),
 
 	// Fields
@@ -194,17 +194,17 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				array('tl_formdata', 'generateAlias')
 			)
 		),
-		'confirmationMailSent' => array
+		'confirmationSent' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailSent'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationSent'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true)
 		),
-		'confirmationMailDate' => array
+		'confirmationDate' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationMailDate'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['confirmationDate'],
 			'exclude'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
