@@ -244,7 +244,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationMailSent','confirmationMailDate','importSource');
+		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate','importSource');
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
@@ -1919,7 +1919,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
 				{
-					$arrUpd = array('confirmationMailSent' => '1', 'confirmationMailDate' => time());
+					$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => time());
 					$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
 									->set($arrUpd)
 									->execute($this->intId);
@@ -1935,12 +1935,19 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 		$strHint = '';
 
-		if (strlen($objRow->confirmationMailSent))
+		if (strlen($objRow->confirmationSent))
 		{
 			if (!$blnSend)
 			{
-				$dateConfirmation = new Date($objRow->confirmationMailDate);
-				$strHint .= '<div class="tl_message"><p class="tl_info">'. sprintf($GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'], $dateConfirmation->date, $dateConfirmation->time) .'</p></div>';
+				if (strlen($objRow->confirmationDate))
+				{
+					$dateConfirmation = new Date($objRow->confirmationDate);
+					$strHint .= '<div class="tl_message"><p class="tl_info">'. sprintf($GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'], $dateConfirmation->date, $dateConfirmation->time) .'</p></div>';
+				}
+				else
+				{
+					$strHint .= '<div class="tl_message"><p class="tl_info">'. sprintf($GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'], '-n/a-', '-n/a-') .'</p></div>';
+				}
 			}
 		}
 
