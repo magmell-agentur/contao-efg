@@ -26,7 +26,6 @@ $GLOBALS['TL_LANG']['FMD']['formdatalisting']['0'] = "Auflistung Formular-Daten"
 $GLOBALS['TL_LANG']['FMD']['formdatalisting']['1'] = "Verwenden Sie dieses Modul dazu, die Daten einer beliebigen Formular-Daten-Tabelle im Frontend aufzulisten.";
 $GLOBALS['TL_LANG']['tl_module']['list_formdata']['0'] = "Formular-Daten-Tabelle";
 $GLOBALS['TL_LANG']['tl_module']['list_formdata']['1'] = "Bitte wählen Sie die Formular-Daten-Tabelle, deren Datensätze Sie auflisten möchten.";
-
 $GLOBALS['TL_LANG']['tl_module']['efg_list_fields']['0'] = "Felder";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_fields']['1'] = "Bitte wählen Sie die Felder, die Sie auflisten möchten.";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_searchtype'] = array('Typ des Such-Formulars', 'Bitte wählen Sie, welchen Typ des Such-Formulars Sie verwenden möchten.');
@@ -38,9 +37,10 @@ $GLOBALS['TL_LANG']['efg_list_searchtype']['multiplefields'] = array('Mehrere Ei
 $GLOBALS['TL_LANG']['tl_module']['efg_list_search']['0'] = "Durchsuchbare Felder";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_search']['1'] = "Bitte wählen Sie die Felder, die im Frontend durchsuchbar sein sollen.";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_info'] = array('Felder der Detailseite', 'Bitte wählen Sie die Felder, die Sie auf der Detailseite anzeigen möchten. Wählen Sie kein Feld, um die Detailansicht eines Datensatzes zu deaktivieren.');
-
 $GLOBALS['TL_LANG']['tl_module']['efg_iconfolder']['0'] = "Verzeichnis der Icons";
 $GLOBALS['TL_LANG']['tl_module']['efg_iconfolder']['1'] = "Tragen Sie hier das Verzeichnis Ihrer Icons ein. Falls das Feld nicht ausgefüllt wird, werden die Icons im Verzeichnis \"system/modules/efg/html/\" verwendet.";
+$GLOBALS['TL_LANG']['tl_module']['efg_fe_keep_id']['0'] = "Datensatz-ID beibehalten bei Frontendbearbeitung";
+$GLOBALS['TL_LANG']['tl_module']['efg_fe_keep_id']['1'] = "Bei der Frontendbearbeitung wird normalerweise ein neuer Datensatz -somit neue ID- angelegt, anschließend der alte gelöscht. Wählen Sie diese Option, falls Sie auf eine unveränderte Datensatz-ID angewiesen sind.";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_access']['0'] = "Anzeige Einschränkung";
 $GLOBALS['TL_LANG']['tl_module']['efg_list_access']['1'] = "Wählen Sie, welche Daten angezeigt werden dürfen.";
 $GLOBALS['TL_LANG']['tl_module']['efg_DetailsKey']['0'] = "URL-Fragment der Detailseite";
