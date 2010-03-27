@@ -80,6 +80,7 @@ CREATE TABLE `tl_module` (
   `efg_fe_edit_access` varchar(32) NOT NULL default '',
   `efg_fe_delete_access` varchar(32) NOT NULL default '',
   `efg_fe_export_access` varchar(32) NOT NULL default '',
+  `efg_fe_keep_id` char(1) NOT NULL default '',
   `efg_iconfolder` varchar(255) NOT NULL default '',
   `efg_DetailsKey` varchar(64) NOT NULL default '',
   `efg_list_searchtype` varchar(32) NOT NULL default '',

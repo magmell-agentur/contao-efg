@@ -2851,7 +2851,6 @@ class ModuleFormdataListing extends Module
 			$intListingId = intval($this->id);
 		}
 
-
 		$intEditId = 0;
 		$strForm = '';
 		$intFormId = 0;
@@ -2898,10 +2897,10 @@ class ModuleFormdataListing extends Module
 
 		$arrRecordFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 
-		$strSep = '';
 
 		$strQuery = "SELECT ";
 		$strWhere = '';
+		$strSep = '';
 
 		foreach($arrRecordFields as $field)
 		{
@@ -2920,7 +2919,6 @@ class ModuleFormdataListing extends Module
 
 		$strQuery .= " FROM " . $this->list_table . " f";
 		$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "id=?";
-
 		$strQuery .= $strWhere;
 
 		$objRecord = $this->Database->prepare($strQuery)

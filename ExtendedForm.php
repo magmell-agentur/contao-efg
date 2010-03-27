@@ -113,6 +113,7 @@ class ExtendedForm extends Form
 	 */
 	protected function compile()
 	{
+
 		$hasUpload = false;
 		$doNotSubmit = false;
 		$arrSubmitted = array();

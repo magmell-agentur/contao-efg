@@ -115,7 +115,7 @@ class Efp extends Frontend
 		$intListingId = intval($_SESSION['EFP']['LISTING_MOD']['id']);
 		if ($intListingId)
 		{
-			$objListing = $this->Database->prepare("SELECT id,list_formdata,efg_fe_edit_access,efg_DetailsKey FROM tl_module WHERE id=?")
+			$objListing = $this->Database->prepare("SELECT id,list_formdata,efg_fe_edit_access,efg_fe_keep_id,efg_DetailsKey FROM tl_module WHERE id=?")
 								->execute($intListingId);
 			if ($objListing->numRows)
 			{
@@ -127,6 +127,7 @@ class Efp extends Frontend
 		{
 			$this->strFormdataDetailsKey = $arrListing['efg_DetailsKey'];
 		}
+
 
 		$blnFEedit = false;
 		$intOldId = 0;
@@ -171,7 +172,6 @@ class Efp extends Frontend
 
 		// Types of form fields with storable data
 		$arrFFstorable = $this->FormData->arrFFstorable;
-
 
 		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0 )
 		{
@@ -291,9 +291,20 @@ class Efp extends Frontend
 			}
 
 			// store formdata
-			$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+			// Update or insert and delete
+			if ($blnFEedit && strlen($arrListing['efg_fe_keep_id']))
+			{
+				$intNewId = $intOldId;
+				$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
+ 				$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+ 							->execute($intOldId);
 
-			$intNewId = $objNewFormdata->insertId;
+			}
+			else
+			{
+				$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+				$intNewId = $objNewFormdata->insertId;
+			}
 
 			// store details data
 			foreach ($arrFormFields as $k => $arrField)
@@ -364,16 +375,17 @@ class Efp extends Frontend
 			// after frontend editing delete old record
 			if ( $blnFEedit )
 			{
-				//if ($intNewId > 0 && $this->Input->get('id'))
-				if ($intNewId > 0 && intval($intOldId)>0)
+				if ( !isset($arrListing['efg_fe_keep_id']) || $arrListing['efg_fe_keep_id'] != "1")
 				{
- 					$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
- 							->execute($intOldId);
- 					$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")
- 							->execute($intOldId);
-
-					$strRedirectTo = preg_replace('/\?.*$/', '', $this->Environment->request);
+					if ($intNewId > 0 && intval($intOldId)>0 && intval($intNewId) != intval($intOldId))
+					{
+	 					$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+	 							->execute($intOldId);
+	 					$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")
+	 							->execute($intOldId);
+					}
 				}
+				$strRedirectTo = preg_replace('/\?.*$/', '', $this->Environment->request);
 			}
 
 			// auto generate alias
