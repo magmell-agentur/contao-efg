@@ -452,12 +452,14 @@ class Efp extends Frontend
 			}
 			else
 			{
+// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = trimsplit(',', $varRecipient);
 			}
 
 			if (strlen($arrForm['confirmationMailRecipient']))
 			{
 				$varRecipient = $arrForm['confirmationMailRecipient'];
+// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = array_merge($arrRecipient, trimsplit(',', $varRecipient));
 			}
 			$arrRecipient = array_unique($arrRecipient);
@@ -560,7 +562,7 @@ class Efp extends Frontend
 								{
 									$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
-								if (!strlen($strVal) && $blnSkipEmpty)
+								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -570,13 +572,13 @@ class Efp extends Frontend
 							else
 							{
 								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!strlen($strVal) && $blnSkipEmpty)
+								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
-								if (!is_bool(strpos($strVal, "\n")))
+								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
 									$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 									$strVal = nl2br($strVal);
@@ -769,6 +771,7 @@ class Efp extends Frontend
 			}
 			else
 			{
+// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = trimsplit(',', $varRecipient);
 			}
 			$arrRecipient = array_unique($arrRecipient);
@@ -868,7 +871,7 @@ class Efp extends Frontend
 								{
 									$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
-								if (!strlen($strVal) && $blnSkipEmpty)
+								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -884,7 +887,7 @@ class Efp extends Frontend
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
-								if (!is_bool(strpos($strVal, "\n")))
+								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
 									$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 									$strVal = nl2br($strVal);
