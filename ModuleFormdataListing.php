@@ -2176,7 +2176,7 @@ class ModuleFormdataListing extends Module
 				}
 				// single file
 				//elseif (strlen($arrFields[$class]['content']) && is_file(TL_ROOT . '/' . $arrFields[$class]['content']) )
-				elseif (strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
+				elseif (!is_array($arrFields[$class]['raw']) && strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
 				{
 					$objFile = new File($arrFields[$class]['content']);
 
