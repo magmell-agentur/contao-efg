@@ -307,11 +307,9 @@ class ExtendedForm extends Form
 
 			if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
 			{
-
 				// frontend editing
 				if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 				{
-
 					if (is_array($objWidget->options))
 					{
 						$arrData['options'] = $objWidget->options;
@@ -347,7 +345,6 @@ class ExtendedForm extends Form
 						}
 					}
 				}
-
 			}
 
 			// HOOK: load form field callback
@@ -383,7 +380,6 @@ class ExtendedForm extends Form
 
 				if (!$doNotValidate)
 				{
-
 					if ($objWidget instanceof uploadable)
 					{
 						// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
@@ -417,7 +413,6 @@ class ExtendedForm extends Form
 						{
 							$objWidget->validate();
 						}
-
 					} // if instance of uploadable
 					else
 					{
@@ -433,7 +428,6 @@ class ExtendedForm extends Form
 							$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
 						}
 					}
-
 				}
 
 				if ($objWidget->hasErrors())
@@ -453,7 +447,6 @@ class ExtendedForm extends Form
 				}
 
 				unset($_POST[$objFields->name]);
-
 			} // if ($this->Input->post('FORM_SUBMIT') == $formId)
 
 
@@ -551,7 +544,6 @@ class ExtendedForm extends Form
 					}
 				}
 			}
-
 		}
 
 		$strAttributes = '';
