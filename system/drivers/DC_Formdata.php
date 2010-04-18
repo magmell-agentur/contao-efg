@@ -2221,36 +2221,6 @@ $return .= '
 		$this->procedure[] = 'id=?';
 		$this->blnCreateNewVersion = false;
 
-		// Change version
-		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['enableVersioning'] && $this->Input->post('FORM_SUBMIT') == 'tl_version' && strlen($this->Input->post('version')))
-		{
-			$objData = $this->Database->prepare("SELECT * FROM tl_version WHERE fromTable=? AND pid=? AND version=?")
-									->limit(1)
-									->execute($this->strTable, $this->intId, $this->Input->post('version'));
-
-			if ($objData->numRows)
-			{
-				$data = deserialize($objData->data);
-
-				if (is_array($data))
-				{
-					$this->Database->prepare("UPDATE " . $objData->fromTable . " %s WHERE id=?")
-									->set($data)
-									->execute($this->intId);
-
-					$this->Database->prepare("UPDATE tl_version SET active='' WHERE pid=?")
-									->execute($this->intId);
-
-					$this->Database->prepare("UPDATE tl_version SET active=1 WHERE pid=? AND version=?")
-									->execute($this->intId, $this->Input->post('version'));
-
-					$this->log(sprintf('Version %s of record ID %s (table %s) has been restored', $this->Input->post('version'), $this->intId, $this->strTable), 'DC_Table edit()', TL_GENERAL);
-				}
-			}
-
-			$this->reload();
-		}
-
 		// Get current record
 		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
@@ -2262,26 +2232,15 @@ $return .= '
 		$objRow = $this->Database->prepare($sqlQuery)
 								 ->limit(1)
 								 ->execute($this->intId);
+
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Table edit()', TL_ERROR);
 			$this->redirect('typolight/main.php?act=error');
 		}
-
-		// Create a new version if there is none
-		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['enableVersioning'])
-		{
-			$objVersion = $this->Database->prepare("SELECT id FROM tl_version WHERE fromTable=? AND pid=?")
-										 ->limit(1)
-										 ->execute($this->strTable, $this->intId);
-
-			if ($objVersion->numRows < 1)
-			{
-				$this->createNewVersion($this->strTable, $this->intId);
-			}
-		}
-
+// TODO: objActiveRecord
+//		$this->objActiveRecord = $objRow;
 
 		// Build an array from boxes and rows
 		$this->strPalette = $this->getPalette();
@@ -2309,7 +2268,6 @@ $return .= '
 						$legends[$k] = substr($vv, 1, -1);
 						unset($boxes[$k][$kk]);
 					}
-
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$vv]['exclude'] || !is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$vv]))
 					{
 						unset($boxes[$k][$kk]);
@@ -2420,7 +2378,7 @@ $return .= '
 					}
 
 					// field types radio, select, multi checkbox
-					if ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || $strInputType=='countryselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+					elseif ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || $strInputType=='countryselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
 						{
@@ -2469,7 +2427,6 @@ $return .= '
 
 									$sqlForeignFd = "SELECT f.id," . $strForeignSqlField . " FROM tl_formdata f, tl_formdata_details fd ";
 									$sqlForeignFd .= "WHERE (f.id=fd.pid) AND f." . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterKey'] . "='" . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterValue'] . "' AND fd.ff_name='" . $strForeignField . "'";
-
 
 									if (strlen($strForeignKeyCond))
 									{
@@ -2556,6 +2513,7 @@ $return .= '
 									$strK = false;
 	 								if (strlen($vVal) && $strK == false)
 	 								{
+
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
 										{
@@ -2592,7 +2550,7 @@ $return .= '
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					if ( $strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] )
+					elseif ( $strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] )
 					{
 						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
 						{
@@ -2617,7 +2575,7 @@ $return .= '
 					} // field typ single checkbox
 
 					// field type efgLookupSelect
-					if ( $strInputType=='efgLookupSelect' )
+					elseif ( $strInputType=='efgLookupSelect' )
 					{
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -2657,7 +2615,7 @@ $return .= '
 					} // field type efgLookupSelect
 
 					// field type efgLookupCheckbox
-					if ( $strInputType=='efgLookupCheckbox' )
+					elseif ( $strInputType=='efgLookupCheckbox' )
 					{
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -2697,9 +2655,8 @@ $return .= '
 					} // field type efgLookupCheckbox
 
 					// field type efgLookupRadio
-					if ( $strInputType=='efgLookupRadio' )
+					elseif ( $strInputType=='efgLookupRadio' )
 					{
-
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
@@ -2737,7 +2694,7 @@ $return .= '
 
 					} // field type efgLookupRadio
 
-
+/*
 					// Call load_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback']))
 					{
@@ -2749,7 +2706,10 @@ $return .= '
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
 						}
+// TODO: objActiveRecord, auch bei vorigen Typen varValue in objActiveRecord setten
+//						$this->objActiveRecord->{$this->strField} = $this->varValue;
 					}
+*/
 
 					// Build row
 					$blnAjax ? $strAjax .= $this->row() : $return .= $this->row();
@@ -2814,13 +2774,6 @@ $return .= '
 					$this->import($callback[0]);
 					$this->$callback[0]->$callback[1]($this);
 				}
-			}
-
-			// Save current version
-			if ($this->blnCreateNewVersion && $this->Input->post('SUBMIT_TYPE') != 'auto')
-			{
-				$this->createNewVersion($this->strTable, $this->intId);
-				$this->log(sprintf('A new version of record ID %s (table %s) has been created', $this->intId, $this->strTable), 'DC_Table edit()', TL_GENERAL);
 			}
 
 			// Set current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
@@ -2969,19 +2922,6 @@ window.addEvent(\'domready\', function()
 				$this->blnCreateNewVersion = false;
 				$this->strPalette = trimsplit('[;,]', $this->getPalette());
 
-				// Create a new version if there is none
-				if ($GLOBALS['TL_DCA'][$this->strTable]['config']['enableVersioning'])
-				{
-					$objVersion = $this->Database->prepare("SELECT id FROM tl_version WHERE fromTable=? AND pid=?")
-												 ->limit(1)
-												 ->execute($this->strTable, $this->intId);
-
-					if ($objVersion->numRows < 1)
-					{
-						$this->createNewVersion($this->strTable, $this->intId);
-					}
-				}
-
 				// Add meta fields if the current user is an administrator
 				if ($this->User->isAdmin)
 				{
@@ -3028,11 +2968,13 @@ window.addEvent(\'domready\', function()
 				$strSqlFields = (count($arrBaseFields)>0 ? implode(', ', $arrBaseFields) : '');
 				$strSqlFields .= (count($arrSqlDetails)>0 ? (strlen($strSqlFields) ? ', ' : '') . implode(', ', $arrSqlDetails) : '');
 
-
 				// Get field values
 				$objValue = $this->Database->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
 											->limit(1)
 											->execute($this->intId);
+// TODO: objActiveRecord
+// Store the active record
+//				$this->objActiveRecord = $objValue;
 
 				foreach ($this->strPalette as $v)
 				{
@@ -3081,6 +3023,15 @@ window.addEvent(\'domready\', function()
 						$this->varValue = $objValue->$v;
 					}
 
+					// Call options_callback
+					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback']))
+					{
+						$strClass = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][0];
+						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][1];
+
+						$this->import($strClass);
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
+					}
 
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
@@ -3091,11 +3042,9 @@ window.addEvent(\'domready\', function()
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'text';
 					}
 
-
 					// field types radio, select, multi checkbox
-					if ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+					elseif ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
 					{
-
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
 						{
 							if ($this->strField == 'fd_user')
@@ -3141,7 +3090,6 @@ window.addEvent(\'domready\', function()
 
 									$sqlForeignFd = "SELECT f.id," . $strForeignSqlField . " FROM tl_formdata f, tl_formdata_details fd ";
 									$sqlForeignFd .= "WHERE (f.id=fd.pid) AND f." . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterKey'] . "='" . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterValue'] . "' AND fd.ff_name='" . $strForeignField . "'";
-
 
 									if (strlen($strForeignKeyCond))
 									{
@@ -3213,7 +3161,6 @@ window.addEvent(\'domready\', function()
 
 							$arrValues = explode('|', $this->varValue);
 
-
 							if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['efgStoreValues'])
 							{
 								$this->varValue = $arrValues;
@@ -3266,7 +3213,7 @@ window.addEvent(\'domready\', function()
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					if ( $strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] )
+					elseif ( $strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] )
 					{
 						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
 						{
@@ -3291,9 +3238,8 @@ window.addEvent(\'domready\', function()
 					} // field typ single checkbox
 
 					// field type efgLookupSelect
-					if ( $strInputType=='efgLookupSelect' )
+					elseif ( $strInputType=='efgLookupSelect' )
 					{
-
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
@@ -3316,7 +3262,8 @@ window.addEvent(\'domready\', function()
 							{
 								$this->varValue = explode('|', $this->varValue);
 							}
-							foreach ($this->varValue as $k => $v) {
+							foreach ($this->varValue as $k => $v)
+							{
 								$sNewVal = array_search($v, $arrNewOptions);
 								if ($sNewVal)
 								{
@@ -3324,16 +3271,12 @@ window.addEvent(\'domready\', function()
 								}
 							}
 						}
-
-						// render type efgLookupSelect as SelectMenu
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 
 					} // field type efgLookupSelect
 
 					// field type efgLookupCheckbox
-					if ( $strInputType=='efgLookupCheckbox' )
+					elseif ( $strInputType=='efgLookupCheckbox' )
 					{
-
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
@@ -3364,16 +3307,12 @@ window.addEvent(\'domready\', function()
 								}
 							}
 						}
-
-						// render type efgLookupCheckbox as CheckboxMenu
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 
 					} // field type efgLookupCheckbox
 
 					// field type efgLookupRadio
-					if ( $strInputType=='efgLookupRadio' )
+					elseif ( $strInputType=='efgLookupRadio' )
 					{
-
 						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
@@ -3404,9 +3343,6 @@ window.addEvent(\'domready\', function()
 								}
 							}
 						}
-
-						// render type efgLookupRadio as RadioMenu
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 
 					} // field type efgLookupRadio
 
@@ -3431,10 +3367,10 @@ window.addEvent(\'domready\', function()
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 					}
-					// input type efgLookupCheckbox: modify DCA to render as CheckboxMenu
-					if ( $strInputType=='efgLookupCheckbox' )
+					// input type efgLookupSelect: modify DCA to render as SelectMenu
+					if ( $strInputType=='efgLookupSelect' )
 					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 					}
 
 					// Build the current row
