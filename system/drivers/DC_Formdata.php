@@ -2389,7 +2389,7 @@ $return .= '
 					$this->varValue = $objRow->$vv;
 
 					// Call options_callback
-					if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback']))
+					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback']))
 					{
 						$strClass = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][0];
 						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][1];
