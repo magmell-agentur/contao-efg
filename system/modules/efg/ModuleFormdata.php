@@ -57,38 +57,21 @@ class ModuleFormdata extends Backend
 
 		$this->loadDataContainer('tl_form_field');
 
-		$this->import('FormData');		
-		
+		$this->import('FormData');
+
 		// Types of form fields with storable data
 		$this->arrFFstorable = $this->FormData->arrFFstorable;
-		/*
-		$this->arrFFstorable = array(
-			'sessionText', 'sessionOption', 'sessionCalculator', 
-			'hidden','text','calendar','password','textarea',
-			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
-			'radio','efgLookupRadio',
-			'checkbox','efgLookupCheckbox',
-			'upload'
-		);
-		*/
-		//$arrFFignore = array('fieldset','condition','submit','efgFormPaginator','captcha','headline','explanation','html');
-		//$this->arrFFstorable = array_diff(array_keys($GLOBALS['TL_FFL']), $arrFFignore);
 	}
 
 	public function generate()
 	{
-
-		//$this->getStoreForms();
-
 		if ($this->Input->get('do') && $this->Input->get('do') != "feedback")
 		{
-			//if ($this->arrStoreForms[$this->Input->get('do')])
 			if ($this->FormData->arrStoreForms[$this->Input->get('do')])
 			{
 				$session = $this->Session->getData();
-				//$session['filter']['tl_feedback']['form'] = $this->arrStoreForms[$this->Input->get('do')]['title'];
 				$session['filter']['tl_feedback']['form'] = $this->FormData->arrStoreForms[$this->Input->get('do')]['title'];
-				
+
 				$this->Session->setData($session);
 			}
 		}
@@ -103,36 +86,6 @@ class ModuleFormdata extends Backend
 			return $this->objDc->$act();
 		}
 	}
-
-
-	/*
-	 * Get all Forms marked to store data in database
-	 */
-/*	
-	public function getStoreForms()
-	{
-		if ( !$this->arrStoreForms)
-		{
-			$objForms = $this->Database->prepare("SELECT f.id,f.title,f.formID FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND (f.storeFormdata=?) ORDER BY f.title")
-										->execute("1");
-			while ($objForms->next())
-			{
-				if (strlen($objForms->formID)) {
-					$varKey = $objForms->formID;
-				}
-				else
-				{
-					$varKey = str_replace('-', '_', standardize($objForms->title));
-				}
-				$this->arrStoreForms[$varKey] = $objForms->row();
-				$this->arrFormsDcaKey[$varKey] = $objForms->title;
-			}
-			
-		}
-
-		return $this->arrStoreForms;
-	}
-*/
 
 	/**
 	 * Create DCA files
@@ -153,16 +106,8 @@ class ModuleFormdata extends Backend
 	 */
 	public function callbackEditButton($row, $href, $label, $title, $icon, $attributes, $strTable, $arrRootIds, $arrChildRecordIds, $blnCircularReference, $strPrevious, $strNext)
 	{
-		/*
-		if (!$this->arrStoreForms)
-		{
-			$this->getStoreForms();
-		}
-		*/
-
 		$return = '';
-		
-		//$strDcaKey = array_search($row['form'], $this->arrFormsDcaKey);
+
 		$strDcaKey = array_search($row['form'], $this->FormData->arrFormsDcaKey);
 		if ($strDcaKey)
 		{
@@ -172,7 +117,6 @@ class ModuleFormdata extends Backend
 		return $return;
 	}
 
-
 	/**
 	 * Update efg/config.php, dca-files
 	 */
@@ -180,7 +124,6 @@ class ModuleFormdata extends Backend
 	{
 		$this->import('String');
 
-		//$arrStoreForms = $this->getStoreForms();
 		$arrStoreForms = $this->FormData->arrStoreForms;
 
 		// config/config.php
@@ -206,7 +149,6 @@ class ModuleFormdata extends Backend
 		{
 			if (array_key_exists($strModLang, $arrLanguages))
 			{
-				//$this->loadLanguageFile('tl_efg_modules.php');
 				$strFile = sprintf('%s/system/modules/%s/languages/%s/%s.php', TL_ROOT, 'efg', $strModLang, 'tl_efg_modules');
 				if (file_exists($strFile))
 				{
@@ -318,7 +260,6 @@ class ModuleFormdata extends Backend
 		}
 	}
 
-
 	/**
 	 * Return a new template object
 	 * @param string
@@ -328,12 +269,10 @@ class ModuleFormdata extends Backend
 	private function newTemplate($strTemplate)
 	{
 		$objTemplate = new BackendTemplate($strTemplate);
-
 		$objTemplate->folder = 'efg';
 
 		return $objTemplate;
 	}
-
 
 }
 

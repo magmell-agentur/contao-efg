@@ -451,7 +451,6 @@ class ModuleFormdataListing extends Module
 		return parent::generate();
 	}
 
-
 	/**
 	 * Generate module
 	 */
@@ -1906,7 +1905,6 @@ class ModuleFormdataListing extends Module
 
 	}
 
-
 	/**
 	 * List a single record
 	 */
@@ -2298,7 +2296,6 @@ class ModuleFormdataListing extends Module
 		$this->Template->link_export = $strLinkExport;
 
 	}
-
 
 	/**
 	 * Export a single record
@@ -2768,8 +2765,6 @@ class ModuleFormdataListing extends Module
 
 	}
 
-
-
 	/**
 	 * Edit a record
 	 */
@@ -2936,7 +2931,6 @@ class ModuleFormdataListing extends Module
 		}
 	}
 
-
 	protected function deleteSingleRecord()
 	{
 
@@ -3035,7 +3029,6 @@ class ModuleFormdataListing extends Module
 
 	}
 
-
 	/**
 	 * Generate frontend editing form
 	 * @return string
@@ -3057,8 +3050,6 @@ class ModuleFormdataListing extends Module
 		return $this->EditForm->generate();
 
 	}
-
-
 
 	/**
 	 * Format a value
