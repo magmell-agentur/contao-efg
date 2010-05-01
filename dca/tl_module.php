@@ -187,26 +187,22 @@ class tl_ext_module extends Backend
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['inputType'] = 'checkboxWizard';
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['mandatory'] = false;
-			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['options_callback'] = array('tl_ext_module', 'optionsListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['load_callback'][] = array('tl_ext_module', 'onloadListFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['inputType'] = 'checkboxWizard';
-			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['options_callback'] = array('tl_ext_module', 'optionsSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['load_callback'][] = array('tl_ext_module', 'onloadSearchFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['inputType'] = 'checkboxWizard';
-			// $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class'] = str_replace('w50', '', $GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['eval']['tl_class']);
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['options_callback'] = array('tl_ext_module', 'optionsInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['load_callback'][] = array('tl_ext_module', 'onloadInfoFields');
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
 		}
 		return $varValue;
 	}
-
 
 	/**
 	 * Return all formdata tables as array
@@ -244,7 +240,6 @@ class tl_ext_module extends Backend
 		}
 		return $this->arrFormdataTables;
 	}
-
 
 	public function optionsListFields(DC_Table $dc)
 	{
