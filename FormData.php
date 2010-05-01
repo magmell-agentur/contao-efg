@@ -338,9 +338,7 @@ class FormData extends Frontend
 
 	}
 
-
-
-	/*
+	/**
 	 * Get all forms marked to store data in tl_formdata
 	 */
 	public function getStoreForms()
@@ -367,9 +365,9 @@ class FormData extends Frontend
 		}
 	}
 
-
-	/*
+	/**
 	 * Get all pages containig frontend module formdata listing
+	 * @return array
 	 */
 	private function getListingPages()
 	{
@@ -387,8 +385,9 @@ class FormData extends Frontend
 		return $this->arrListingPages;
 	}
 
-	/*
+	/**
 	 * Get all pages for search indexer
+	 * @return array
 	 */
 	private function getSearchableListingPages()
 	{
@@ -410,8 +409,7 @@ class FormData extends Frontend
 		return $this->arrSearchableListingPages;
 	}
 
-
-	/*
+	/**
 	 * Return record from tl_formdata as Array('fd_base' => base fields from tl_formdata, 'fd_details' => detail fields from tl_formdata_details)
 	 * @param integer ID of tl_formdata record
 	 * @return mixed
@@ -451,7 +449,7 @@ class FormData extends Frontend
 		}
 	}
 
-	/*
+	/**
 	 * Return form fields as associative array
 	 * @param integer ID of tl_form record
 	 * @return mixed
@@ -487,8 +485,7 @@ class FormData extends Frontend
 		}
 	}
 
-
-	/*
+	/**
 	 * Prepare post value for tl_formdata / tl_formdata_details DB record
 	 * @param mixed post value
 	 * @param array form field properties
@@ -694,7 +691,7 @@ class FormData extends Frontend
 
 	}
 
-	/*
+	/**
 	 * Prepare post value for Mail / Text
 	 * @param mixed post value
 	 * @param array form field properties
@@ -850,8 +847,7 @@ class FormData extends Frontend
 
 	}
 
-
-	/*
+	/**
 	 * Prepare database value for Mail / Text
 	 * @param mixed database value
 	 * @param array form field properties
@@ -1037,13 +1033,12 @@ class FormData extends Frontend
 		} // if in_array arrFFstorable
 		else
 		{
-			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($varValue) : $varValue;
+			return (is_string($varValue) && strlen($varValue)) ? $this->String->decodeEntities($varValue) : $varValue;
 		}
 
 	}
 
-
-	/*
+	/**
 	 * Prepare database value from tl_formdata / tl_formdata_details for widget
 	 * @param mixed stored value
 	 * @param array form field properties
@@ -1238,7 +1233,7 @@ class FormData extends Frontend
 
 	}
 
-	/*
+	/**
 	 * Prepare dca options array
 	 * @param array form field
 	 * @return array DCA options
@@ -1720,15 +1715,12 @@ class FormData extends Frontend
 
 	}
 
-
-
 	public function importCsv()
 	{
 		if ($this->Input->get('key') != 'import')
 		{
 			return '';
 		}
-
 
 		// Import Csv
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_formdata_import')
@@ -1825,7 +1817,11 @@ class FormData extends Frontend
 
 	}
 
-
+	/**
+	 * Parse Insert tag params
+	 * @param string Insert tag
+	 * @return mixed
+	 */
 	public function parseInsertTagParams($strTag='')
 	{
 		if ($strTag == '')
