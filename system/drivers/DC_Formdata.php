@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * TYPOlight webCMS
@@ -244,7 +244,12 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// all field names of table tl_formdata
-		$this->arrBaseFields = array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate' /*,'importSource'*/);
+		foreach ($this->Database->listFields('tl_formdata') as $arrField)
+		{
+			$this->arrBaseFields[] = $arrField['name'];
+		}
+		$this->arrBaseFields = array_unique($this->arrBaseFields);
+
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
 		$this->getMembers();
@@ -387,7 +392,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 	}
-
 
 	/**
 	 * Return an object property
@@ -1345,25 +1349,47 @@ class DC_Formdata extends DataContainer implements listable, editable
 				if ($objSave->numRows)
 				{
 					$data[$table][$k] = $objSave->fetchAssoc();
+
+					// Store the active record
+					if ($table == $this->strTable && $v == $this->intId)
+					{
+						$this->objActiveRecord = $objSave;
+					}
 				}
 
 				$affected++;
 			}
 		}
 
-		$objUndoStmt = $this->Database->prepare("INSERT INTO tl_undo (tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?)")
-									->execute(time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
+		$this->import('BackendUser', 'User');
 
+		$objUndoStmt = $this->Database->prepare("INSERT INTO tl_undo (pid, tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?, ?)")
+									  ->execute($this->User->id, time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
+
+		// Delete the records
 		if ($objUndoStmt->affectedRows)
 		{
-			// Delete data and add a log entry
+			// Call ondelete_callback
+			if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['ondelete_callback']))
+			{
+				foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['ondelete_callback'] as $callback)
+				{
+					if (is_array($callback))
+					{
+						$this->import($callback[0]);
+						$this->$callback[0]->$callback[1]($this);
+					}
+				}
+			}
+
+			// Delete the records
 			foreach ($delete as $table=>$fields)
 			{
 				foreach ($fields as $k=>$v)
 				{
 					$this->Database->prepare("DELETE FROM " . $table . " WHERE id=?")
-									->limit(1)
-									->execute($v);
+								   ->limit(1)
+								   ->execute($v);
 				}
 			}
 
@@ -1373,7 +1399,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 				$this->log('DELETE FROM '.$this->strTable.' WHERE id='.$data[$this->strTable][0]['id'], 'DC_Table delete()', TL_GENERAL);
 			}
 		}
-
 		if (!$blnDoNotRedirect)
 		{
 			$this->redirect($this->getReferer());
@@ -1678,20 +1703,22 @@ class DC_Formdata extends DataContainer implements listable, editable
 							$varText = '';
 							$varHtml = '';
 
-							$varVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-
-							foreach ($varVal as $k => $strVal)
+							if (strlen($arrSubmitted[$strKey]) || is_array($arrSubmitted[$strKey]))
 							{
-								if (strlen($strVal))
+								$varVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								foreach ($varVal as $k => $strVal)
 								{
-									$varText[] = $this->Environment->base . $strVal;
-									$varHtml[] = '<img src="' . $strVal . '" />';
+									if (strlen($strVal))
+									{
+										$varText[] = $this->Environment->base . $strVal;
+										$varHtml[] = '<img src="' . $strVal . '" />';
+									}
 								}
-							}
-							if (is_array($varText))
-							{
-								$varText = implode(', ', $varText);
-								$varHtml = implode(', ', $varHtml);
+								if (is_array($varText))
+								{
+									$varText = implode(', ', $varText);
+									$varHtml = implode(', ', $varHtml);
+								}
 							}
 
 							if (!strlen($varText) && $blnSkipEmpty)
@@ -2231,7 +2258,7 @@ $return .= '
 
 		$objRow = $this->Database->prepare($sqlQuery)
 								 ->limit(1)
-								 ->execute($this->intId);
+								 ->executeUncached($this->intId);
 
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
@@ -2239,8 +2266,8 @@ $return .= '
 			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Table edit()', TL_ERROR);
 			$this->redirect('typolight/main.php?act=error');
 		}
-// TODO: objActiveRecord
-//		$this->objActiveRecord = $objRow;
+
+		$this->objActiveRecord = $objRow;
 
 		// Build an array from boxes and rows
 		$this->strPalette = $this->getPalette();
@@ -2353,7 +2380,7 @@ $return .= '
 						$this->import($strClass);
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
 					}
-
+/*
 					// Call load_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback']))
 					{
@@ -2365,8 +2392,11 @@ $return .= '
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
 						}
-					}
 
+						$this->objActiveRecord->{$this->strField} = $this->varValue;
+
+					}
+*/
 
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
@@ -2397,7 +2427,6 @@ $return .= '
 							if ($strInputType == 'select' && strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']))
 							{
 								// include blank Option
-								//$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][0] = "-";
 								$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['includeBlankOption'] = true;
 
 								$arrKey = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
@@ -2694,7 +2723,8 @@ $return .= '
 
 					} // field type efgLookupRadio
 
-/*
+					$this->objActiveRecord->{$this->strField} = $this->varValue;
+
 					// Call load_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback']))
 					{
@@ -2706,10 +2736,9 @@ $return .= '
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
 						}
-// TODO: objActiveRecord, auch bei vorigen Typen varValue in objActiveRecord setten
-//						$this->objActiveRecord->{$this->strField} = $this->varValue;
+
+						$this->objActiveRecord->{$this->strField} = $this->varValue;
 					}
-*/
 
 					// Build row
 					$blnAjax ? $strAjax .= $this->row() : $return .= $this->row();
@@ -2972,9 +3001,9 @@ window.addEvent(\'domready\', function()
 				$objValue = $this->Database->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
 											->limit(1)
 											->execute($this->intId);
-// TODO: objActiveRecord
-// Store the active record
-//				$this->objActiveRecord = $objValue;
+
+				// Store the active record
+				$this->objActiveRecord = $objValue;
 
 				foreach ($this->strPalette as $v)
 				{
@@ -3357,6 +3386,9 @@ window.addEvent(\'domready\', function()
 						}
 					}
 
+					// Re-set the current value
+					$this->objActiveRecord->{$this->strField} = $this->varValue;
+
 					// input type efgLookupCheckbox: modify DCA to render as CheckboxMenu
 					if ( $strInputType=='efgLookupCheckbox' )
 					{
@@ -3399,21 +3431,29 @@ window.addEvent(\'domready\', function()
   <input type="hidden" name="FORM_FIELDS_'.$this->intId.'[]" value="'.specialchars(implode(',', $formFields)).'" />
 </div>';
 
-				// Create a new version
-				if ($this->blnCreateNewVersion && $this->Input->post('SUBMIT_TYPE') != 'auto')
+				// Save record
+				if ($this->Input->post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
 				{
-					$this->createNewVersion($this->strTable, $this->intId);
-					$this->log(sprintf('A new version of record ID %s (table %s) has been created', $this->intId, $this->strTable), 'DC_Table editAll()', TL_GENERAL);
-				}
-
-				// Call onsubmit_callback
-				if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
-				{
-					foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] as $callback)
+					// Call onsubmit_callback
+					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
 					{
-						$this->import($callback[0]);
-						$this->$callback[0]->$callback[1]($this);
+						foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] as $callback)
+						{
+							$this->import($callback[0]);
+							$this->$callback[0]->$callback[1]($this);
+						}
 					}
+
+					// Create a new version
+					if ($this->blnCreateNewVersion && $this->Input->post('SUBMIT_TYPE') != 'auto')
+					{
+						$this->createNewVersion($this->strTable, $this->intId);
+						$this->log(sprintf('A new version of %s ID %s has been created', $this->strTable, $this->intId), 'DC_Table editAll()', TL_GENERAL);
+					}
+
+					// Set current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
+					$this->Database->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE id=?")
+								   ->execute(time(), $this->intId);
 				}
 			}
 
@@ -3574,7 +3614,6 @@ window.addEvent(\'domready\', function()
 			$varValue = $objDate->tstamp;
 		}
 
-
 		// Convert checkbox, radio, select, conditionalselect to store the values instead of keys
 		if ( ($arrData['inputType']=='checkbox' && $arrData['eval']['multiple']) || $arrData['inputType']=='radio' || $arrData['inputType']=='select' || $arrData['inputType']=='conditionalselect')
 		{
@@ -3731,6 +3770,11 @@ window.addEvent(\'domready\', function()
 				}
 
 				$this->varValue = deserialize($varValue);
+
+				if (is_object($this->objActiveRecord))
+				{
+					$this->objActiveRecord->{$this->strField} = $this->varValue;
+				}
 			}
 		}
 	}
@@ -3752,7 +3796,7 @@ window.addEvent(\'domready\', function()
 
 			$objFields = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
 										->limit(1)
-										->execute($this->intId);
+										->executeUncached($this->intId);
 
 			// Get selector values from DB
 			if ($objFields->numRows > 0)
