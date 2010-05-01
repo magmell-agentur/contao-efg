@@ -881,7 +881,7 @@ class Efp extends Frontend
 							else
 							{
 								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!strlen($strVal) && $blnSkipEmpty)
+								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
