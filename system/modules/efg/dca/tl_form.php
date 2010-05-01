@@ -105,7 +105,6 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'load_callback'           => array('tl_extform', 'setMailSender'),
 	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
