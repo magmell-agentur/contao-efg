@@ -437,7 +437,6 @@ class ExtendedForm extends Form
 					$doNotSubmit = true;
 				}
 				// Store current value in the session
-				// elseif ($objWidget->submitInput())
 				elseif ($objWidget->submitInput() || $strMode == 'back')
 				{
 					$arrSubmitted[$objFields->name] = $objWidget->value;
@@ -507,7 +506,6 @@ class ExtendedForm extends Form
 			{
 				$this->processFormData($arrSubmitted);
 			}
-
 			else
 			{
 				// if not last page but page is completed, render next page
@@ -525,7 +523,6 @@ class ExtendedForm extends Form
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
 					$this->reload();
 				}
-
 				// last page completed, process form
 				else
 				{
