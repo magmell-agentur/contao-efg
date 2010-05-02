@@ -1854,6 +1854,68 @@ class FormData extends Frontend
 
 	}
 
+// TODO: Name ? Doku-Comments...
+	public function parseSimpleTokens($strBuffer)
+	{
+		// Remove any unwanted tags (especially PHP tags)
+		//$strBuffer = strip_tags($strBuffer, $GLOBALS['TL_CONFIG']['allowedTags']);
+
+		if (!strlen($strBuffer))
+		{
+			return;
+		}
+		$strReturn = '';
+
+		$arrTags = preg_split("/{([^}]+)}/", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
+		if (is_array($arrTags) && count($arrTags)>0)
+		{
+			// Replace tags
+			foreach ($arrTags as $strTag)
+			{
+				if (strncmp($strTag, 'if', 2) === 0)
+				{
+					$strReturn .= preg_replace('/if (.*)/i', '<?php if ($1): ?>', $strTag);
+				}
+				elseif (strncmp($strTag, 'elseif', 6) === 0)
+				{
+					$strReturn .= preg_replace('/elseif (.*)/i', '<?php elseif ($1): ?>', $strTag);
+				}
+				elseif (strncmp($strTag, 'else', 4) === 0)
+				{
+					$strReturn .= '<?php else: ?>';
+				}
+				elseif (strncmp($strTag, 'endif', 5) === 0)
+				{
+					$strReturn .= '<?php endif; ?>';
+				}
+				else
+				{
+					$strReturn .= $strTag;
+				}
+			}
+
+			$strReturn = str_replace('?><br />', '?>', $strReturn);
+
+			// Eval the code
+			ob_start();
+			$blnEval = eval("?>" . $strReturn);
+			$strReturn = ob_get_contents();
+			ob_end_clean();
+
+			// Throw an exception if there is an eval() error
+			if ($blnEval === false)
+			{
+				throw new Exception("Error parsing simple tokens ($strReturn)");
+			}
+
+			// Return the evaled code
+			return $strReturn;
+		}
+
+		return $strBuffer;
+	}
+
 }
 
 ?>
