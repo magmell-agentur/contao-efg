@@ -750,7 +750,7 @@ class FormData extends Frontend
 
 					if ($strVal == '')
 					{
-						$strVal = $varSubmitted;
+						$strVal = (is_array($varSubmitted) ? implode(', ', $varSubmitted) : $varSubmitted);
 					}
 				break;
 				case 'efgLookupRadio':
