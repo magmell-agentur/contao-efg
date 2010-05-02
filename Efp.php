@@ -298,7 +298,6 @@ class Efp extends Frontend
 				$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
  				$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
  							->execute($intOldId);
-
 			}
 			else
 			{
@@ -477,11 +476,14 @@ class Efp extends Frontend
 					//handled by class Email: $dirImages = $fileTemplate->dirname . '/';
 				}
 			}
+var_dump($messageText);
+//var_dump($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
  			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
+var_dump($tags);
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
@@ -603,13 +605,28 @@ class Efp extends Frontend
  					break;
 				}
 			} // foreach tags
+// TODO: fertigmachen, auch bei InfoMail etc. !
+var_dump("\n-- nach replace form tags: --\n");
+var_dump($messageText);
 
 			// Replace standard insert tags
 			if (strlen($messageText))
 			{
 				$messageText = $this->replaceInsertTags($messageText);
+var_dump("\n-- nach replaceInsertTags: --\n");
+var_dump($messageText);
+
+$messageText = $this->FormData->parseSimpleTokens($messageText);
+var_dump("\n-- nach parseSimpleTokens: --\n");
+var_dump($messageText);
+
 				$messageText = strip_tags($messageText);
+var_dump("\n-- nach strip_tags: --\n");
+var_dump($messageText);
+
 			}
+
+
 			if (strlen($messageHtml))
 			{
 				$messageHtml = $this->replaceInsertTags($messageHtml);
@@ -1010,6 +1027,7 @@ class Efp extends Frontend
 
 		} // End information mail
 
+exit;
 
 		// redirect after frontend editing
 		if ($blnFEedit)
