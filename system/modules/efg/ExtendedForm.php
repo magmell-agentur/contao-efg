@@ -84,7 +84,6 @@ class ExtendedForm extends Form
 	 */
 	protected $blnAllowSkipRequired = false;
 
-
 	public function __set($strKey, $varValue)
 	{
 		switch ($strKey)
