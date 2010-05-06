@@ -1665,7 +1665,6 @@ class DC_Formdata extends DataContainer implements listable, editable
  		$tags = array();
  		preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
-
  		// Replace tags of type {{form::<form field name>}}
  		foreach ($tags[0] as $tag)
  		{
@@ -1684,7 +1683,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 					{
 						$arrTagParams = $this->FormData->parseInsertTagParams($tag);
 					}
-
  					$arrField = $arrFormFields[$strKey];
  					$strType = $arrField['type'];
 
