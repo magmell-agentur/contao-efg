@@ -1854,8 +1854,7 @@ class FormData extends Frontend
 
 	}
 
-// TODO: Name ? Doku-Comments...
-	public function parseSimpleTokens($strBuffer)
+	public function parseConditionTags($strBuffer)
 	{
 		// Remove any unwanted tags (especially PHP tags)
 		//$strBuffer = strip_tags($strBuffer, $GLOBALS['TL_CONFIG']['allowedTags']);

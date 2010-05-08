@@ -607,14 +607,14 @@ class Efp extends Frontend
 			if (strlen($messageText))
 			{
 				$messageText = $this->replaceInsertTags($messageText);
-$messageText = $this->FormData->parseSimpleTokens($messageText);
+$messageText = $this->FormData->parseConditionTags($messageText);
 				$messageText = strip_tags($messageText);
 			}
 
 			if (strlen($messageHtml))
 			{
 				$messageHtml = $this->replaceInsertTags($messageHtml);
-$messageHtml = $this->FormData->parseSimpleTokens($messageHtml);
+$messageHtml = $this->FormData->parseConditionTags($messageHtml);
 			}
 			// replace insert tags in subject
 			if (strlen($subject))
@@ -919,13 +919,13 @@ $messageHtml = $this->FormData->parseSimpleTokens($messageHtml);
 			if (strlen($messageText))
 			{
 				$messageText = $this->replaceInsertTags($messageText);
-$messageText = $this->FormData->parseSimpleTokens($messageText);
+$messageText = $this->FormData->parseConditionTags($messageText);
 				$messageText = strip_tags($messageText);
 			}
 			if (strlen($messageHtml))
 			{
 				$messageHtml = $this->replaceInsertTags($messageHtml);
-$messageHtml = $this->FormData->parseSimpleTokens($messageHtml);
+$messageHtml = $this->FormData->parseConditionTags($messageHtml);
 			}
 			// replace insert tags in subject
 			if (strlen($subject))
@@ -1107,7 +1107,6 @@ $messageHtml = $this->FormData->parseSimpleTokens($messageHtml);
 // TODO: parseSimleTokens ...
 //$strContent = $this->replaceInsertTags($strContent);
 //$strContent = $this->FormData->parseSimpleTokens($strContent);
-
 
 		return $strContent;
 
