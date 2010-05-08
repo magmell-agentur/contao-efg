@@ -1810,12 +1810,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 		// Replace standard insert tags
 		if (strlen($messageText))
 		{
+
 			$messageText = $this->replaceInsertTags($messageText);
+$messageText = $this->FormData->parseConditionTags($messageText);
 			$messageText = strip_tags($messageText);
 		}
 		if (strlen($messageHtml))
 		{
 			$messageHtml = $this->replaceInsertTags($messageHtml);
+$messageHtml = $this->FormData->parseConditionTags($messageHtml);
 		}
 		// replace insert tags in subject
 		if (strlen($subject))
