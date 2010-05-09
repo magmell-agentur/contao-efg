@@ -250,11 +250,11 @@ class Efp extends Frontend
 			{
 				$strUserEmail = $arrSubmitted[$arrForm['confirmationMailRecipientField']];
 			}
-
 			if ($arrFormFields['message'])
 			{
 				$strUserMessage = $arrSubmitted['message'];
 			}
+
 			$arrSet = array
 			(
 				'form' => $arrForm['title'],
@@ -280,7 +280,6 @@ class Efp extends Frontend
 				{
 					$arrSet['fd_member'] = 0;
 				}
-
 				$arrSet['fd_user'] = $arrOldFormdata['fd_user'];
 
 				// set published to value of old record, if NO default value is defined
@@ -291,7 +290,7 @@ class Efp extends Frontend
 			}
 
 			// store formdata
-			// Update or insert and delete
+			// update or insert and delete
 			if ($blnFEedit && strlen($arrListing['efg_fe_keep_id']))
 			{
 				$intNewId = $intOldId;
@@ -466,7 +465,6 @@ class Efp extends Frontend
 			$subject = $arrForm['confirmationMailSubject'];
 			$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
-
 			if ( $messageHtmlTmpl != '' )
 			{
 				$fileTemplate = new File($messageHtmlTmpl);
@@ -477,18 +475,33 @@ class Efp extends Frontend
 				}
 			}
 
+			// prepare insert tags to handle separate from 'condition tags'
+			if (strlen($messageText))
+			{
+				$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
+			}
+			if (strlen($messageHtml))
+			{
+				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
+			}
+
+			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
+			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
+
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+ 			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
-	 			//$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
-	 			$elements = explode('::', str_replace(array('{{', '}}'), array('', ''), $tag));
-	 			switch (strtolower($elements[0]))
+	 			//$elements = explode('::', str_replace(array('{{', '}}'), array('', ''), $tag));
+				$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
+
+				switch (strtolower($elements[0]))
 	 			{
  					// Form
  					case 'form':
@@ -606,15 +619,23 @@ class Efp extends Frontend
 			// Replace standard insert tags
 			if (strlen($messageText))
 			{
+				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
 				$messageText = $this->replaceInsertTags($messageText);
-$messageText = $this->FormData->parseConditionTags($messageText);
+				if ($blnEvalMessageText)
+				{
+					$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+				}
 				$messageText = strip_tags($messageText);
 			}
 
 			if (strlen($messageHtml))
 			{
+				$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
 				$messageHtml = $this->replaceInsertTags($messageHtml);
-$messageHtml = $this->FormData->parseConditionTags($messageHtml);
+				if ($blnEvalMessageHtml)
+				{
+					$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in subject
 			if (strlen($subject))
@@ -791,15 +812,32 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 					//handled by class Email: $dirImages = $fileTemplate->dirname . '/';
 				}
 			}
+	
+			// prepare insert tags to handle separate from 'condition tags'
+			if (strlen($messageText))
+			{
+				$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
+			}
+			if (strlen($messageHtml))
+			{
+				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
+			}
+
+			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
+			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+ 			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
+			// .. {{form::uploadfieldname?attachment=true}}
+			// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
-	 			$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
+	 			//$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
+	 			$elements = explode('::', trim(str_replace(array('__BRCL__', '__BRCR__'), array('', ''), $tag)));
 	 			switch (strtolower($elements[0]))
 	 			{
  					// Form
@@ -918,14 +956,22 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 			// Replace standard insert tags
 			if (strlen($messageText))
 			{
+				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
 				$messageText = $this->replaceInsertTags($messageText);
-$messageText = $this->FormData->parseConditionTags($messageText);
+				if ($blnEvalMessageText)
+				{
+					$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+				}
 				$messageText = strip_tags($messageText);
 			}
 			if (strlen($messageHtml))
 			{
+				$messageHtml =  preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
 				$messageHtml = $this->replaceInsertTags($messageHtml);
-$messageHtml = $this->FormData->parseConditionTags($messageHtml);
+				if ($blnEvalMessageHtml)
+				{
+					$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in subject
 			if (strlen($subject))
@@ -990,7 +1036,6 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 			fwrite($fp, $messageHtml);
 			fclose($fp);
 			*/
-
 
 			// Send e-mail
 			if (count($arrRecipient)>0)

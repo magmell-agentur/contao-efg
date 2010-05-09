@@ -1832,7 +1832,7 @@ class FormData extends Frontend
 		{
 			return null;
 		}
-		$strTag = str_replace(array('{{', '}}'), array('', ''), $strTag);
+		$strTag = str_replace(array('{{', '}}', '__BRCL__', '__BRCR__'), array('', ''), $strTag);
 
 		$arrTag = explode('?', $strTag);
 		$strKey = $arrTag[0];
@@ -1854,8 +1854,14 @@ class FormData extends Frontend
 
 	}
 
-	public function parseConditionTags($strBuffer)
+	/**
+	 * Replace 'condition tags': {if ...}, {elseif ...}, {else} and  {endif}
+	 * @param string String to parse
+	 * @return boolean|null
+	 */
+	public function replaceConditionTags(&$strBuffer)
 	{
+// TODO: !!!
 		// Remove any unwanted tags (especially PHP tags)
 		//$strBuffer = strip_tags($strBuffer, $GLOBALS['TL_CONFIG']['allowedTags']);
 
@@ -1863,6 +1869,8 @@ class FormData extends Frontend
 		{
 			return;
 		}
+
+		$blnEval = false;
 		$strReturn = '';
 
 		$arrTags = preg_split("/{([^}]+)}/", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
@@ -1894,25 +1902,38 @@ class FormData extends Frontend
 				}
 			}
 
-			$strReturn = str_replace('?><br />', '?>', $strReturn);
+  			$strBuffer = $strReturn;
 
-			// Eval the code
-			ob_start();
-			$blnEval = eval("?>" . $strReturn);
-			$strReturn = ob_get_contents();
-			ob_end_clean();
-
-			// Throw an exception if there is an eval() error
-			if ($blnEval === false)
-			{
-				throw new Exception("Error parsing simple tokens ($strReturn)");
-			}
-
-			// Return the evaled code
-			return $strReturn;
+			$blnEval = true;
 		}
 
-		return $strBuffer;
+		return $blnEval;
+	}
+
+	public function evalConditionTags($strBuffer, $arrSubmitted = null, $arrFiles = null, $arrForm = null)
+	{
+		if (!strlen($strBuffer))
+		{
+			return;
+		}
+
+		$strReturn = str_replace('?><br />', '?>', $strBuffer);
+
+		// Eval the code
+		ob_start();
+		$blnEval = eval("?>" . $strReturn);
+		$strReturn = ob_get_contents();
+		ob_end_clean();
+
+		// Throw an exception if there is an eval() error
+		if ($blnEval === false)
+		{
+			throw new Exception("Error eval() in FormData::evalConditionTags ($strReturn)");
+		}
+
+		// Return the evaled code
+		return $strReturn;
+
 	}
 
 }
