@@ -1468,14 +1468,12 @@ class DC_Formdata extends DataContainer implements listable, editable
 	}
 
 
-
 	/**
 	 * Send confirmation mail
 	 * @param integer
 	 * @param integer
 	 * @return string
 	 */
-
 	public function mail($intID=false, $ajaxId=false)
 	{
 
@@ -1661,15 +1659,32 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 		}
 
+		// prepare insert tags to handle separate from 'condition tags'
+		if (strlen($messageText))
+		{
+			$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
+		}
+		if (strlen($messageHtml))
+		{
+			$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
+		}
+
+		// replace 'condition tags'
+		$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
+		$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
+
 		// Replace tags in messageText, messageHtml ...
  		$tags = array();
- 		preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+ 		// preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+ 		preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
 
  		// Replace tags of type {{form::<form field name>}}
+		// .. {{form::uploadfieldname?attachment=true}}
+		// .. {{form::fieldname?label=Label for this field: }}
  		foreach ($tags[0] as $tag)
  		{
- 			$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
-
+			//$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
+			$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 			switch (strtolower($elements[0]))
  			{
  				// Form
@@ -1778,6 +1793,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 							{
 								$strLabel = '';
 							}
+
 							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
 							if (!is_bool(strpos($strVal, "\n")))
@@ -1807,18 +1823,25 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 		}
 
-		// Replace standard insert tags
+		// Replace standard insert tags and eval condition tags
 		if (strlen($messageText))
 		{
-
+			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
 			$messageText = $this->replaceInsertTags($messageText);
-$messageText = $this->FormData->parseConditionTags($messageText);
+			if ($blnEvalMessageText)
+			{
+				$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+			}
 			$messageText = strip_tags($messageText);
 		}
 		if (strlen($messageHtml))
 		{
+			$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
 			$messageHtml = $this->replaceInsertTags($messageHtml);
-$messageHtml = $this->FormData->parseConditionTags($messageHtml);
+			if ($blnEvalMessageHtml)
+			{
+				$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+			}
 		}
 		// replace insert tags in subject
 		if (strlen($subject))
@@ -1892,7 +1915,6 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 			$confEmail->html = $messageHtml;
 		}
 
-
 		// Send Mail
 		if (strlen($this->Input->get('token')) && $this->Input->get('token') == $this->Session->get('fd_mail_send'))
 		{
@@ -1921,21 +1943,6 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 							}
 						}
 
-						// USED TO DEBUG ONLY
-						/*
-						$fp = fopen('../efg_mail_debug_be.txt', 'ab');
-						fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
-						fwrite($fp, "\n confirmation Mail:");
-						fwrite($fp, "\n sender=".$sender);
-						fwrite($fp, "\n mail to=".$recipient);
-						fwrite($fp, "\n subject=".$subject);
-						fwrite($fp, "\n plain text:\n");
-						fwrite($fp, $messageText);
-						fwrite($fp, "\n html text:\n");
-						fwrite($fp, $messageHtml);
-						fclose($fp);
-						*/
-
 						$confEmail->sendTo($recipient);
 						$blnConfirmationSent = true;
 
@@ -1952,7 +1959,6 @@ $messageHtml = $this->FormData->parseConditionTags($messageHtml);
 									->set($arrUpd)
 									->execute($this->intId);
 				}
-
 
 			}
 
