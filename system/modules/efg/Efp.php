@@ -450,14 +450,12 @@ class Efp extends Frontend
 			}
 			else
 			{
-// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = trimsplit(',', $varRecipient);
 			}
 
 			if (strlen($arrForm['confirmationMailRecipient']))
 			{
 				$varRecipient = $arrForm['confirmationMailRecipient'];
-// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = array_merge($arrRecipient, trimsplit(',', $varRecipient));
 			}
 			$arrRecipient = array_unique($arrRecipient);
@@ -794,7 +792,6 @@ class Efp extends Frontend
 			}
 			else
 			{
-// TODO: use String->splitCsv($varRecipient) in TL >= 2.8
 				$arrRecipient = trimsplit(',', $varRecipient);
 			}
 			$arrRecipient = array_unique($arrRecipient);
@@ -1093,15 +1090,20 @@ class Efp extends Frontend
 			$this->import('FormData');
 			$arrFormFields = $this->FormData->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
 
+//$strReturn = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strContent);
+//$blnEval = $this->FormData->replaceConditionTags($strReturn);
+
 			// Replace tags
 	 		$tags = array();
 			preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
+//preg_match_all('/__BRCL__.*?__BRCR__/i', $strReturn, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 	 		// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
 	 			$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
+//$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 	 			switch (strtolower($elements[0]))
 	 			{
 					// Form
@@ -1143,11 +1145,21 @@ class Efp extends Frontend
 						}
 
 						$strContent = str_replace($tag, $strLabel . $strVal, $strContent);
+//$strReturn = str_replace($tag, $strLabel . $strVal, $strReturn);
 					break;
 				}
 			}
 			// unset($_SESSION['EFP']['FORMDATA']);
+
+// $strReturn = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strReturn);
+
+// eval("\$strRet = \$strReturn;");
+
+//$strContent = $strRet;
+
+			return $strContent;
 		}
+
 
 // TODO: parseSimleTokens ...
 //$strContent = $this->replaceInsertTags($strContent);
