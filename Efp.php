@@ -1090,20 +1090,28 @@ class Efp extends Frontend
 			$this->import('FormData');
 			$arrFormFields = $this->FormData->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
 
-//$strReturn = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strContent);
-//$blnEval = $this->FormData->replaceConditionTags($strReturn);
+$blnTest = preg_match_all('/<div class="ce_text block">.*?<\/div>/si', $strContent, $arrMatch);
+
+if (is_array($arrMatch[0]) && count($arrMatch[0]))
+{
+	for ($m=0; $m < count($arrMatch[0]); $m++)
+	{
+		$strTemp = $arrMatch[0][$m];
+
+$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
+$blnEval = $this->FormData->replaceConditionTags($strTemp);
 
 			// Replace tags
 	 		$tags = array();
-			preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
-//preg_match_all('/__BRCL__.*?__BRCR__/i', $strReturn, $tags);
+		//	preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
+preg_match_all('/__BRCL__.*?__BRCR__/i', $strTemp, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 	 		// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
-	 			$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
-//$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
+	 	//		$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
+$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 	 			switch (strtolower($elements[0]))
 	 			{
 					// Form
@@ -1144,19 +1152,35 @@ class Efp extends Frontend
 							$strLabel = '';
 						}
 
-						$strContent = str_replace($tag, $strLabel . $strVal, $strContent);
-//$strReturn = str_replace($tag, $strLabel . $strVal, $strReturn);
+			//			$strContent = str_replace($tag, $strLabel . $strVal, $strContent);
+$strTemp = str_replace($tag, $strLabel . $strVal, $strTemp);
 					break;
 				}
 			}
 			// unset($_SESSION['EFP']['FORMDATA']);
 
-// $strReturn = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strReturn);
+$strTemp = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strTemp);
+//var_dump($strTemp);
 
-// eval("\$strRet = \$strReturn;");
+// Eval the code
+ob_start();
+$blnCheck = eval("?>" . $strTemp);
+$strCheck = ob_get_contents();
+$strTemp = $strCheck;
+ob_end_clean();
+
+
+//var_dump($blnCheck);
+//var_dump($strTemp);
+//var_dump($strCheck);
+
+$strContent = str_replace($arrMatch[0][$m], $strTemp, $strContent);
+	}
+}
+
 
 //$strContent = $strRet;
-
+//$strContent = $strReturn;
 			return $strContent;
 		}
 
