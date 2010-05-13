@@ -1487,12 +1487,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$strFormFilter = ($this->strTable == 'tl_formdata' && strlen($this->strFormKey) ? $this->sqlFormFilter : '');
 		$table_alias = ($this->strTable == 'tl_formdata' ? ' f' : '');
 
-		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notEditable'])
-		{
-			$this->log('Table ' . $this->strTable . ' is not editable', 'DC_Table edit()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
-		}
-
 		if ($intID)
 		{
 			$this->intId = $intID;
@@ -1528,15 +1522,16 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 		// Form
 		$intFormId = 0;
-		if (count($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detail_fields']))
+
+		if (count($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields']))
 		{
 			// try to get Form ID
-			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detail_fields'] as $strField)
+			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields'] as $strField)
 			{
 				if ($intFormId > 0) break;
-				if(strlen($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['fields'][$strField]['f_id']))
+				if(strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
 				{
-					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['fields'][$strField]['f_id']);
+					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']);
 					$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")
 						->limit(1)
 						->execute($intFormId);
@@ -1698,8 +1693,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 					{
 						$arrTagParams = $this->FormData->parseInsertTagParams($tag);
 					}
- 					$arrField = $arrFormFields[$strKey];
- 					$strType = $arrField['type'];
+
+					$arrField = $arrFormFields[$strKey];
+					$strType = $arrField['type'];
+					if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
+					{
+						$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
+						$strType = $arrField['inputType'];
+					}
 
 					$strLabel = '';
 					$strVal = '';
@@ -1786,6 +1787,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 						}
 						else
 						{
+
 							$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
@@ -1832,7 +1834,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 			{
 				$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
 			}
-			$messageText = strip_tags($messageText);
 		}
 		if (strlen($messageHtml))
 		{
@@ -1908,6 +1909,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 		if ( $messageText != '' )
 		{
+			$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
+			$messageText = strip_tags($messageText);
 			$confEmail->text = $messageText;
 		}
 		if ( $messageHtml != '' )
