@@ -1090,104 +1090,92 @@ class Efp extends Frontend
 			$this->import('FormData');
 			$arrFormFields = $this->FormData->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
 
-$blnTest = preg_match_all('/<div class="ce_text block">.*?<\/div>/si', $strContent, $arrMatch);
+			preg_match('/<body[^>]*?>.*?<\/body>/si', $strContent, $arrMatch);
 
-if (is_array($arrMatch[0]) && count($arrMatch[0]))
-{
-	for ($m=0; $m < count($arrMatch[0]); $m++)
-	{
-		$strTemp = $arrMatch[0][$m];
+			if (is_array($arrMatch) && count($arrMatch))
+			{
+				for ($m=0; $m < count($arrMatch); $m++)
+				{
+					$strTemp = $arrMatch[$m];
+					$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
 
-$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
-$blnEval = $this->FormData->replaceConditionTags($strTemp);
+					$blnEval = $this->FormData->replaceConditionTags($strTemp);
 
-			// Replace tags
-	 		$tags = array();
-		//	preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
-preg_match_all('/__BRCL__.*?__BRCR__/i', $strTemp, $tags);
+					// Replace tags
+					$tags = array();
+					// preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
+					preg_match_all('/__BRCL__.*?__BRCR__/i', $strTemp, $tags);
 
-	 		// Replace tags of type {{form::<form field name>}}
-	 		// .. {{form::fieldname?label=Label for this field: }}
-	 		foreach ($tags[0] as $tag)
-	 		{
-	 	//		$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
-$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
-	 			switch (strtolower($elements[0]))
-	 			{
-					// Form
-					case 'form':
-						$strKey = $elements[1];
-						$arrKey = explode('?', $strKey);
-						$strKey = $arrKey[0];
-
- 						$arrTagParams = null;
-						if (isset($arrKey[1]) && strlen($arrKey[1]))
+					// Replace tags of type {{form::<form field name>}}
+					// .. {{form::fieldname?label=Label for this field: }}
+					foreach ($tags[0] as $tag)
+					{
+						// $elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
+						$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
+						switch (strtolower($elements[0]))
 						{
-							$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+							// Form
+							case 'form':
+								$strKey = $elements[1];
+								$arrKey = explode('?', $strKey);
+								$strKey = $arrKey[0];
+
+								$arrTagParams = null;
+								if (isset($arrKey[1]) && strlen($arrKey[1]))
+								{
+									$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+								}
+
+								$arrField = $arrFormFields[$strKey];
+								$strType = $arrField['type'];
+
+								$strLabel = '';
+								$strVal = '';
+								if ($arrTagParams && strlen($arrTagParams['label']))
+								{
+									$strLabel = $arrTagParams['label'];
+								}
+
+								$strVal = $arrSubmitted[$strKey];
+								if (is_array($strVal))
+								{
+									$strVal = implode(', ', $strVal);
+								}
+
+								if (strlen($strVal))
+								{
+									$strVal = nl2br($strVal);
+								}
+
+								if (!strlen($strVal) && $blnSkipEmpty)
+								{
+									$strLabel = '';
+								}
+
+								// $strContent = str_replace($tag, $strLabel . $strVal, $strContent);
+								$strTemp = str_replace($tag, $strLabel . $strVal, $strTemp);
+							break;
 						}
+					}
+					// unset($_SESSION['EFP']['FORMDATA']);
 
- 						$arrField = $arrFormFields[$strKey];
- 						$strType = $arrField['type'];
+					$strTemp = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strTemp);
 
-						$strLabel = '';
-						$strVal = '';
-						if ($arrTagParams && strlen($arrTagParams['label']))
-						{
-							$strLabel = $arrTagParams['label'];
-						}
+					// Eval the code
+					if ($blnEval)
+					{
+						ob_start();
+						$blnCheck = eval("?>" . $strTemp);
+						$strCheck = ob_get_contents();
+						$strTemp = $strCheck;
+						ob_end_clean();
+					}
 
-						$strVal = $arrSubmitted[$strKey];
-						if (is_array($strVal))
-						{
-							$strVal = implode(', ', $strVal);
-						}
-
-						if (strlen($strVal))
-						{
-							$strVal = nl2br($strVal);
-						}
-
-						if (!strlen($strVal) && $blnSkipEmpty)
-						{
-							$strLabel = '';
-						}
-
-			//			$strContent = str_replace($tag, $strLabel . $strVal, $strContent);
-$strTemp = str_replace($tag, $strLabel . $strVal, $strTemp);
-					break;
+					$strContent = str_replace($arrMatch[$m], $strTemp, $strContent);
 				}
 			}
-			// unset($_SESSION['EFP']['FORMDATA']);
 
-$strTemp = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strTemp);
-//var_dump($strTemp);
-
-// Eval the code
-ob_start();
-$blnCheck = eval("?>" . $strTemp);
-$strCheck = ob_get_contents();
-$strTemp = $strCheck;
-ob_end_clean();
-
-
-//var_dump($blnCheck);
-//var_dump($strTemp);
-//var_dump($strCheck);
-
-$strContent = str_replace($arrMatch[0][$m], $strTemp, $strContent);
-	}
-}
-
-
-//$strContent = $strRet;
-//$strContent = $strReturn;
-			return $strContent;
 		}
-
-
-// TODO: parseSimleTokens ...
-//$strContent = $this->replaceInsertTags($strContent);
-//$strContent = $this->FormData->parseSimpleTokens($strContent);
 
 		return $strContent;
 
