@@ -1857,17 +1857,13 @@ class FormData extends Frontend
 	/**
 	 * Replace 'condition tags': {if ...}, {elseif ...}, {else} and  {endif}
 	 * @param string String to parse
-	 * @return boolean|null
+	 * @return boolean
 	 */
 	public function replaceConditionTags(&$strBuffer)
 	{
-// TODO: !!!
-		// Remove any unwanted tags (especially PHP tags)
-		//$strBuffer = strip_tags($strBuffer, $GLOBALS['TL_CONFIG']['allowedTags']);
-
 		if (!strlen($strBuffer))
 		{
-			return;
+			return false;
 		}
 
 		$blnEval = false;
@@ -1883,18 +1879,22 @@ class FormData extends Frontend
 				if (strncmp($strTag, 'if', 2) === 0)
 				{
 					$strReturn .= preg_replace('/if (.*)/i', '<?php if ($1): ?>', $strTag);
+					$blnEval = true;
 				}
 				elseif (strncmp($strTag, 'elseif', 6) === 0)
 				{
 					$strReturn .= preg_replace('/elseif (.*)/i', '<?php elseif ($1): ?>', $strTag);
+					$blnEval = true;
 				}
 				elseif (strncmp($strTag, 'else', 4) === 0)
 				{
 					$strReturn .= '<?php else: ?>';
+					$blnEval = true;
 				}
 				elseif (strncmp($strTag, 'endif', 5) === 0)
 				{
 					$strReturn .= '<?php endif; ?>';
+					$blnEval = true;
 				}
 				else
 				{
@@ -1903,8 +1903,6 @@ class FormData extends Frontend
 			}
 
   			$strBuffer = $strReturn;
-
-			$blnEval = true;
 		}
 
 		return $blnEval;
