@@ -30,9 +30,9 @@
 /**
  * Class EfgFormPaginator
  *
- * @copyright  Thomas Kuhn 2009
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
- * @package    Controller
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
+ * @package    efg
  */
 class EfgFormPaginator extends Widget
 {

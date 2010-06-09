@@ -14,10 +14,9 @@
  * This file modifies the data container array of table tl_module.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
@@ -26,7 +25,6 @@
 * to fix height of style class w50 in backend
 */
 $GLOBALS['BE_MOD']['design']['modules']['stylesheet'] = 'system/modules/efg/html/w50_fix.css';
-
 
 /**
  * Add palettes to tl_module
@@ -167,8 +165,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_keep_id'] = array
  * Class tl_ext_module
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
 class tl_ext_module extends Backend
@@ -266,11 +264,12 @@ class tl_ext_module extends Backend
 			$GLOBALS['TL_DCA']['tl_module']['fields'][$strField]['eval']['mandatory'] = false;
 			foreach ($GLOBALS['TL_DCA']['tl_formdata']['fields'] as $k => $v)
 			{
+				/*
 				if (in_array($k, array('ip', 'published')) )
 				{
-// ###
-				//	continue;
+					continue;
 				}
+				*/
 				$arrReturn[$k] = (strlen($GLOBALS['TL_DCA']['tl_formdata']['fields'][$k]['label'][0]) ? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$k]['label'][0] . ' [' . $k . ']' : $k);
 			}
 		}
@@ -310,7 +309,6 @@ class tl_ext_module extends Backend
 			{
 				$varValue = explode(',', $varValue);
 			}
-
 		}
 		return $varValue;
 	}

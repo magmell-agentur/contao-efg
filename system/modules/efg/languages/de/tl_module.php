@@ -11,13 +11,12 @@
  * additional TYPOlight applications like the TYPOlight MVC Framework please
  * visit the project website http://www.typolight.org.
  *
- * Extended language file for table tl_form (en).
+ * Extended language file for table tl_module (de).
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.0
  * @license    LGPL
  * @filesource
  */

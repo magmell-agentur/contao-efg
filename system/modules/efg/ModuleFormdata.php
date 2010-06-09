@@ -12,20 +12,17 @@
  * visit the project website http://www.typolight.org.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn
- * @package    efg
- * @license    LGPL
+ * @copyright  Leo Feyer 2007
+ * @author     Leo Feyer
  * @filesource
  */
 
 /**
  * Class ModuleFormdata
  *
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  */
 class ModuleFormdata extends Backend
 {

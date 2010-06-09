@@ -14,10 +14,9 @@
  * This is the extended data container array for table tl_form.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
@@ -228,16 +227,13 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
 	array('storeFormdata' => 'efgAliasField,efgStoreValues,useFormValues,useFieldNames')
 );
 
-// PanelLayout
-// $GLOBALS['TL_DCA']['tl_form']['list']['sorting']['panelLayout'] = 'filter;search,limit';
-
 
 /**
  * Class tl_extform
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
 class tl_ext_form extends Backend

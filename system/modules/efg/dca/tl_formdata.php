@@ -15,10 +15,9 @@
  * This is the data container array for table tl_feedback.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  * @license    LGPL
  * @filesource
  */
@@ -231,9 +230,9 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
  * Class tl_formdata
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn
- * @package    Controller
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
+ * @package    efg
  */
 class tl_formdata extends Backend
 {

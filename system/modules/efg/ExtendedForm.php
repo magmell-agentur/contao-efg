@@ -31,8 +31,8 @@
  * Class ExtendedForm
  *
  * Provide methods to handle front end forms (multi page and formdata frontend editing)
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
 class ExtendedForm extends Form
@@ -234,16 +234,16 @@ class ExtendedForm extends Form
 			{
 				// skip fields outside range of active page
 				$intFieldSorting = (int) $objFields->sorting;
-				if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage-1)]['sorting'])
+				if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'])
 				{
 					continue;
 				}
 				elseif ($this->intActivePage > 1 && $this->intActivePage < $this->intTotalPages
-						&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage-2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage-1)]['sorting'] ))
+						&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'] ))
 				{
 					continue;
 				}
-				elseif ($this->intActivePage == $this->intTotalPages && $intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage-2)]['sorting'])
+				elseif ($this->intActivePage == $this->intTotalPages && $intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'])
 				{
 					continue;
 				}
