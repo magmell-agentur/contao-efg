@@ -25,10 +25,9 @@
  * modified version of DC_Table by Leo Feyer
  *
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
- * @package    Controller
- * @version    1.12.1
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
+ * @package    efg
  */
 class DC_Formdata extends DataContainer implements listable, editable
 {
@@ -2390,7 +2389,7 @@ $return .= '
 						$this->import($strClass);
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
 					}
-/*
+					/*
 					// Call load_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback']))
 					{
@@ -2406,7 +2405,7 @@ $return .= '
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
 
 					}
-*/
+					*/
 
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
