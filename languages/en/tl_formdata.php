@@ -14,10 +14,9 @@
  * Language file for table tl_formdata (en).
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.11.0
  * @license    LGPL
  * @filesource
  */

@@ -31,8 +31,8 @@
  * Class EfgFormImageSelect
  *
  * Provide methods to handle input field "image selector".
- * @copyright  Thomas Kuhn
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */
 class EfgFormImageSelect extends Widget

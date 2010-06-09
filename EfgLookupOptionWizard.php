@@ -25,10 +25,9 @@ if (!defined('TL_ROOT'))
  * Class EfgLookupOptionWizard
  *
  * Provide methods to handle form field lookup option
- * @copyright  Thomas Kuhn
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
- * @package    Controller
- * @version    1.12.1
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
+ * @package    efg
 */
 class EfgLookupOptionWizard extends Widget {
 

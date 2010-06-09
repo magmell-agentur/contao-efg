@@ -24,8 +24,8 @@
  *
  * Form field "radio (DB)".
  * based on FormRadio by Leo Feyer
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */
 class EfgFormLookupRadio extends Widget

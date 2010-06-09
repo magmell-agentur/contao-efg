@@ -20,13 +20,10 @@
 /**
  * Class Efp
  * extended form processing
- * - sends cofirmation via email to sender of a form
- * - stores data in database
  *
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  */
 class Efp extends Frontend
 {
@@ -64,7 +61,7 @@ class Efp extends Frontend
 		parent::__construct();
 	}
 
-		/**
+	/**
 	 * Set an object property
 	 * @param string
 	 * @param mixed
@@ -709,24 +706,7 @@ class Efp extends Frontend
 				$confEmail->html = $messageHtml;
 			}
 
-			// USED TO DEBUG ONLY
-			/*
-			$fp = fopen('efg_mail_debug.txt', 'ab');
-			fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
-			fwrite($fp, "\n confirmation Mail:");
-			fwrite($fp, "\n -------------------------\n");
-			fwrite($fp, "\n sender=".$sender);
-			fwrite($fp, "\n mail to=".$recipient);
-			fwrite($fp, "\n subject=".$subject);
-			fwrite($fp, "\n plain text:\n");
-			fwrite($fp, $messageText);
-			fwrite($fp, "\n html text:\n");
-			fwrite($fp, $messageHtml);
-			fclose($fp);
-			*/
-
 			// Send e-mail
-
 			$blnConfirmationSent = false;
 			if (count($arrRecipient)>0)
 			{
@@ -1019,21 +999,6 @@ class Efp extends Frontend
 				$infoEmail->html = $messageHtml;
 			}
 
-			// USED TO DEBUG ONLY
-			/*
-			$fp = fopen('efg_mail_debug.txt', 'ab');
-			fwrite($fp, "\n--- [".date("d-m-Y H:i")."] Mail Debug ---");
-			fwrite($fp, "\n information Mail:");
-			fwrite($fp, "\n sender=".$sender);
-			fwrite($fp, "\n mail to=".$recipient);
-			fwrite($fp, "\n subject=".$subject);
-			fwrite($fp, "\n plain text:\n");
-			fwrite($fp, $messageText);
-			fwrite($fp, "\n html text:\n");
-			fwrite($fp, $messageHtml);
-			fclose($fp);
-			*/
-
 			// Send e-mail
 			if (count($arrRecipient)>0)
 			{
@@ -1070,7 +1035,6 @@ class Efp extends Frontend
 
 	/*
 	 * Callback function to display submitted data on confirmation page
-	 *
 	 */
 	public function processConfirmationContent($strContent)
 	{

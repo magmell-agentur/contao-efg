@@ -14,12 +14,10 @@
  * Language file for modules.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 
- * @author     Thomas Kuhn <th_kuhn@gmx.net> 
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg 
  * @license    LGPL 
- * @filesource
- * @version    1.12.1
  */
 
 <?php $this->import('String'); ?>

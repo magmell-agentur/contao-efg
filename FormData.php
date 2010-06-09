@@ -22,10 +22,9 @@
  *
  * Provide methods to handle data stored in tables tl_formdata and tl_formdata_details.
  *
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn <th_kuhn@gmx.net>
+ * @copyright  Thomas Kuhn 2007 - 2010
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
- * @version    1.12.1
  */
 class FormData extends Frontend
 {
@@ -276,11 +275,6 @@ class FormData extends Frontend
 					}
 
 					$strUrl = $arrProcessed[$pageId];
-
-					/*
-					$objData = $this->Database->prepare("SELECT id,alias FROM tl_formdata WHERE form=?")
-								->execute($strForm);
-					*/
 
 					// prepare conditions
 					$strQuery = "SELECT id,alias FROM tl_formdata f";
@@ -1666,9 +1660,8 @@ class FormData extends Frontend
 				$arrOptions = $arrTempOptions;
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
-// #####################
-			// countryselect...
-/*
+			// countryselectmenu
+			/*
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
@@ -1678,7 +1671,7 @@ class FormData extends Frontend
 				}
 				$arrOptions = $arrTempOptions;
 			break;
-*/
+			*/
 
 			default:
 				if ($arrField['options'])
@@ -1712,108 +1705,6 @@ class FormData extends Frontend
 		} // end switch $arrField['type']
 
 		return $arrOptions;
-
-	}
-
-	public function importCsv()
-	{
-		if ($this->Input->get('key') != 'import')
-		{
-			return '';
-		}
-
-		// Import Csv
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_formdata_import')
-		{
-
-			if (!$this->Input->post('source') || $this->Input->post('source')=='')
-			{
-				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['ERR']['all_fields'];
-				$this->reload();
-			}
-
-			$strCsvFile = $this->Input->post('source');
-			$objFile = new File($strCsvFile);
-
-			if ($objFile->extension != 'csv')
-			{
-				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension);
-				continue;
-			}
-
-			// Get separator
-			switch ($this->Input->post('separator'))
-			{
-				case 'semicolon':
-					$strSeparator = ';';
-					break;
-
-				case 'tabulator':
-					$strSeparator = '\t';
-					break;
-
-				case 'linebreak':
-					$strSeparator = '\n';
-					break;
-
-				default:
-					$strSeparator = ',';
-					break;
-			}
-
-			$strFile = $objFile->getContent();
-			$arrRecipients = trimsplit($strSeparator, $strFile);
-			$arrRecipients = array_unique($arrRecipients);
-			$time = time();
-
-			foreach ($arrRecipients as $strRecipient)
-			{
-//				$this->Database->prepare("DELETE FROM tl_newsletter_recipients WHERE pid=? AND email=?")->execute($this->Input->get('id'), $strRecipient);
-//				$this->Database->prepare("INSERT INTO tl_newsletter_recipients SET pid=?, tstamp=?, email=?, active=?")->execute($this->Input->get('id'), $time, $strRecipient, 1);
-			}
-
-			setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-			$this->redirect(str_replace('&key=import', '', $this->Environment->request));
-		}
-
-		$objTree = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['source'], 'source', null, 'source', 'tl_formdata'));
-
-		// Return form
-		return '
-<div id="tl_buttons">
-<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
-</div>
-
-<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'.$this->getMessages().'
-
-<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
-<div class="tl_formbody_edit">
-<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import" />
-
-<div class="tl_tbox block">
-  <h3><label for="separator">'.$GLOBALS['TL_LANG']['MSC']['separator'][0].'</label></h3>
-  <select name="separator" id="separator" class="tl_select" onfocus="Backend.getScrollOffset();">
-    <option value="comma">'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
-    <option value="semicolon">'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
-    <option value="tabulator">'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
-    <option value="linebreak">'.$GLOBALS['TL_LANG']['MSC']['linebreak'].'</option>
-  </select>'.(strlen($GLOBALS['TL_LANG']['MSC']['separator'][1]) ? '
-  <p class="tl_help">'.$GLOBALS['TL_LANG']['MSC']['separator'][1].'</p>' : '').'
-  <h3><label for="source">'.$GLOBALS['TL_LANG']['tl_formdata']['source'][0].'</label> <a href="typolight/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); this.blur(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>
-'.$objTree->generate().(strlen($GLOBALS['TL_LANG']['tl_formdata']['source'][1]) ? '
-  <p class="tl_help">'.$GLOBALS['TL_LANG']['tl_formdata']['source'][1].'</p>' : '').'
-</div>
-
-</div>
-
-<div class="tl_formbody_submit">
-
-<div class="tl_submit_container">
-<input type="submit" name="save" id="save" class="tl_submit" alt="import form data" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_newsletter_recipients']['import'][0]).'" />
-</div>
-
-</div>
-</form>';
 
 	}
 
