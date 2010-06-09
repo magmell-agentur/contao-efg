@@ -1693,7 +1693,7 @@ class FormData extends Frontend
 								foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
 								{
 									$this->import($callback[0]);
-									$objWidget = $this->$callback[0]->$callback[1]($objWidget, $arrField['pid']);
+									$objWidget = $this->$callback[0]->$callback[1]($objWidget, $arrField['pid'], array());
 								}
 							}
 
