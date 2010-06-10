@@ -486,7 +486,7 @@ class Efp extends Frontend
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
  			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
-			preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
@@ -806,7 +806,7 @@ class Efp extends Frontend
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
  			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
-			preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
@@ -872,15 +872,15 @@ class Efp extends Frontend
 							}
 							elseif ($strType=='upload')
 							{
-								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
+								if ($arrTagParams && (array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) )
 								{
+									
 									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
 									{
 										if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
 										{
 											$attachments[$arrFiles[$strKey]['tmp_name']] = array('name'=>$arrFiles[$strKey]['name'], 'file'=>$arrFiles[$strKey]['tmp_name'], 'mime'=>$arrFiles[$strKey]['type']);
 										}
-
 									}
 									$strVal = '';
 								}
@@ -1061,6 +1061,7 @@ class Efp extends Frontend
 				for ($m=0; $m < count($arrMatch); $m++)
 				{
 					$strTemp = $arrMatch[$m];
+
 					$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
 
 					$blnEval = $this->FormData->replaceConditionTags($strTemp);
@@ -1068,12 +1069,14 @@ class Efp extends Frontend
 					// Replace tags
 					$tags = array();
 					// preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
-					preg_match_all('/__BRCL__.*?__BRCR__/i', $strTemp, $tags);
+
+					preg_match_all('/__BRCL__.*?__BRCR__/si', $strTemp, $tags);
 
 					// Replace tags of type {{form::<form field name>}}
 					// .. {{form::fieldname?label=Label for this field: }}
 					foreach ($tags[0] as $tag)
 					{
+						
 						// $elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
 						$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 						switch (strtolower($elements[0]))
