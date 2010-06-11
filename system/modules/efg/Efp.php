@@ -1040,8 +1040,14 @@ class Efp extends Frontend
 	{
 
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
-
- 		if ( $arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']))
+		
+		$blnProcess = false;
+		if (preg_match('/\{\{form::/si', $strContent)) {
+			$blnProcess = true;
+		}
+		
+		
+ 		if ($arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']) && $blnProcess)
 		{
 			$blnSkipEmpty = false;
 
@@ -1058,6 +1064,7 @@ class Efp extends Frontend
 
 			if (is_array($arrMatch) && count($arrMatch))
 			{
+
 				for ($m=0; $m < count($arrMatch); $m++)
 				{
 					$strTemp = $arrMatch[$m];
@@ -1065,6 +1072,7 @@ class Efp extends Frontend
 					$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
 
 					$blnEval = $this->FormData->replaceConditionTags($strTemp);
+
 
 					// Replace tags
 					$tags = array();
@@ -1139,6 +1147,7 @@ class Efp extends Frontend
 					}
 
 					$strContent = str_replace($arrMatch[$m], $strTemp, $strContent);
+				
 				}
 			}
 

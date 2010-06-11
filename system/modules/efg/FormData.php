@@ -1760,8 +1760,8 @@ class FormData extends Frontend
 		$blnEval = false;
 		$strReturn = '';
 
-		$arrTags = preg_split("/{([^}]+)}/", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-
+		$arrTags = preg_split("/(\{if|\{elseif|\{else|\{endif)([^}]+)?(\})/", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+		
 		if (is_array($arrTags) && count($arrTags)>0)
 		{
 			// Replace tags
