@@ -480,6 +480,16 @@ class Efp extends Frontend
 				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 			}
 
+			if (strlen($subject))
+			{
+				$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
+			}
+			if (strlen($sender))
+			{
+				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
+			}
+			
+			
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -487,7 +497,8 @@ class Efp extends Frontend
 	 		$tags = array();
  			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
-
+			
+			
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
@@ -635,11 +646,13 @@ class Efp extends Frontend
 			// replace insert tags in subject
 			if (strlen($subject))
 			{
+				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
 			{
+				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
 				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
 			}
@@ -799,7 +812,15 @@ class Efp extends Frontend
 			{
 				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 			}
-
+			if (strlen($subject))
+			{
+				$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
+			}
+			if (strlen($sender))
+			{
+				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
+			}
+			
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -953,11 +974,13 @@ class Efp extends Frontend
 			// replace insert tags in subject
 			if (strlen($subject))
 			{
+				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
 			{
+				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
 				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
 			}
