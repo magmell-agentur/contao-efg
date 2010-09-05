@@ -260,7 +260,6 @@ class ModuleFormdata extends Backend
 	/**
 	 * Return a new template object
 	 * @param string
-	 * @param object
 	 * @return object
 	 */
 	private function newTemplate($strTemplate)
