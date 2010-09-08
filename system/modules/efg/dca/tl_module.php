@@ -24,13 +24,12 @@
 /**
 * to fix height of style class w50 in backend
 */
-$GLOBALS['BE_MOD']['design']['modules']['stylesheet'] = 'system/modules/efg/html/w50_fix.css';
+//$GLOBALS['BE_MOD']['design']['modules']['stylesheet'] = 'system/modules/efg/html/w50_fix.css';
 
 /**
  * Add palettes to tl_module
  */
 $GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,align,space,cssID';
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
 
 /**
