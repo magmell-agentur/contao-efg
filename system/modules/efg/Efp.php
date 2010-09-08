@@ -817,7 +817,7 @@ class Efp extends Frontend
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
-			
+
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
