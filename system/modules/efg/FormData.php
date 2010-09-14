@@ -1770,6 +1770,7 @@ class FormData extends Frontend
 		$strReturn = '';
 
 		$arrTags = preg_split("/(\{[^}]+\})/sim", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
 		if (is_array($arrTags) && count($arrTags)>0)
 		{
 			// Replace tags
