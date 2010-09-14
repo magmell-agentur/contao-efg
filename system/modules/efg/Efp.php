@@ -302,7 +302,7 @@ class Efp extends Frontend
 				$intNewId = $intOldId;
 				$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
  				$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
- 							->execute($intOldId);
+								->execute($intOldId);
 			}
 			else
 			{
