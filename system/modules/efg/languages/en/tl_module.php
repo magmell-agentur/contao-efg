@@ -76,4 +76,17 @@ $GLOBALS['TL_LANG']['efg_fe_export_access']['public'] = array('Public', 'Each vi
 $GLOBALS['TL_LANG']['efg_fe_export_access']['member'] = array('Owner', 'Members are allowed to export their own records only.');
 $GLOBALS['TL_LANG']['efg_fe_export_access']['groupmembers'] = array('Group members', 'Members are allowed to export their own records and records of their group members only.');
 
+$GLOBALS['TL_LANG']['tl_module']['efg_com_allow_comments'] = array('Enable comments', 'Allow visitors to comment items.');
+$GLOBALS['TL_LANG']['tl_module']['com_moderate'] = array('Moderate comments', 'Approve comments before they are published on the website.');
+$GLOBALS['TL_LANG']['tl_module']['com_bbcode'] = array('Allow BBCode', 'Allow visitors to format their comments with BBCode.');
+$GLOBALS['TL_LANG']['tl_module']['com_requireLogin'] = array('Require login to comment', 'Allow only authenticated users to create comments.');
+$GLOBALS['TL_LANG']['tl_module']['com_disableCaptcha'] = array('Disable the security question', 'Use this option only if you have limited comments to authenticated users.');
+$GLOBALS['TL_LANG']['tl_module']['efg_com_per_page'] = array('Comments per page', 'Number of comments per page. Set to 0 to disable pagination.');
+$GLOBALS['TL_LANG']['tl_module']['com_order'] = array('Sort order', 'By default, comments are sorted ascending, starting with the oldest one.');
+$GLOBALS['TL_LANG']['tl_module']['com_template'] = array('Comments template', 'Here you can select the comments template.');
+$GLOBALS['TL_LANG']['tl_module']['efg_com_notify'] = array('Notify', 'Please choose who to notify when comments are added.');
+$GLOBALS['TL_LANG']['tl_module']['notify_admin'] = 'System administrator';
+$GLOBALS['TL_LANG']['tl_module']['notify_author'] = 'Owner of the item';
+$GLOBALS['TL_LANG']['tl_module']['notify_both']  = 'Owner and system administrator';
+
 ?>
