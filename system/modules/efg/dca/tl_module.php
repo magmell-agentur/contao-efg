@@ -33,8 +33,12 @@
 /**
  * Add palettes to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,align,space,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{comments_legend:hide},efg_com_allow_comments;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,align,space,cssID';
 $GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
+
+$GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'efg_com_allow_comments';
+$GLOBALS['TL_DCA']['tl_module']['subpalettes']['efg_com_allow_comments'] = 'com_moderate,com_bbcode,com_requireLogin,com_disableCaptcha,efg_com_per_page,com_order,com_template,efg_com_notify';
+
 
 /**
  * Add fields to tl_module
@@ -162,6 +166,80 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_keep_id'] = array
 	'inputType'               => 'checkbox',
 	'eval'                    => array('tl_class'=>'clr m12 cbx')
 );
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_allow_comments'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_com_allow_comments'],
+	'exclude'                 => true,
+	'filter'                  => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('submitOnChange'=>true)
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_moderate'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_moderate'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_bbcode'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_bbcode'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_requireLogin'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_requireLogin'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_disableCaptcha'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_disableCaptcha'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_per_page'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_com_per_page'],
+	'exclude'                 => true,
+	'inputType'               => 'text',
+	'eval'                    => array('rgxp'=>'digit', 'tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_order'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_order'],
+	'default'                 => 'ascending',
+	'exclude'                 => true,
+	'inputType'               => 'select',
+	'options'                 => array('ascending', 'descending'),
+	'reference'               => &$GLOBALS['TL_LANG']['MSC'],
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['com_template'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_template'],
+	'default'                 => 'com_default',
+	'exclude'                 => true,
+	'inputType'               => 'select',
+	'options_callback'        => array('tl_module_comments', 'getCommentTemplates'),
+	'eval'                    => array('tl_class'=>'w50')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_com_notify'],
+	'default'                 => 'notify_admin',
+	'exclude'                 => true,
+	'inputType'               => 'select',
+	'options'                 => array('notify_admin', 'notify_author', 'notify_both'),
+	'reference'               => &$GLOBALS['TL_LANG']['tl_module'],
+	'eval'                    => array('tl_class' => 'w50')
+);
+
 
 
 /**
