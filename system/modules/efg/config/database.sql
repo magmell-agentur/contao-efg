@@ -84,6 +84,9 @@ CREATE TABLE `tl_module` (
   `efg_iconfolder` varchar(255) NOT NULL default '',
   `efg_DetailsKey` varchar(64) NOT NULL default '',
   `efg_list_searchtype` varchar(32) NOT NULL default '',
+  `efg_com_allow_comments` char(1) NOT NULL default '',
+  `efg_com_notify` varchar(32) NOT NULL default '',
+  `efg_com_per_page` smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
