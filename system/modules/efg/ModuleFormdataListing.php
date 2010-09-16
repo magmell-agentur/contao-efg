@@ -621,7 +621,6 @@ class ModuleFormdataListing extends Module
 
 		}
 
-
 		$this->arrBaseFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'];
 		$this->arrDetailFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields'];
 
@@ -2148,7 +2147,6 @@ class ModuleFormdataListing extends Module
 
 		$arrItem = array();
 
-		// foreach ($arrRow as $k=>$v)
 		foreach ($arrListFields as $intKey => $strVal)
 		{
 
@@ -2180,8 +2178,8 @@ class ModuleFormdataListing extends Module
 					$arrFields[$class]['content'] = '&nbsp;';
 					$arrItem[$k]['content'] = '&nbsp;';
 				}
+
 				// single file
-				//elseif (strlen($arrFields[$class]['content']) && is_file(TL_ROOT . '/' . $arrFields[$class]['content']) )
 				elseif (!is_array($arrFields[$class]['raw']) && strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
 				{
 					$objFile = new File($arrFields[$class]['content']);
@@ -2284,10 +2282,7 @@ class ModuleFormdataListing extends Module
 
 					unset($arrTemp);
 				}
-
-
 			}
-
 		}
 
 		/**
@@ -2302,6 +2297,74 @@ class ModuleFormdataListing extends Module
 		$this->Template->link_edit = $strLinkEdit;
 		$this->Template->link_delete = $strLinkDelete;
 		$this->Template->link_export = $strLinkExport;
+
+		/**
+		 * Comments
+		 */
+		// comments extension required
+		if ( /* $objRecord->noComments || */ !in_array('comments', $this->Config->getActiveModules()))
+		{
+			$this->Template->allowComments = false;
+			return;
+		}
+
+		if (!$this->efg_com_allow_comments)
+		{
+			$this->Template->allowComments = false;
+			return;
+		}
+
+		$this->Template->allowComments = true;
+
+		// Adjust the comments headline level
+		$intHl = min(intval(str_replace('h', '', $this->hl)), 5);
+		$this->Template->hlc = 'h' . ($intHl + 1);
+
+		$this->import('Comments');
+		$arrNotifies = array();
+
+		// Notify system administrator
+		if ($this->efg_com_notify != 'notify_author')
+		{
+			$arrNotifies[] = $GLOBALS['TL_ADMIN_EMAIL'];
+		}
+
+		// Notify author
+		if ($this->efg_com_notify != 'notify_admin')
+		{
+			if (intval($objRecord->fd_user) > 0)
+			{
+				$objUser = $this->Database->prepare("SELECT email FROM tl_user WHERE id=?")
+											->limit(1)
+											->execute($objRecord->fd_user);
+				if ($objUser->numRows)
+				{
+					$arrNotifies[] = $objUser->email;
+				}
+			}
+			if (intval($objRecord->fd_member) > 0)
+			{
+				$objMember = $this->Database->prepare("SELECT email FROM tl_member WHERE id=?")
+											->limit(1)
+											->execute($objRecord->fd_member);
+				if ($objMember->numRows)
+				{
+					$arrNotifies[] = $objMember->email;
+				}
+			}
+		}
+
+		$objConfig = new stdClass();
+
+		$objConfig->perPage = $this->efg_com_per_page;
+		$objConfig->order = $this->com_order;
+		$objConfig->template = $this->com_template;
+		$objConfig->requireLogin = $this->com_requireLogin;
+		$objConfig->disableCaptcha = $this->com_disableCaptcha;
+		$objConfig->bbcode = $this->com_bbcode;
+		$objConfig->moderate = $this->com_moderate;
+
+		$this->Comments->addCommentsToTemplate($this->Template, $objConfig, 'tl_formdata', $this->intRecordId, $arrNotifies);
 
 	}
 
