@@ -2301,14 +2301,7 @@ class ModuleFormdataListing extends Module
 		/**
 		 * Comments
 		 */
-		// comments extension required
-		if ( /* $objRecord->noComments || */ !in_array('comments', $this->Config->getActiveModules()))
-		{
-			$this->Template->allowComments = false;
-			return;
-		}
-
-		if (!$this->efg_com_allow_comments)
+		if (!$this->efg_com_allow_comments || !in_array('comments', $this->Config->getActiveModules()))
 		{
 			$this->Template->allowComments = false;
 			return;

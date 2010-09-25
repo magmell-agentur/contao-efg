@@ -308,6 +308,14 @@ class Efp extends Frontend
 			{
 				$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
 				$intNewId = $objNewFormdata->insertId;
+
+				// update related comments
+				if (in_array('comments', $this->Config->getActiveModules()))
+				{
+					$this->Database->prepare("UPDATE tl_comments %s WHERE `source` = 'tl_formdata' AND parent=?")
+								->set(array('parent' => $intNewId))
+								->execute($intOldId);
+				}
 			}
 
 			// store details data
