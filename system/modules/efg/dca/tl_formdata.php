@@ -277,7 +277,6 @@ class tl_formdata extends Backend
 		{
 			if ($varFormKey != 'tl_formdata' )
 			{
-
 				if ( array_key_exists($varFormKey, $GLOBALS['BE_MOD']['formdata']) )
 				{
 					$strFile = sprintf('%s/system/modules/%s/dca/%s.php', TL_ROOT, $strModule, $strFileName);
@@ -293,6 +292,18 @@ class tl_formdata extends Backend
 							$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
 							unset($GLOBALS['TL_DCA'][$strName]);
 						}
+
+						// HOOK: allow to load custom settings
+						if (isset($GLOBALS['TL_HOOKS']['loadDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadDataContainer']))
+						{
+							foreach ($GLOBALS['TL_HOOKS']['loadDataContainer'] as $callback)
+							{
+								$this->import($callback[0]);
+								$this->$callback[0]->$callback[1]('tl_formdata');
+							}
+						}
+
+
 					}
 				}
 			}
@@ -314,10 +325,22 @@ class tl_formdata extends Backend
 						$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
 						unset($GLOBALS['TL_DCA'][$strName]);
 					}
+
+					// HOOK: allow to load custom settings
+					if (isset($GLOBALS['TL_HOOKS']['loadDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadDataContainer']))
+					{
+						foreach ($GLOBALS['TL_HOOKS']['loadDataContainer'] as $callback)
+						{
+							$this->import($callback[0]);
+							$this->$callback[0]->$callback[1]('tl_formdata');
+						}
+					}
+
 				}
 			}
 		}
-		include(TL_ROOT . '/system/config/dcaconfig.php');
+
+		@include(TL_ROOT . '/system/config/dcaconfig.php');
 
 	}
 
