@@ -44,15 +44,19 @@ class FormDataComments extends Backend
 	public function listComments($arrRow)
 	{
 		$this->import('FormData');
-		$arrData = $this->FormData->getFormdataAsArray($arrRow['parent']);
 
 		$strRet = '';
-		if (is_array($arrData))
+
+		$objParent = $this->Database->prepare("SELECT `id`, `form`, `alias`  FROM tl_formdata WHERE id=?")
+											->execute($arrRow['parent']);
+
+		if ($objParent->numRows)
 		{
-			$strRet .= ' (' . $arrData['fd_base']['form'];
-			if (isset($arrData['fd_base']['alias']) && strlen($arrData['fd_base']['alias']))
+			$strRet .= ' (' . $objParent->form;
+
+			if (strlen($objParent->alias))
 			{
-				$strRet .= ' - '.$arrData['fd_base']['alias'];
+				$strRet .= ' - '.$objParent->alias;
 			}
 			$strRet .= ')';
 		}
