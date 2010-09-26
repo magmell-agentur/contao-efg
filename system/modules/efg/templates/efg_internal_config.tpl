@@ -114,5 +114,6 @@ $GLOBALS['TL_HOOKS']['outputTemplate'][] = array('Efp', 'processConfirmationCont
 <?php else: ?>
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('Efp', 'processConfirmationContent');
 <?php endif; ?>
+$GLOBALS['TL_HOOKS']['listComments'][] = array('FormDataComments', 'listComments');
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = array('FormData', 'getSearchablePages');
 ?>
