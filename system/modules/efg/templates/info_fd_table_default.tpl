@@ -25,6 +25,7 @@
 </tbody>
 </table>
 
+<!-- indexer::stop -->
 <?php if ($this->editAllowed): ?>
 <div class="fd_edit"><a href="<?php echo $this->link_edit; ?>" class="fd_edit" title="<?php echo $this->textlink_edit[1]; ?>"><?php echo $this->textlink_edit[0]; ?></a></div>
 <?php endif; ?>
@@ -38,7 +39,7 @@
 <?php endif; ?>
 
 <div class="go_back">{{link::back}}</div>
-
+<!-- indexer::continue -->
 
 <?php if ($this->allowComments && ($this->comments || !$this->requireLogin)): ?>
 
