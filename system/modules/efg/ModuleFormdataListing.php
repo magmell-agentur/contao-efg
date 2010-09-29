@@ -2096,7 +2096,6 @@ class ModuleFormdataListing extends Module
 									->limit(1)
 									->execute($this->intRecordId);
 
-
 		if ($objRecord->numRows < 1)
 		{
 			return;
@@ -2295,6 +2294,7 @@ class ModuleFormdataListing extends Module
 		$this->Template->recordID = $this->intRecordId;
 
 		$this->Template->link_edit = $strLinkEdit;
+
 		$this->Template->link_delete = $strLinkDelete;
 		$this->Template->link_export = $strLinkExport;
 
