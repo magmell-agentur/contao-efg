@@ -175,6 +175,16 @@ class DC_Formdata extends DataContainer implements listable, editable
 	protected $arrDetailFieldsObj = null;
 
 	/**
+	 * Fields available for import field mapping
+	 */
+	protected $arrImportableFields = null;
+
+	/**
+	 * Fields not available for import
+	 */
+	protected $arrImportIgnoreFields = null;
+
+	/**
 	 * Sql statements for detail fields
 	 * @param mixed
 	 */
@@ -232,7 +242,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// get all forms marked to store data
-		$objForms = $this->Database->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
+		$objForms = $this->Database->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
 										->execute("1");
 		if ( !$this->arrStoreForms )
 		{
@@ -352,7 +362,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 		if ( count($arrFFNames) )
 		{
-			$this->arrDetailFields = array_diff($arrFFNames, $this->arrBaseFields);
+			$this->arrDetailFields = array_diff($arrFFNames, $this->arrBaseFields, array('import_source'));
 		}
 
 		// store array of sql-stmts for detail fields
@@ -844,7 +854,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 				foreach ($this->arrDetailFields as $strDetailField)
 				{
 					$strVal = '';
-					$arrDetailSet = array('pid' => $insertID, 'tstamp' => time(), 'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['ff_id'], 'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['inputType'], 'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0] , 'ff_name' => $strDetailField, 'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0] );
+					$arrDetailSet = array(
+						'pid' => $insertID,
+						'tstamp' => time(),
+						'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['ff_id'],
+						'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['inputType'],
+						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0] ,
+						'ff_name' => $strDetailField,
+						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0]
+					);
 
    					// default value
    					if ( strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) )
@@ -5743,13 +5761,550 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 	}
 
 
+	public function importFile()
+	{
+		if ($this->Input->get('key') != 'import')
+		{
+			return '';
+		}
 
-	public function export($sMode='csv')
+		if (is_null($this->arrImportIgnoreFields))
+		{
+			$this->arrImportIgnoreFields = array('id', 'pid', 'sorting', 'tstamp', 'form', 'ip', 'date', 'confirmationSent', 'confirmationDate', 'import_source' );
+		}
+
+		if (is_null($this->arrImportableFields))
+		{
+			$arrFdFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
+			$arrFdFields = array_diff($arrFdFields, $this->arrImportIgnoreFields);
+			foreach ($arrFdFields as $strFdField)
+			{
+				$this->arrImportableFields[$strFdField] = $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strFdField]['label'][0];
+			}
+		}
+
+		$arrSessionData = $this->Session->get('EFG');
+		if (is_null($arrSessionData))
+		{
+			$arrSessionData = array();
+		}
+		$this->Session->set('EFG', $arrSessionData);
+
+		// Import CSV
+		if ($_POST['FORM_SUBMIT'] == 'tl_formdata_import')
+		{
+
+			$strMode = 'preview';
+			$arrSessionData['import'][$this->strFormKey]['separator'] = $_POST['separator'];
+			$arrSessionData['import'][$this->strFormKey]['csv_has_header'] = ($_POST['csv_has_header'] == '1' ? '1' : '');
+			$this->Session->set('EFG', $arrSessionData);
+
+			if (!$this->Input->post('import_source') || $this->Input->post('import_source') == '')
+			{
+				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['tl_formdata']['error_select_source'];
+				$this->reload();
+			}
+
+			$strCsvFile = $this->Input->post('import_source');
+			$objFile = new File($strCsvFile);
+
+			if ($objFile->extension != 'csv')
+			{
+				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension);
+				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
+				$this->reload();
+			}
+
+			// Get separator
+			switch ($this->Input->post('separator'))
+			{
+				case 'semicolon':
+					$strSeparator = ';';
+					break;
+
+				case 'tabulator':
+					$strSeparator = '\t';
+					break;
+
+				default:
+					$strSeparator = ',';
+					break;
+			}
+
+			if ($_POST['FORM_MODE'] == 'import')
+			{
+				$strMode = 'import';
+
+				$time = time();
+				$intTotal = null;
+				$intInvalid = 0;
+				$intValid = 0;
+
+				$arrImportCols = $this->Input->post('import_cols');
+				$arrSessionData['import'][$this->strFormKey]['import_cols'] = $arrImportCols;
+				$this->Session->set('EFG', $arrSessionData);
+
+				$arrMapFields = array_flip($arrImportCols);
+				if (isset($arrMapFields['__IGNORE__']))
+				{
+					unset($arrMapFields['__IGNORE__']);
+				}
+
+				$blnUseCsvHeader = ($arrSessionData['import'][$this->strFormKey]['csv_has_header'] == '1' ? true : false);
+
+				$arrEntries = array();
+				$resFile = $objFile->handle;
+
+				$timeNow = time();
+				$strFormTitle = $this->arrFormsDcaKey[substr($this->strFormKey, 3)];
+
+				$strAliasField = (strlen($this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
+
+				$objForm = $this->Database->prepare("SELECT id FROM tl_form WHERE `title`=?")
+									->limit(1)
+									->execute($strFormTitle);
+				if ($objForm->numRows == 1)
+				{
+					$intFormId = intval($objForm->id);
+					$arrFormFields = $this->FormData->getFormfieldsAsArray($intFormId);
+				}
+
+				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
+				{
+					if (is_null($intTotal))
+					{
+						$intTotal = 0;
+						if ($blnUseCsvHeader)
+						{
+							continue;
+						}
+					}
+
+					$blnSaved = true;
+
+					$strAlias = '';
+					if (isset($arrRow[$arrMapFields['alias']]) && strlen($arrRow[$arrMapFields['alias']]))
+					{
+						$strAlias = $arrRow[$arrMapFields['alias']];
+					}
+					elseif (isset($arrRow[$arrMapFields[$strAliasField]]) && strlen($arrRow[$arrMapFields[$strAliasField]]))
+					{
+						$this->Input->setPost($strAliasField, $arrRow[$arrMapFields[$strAliasField]]);
+					}
+
+					$arrDetailSets = array();
+
+					// prepare base data
+					$arrSet = array
+					(
+						'tstamp' => $timeNow,
+						'fd_member' => 0,
+						'fd_user' => intval($this->User->id),
+						'form' => $strFormTitle,
+						'ip' => $this->Environment->ip,
+						'date' => $timeNow,
+						'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
+						// 'alias' => '',
+						// 'fd_member_group' => 0,
+						// 'fd_user_group' => 0
+					);
+
+					foreach ($arrMapFields as $strField => $intCol)
+					{
+						if (in_array($strField, $this->arrImportIgnoreFields))
+						{
+							continue;
+						}
+
+						if (in_array($strField, $this->arrBaseFields))
+						{
+							$arrField = $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField];
+
+							if (in_array($strField, $this->arrOwnerFields))
+							{
+								switch ($strField)
+								{
+									case 'fd_user':
+										$array = 'arrUsers';
+										break;
+									case 'fd_member':
+										$array = 'arrMembers';
+										break;
+									case 'fd_user_group':
+										$array = 'arrUserGroups';
+										break;
+									case 'fd_member_group':
+										$array = 'arrMemberGroups';
+										break;
+								}
+
+								if (is_numeric($arrRow[$intCol]) && array_key_exists($arrRow[$intCol], $this->{$array}))
+								{
+									$varValue = $arrRow[$intCol];
+								}
+								elseif (is_string($arrRow[$intCol]))
+								{
+									$varValue = intval(array_search($arrRow[$intCol], $this->{$array}));
+								}
+							}
+							elseif ($strField == 'published')
+							{
+								if ($arrRow[$intCol] == $arrField['label'][0] || intval($arrRow[$intCol]) == 1)
+								{
+									$varValue = '1';
+								}
+								else
+								{
+									$varValue = '';
+								}
+							}
+							elseif ($strField == 'alias')
+							{
+								continue;
+							}
+							else
+							{
+								$varValue = $arrRow[$intCol];
+							}
+							$arrSet[$strField] = $varValue;
+						}
+					}
+
+					// prepare details data
+					foreach ($arrMapFields as $strField => $intCol)
+					{
+						if (in_array($strField, $this->arrImportIgnoreFields))
+						{
+							continue;
+						}
+
+						if (in_array($strField, $this->arrDetailFields))
+						{
+							// $arrField = array_merge($arrFormFields[$strField], $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField]);
+							$arrField = $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField];
+							$arrField['type'] = $arrFormFields[$strField]['type'];
+
+							$varValue = $this->FormData->prepareImportValForDb($arrRow[$intCol], $arrField);
+
+							// prepare details data
+							$arrDetailSet = array(
+								// 'pid' => $intNewId,
+								'sorting' => $arrFormFields[$strField]['sorting'],
+								'tstamp' => $timeNow,
+								'ff_id' => $arrField['ff_id'],
+								'ff_type' => $arrField['inputType'],
+								'ff_label' => $arrField['label'][0],
+								'ff_name' => $strField,
+								'value' => $varValue
+							);
+
+							$arrDetailSets[] = $arrDetailSet;
+						}
+					}
+
+					if (count($arrDetailSets))
+					{
+						try
+						{
+							$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+							$intNewId = $objNewFormdata->insertId;
+
+							$strAlias = $this->FormData->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
+							if (strlen($strAlias))
+							{
+								$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);
+							}
+
+							foreach ($arrDetailSets as $kD => $arrDetailSet)
+							{
+								$arrDetailSet['pid'] = $intNewId;
+								try
+								{
+									$objNewFormdataDetails = $this->Database->prepare("INSERT INTO tl_formdata_details %s")
+																			->set($arrDetailSet)
+																			->execute();
+								}
+								catch(Exception $ee)
+								{
+									$blnSaved = false;
+								}
+							}
+
+						}
+						catch (Exception $e)
+						{
+							$blnSaved = false;
+						}
+					}
+					else
+					{
+						$blnSaved = false;
+					}
+
+					if ($blnSaved)
+					{
+						$intValid++;
+					}
+					else
+					{
+						$intInvalid++;
+					}
+
+					$intTotal++;
+
+				} // while $arrRow
+
+				$_SESSION['TL_CONFIRM'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_confirm'], $intValid);
+
+				if ($intInvalid > 0)
+				{
+					$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_invalid'], $intInvalid);
+				}
+
+				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
+
+				$this->reload();
+
+			}
+
+			// Generate preview and form to select import fields
+			if ($strMode == 'preview')
+			{
+				return $this->formImportPreview($objFile, $strSeparator);
+			}
+
+		}
+
+		return $this->formImportSource();
+		
+	}
+
+	/**
+	 * Generate the form to select import source and basic settings and return it as HTML string
+	 * @return string
+	 */
+	protected function formImportSource()
+	{
+		$arrSessionData = $this->Session->get('EFG');
+
+		$objTree = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
+
+		// Return form
+		return '
+<div id="tl_buttons">
+<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+</div>
+
+<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'.$this->getMessages().'
+
+<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
+<div class="tl_formbody_edit">
+<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import" />
+<input type="hidden" name="FORM_MODE" value="preview" />
+
+<div class="tl_tbox block">
+
+  <div class="w50">
+  <h3><label for="separator">'.$GLOBALS['TL_LANG']['MSC']['separator'][0].'</label></h3>
+  <select name="separator" id="separator" class="tl_select" onfocus="Backend.getScrollOffset();">
+    <option value="comma"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'comma' ? ' selected="SELECTED"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
+    <option value="semicolon"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'semicolon' ? ' selected="SELECTED"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
+    <option value="tabulator"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'tabulator' ? ' selected="SELECTED"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
+  </select>'.(strlen($GLOBALS['TL_LANG']['MSC']['separator'][1]) ? '
+  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['MSC']['separator'][1].'</p>' : '').'
+  </div>
+  <div class="w50 m12 cbx">
+  <div class="tl_checkbox_single_container">
+  <input name="csv_has_header" id="csv_has_header" type="checkbox" value="1"'.($arrSessionData['import'][$this->strFormKey]['csv_has_header'] == '1' ? ' checked="CHECKED"' : '').'/>
+  <label for="csv_has_header">'.$GLOBALS['TL_LANG']['tl_formdata']['csv_has_header'][0].'</label>
+  </div>
+  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_formdata']['csv_has_header'][1].'</p>
+  </div>
+
+  <div class="clr">
+  <h3><label for="import_source">'.$GLOBALS['TL_LANG']['tl_formdata']['import_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>
+'.$objTree->generate().(strlen($GLOBALS['TL_LANG']['tl_formdata']['import_source'][1]) ? '
+  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_formdata']['import_source'][1].'</p>' : '').'
+  </div>
+</div>
+
+</div>
+
+<div class="tl_formbody_submit">
+
+<div class="tl_submit_container">
+  <input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_formdata']['import'][0]).'" onfocus="document.cookie = \'BE_PAGE_OFFSET=0; path=/\';" />
+</div>
+
+</div>
+</form>';
+
+	}
+
+	/**
+	 * Generate the form to select the field mappings and return it as HTML string
+	 * @return string
+	 */
+	protected function formImportPreview($objFile, $strSeparator)
+	{
+
+		$arrSessionData = $this->Session->get('EFG');
+		$blnUseCsvHeader = ($arrSessionData['import'][$this->strFormKey]['csv_has_header'] == '1' ? true : false);
+
+		$arrEntries = array();
+		$resFile = $objFile->handle;
+
+		$intReadLines = 10;
+		if ($blnUseCsvHeader)
+		{
+			$intReadLines++;
+		}
+
+		while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
+		{
+			$arrEntries[] = $arrRow;
+			$intTotal++;
+			if ($intTotal == $intReadLines)
+			{
+				break;
+			}
+		}
+
+		if ($blnUseCsvHeader)
+		{
+			foreach ($arrEntries[0] as $col => $val)
+			{
+				if (array_key_exists($val, $this->arrImportableFields))
+				{
+					$arrSessionData['import'][$this->strFormKey]['import_cols'][$col] = $val;
+				}
+				else
+				{
+					$mxRes = array_search($val, $this->arrImportableFields);
+					if ($mxRes !== false)
+					{
+						$arrSessionData['import'][$this->strFormKey]['import_cols'][$col] = $mxRes;
+					}
+					else
+					{
+						$arrSessionData['import'][$this->strFormKey]['import_cols'][$col] = '__IGNORE__';
+					}
+				}
+			}
+		}
+
+		$this->Session->set('EFG', $arrSessionData);
+
+		$return .= '
+<div id="tl_buttons">
+<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+</div>
+
+<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'.$this->getMessages().'
+
+<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
+<div class="tl_formbody_edit">
+	<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import" />
+	<input type="hidden" name="FORM_MODE" value="import" />
+	<input type="hidden" name="import_source" value="'.$this->Input->post('import_source').'" />
+	<input type="hidden" name="separator" value="'.$this->Input->post('separator').'" />
+	<input type="hidden" name="csv_has_header" value="'.$this->Input->post('csv_has_header').'" />
+
+	<div class="tl_tbox block">
+		<h3>'.$GLOBALS['TL_LANG']['tl_formdata']['import_preview'][0].'</h3>
+		<p class="tl_help">'.$GLOBALS['TL_LANG']['tl_formdata']['import_preview'][1].'</p>
+		<div class="fd_import_prev">
+			<div>';
+		$return .= '
+			<table class="fd_import_data">
+				<thead><tr>';
+		foreach ($arrEntries[0] as $col => $val)
+		{
+			$return .= '
+					<td>'.$this->importFieldmapMenu($arrEntries, $col, $val).'</td>';
+		}
+		$return .= '
+				</tr></thead>';
+		$return .= '
+				<tbody>';
+
+		if ($blnUseCsvHeader)
+		{
+			array_shift($arrEntries);
+		}
+
+		foreach ($arrEntries as $row)
+		{
+			$return .= '
+				<tr>';
+			foreach ($row as $col => $val)
+			{
+				$return .= '
+					<td>'.$val.'</td>';
+			}
+			$return .= '
+			</tr>';
+		}
+		$return .= '
+				</tbody>
+			</table>';
+		$return .= '
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="tl_formbody_submit">
+	<div class="tl_submit_container">
+		<input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_formdata']['import'][0]).'" />
+	</div>
+</div>
+</form>';
+
+		return $return;
+
+	}
+
+	/**
+	 * Generate a dropdown menu to select destination field and return it as HTML string
+	 * @return string
+	 */
+	protected function importFieldmapMenu(&$arrEntries, $col, $val)
+	{
+
+		$arrSessionData = $this->Session->get('EFG');
+
+		$return = '
+<select name="import_cols['.$col.']">
+	<option value="__IGNORE__"'.((!isset($arrSessionData['import'][$this->strFormKey]['import_cols'][$col]) || $arrSessionData['import'][$this->strFormKey]['import_cols'][$col] == '__IGNORE__') ? ' selected="SELECTED"' : '').'>'.$GLOBALS['TL_LANG']['tl_formdata']['option_import_ignore'].'</option>';
+		if (count($this->arrImportableFields) > 0)
+		{
+			foreach (array_keys($this->arrImportableFields) as $strFdField)
+			{
+				$selected = '';
+				if (isset($arrSessionData['import'][$this->strFormKey]['import_cols']))
+				{
+					if ($arrSessionData['import'][$this->strFormKey]['import_cols'][$col] == $strFdField)
+					{
+						$selected = ' selected="SELECTED"';
+					}
+				}
+				$return .= '<option value="'.$strFdField.'"'.$selected.'>'.(isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strFdField]['label'][0]) ? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strFdField]['label'][0] : $strFdField).'</option>';
+			}
+		}
+		$return .= '
+</select>';
+
+		return $return;
+
+	}
+
+	public function export($strMode='csv')
 	{
 
 		if (strlen($this->Input->get('expmode')))
 		{
-			$sMode = $this->Input->get('expmode');
+			$strMode = $this->Input->get('expmode');
 		}
 
 		$return = '';
@@ -5759,7 +6314,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		$arrHookData = array();
 		$arrHookDataColumns = array();
 
-		if ($sMode=='xls')
+		if ($strMode=='xls')
 		{
 			// check for HOOK efgExportXls
 			if (array_key_exists('efgExportXls', $GLOBALS['TL_HOOKS']) && is_array($GLOBALS['TL_HOOKS']['efgExportXls']))
@@ -5772,7 +6327,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 			}
 		}
-		elseif ($sMode!='csv')
+		elseif ($strMode!='csv')
 		{
 			$blnCustomExport = true;
 		}
@@ -5961,7 +6516,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		$useFormValues = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
 		$useFieldNames = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
-		if ($sMode=='csv')
+		if ($strMode=='csv')
 		{
 			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
 			header('Content-Transfer-Encoding: binary');
@@ -5970,7 +6525,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			header('Pragma: public');
 			header('Expires: 0');
 		}
-		elseif ($sMode=='xls')
+		elseif ($strMode=='xls')
 		{
 			if (!$blnCustomXlsExport)
 			{
@@ -6017,7 +6572,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 				if ($intRowCounter == 0)
 				{
-					if ($sMode == 'xls')
+					if ($strMode == 'xls')
 					{
 						if (!$blnCustomXlsExport)
 						{
@@ -6060,18 +6615,18 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 							$strName = $this->String->decodeEntities($strName);
 						}
 
-						if ($this->blnExportUTF8Decode || ($sMode == 'xls' && !$blnCustomXlsExport))
+						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
 						{
 							$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
 						}
 
-						if ($sMode=='csv')
+						if ($strMode=='csv')
 						{
 							$strName = str_replace('"', '""', $strName);
 							echo $strExpSep . $strExpEncl . $strName . $strExpEncl;
 							$strExpSep = ";";
 						}
-						elseif ($sMode=='xls')
+						elseif ($strMode=='xls')
 						{
 							if (!$blnCustomXlsExport)
 							{
@@ -6092,7 +6647,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 					$intRowCounter++;
 
-					if ($sMode=='csv')
+					if ($strMode=='csv')
 					{
 						echo "\n";
 					}
@@ -6276,20 +6831,20 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						$strVal = $this->String->decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
-						if ($this->blnExportUTF8Decode || ($sMode == 'xls' && !$blnCustomXlsExport))
+						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
 						{
 							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
 						}
 					}
 
-					if ($sMode=='csv')
+					if ($strMode=='csv')
 					{
 						$strVal = str_replace('"', '""', $strVal);
 						echo $strExpSep . $strExpEncl . $strVal . $strExpEncl;
 
 						$strExpSep = ";";
 					}
-					elseif ($sMode=='xls')
+					elseif ($strMode=='xls')
 					{
 						if (!$blnCustomXlsExport)
 						{
@@ -6307,7 +6862,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 				}
 
-				if ($sMode=='csv')
+				if ($strMode=='csv')
 				{
 					$strExpSep = '';
 					echo "\n";
@@ -6317,7 +6872,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 		} // if objRow->numRows
 
-		if ($sMode=='xls')
+		if ($strMode=='xls')
 		{
 			if (!$blnCustomXlsExport)
 			{
@@ -6338,7 +6893,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			foreach ($GLOBALS['TL_HOOKS']['efgExport'] as $key => $callback)
 			{
 				$this->import($callback[0]);
-				$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData, $sMode);
+				$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData, $strMode);
 			}
 		}
 		exit;
