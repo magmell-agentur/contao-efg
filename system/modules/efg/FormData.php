@@ -116,7 +116,6 @@ class FormData extends Frontend
 	 */
 	public function generateAlias($varValue=null, $strFormTitle=null, $intRecId=null)
 	{
-
 		$autoAlias = false;
 		$strAliasField = '';
 
@@ -693,6 +692,89 @@ class FormData extends Frontend
 		}
 
 	}
+
+
+	/**
+	 * Prepare value from CSV for tl_formdata / tl_formdata_details DB record
+	 * @param string field value from csv file
+	 * @param array form field properties
+	 * @return mixed
+	 */
+	public function prepareImportValForDb($varValue='', $arrField=false)
+	{
+		if (!is_array($arrField))
+		{
+			return false;
+		}
+
+		$strType = $arrField['type'];
+		$strVal = '';
+
+		if ( in_array($strType, $this->arrFFstorable) )
+		{
+
+			switch ($strType)
+			{
+				case 'efgLookupCheckbox':
+				case 'checkbox':
+				case 'efgLookupRadio':
+				case 'radio':
+				case 'efgLookupSelect':
+				case 'efgImageSelect':
+				case 'conditionalselect':
+				case 'countryselect':
+				case 'fp_preSelectMenu':
+				case 'select':
+					$strVal = '';
+					if ($arrField['eval']['multiple'])
+					{
+						$arrSel = array();
+						if (strlen($varValue))
+						{
+							$arrSel = trimsplit(",\n", $varValue);
+						}
+						$strVal = implode('|', $arrSel);
+					}
+					else
+					{
+						$strVal = $varValue;
+					}
+				break;
+				case 'upload':
+				case 'password':
+				case 'hidden':
+				case 'text':
+				case 'calendar':
+				case 'textarea':
+				default:
+					$strVal = $varValue;
+					// Convert date formats into timestamps
+					if (in_array($arrField['eval']['rgxp'], array('date', 'time', 'datim')))
+					{
+						if (is_numeric($strVal))
+						{
+							$strVal = (int) $strVal;
+						}
+						elseif (is_string($strVal) && strlen($strVal) )
+						{
+							$objDate = new Date($strVal, $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format']);
+							$strVal = $objDate->tstamp;
+						}
+					}
+				break;
+			}
+
+			return (is_array($strVal) || is_object($strVal)) ? serialize($strVal) : $this->String->decodeEntities($strVal);
+
+		} // if in_array arrFFstorable
+		else
+		{
+			return (is_array($strVal) || is_object($strVal)) ? serialize($varValue) : $this->String->decodeEntities($varValue);
+		}
+
+	}
+
+
 
 	/**
 	 * Prepare post value for Mail / Text

@@ -238,7 +238,6 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 		'global_operations' => array
 		(
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
-			/*
 			'import' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['import'],
@@ -246,7 +245,6 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				'class'               => 'header_csv_import',
 				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			),
-			*/
 			'export' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['export'],
@@ -426,13 +424,11 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => false,
 			'eval'                    => array('rte' => 'tinyMCE', 'cols' => 80,'rows' => 5, 'style' => 'height: 80px'),
 		),
-/*		
-		'importSource' => array
+		'import_source' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['importSource'],
-			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv')
+			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['import_source'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
 		)
-*/		
 	),
 	'tl_formdata' => array
 	(

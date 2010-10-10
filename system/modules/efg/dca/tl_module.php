@@ -345,12 +345,10 @@ class tl_ext_module extends Backend
 			$GLOBALS['TL_DCA']['tl_module']['fields'][$strField]['eval']['mandatory'] = false;
 			foreach ($GLOBALS['TL_DCA']['tl_formdata']['fields'] as $k => $v)
 			{
-				/*
-				if (in_array($k, array('ip', 'published')) )
+				if (in_array($k, array('importSource')) )
 				{
 					continue;
 				}
-				*/
 				$arrReturn[$k] = (strlen($GLOBALS['TL_DCA']['tl_formdata']['fields'][$k]['label'][0]) ? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$k]['label'][0] . ' [' . $k . ']' : $k);
 			}
 		}

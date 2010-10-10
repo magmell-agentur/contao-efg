@@ -279,6 +279,25 @@ class ModuleFormdata extends Backend
 		return $objTemplate;
 	}
 
+
+	/**
+	 * Import Form data from CSV file
+	 * @param object Datacontainer
+	 * @param string Table name
+	 * @param array Module
+	 * @return string
+	 */
+	public function importCsv($dc, $strTable, $arrModule)
+	{
+		if ($this->Input->get('key') != 'import')
+		{
+			return '';
+		}
+
+		return $dc->importFile();
+
+	}
+
 }
 
 ?>

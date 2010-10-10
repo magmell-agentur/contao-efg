@@ -399,7 +399,7 @@ class tl_formdata extends Backend
 		$objAlias = $this->Database->prepare("SELECT id FROM tl_formdata WHERE alias=?")
 								   ->execute($varValue, $dc->id);
 
-		// Check whether the news alias exists
+		// Check whether the alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
 		{
 			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));

@@ -76,7 +76,7 @@ $GLOBALS['BE_MOD']['formdata']['feedback'] = array
 $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
 	(
 		'tables'     => array('tl_formdata', 'tl_formdata_details'),
-		'import'     => array('FormData', 'importCsv'),
+		'import'     => array('ModuleFormdata', 'importCsv'),
 		'icon'       => 'system/modules/efg/html/formdata.gif',
 		'stylesheet' => 'system/modules/efg/html/style.css'
 	);

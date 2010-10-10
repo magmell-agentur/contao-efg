@@ -20,3 +20,9 @@
 .fd_mail_send .preview_plaintext { margin-bottom:12px; border:1px solid #cccccc; padding:24px 18px; overflow:auto; }
 .fd_mail_send .preview_html { margin-bottom:12px; border:1px solid #cccccc; padding:24px 18px; overflow:auto; }
 .fd_mail_send h3 { border:1px solid #cccccc; background-color:#f6f6f6; padding:4px 12px; margin: 0px; margin-top: 12px; border-bottom:0px; }
+
+div.fd_import_prev { border:1px solid #BBBBBB; overflow: auto; margin-top: 9px; max-height: 400px; }
+table.fd_import_data { border-collapse: collapse; margin: 4px; }
+table.fd_import_data thead tr { background-color: #f0f0f0; }
+table.fd_import_data td { vertical-align: top; padding: 2px; border: 1px solid #dedede; }
+table.fd_import_data thead td { padding: 4px 1px; }
