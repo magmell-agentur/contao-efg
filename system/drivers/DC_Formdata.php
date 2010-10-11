@@ -5880,8 +5880,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						}
 					}
 
-					$blnSaved = true;
-
 					$strAlias = '';
 					if (isset($arrRow[$arrMapFields['alias']]) && strlen($arrRow[$arrMapFields['alias']]))
 					{
@@ -6002,38 +6000,38 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						}
 					}
 
+					$intNewId = 0;
+					$blnSaved = true;
+
 					if (count($arrDetailSets))
 					{
-						try
+						$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+						$intNewId = $objNewFormdata->insertId;
+
+						$strAlias = $this->FormData->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
+						if (strlen($strAlias))
 						{
-							$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
-							$intNewId = $objNewFormdata->insertId;
-
-							$strAlias = $this->FormData->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
-							if (strlen($strAlias))
-							{
-								$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);
-							}
-
-							foreach ($arrDetailSets as $kD => $arrDetailSet)
-							{
-								$arrDetailSet['pid'] = $intNewId;
-								try
-								{
-									$objNewFormdataDetails = $this->Database->prepare("INSERT INTO tl_formdata_details %s")
-																			->set($arrDetailSet)
-																			->execute();
-								}
-								catch(Exception $ee)
-								{
-									$blnSaved = false;
-								}
-							}
-
+							$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);
 						}
-						catch (Exception $e)
+
+						foreach ($arrDetailSets as $kD => $arrDetailSet)
 						{
-							$blnSaved = false;
+							$arrDetailSet['pid'] = $intNewId;
+							try
+							{
+								$objNewFormdataDetails = $this->Database->prepare("INSERT INTO tl_formdata_details %s")
+																		->set($arrDetailSet)
+																		->execute();
+							}
+							catch(Exception $ee)
+							{
+								$blnSaved = false;
+							}
+						}
+
+						if ($blnSaved === false && $intNewId > 0)
+						{
+							$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")->execute($intNewId);
 						}
 					}
 					else
@@ -6047,6 +6045,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 					}
 					else
 					{
+
 						$intInvalid++;
 					}
 
@@ -6062,7 +6061,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				}
 
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-
 				$this->reload();
 
 			}
