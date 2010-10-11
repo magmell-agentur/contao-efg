@@ -6152,7 +6152,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		$arrEntries = array();
 		$resFile = $objFile->handle;
 
-		$intReadLines = 10;
+		$intReadLines = 50;
 		if ($blnUseCsvHeader)
 		{
 			$intReadLines++;
