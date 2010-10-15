@@ -6060,6 +6060,11 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 					$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_invalid'], $intInvalid);
 				}
 
+				$objFile->close();
+
+				// Add a log entry
+				$this->log('Imported file "'.$objFile->filename.'" into form data "'.$strFormTitle.'", created '.$intValid.' new records', 'DC_Formdata importFile()', TL_GENERAL);
+
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$this->reload();
 
