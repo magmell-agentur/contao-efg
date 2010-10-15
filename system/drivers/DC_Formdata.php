@@ -6168,7 +6168,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			}
 		}
 
-		if ($blnUseCsvHeader)
+		if ($blnUseCsvHeader && !isset($arrSessionData['import'][$this->strFormKey]['import_cols']))
 		{
 			foreach ($arrEntries[0] as $col => $val)
 			{
