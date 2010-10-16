@@ -1011,6 +1011,11 @@ class Efp extends Frontend
 			if (isset($arrSubmitted['email']) && strlen($arrSubmitted['email']) && !is_bool(strpos($arrSubmitted['email'], '@')))
 			{
 				$replyTo = $arrSubmitted['email'];
+				// add name
+				if (isset($arrSubmitted['name']) && strlen($arrSubmitted['name']))
+				{
+					$replyTo = '"'. $arrSubmitted['name'] .'" <' . $arrSubmitted['email'] . '>';
+				}
 				$infoEmail->replyTo($replyTo);
 			}
 
