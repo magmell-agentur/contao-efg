@@ -5311,9 +5311,23 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 			$objTotal = $this->Database->prepare($sqlQuery)
 									   ->execute($this->values);
-
 			$total = $objTotal->total;
+			$blnIsMaxResultsPerPage = false;
 
+			// Overall limit
+			if ($total > $GLOBALS['TL_CONFIG']['maxResultsPerPage'] && (is_null($this->limit) || preg_replace('/^.*,/i', '', $this->limit) == $GLOBALS['TL_CONFIG']['maxResultsPerPage']))
+			{
+				if (is_null($this->limit))
+				{
+					$this->limit = '0,' . $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
+				}
+
+				$blnIsMaxResultsPerPage = true;
+				$GLOBALS['TL_CONFIG']['resultsPerPage'] = $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
+				$session['filter'][$filter]['limit'] = $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
+			}
+
+			
 			// Build options
 			if ($total > 0)
 			{
