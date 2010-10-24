@@ -635,7 +635,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupCheckbox'
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'select'
 					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fp_preSelectMenu'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect')
+					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect'
+					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgImageSelect'
+					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fileTree')
 					&& $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
 				$row[$i] = strlen($value) ? str_replace('|', ', ', $value) : $value;
@@ -1697,7 +1699,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		// Replace tags in messageText, messageHtml ...
  		$tags = array();
  		// preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
- 		preg_match_all('/__BRCL__.*?__BRCR__/i', $messageText . $messageHtml . $subject . $sender, $tags);
+ 		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
  		// Replace tags of type {{form::<form field name>}}
 		// .. {{form::uploadfieldname?attachment=true}}
@@ -2758,6 +2760,11 @@ $return .= '
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 
 					} // field type efgLookupRadio
+
+					else
+					{
+						$this->varValue = $this->FormData->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+					}
 
 					$this->objActiveRecord->{$this->strField} = $this->varValue;
 
@@ -4714,7 +4721,8 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				foreach ($showFields as $k=>$v)
 				{
 
-					if (in_array($v, $this->arrDetailFields) && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'radio' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox') )
+					if (in_array($v, $this->arrDetailFields) 
+						&& in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'], array('radio', 'efgLookupRadio', 'select', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox', 'efgImageSelect', 'fileTree')))
 					{
 						$row[$v] = str_replace('|', ', ', $row[$v]);
 					}
