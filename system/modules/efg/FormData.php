@@ -71,7 +71,7 @@ class FormData extends Frontend
 			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
 			'radio','efgLookupRadio',
 			'checkbox','efgLookupCheckbox',
-			'upload'
+			'upload', 'fileTree'
 		);
 
 		if (is_array($GLOBALS['EFG']['storable_fields']) && count($GLOBALS['EFG']['storable_fields']))
@@ -941,6 +941,7 @@ class FormData extends Frontend
 	 */
 	public function prepareDbValForMail($varValue='', $arrField=false, $varFile=false)
 	{
+
 		if (!is_array($arrField))
 		{
 			return false;
@@ -959,23 +960,24 @@ class FormData extends Frontend
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
 
 					$strVal = '';
-
 					$arrSel = array();
-					if (is_string($varValue))
+
+					if (is_string($varValue) && strpos($varValue, '|') !== false)
 					{
-						$arrSel[] = $varValue;
+						$arrSel = explode('|', $varValue);
 					}
-					if (is_array($varValue))
+					else
 					{
-						$arrSel = $varValue;
+						$arrSel = deserialize($varValue, true);
 					}
 
 					if (count($arrSel))
 					{
+
 						// get options labels instead of values for mail / text
 						if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
 						{
-							foreach ( $arrSel as $kSel => $vSel)
+							foreach ($arrSel as $kSel => $vSel)
 							{
 								foreach ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options'] as $strOptsKey => $varOpts)
 								{
@@ -1042,15 +1044,15 @@ class FormData extends Frontend
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
 
 					$strVal = '';
-
 					$arrSel = array();
-					if (is_string($varValue))
+
+					if (is_string($varValue) && strpos($varValue, '|') !== false)
 					{
-						$arrSel[] = $varValue;
+						$arrSel = explode('|', $varValue);
 					}
-					if (is_array($varValue))
+					else
 					{
-						$arrSel = $varValue;
+						$arrSel = deserialize($varValue, true);
 					}
 
 					if (count($arrSel))
@@ -1092,7 +1094,16 @@ class FormData extends Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					$arrSel = deserialize($varValue, true);
+					//$arrSel = deserialize($varValue, true);
+					if (is_string($varValue) && strpos($varValue, '|') !== false)
+					{
+						$arrSel = explode('|', $varValue);
+					}
+					else
+					{
+						$arrSel = deserialize($varValue, true);
+					}
+
 					if (count($arrSel))
 					{
 						$strVal = $arrSel;
@@ -1131,13 +1142,17 @@ class FormData extends Frontend
 	 */
 	public function prepareDbValForWidget($varValue='', $arrField=false, $varFile=false)
 	{
-
 		if (!is_array($arrField))
 		{
 			return false;
 		}
 
 		$strType = $arrField['type'];
+		if (TL_MODE == 'BE' && isset($arrField['inputType']))
+		{
+			$strType = $arrField['inputType'];
+		}
+
 		$varVal = $varValue;
 
 		if ( in_array($strType, $this->arrFFstorable) )
@@ -1257,7 +1272,12 @@ class FormData extends Frontend
 					}
 				break;
 				case 'efgImageSelect':
-					if (strlen($varVal))
+				case 'fileTree':
+					if (is_string($varVal) && strpos($varVal, '|') !== false)
+					{
+						$varVal = explode('|', $varVal);
+					}
+					elseif (strlen($varVal))
 					{
 						$varVal = deserialize($varValue);
 					}
