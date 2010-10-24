@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailText'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'textarea',
-	'eval'                    => array('mandatory'=>true, 'rows'=>15, 'allowHTML'=>false)
+	'eval'                    => array('mandatory'=>true, 'rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailTemplate'] = array
 (
