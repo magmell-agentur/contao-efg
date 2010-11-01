@@ -907,7 +907,7 @@ class Efp extends Frontend
 							}
 							elseif ($strType=='upload')
 							{
-								if ($arrTagParams && (array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) )
+								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
 								{
 									
 									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
