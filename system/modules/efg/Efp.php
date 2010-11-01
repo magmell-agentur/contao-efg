@@ -134,7 +134,6 @@ class Efp extends Frontend
 			$this->strFormdataDetailsKey = $arrListing['efg_DetailsKey'];
 		}
 
-
 		$blnFEedit = false;
 		$intOldId = 0;
 		$strRedirectTo = '';
@@ -512,8 +511,7 @@ class Efp extends Frontend
 	 		$tags = array();
  			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
-			
-			
+
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
@@ -909,7 +907,6 @@ class Efp extends Frontend
 							{
 								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
 								{
-									
 									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
 									{
 										if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
