@@ -1435,8 +1435,6 @@ class ModuleFormdataListing extends Module
 						continue;
 					}
 
-					$value = $this->formatValue($k, $v);
-
 					$strLinkDetails = '';
 					if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 					{
@@ -1486,12 +1484,20 @@ class ModuleFormdataListing extends Module
 						}
 					}
 
+					$value = $this->formatValue($k, $v);
+					$v = $this->String->decodeEntities($v);
+
+					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
+					{
+						$v = (is_string($v) && strpos($v, '|') !== false) ? explode('|', $v) : deserialize($v);
+					}
+
 					$arrTd[$class][] = array
 					(
 						'id' => $arrRows[$i]['id'],
 						'alias' => $arrRows[$i]['alias'],
-						'content' => ($value ? $value : ''),
-						'raw' => deserialize($this->String->decodeEntities($v)),
+						'content' => ($value ? $value : '&nbsp;'),
+						'raw' => $v,
 						'class' => 'col_' . $j . (($j == 0) ? ' col_first' : '') . (($j == $intLastCol) ? ' col_last' : ''),
 						'link_details' => $strLinkDetails,
 						'link_edit' => $strLinkEdit,
@@ -1505,8 +1511,8 @@ class ModuleFormdataListing extends Module
 							'alias' => $arrRows[$i]['alias'],
 							'name' => $k,
 							'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
-							'content' => $value,
-							'raw' => deserialize($this->String->decodeEntities($v)),
+							'content' => ($value ? $value : '&nbsp;'),
+							'raw' => $v,
 							'class' => 'field_' . $j . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
 							'record_class' => str_replace('row_', 'record_', $class),
 							'link_details' => $strLinkDetails,
@@ -1515,19 +1521,17 @@ class ModuleFormdataListing extends Module
 							'link_export' => $strLinkExport
 					);
 
-
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 					{
-
 						$value = $arrListItems[$i][$k]['raw'];
 
-						if (is_dir(TL_ROOT .'/' . $value))
+						if (is_string($value) && strlen($value) && is_dir(TL_ROOT .'/' . $value))
 						{
 							$arrTd[$class][count($arrTd[$class])-1]['content'] = '&nbsp;';
 							$arrListItems[$i][$k]['content'] = '&nbsp;';
 						}
 						// single file
-						elseif (strlen($value) && is_file(TL_ROOT . '/' . $value) )
+						elseif (is_string($value) && strlen($value) && is_file(TL_ROOT . '/' . $value))
 						{
 							$objFile = new File($value);
 							if (!in_array($objFile->extension, $allowedDownload) )
@@ -1568,8 +1572,6 @@ class ModuleFormdataListing extends Module
 								}
 							}
 						}
-
-
 						// multiple files
 						elseif (is_array($value))
 						{
@@ -2152,20 +2154,30 @@ class ModuleFormdataListing extends Module
 			$k = $strVal;
 			$v = $arrRow[$k];
 
+			$value = $this->formatValue($k, $v);
+			$v = deserialize($this->String->decodeEntities($v));
+
+			if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
+			{
+				$v = (is_string($v) && strpos($v, '|') !== false) ? explode('|', $v) : deserialize($v);
+			}
+
 			$class = 'row_' . ++$count . (($count == 0) ? ' row_first' : '') . (($count >= (count($arrListFields) - 1)) ? ' row_last' : '') . ((($count % 2) == 0) ? ' even' : ' odd');
 
 			$arrFields[$class] = array
 			(
 				'label' => (strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
-				'content' => $this->formatValue($k, $v),
-				'raw' => deserialize($this->String->decodeEntities($v))
+				'content' => $value,
+				// 'raw' => deserialize($this->String->decodeEntities($v))
+				'raw' => $v
 			);
 
 			$arrItem[$k] = array(
-				'name'=>$k,
+				'name' => $k,
 				'label'=>(strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
-				'content' => $this->formatValue($k, $v),
-				'raw' => deserialize($this->String->decodeEntities($v)),
+				'content' => $value,
+				//'raw' => deserialize($this->String->decodeEntities($v)),
+				'raw' => $v,
 				'class' => str_replace('row_', 'field_', $class)
 			);
 
@@ -3158,7 +3170,9 @@ class ModuleFormdataListing extends Module
 				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='select'
 				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='conditionalselect'
 				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupSelect'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='radio') )
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='radio'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='fileTree')
+			)
 		{
 			$value = str_replace('|', ', ', $value);
 		}

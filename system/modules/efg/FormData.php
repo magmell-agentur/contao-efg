@@ -623,6 +623,17 @@ class FormData extends Frontend
 						}
 					}
 				break;
+				case 'efgImageSelect':
+					$strVal = '';
+					if (is_array($varSubmitted))
+					{
+						$strVal = implode('|', $varSubmitted);
+					}
+					elseif (strlen($varSubmitted))
+					{
+						$strVal = $varSubmitted;
+					}
+				break;
 				case 'upload':
 					$strVal = '';
 					if (strlen($varFile['name']))
