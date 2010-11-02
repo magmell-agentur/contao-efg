@@ -594,7 +594,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 
 			$value = deserialize($row[$i]);
-
 			$class = (($count++ % 2) == 0) ? ' class="tl_bg"' : '';
 
 			// ignore display of empty detail-fields if this is overall "feedback"
@@ -617,15 +616,16 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 				$row[$i] = implode(', ', $value);
 			}
-			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['rgxp'] == 'date' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['flag'], array(5, 6, 7, 8, 9, 10))) {
-				$row[$i] = ($value ? date($GLOBALS['TL_CONFIG']['dateFormat'], $value) : '');
+			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['rgxp'] == 'date') {
+				$row[$i] = $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $value);
 			}
-			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['rgxp'] == 'datim' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['flag'], array(5, 6, 7, 8, 9, 10))) {
-				$row[$i] = ($value ? date($GLOBALS['TL_CONFIG']['datimFormat'], $value) : '');
-			}
-			elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['flag'], array(5, 6, 7, 8, 9, 10)))
+			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['rgxp'] == 'time')
 			{
-				$row[$i] = ($value ? date($GLOBALS['TL_CONFIG']['datimFormat'], $value) : '');
+				$row[$i] = $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $value);
+			}
+			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['rgxp'] == 'datim' || in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['flag'], array(5, 6, 7, 8, 9, 10)) || $i == 'tstamp')
+			{
+				$row[$i] = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 			}
 			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
@@ -680,18 +680,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 				}
 				else
 				{
-
 					$objKey = $this->Database->prepare("SELECT " . $chunks[1] . " FROM " . $chunks[0] . " WHERE id=?")
 											 ->limit(1)
 											 ->execute($row[$i]);
-
 					if ($objKey->numRows)
 					{
 						$row[$i] = $objKey->$chunks[1];
 					}
 				}
 			}
-
 
 			// check multiline value
 			if (!is_bool(strpos($row[$i], "\n")))
@@ -4671,7 +4668,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_select" />' : '').'
 
-<div class="tl_listing_container">'.(($this->Input->get('act') == 'select') ? '
+<div class="tl_listing_container list_view">'.(($this->Input->get('act') == 'select') ? '
 
 <div class="tl_select_trigger">
 <label for="tl_select_trigger" class="tl_select_label">'.$GLOBALS['TL_LANG']['MSC']['selectAll'].'</label> <input type="checkbox" id="tl_select_trigger" onclick="Backend.toggleCheckboxes(this)" class="tl_tree_checkbox" />
@@ -4727,21 +4724,21 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 						$row[$v] = str_replace('|', ', ', $row[$v]);
 					}
 
-					if (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 					{
+						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '';
+						$arrRowFormatted[$v] = $args[$k];
+					}
 
-						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
-						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '';
-						}
-						elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
-						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '';
-						}
-						else
-						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '';
-						}
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
+					{
+						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '';
+						$arrRowFormatted[$v] = $args[$k];
+					}
+
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
+					{
+						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '';
 						$arrRowFormatted[$v] = $args[$k];
 					}
 
