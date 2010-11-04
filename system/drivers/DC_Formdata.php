@@ -185,6 +185,11 @@ class DC_Formdata extends DataContainer implements listable, editable
 	protected $arrImportIgnoreFields = null;
 
 	/**
+	 * Fields to ignore on export
+	 */
+	protected $arrExportIgnoreFields = null;
+
+	/**
 	 * Sql statements for detail fields
 	 * @param mixed
 	 */
@@ -239,6 +244,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 		if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
 		{
 			$this->blnExportUTF8Decode = false;
+		}
+
+		if (isset($GLOBALS['EFG']['exportIgnoreFields']))
+		{
+			if (is_string($GLOBALS['EFG']['exportIgnoreFields']) && strlen($GLOBALS['EFG']['exportIgnoreFields']))
+			{
+				$this->arrExportIgnoreFields = trimsplit(',', $GLOBALS['EFG']['exportIgnoreFields']);
+			}
 		}
 
 		// get all forms marked to store data
@@ -6345,7 +6358,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			}
 			else
 			{
-				// include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
 				include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 			}
 		}
@@ -6360,6 +6372,11 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		$showFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 		$ignoreFields = array('tstamp', 'sorting');
 
+		if (is_array($this->arrExportIgnoreFields) && count($this->arrExportIgnoreFields) > 0)
+		{
+			$ignoreFields = array_unique(array_merge($ignoreFields, $this->arrExportIgnoreFields));
+		}
+		
 		$table = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 6) ? $this->ptable : $this->strTable;
 		$table_alias = ($table == 'tl_formdata' ? ' f' : '');
 
@@ -6382,13 +6399,6 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 
 		$sqlWhere = '';
 
-		// changed in v1.12.2: search and filter from session instead of just exporting CURRENT IDS only
-		/*
-		if (isset($session['CURRENT']['IDS']) && count($session['CURRENT']['IDS'])>0 )
-		{
-			$sqlWhere = " WHERE id IN (" . implode(',', $session['CURRENT']['IDS']) . ") ";
-		}
-		*/
 		// Set search value from session
 		$strSessionKey = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 		if (strlen($session['search'][$strSessionKey]['value']))
