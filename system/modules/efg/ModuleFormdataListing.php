@@ -126,6 +126,11 @@ class ModuleFormdataListing extends Module
 	protected $blnExportUTF8Decode = true;
 
 	/**
+	 * Fields to ignore on export
+	 */
+	protected $arrExportIgnoreFields = null;
+
+	/**
 	 * Display a wildcard in the back end
 	 * @return string
 	 */
@@ -153,6 +158,14 @@ class ModuleFormdataListing extends Module
 		if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
 		{
 			$this->blnExportUTF8Decode = false;
+		}
+
+		if (isset($GLOBALS['EFG']['exportIgnoreFields']))
+		{
+			if (is_string($GLOBALS['EFG']['exportIgnoreFields']) && strlen($GLOBALS['EFG']['exportIgnoreFields']))
+			{
+				$this->arrExportIgnoreFields = trimsplit(',', $GLOBALS['EFG']['exportIgnoreFields']);
+			}
 		}
 
 		// remove download and export from referer
@@ -717,19 +730,19 @@ class ModuleFormdataListing extends Module
 				return;
 			}
 
-			if ($this->Input->get('act') == 'delete' && intval($this->intRecordId) > 0 )
+			elseif ($this->Input->get('act') == 'delete' && intval($this->intRecordId) > 0 )
 			{
 				$this->deleteSingleRecord();
 				return;
 			}
 
-			if ($this->Input->get('act') == 'export' && intval($this->intRecordId) > 0 )
+			elseif ($this->Input->get('act') == 'export' && intval($this->intRecordId) > 0 )
 			{
 				$this->exportSingleRecord($strExportMode);
 				return;
 			}
 
-			if (!is_null($this->intRecordId) && intval($this->intRecordId) > 0 )
+			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0 )
 			{
 				$this->listSingleRecord();
 				return;
@@ -1104,7 +1117,7 @@ class ModuleFormdataListing extends Module
 
 			$arrListSort = explode(',', $strListSort);
 			$arrSort = array();
-			$arrSortSigned = array('digit', 'date', 'datim');
+			$arrSortSigned = array('digit', 'date', 'datim', 'time');
 
 			if (count($arrListSort))
 			{
@@ -1731,15 +1744,15 @@ class ModuleFormdataListing extends Module
 					$strVal = '';
 					$strVal = $row[$v];
 
-					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'date' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 					{
 						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '' );
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'datim' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '' );
 					}
-					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
 					{
 						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
 					}
@@ -1799,6 +1812,17 @@ class ModuleFormdataListing extends Module
 						else
 						{
 							$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+						}
+					}
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'fileTree')
+					{
+						if (is_string($row[$v]) && strpos($row[$v], '|') !== false)
+						{
+							$strVal = implode(",\n", explode('|', $row[$v]));
+						}
+						else
+						{
+							$strVal = implode(",\n", deserialize($row[$v], true));
 						}
 					}
 					else
@@ -2662,15 +2686,15 @@ class ModuleFormdataListing extends Module
 					$strVal = '';
 					$strVal = $row[$v];
 
-					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'date' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 					{
 						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '' );
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'datim' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '' );
 					}
-					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
 					{
 						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
 					}
@@ -2730,6 +2754,17 @@ class ModuleFormdataListing extends Module
 						else
 						{
 							$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+						}
+					}
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'fileTree')
+					{
+						if (is_string($row[$v]) && strpos($row[$v], '|') !== false)
+						{
+							$strVal = implode(",\n", explode('|', $row[$v]));
+						}
+						else
+						{
+							$strVal = implode(",\n", deserialize($row[$v], true));
 						}
 					}
 					else
