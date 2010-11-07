@@ -2134,15 +2134,15 @@ $return .= '
 		// Date and time
 		if ($value && $rgxp == 'date')
 		{
-			$value = date($GLOBALS['TL_CONFIG']['dateFormat'], $value);
+			$value = $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $value);
 		}
 		elseif ($value && $rgxp == 'time')
 		{
-			$value = date($GLOBALS['TL_CONFIG']['timeFormat'], $value);
+			$value = $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $value);
 		}
 		elseif ($value && $rgxp == 'datim')
 		{
-			$value = date($GLOBALS['TL_CONFIG']['datimFormat'], $value);
+			$value = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='checkbox'
 				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupCheckbox'
