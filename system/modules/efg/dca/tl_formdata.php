@@ -376,42 +376,13 @@ class tl_formdata extends Backend
 	 */
 	public function generateAlias($varValue, DataContainer $dc)
 	{
-		$autoAlias = false;
-
 		$strFormTitle = '';
 		if (strlen($dc->strFormFilterValue))
 		{
 			$strFormTitle = $dc->strFormFilterValue;
 		}
-
-		$objFormField = $this->Database->prepare("SELECT ff.name FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.title=? AND ff.type=? AND ff.rgxp NOT IN ('email','date','datim','time') ORDER BY sorting")
-							->limit(1)
-							->execute($strFormTitle, 'text');
-
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			// get value from post instead of DB, because the field holding the value will be saved in a later step
-			$autoAlias = true;
-			$varValue = standardize($this->Input->post($objFormField->name));
-		}
-
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_formdata WHERE alias=?")
-								   ->execute($varValue, $dc->id);
-
-		// Check whether the alias exists
-		if ($objAlias->numRows > 1 && !$autoAlias)
-		{
-			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-		}
-
-		// Add ID to alias
-		if ($objAlias->numRows && $autoAlias)
-		{
-			$varValue .= '.' . $dc->id;
-		}
-
-		return $varValue;
+		$this->import('FormData');
+		return $this->FormData->generateAlias($varValue, $strFormTitle, $dc->id);
 	}
 
 

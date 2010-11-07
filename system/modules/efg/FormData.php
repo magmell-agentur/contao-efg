@@ -109,7 +109,8 @@ class FormData extends Frontend
 
 	/**
 	 * Autogenerate an alias if it has not been set yet
-	 * alias is created from formdata content related to first form field of type text not using rgxp=email
+	 * if no form field is configured to be used as alias field
+	 * first form field of type text not using rgxp=email/date/datim/time will be used
 	 * @param mixed
 	 * @param object
 	 * @return string
