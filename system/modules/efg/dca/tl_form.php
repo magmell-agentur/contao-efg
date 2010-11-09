@@ -258,8 +258,11 @@ class tl_ext_form extends Backend
 		$fields = array();
 
 		// Get all form fields which can be used to define recipient of confirmation mail
-		$objFields = $this->Database->prepare("SELECT id,name,label FROM tl_form_field WHERE pid=? AND (type=? OR type=? OR type=? OR type=? OR type=?) ORDER BY name ASC")
-							->execute($this->Input->get('id'), 'text', 'hidden', 'select', 'radio', 'checkbox');
+//		$objFields = $this->Database->prepare("SELECT id,name,label FROM tl_form_field WHERE pid=? AND (type=? OR type=? OR type=? OR type=? OR type=?) ORDER BY name ASC")
+//							->execute($this->Input->get('id'), 'text', 'hidden', 'select', 'radio', 'checkbox');
+
+		$objFields = $this->Database->prepare("SELECT id,name,label FROM tl_form_field WHERE pid=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? ORDER BY name ASC")
+							->execute($this->Input->get('id'), 'calendar', 'captcha', 'condition', 'efgFormPaginator', 'explanation', 'headline', 'submit', 'upload', 'xdependentcalendarfields');
 
 		$fields[] = '-';
 		while ($objFields->next())
