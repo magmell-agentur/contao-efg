@@ -179,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailText'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'textarea',
-	'eval'                    => array('rows'=>15, 'allowHTML'=>false)
+	'eval'                    => array('rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailTemplate'] = array
 (
