@@ -62,7 +62,6 @@ class ModuleFormdata extends Backend
 		parent::__construct();
 
 		$this->loadDataContainer('tl_form_field');
-
 		$this->import('FormData');
 
 		// Types of form fields with storable data
@@ -100,7 +99,7 @@ class ModuleFormdata extends Backend
 	{
 		$this->intFormId = $dc->id;
 
-		$this->objForm = $this->Database->prepare("SELECT id,title,formID,allowTags,storeValues,storeFormdata,sendConfirmationMail,confirmationMailText,sendFormattedMail,efgStoreValues FROM tl_form WHERE id=?")
+		$this->objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")
 						->execute($this->intFormId)
 						->fetchAssoc();
 		$this->updateConfig();
