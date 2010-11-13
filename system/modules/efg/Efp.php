@@ -685,7 +685,7 @@ class Efp extends Frontend
 			}
 			if (strlen($replyTo))
 			{
-				$confEmail->replyTo($rplyTo);
+				$confEmail->replyTo($replyTo);
 			}
 
 			$confEmail->subject = $subject;
