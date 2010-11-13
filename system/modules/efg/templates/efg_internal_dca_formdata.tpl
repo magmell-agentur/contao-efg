@@ -215,7 +215,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
-	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
+	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			/*
@@ -228,7 +228,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	<div class="fd_head">%s<span>[%s]</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
-	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row"><div class="fd_label"><?php echo str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>: </div><div class="fd_value">%s </div></div>
+	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			*/
@@ -628,7 +628,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 <?php $strField = str_replace("'", "\'", $this->String->decodeEntities($varKey)); ?>
 		if ( strlen($arrRow['<?php echo $strField; ?>']) )
 		{
-			$strRowLabel .= '<div class="fd_row">';
+			$strRowLabel .= '<div class="fd_row field_<?php echo $varKey; ?>">';
 			$strRowLabel .= '<div class="fd_label">' . $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['label'][0] . ': </div>';
 			$strRowLabel .= '<div class="fd_value">' . $arrRow['<?php echo $strField; ?>'] . ' </div>';
 			$strRowLabel .= '</div>';
