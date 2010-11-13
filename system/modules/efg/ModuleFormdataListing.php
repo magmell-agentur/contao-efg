@@ -1247,6 +1247,12 @@ class ModuleFormdataListing extends Module
 					$class = ' sorted ' . $this->Input->get('sort');
 				}
 
+				// add CSS class defined in form generator
+				if (isset($GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['ff_class']) && strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['ff_class']))
+				{
+					$class .= ' ' . $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['ff_class'];
+				}
+
 				$arrTh[] = array
 				(
 					'link' => htmlspecialchars($strField),
@@ -1505,13 +1511,20 @@ class ModuleFormdataListing extends Module
 						$v = (is_string($v) && strpos($v, '|') !== false) ? explode('|', $v) : deserialize($v);
 					}
 
+					// add CSS class defined in form generator
+					$ff_class = '';
+					if (isset($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class']) && strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class']))
+					{
+						$ff_class = ' ' . $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class'];
+					}
+
 					$arrTd[$class][] = array
 					(
 						'id' => $arrRows[$i]['id'],
 						'alias' => $arrRows[$i]['alias'],
 						'content' => ($value ? $value : '&nbsp;'),
 						'raw' => $v,
-						'class' => 'col_' . $j . (($j == 0) ? ' col_first' : '') . (($j == $intLastCol) ? ' col_last' : ''),
+						'class' => 'col_' . $j . $ff_class . (($j == 0) ? ' col_first' : '') . (($j == $intLastCol) ? ' col_last' : ''),
 						'link_details' => $strLinkDetails,
 						'link_edit' => $strLinkEdit,
 						'link_delete' => $strLinkDelete,
@@ -1526,7 +1539,7 @@ class ModuleFormdataListing extends Module
 							'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
 							'content' => ($value ? $value : '&nbsp;'),
 							'raw' => $v,
-							'class' => 'field_' . $j . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
+							'class' => 'field_' . $j . $ff_class . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
 							'record_class' => str_replace('row_', 'record_', $class),
 							'link_details' => $strLinkDetails,
 							'link_edit' => $strLinkEdit,
@@ -2187,6 +2200,12 @@ class ModuleFormdataListing extends Module
 			}
 
 			$class = 'row_' . ++$count . (($count == 0) ? ' row_first' : '') . (($count >= (count($arrListFields) - 1)) ? ' row_last' : '') . ((($count % 2) == 0) ? ' even' : ' odd');
+
+			// add CSS class defined in form generator
+			if (isset($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class']) && strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class']))
+			{
+				$class .= ' ' . $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['ff_class'];
+			}
 
 			$arrFields[$class] = array
 			(
