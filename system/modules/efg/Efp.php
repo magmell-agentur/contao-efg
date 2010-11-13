@@ -1191,5 +1191,3 @@ class Efp extends Frontend
 	}
 
 }
-
-?>

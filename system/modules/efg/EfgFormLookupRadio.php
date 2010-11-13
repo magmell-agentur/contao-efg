@@ -137,5 +137,3 @@ class EfgFormLookupRadio extends Widget
 	}
 
 }
-
-?>

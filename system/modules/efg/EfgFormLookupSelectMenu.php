@@ -214,5 +214,3 @@ class EfgFormLookupSelectMenu extends Widget
 						$strOptions) . $this->addSubmit();
 	}
 }
-
-?>

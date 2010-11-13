@@ -218,5 +218,3 @@ class EfgFormLookupCheckbox extends Widget
 						$strOptions) . $this->addSubmit();
 	}
 }
-
-?>

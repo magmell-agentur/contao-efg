@@ -298,9 +298,6 @@ class ModuleFormdata extends Backend
 		}
 
 		return $dc->importFile();
-
 	}
 
 }
-
-?>

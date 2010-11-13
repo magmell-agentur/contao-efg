@@ -575,5 +575,3 @@ class ExtendedForm extends Form
 	}
 
 }
-
-?>

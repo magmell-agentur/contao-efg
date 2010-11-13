@@ -241,4 +241,3 @@ class EfgLookupOptionWizard extends Widget {
 	}
 
 }
-?>

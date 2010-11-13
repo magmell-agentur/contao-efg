@@ -144,5 +144,3 @@ class EfgFormPaginator extends Widget
 
 	}
 }
-
-?>

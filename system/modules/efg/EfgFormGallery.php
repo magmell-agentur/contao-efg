@@ -380,5 +380,3 @@ class EfgFormGallery extends ContentElement
 	}
 
 }
-
-?>

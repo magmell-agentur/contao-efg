@@ -1949,5 +1949,3 @@ class FormData extends Frontend
 	}
 
 }
-
-?>
