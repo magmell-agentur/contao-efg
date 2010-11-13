@@ -441,12 +441,13 @@ class Efp extends Frontend
 			$arrRecipient = array();
 			$sender = '';
 			$senderName = '';
+			$replyTo = '';
 			$attachments = array();
 
 			$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			$sender = $arrForm['confirmationMailSender'];
-			if(strlen($sender)){
+			if (strlen($sender)){
 				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
 				if (strpos($sender, '<')>0) {
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
@@ -670,12 +671,23 @@ class Efp extends Frontend
 				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
 			}
 
+			// replace insert tags in replyto
+			if (strlen($arrForm['confirmationMailReplyto']))
+			{
+				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto']);
+			}
+
 			$confEmail = new Email();
 			$confEmail->from = $sender;
 			if (strlen($senderName))
 			{
 				$confEmail->fromName = $senderName;
 			}
+			if (strlen($replyTo))
+			{
+				$confEmail->replyTo($rplyTo);
+			}
+
 			$confEmail->subject = $subject;
 
 
@@ -749,6 +761,7 @@ class Efp extends Frontend
 							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
 						}
 					}
+
 					$confEmail->sendTo($recipient);
 					$blnConfirmationSent = true;
 				}

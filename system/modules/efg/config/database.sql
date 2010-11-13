@@ -22,6 +22,7 @@ CREATE TABLE `tl_form` (
   `confirmationMailRecipientField` varchar(64) NOT NULL default '',
   `confirmationMailRecipient` varchar(255) NOT NULL default '',
   `confirmationMailSender` varchar(255) NOT NULL default '',
+  `confirmationMailReplyto` varchar(255) NOT NULL default '',
   `confirmationMailSubject` varchar(255) NOT NULL default '',
   `confirmationMailText` text NULL,
   `confirmationMailTemplate` varchar(255) NOT NULL default '',

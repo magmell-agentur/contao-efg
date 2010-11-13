@@ -115,6 +115,14 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 	'inputType'               => 'text',
 	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 );
+$GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailReplyto'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['confirmationMailReplyto'],
+	'exclude'                 => true,
+	'filter'                  => false,
+	'inputType'               => 'text',
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50')
+);
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['confirmationMailSubject'],
@@ -227,7 +235,7 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
 	array('sendFormattedMail' => 'formattedMailRecipient,formattedMailSubject,formattedMailText,formattedMailTemplate,formattedMailSkipEmpty')
 );
 array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
-	array('sendConfirmationMail' => 'confirmationMailRecipientField,confirmationMailRecipient,confirmationMailSender,confirmationMailSubject,confirmationMailText,confirmationMailTemplate,confirmationMailSkipEmpty,addConfirmationMailAttachments')
+	array('sendConfirmationMail' => 'confirmationMailRecipientField,confirmationMailRecipient,confirmationMailSender,confirmationMailReplyto,confirmationMailSubject,confirmationMailText,confirmationMailTemplate,confirmationMailSkipEmpty,addConfirmationMailAttachments')
 );
 array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
 	array('addConfirmationMailAttachments' => 'confirmationMailAttachments')
