@@ -115,7 +115,7 @@ class ModuleFormdata extends Backend
 
 		$strDcaKey = array_search($row['form'], $this->FormData->arrFormsDcaKey);
 		if ($strDcaKey)
-		{
+		{ 
 			$return .= '<a href="'.$this->addToUrl($href.'&amp;do=fd_'.$strDcaKey.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 		}
 

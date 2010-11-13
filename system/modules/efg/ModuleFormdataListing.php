@@ -1927,7 +1927,6 @@ class ModuleFormdataListing extends Module
 
 			} // foreach ($result as $row)
 
-
 			if ($strExportMode=='xls')
 			{
 				if (!$blnCustomXlsExport)

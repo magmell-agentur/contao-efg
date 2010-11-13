@@ -33,7 +33,6 @@
 <?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
 <?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
 
-
 <?php
 // default list config
 $arrListDefaults = array(
