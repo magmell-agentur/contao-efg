@@ -529,6 +529,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 	case 'upload': ?>
 <?php if ($varVals['storeFile']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['files'] = true;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['extensions'] = '<?php echo $varVals['extensions']?>';
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['fieldType'] = 'radio';
 <?php endif; ?>
 <?php
