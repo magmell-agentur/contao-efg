@@ -699,15 +699,12 @@ class Efp extends Frontend
 				if($arrForm['confirmationMailAttachments'])
 				{
 					$arrCustomAttachments = deserialize($arrForm['confirmationMailAttachments'], true);
-					// did the saved value result in an array?
 					if(is_array($arrCustomAttachments))
 					{
 						foreach ($arrCustomAttachments as $strFile)
 						{
-							// does the file really exist?
 							if(is_file($strFile))
 							{
-								// can we read the file?
 								if(is_readable($strFile))
 								{
 									$objFile = new File($strFile);
