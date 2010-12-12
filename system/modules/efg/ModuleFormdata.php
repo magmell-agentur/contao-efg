@@ -147,7 +147,6 @@ class ModuleFormdata extends Backend
 
 		// languages/modules.php
 		$arrModLangs = scan(TL_ROOT . '/system/modules/efg/languages');
-
 		$arrLanguages = $this->getLanguages();
 
 		foreach ($arrModLangs as $strModLang)
