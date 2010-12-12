@@ -222,17 +222,38 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailAttachments'] = array
 	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true)
 );
 
+$GLOBALS['TL_DCA']['tl_form']['fields']['addFormattedMailAttachments'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['addFormattedMailAttachments'],
+	'exclude'                 => true,
+	'filter'                  => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('submitOnChange'=>true)
+);
+$GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailAttachments'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['formattedMailAttachments'],
+	'exclude'                 => true,
+	'filter'                  => false,
+	'inputType'               => 'fileTree',
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true)
+);
+
 // Palettes
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendFormattedMail';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendConfirmationMail';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'addConfirmationMailAttachments';
+$GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'addFormattedMailAttachments';
 
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'storeFormdata';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] =  str_replace(array('storeValues', 'sendViaEmail'), array('storeValues;{efgStoreFormdata_legend:hide},storeFormdata', 'sendViaEmail;{efgSendFormattedMail_legend:hide},sendFormattedMail;{efgSendConfirmationMail_legend:hide},sendConfirmationMail'), $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] );
 
 // Subpalettes
 array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
-	array('sendFormattedMail' => 'formattedMailRecipient,formattedMailSubject,formattedMailText,formattedMailTemplate,formattedMailSkipEmpty')
+	array('sendFormattedMail' => 'formattedMailRecipient,formattedMailSubject,formattedMailText,formattedMailTemplate,formattedMailSkipEmpty,addFormattedMailAttachments')
+);
+array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
+	array('addFormattedMailAttachments' => 'formattedMailAttachments')
 );
 array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DCA']['tl_form']['subpalettes']),
 	array('sendConfirmationMail' => 'confirmationMailRecipientField,confirmationMailRecipient,confirmationMailSender,confirmationMailReplyto,confirmationMailSubject,confirmationMailText,confirmationMailTemplate,confirmationMailSkipEmpty,addConfirmationMailAttachments')
