@@ -581,8 +581,7 @@ class ModuleFormdataListing extends Module
 				}
 			}
 		}
-
-		if (!$blnExport)
+		else
 		{
 			$this->Template->textlink_details = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_details'];
 			$this->Template->textlink_edit = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_edit'];
@@ -637,17 +636,17 @@ class ModuleFormdataListing extends Module
 		$this->arrBaseFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'];
 		$this->arrDetailFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields'];
 
-		if ( strlen($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterKey']) )
+		if (strlen($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterKey']))
 		{
 			$this->strFormFilterKey = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterKey'];
 		}
-		if ( strlen($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterValue']) )
+		if (strlen($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterValue']))
 		{
 			$this->strFormFilterValue = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['formFilterValue'];
 		}
 
 		// List, edit or delete a single record
-		if ( strlen($this->Input->get($this->strDetailKey)) )
+		if (strlen($this->Input->get($this->strDetailKey)))
 		{
 
 			// check details record
@@ -1097,7 +1096,7 @@ class ModuleFormdataListing extends Module
 		$strQuery .=  $strWhere;
 
 		// Order by
-		if ( strlen($this->Input->get('order_by')) )
+		if (strlen($this->Input->get('order_by')))
 		{
 			if (in_array($this->Input->get('order_by'), $arrListFields) && (in_array($this->Input->get('order_by'), $this->arrBaseFields) || in_array($this->Input->get('order_by'), $this->arrDetailFields)))
 			{
@@ -1232,7 +1231,7 @@ class ModuleFormdataListing extends Module
 			for ($i=0; $i<count($arrFields); $i++)
 			{
 				// do not display some special fields
-				if ( in_array($arrFields[$i], $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['inputType'] == 'password' )
+				if (in_array($arrFields[$i], $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['inputType'] == 'password')
 				{
 					continue;
 				}
@@ -1263,10 +1262,8 @@ class ModuleFormdataListing extends Module
 
 			}
 		}
-
-		if ($blnExport)
+		else
 		{
-
 			$strExpEncl = '"';
 			$strExpSep = '';
 
@@ -1360,7 +1357,6 @@ class ModuleFormdataListing extends Module
 				echo "\n";
 			}
 
-
 		}
 
 		// Data result
@@ -1368,7 +1364,6 @@ class ModuleFormdataListing extends Module
 
 		if (!$blnExport)
 		{
-
 			// also store as list of items
 			$arrListItems = array();
 			$arrEditAllowed = array();
@@ -1702,8 +1697,7 @@ class ModuleFormdataListing extends Module
 
 		} // !$blnExport
 
-
-		if ($blnExport)
+		else
 		{
 
 			$arrEditAllowed = array();
@@ -1798,7 +1792,7 @@ class ModuleFormdataListing extends Module
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") == FALSE) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+							if ((strpos($row[$v], "|") === false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
@@ -1946,7 +1940,6 @@ class ModuleFormdataListing extends Module
 			exit;
 
 		} // $blnExport
-
 
 	}
 
