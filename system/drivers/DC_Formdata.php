@@ -453,6 +453,10 @@ class DC_Formdata extends DataContainer implements listable, editable
 				return $this->strFormFilterValue;
 				break;
 
+			case 'arrFieldConfig':
+				return $this->arrFieldConfig;
+				break;
+
 			default:
 				return parent::__get($strKey);
 				break;
@@ -2456,7 +2460,8 @@ $return .= '
 					}
 
 					// field types radio, select, multi checkbox
-					elseif ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || $strInputType=='countryselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+					elseif (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
+							|| ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
 						{
@@ -4721,7 +4726,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 			foreach ($result as $row)
 			{
 
-				$arrRowFormatted = array();
+				$rowFormatted = array();
 
 				$args = array();
 				$this->current[] = $row['id'];
@@ -4730,61 +4735,58 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				// Label
 				foreach ($showFields as $k=>$v)
 				{
-
-					if (in_array($v, $this->arrDetailFields) 
+					if (in_array($v, $this->arrDetailFields)
 						&& in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'], array('radio', 'efgLookupRadio', 'select', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox', 'efgImageSelect', 'fileTree')))
 					{
 						$row[$v] = str_replace('|', ', ', $row[$v]);
 					}
 
-					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
+					if (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
-						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '';
-						$arrRowFormatted[$v] = $args[$k];
+						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
+						{
+							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '';
+							$rowFormatted[$v] = $args[$k];
+						}
+						elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
+						{
+							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '';
+							$rowFormatted[$v] = $args[$k];
+						}
+						else
+						{
+							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '';
+							$rowFormatted[$v] = $args[$k];
+						}
 					}
-
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
-					{
-						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '';
-						$arrRowFormatted[$v] = $args[$k];
-					}
-
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
-					{
-						$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '';
-						$arrRowFormatted[$v] = $args[$k];
-					}
-
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
 						$args[$k] = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
-						$arrRowFormatted[$v] = $args[$k];
+						$rowFormatted[$v] = $args[$k];
 					}
-
 					elseif (in_array($v, $this->arrBaseFields) && in_array($v , $this->arrOwnerFields))
 					{
 						if ($v == 'fd_member')
 						{
 							$args[$k] = $this->arrMembers[$row[$v]];
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 						}
-						if ($v == 'fd_user')
+						elseif ($v == 'fd_user')
 						{
 							$args[$k] = $this->arrUsers[$row[$v]];
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 						}
-						if ($v == 'fd_member_group')
+						elseif ($v == 'fd_member_group')
 						{
 							$args[$k] = $this->arrMemberGroups[$row[$v]];
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 						}
-						if ($v == 'fd_user_group')
+						elseif ($v == 'fd_user_group')
 						{
 							$args[$k] = $this->arrUserGroups[$row[$v]];
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 						}
 					}
-
 					else
 					{
 						$row_v = deserialize($row[$v]);
@@ -4799,13 +4801,16 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 							}
 
 							$args[$k] = implode(', ', $args_k);
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 
 						}
-						elseif (is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]))
+						elseif (isset($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]))
 						{
 							$args[$k] = is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]][0] : $GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]];
-							$arrRowFormatted[$v] = $args[$k];
+						}
+						elseif (array_is_assoc($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) && isset($GLOBALS['TL_DCA'][$table]['fields'][$v]['options'][$row[$v]]))
+						{
+							$args[$k] = $GLOBALS['TL_DCA'][$table]['fields'][$v]['options'][$row[$v]];
 						}
 						else
 						{
@@ -4820,7 +4825,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 								unset($strVal);
 							}
 							$args[$k] = $row[$v];
-							$arrRowFormatted[$v] = $args[$k];
+							$rowFormatted[$v] = $args[$k];
 						}
 					}
 
@@ -4944,7 +4949,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 					$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][1];
 
 					$this->import($strClass);
-					$return .= $this->$strClass->$strMethod($arrRowFormatted, $label, $this);
+					$return .= $this->$strClass->$strMethod($rowFormatted, $label, $this);
 				}
 				else
 				{
