@@ -268,7 +268,9 @@ class Efp extends Frontend
 				'ip' => $this->Environment->ip,
 				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 				'fd_member' => intval($this->Member->id),
-				'fd_user' => intval($this->User->id)
+				'fd_member_group' => intval($this->Member->groups[0]),
+				'fd_user' => intval($this->User->id),
+				'fd_user_group' => intval($this->User->groups[0])
 			);
 
 			// if frontend editing keep some values from existing record
@@ -277,15 +279,21 @@ class Efp extends Frontend
 				$arrSet['form'] = $arrOldFormdata['form'];
 				$arrSet['be_notes'] = $arrOldFormdata['be_notes'];
 				$arrSet['fd_member'] = $arrOldFormdata['fd_member'];
-				if (intval($this->Member->id)>0)
+				$arrSet['fd_member_group'] = $arrOldFormdata['fd_member_group'];
+				if (intval($this->Member->id) > 0)
 				{
 					$arrSet['fd_member'] = intval($this->Member->id);
+					if (count($this->Member->groups) == 1 && intval($this->Member->groups[0]) > 0)
+					{
+						$arrSet['fd_member_group'] = intval($this->Member->groups[0]);
+					}
 				}
 				else
 				{
 					$arrSet['fd_member'] = 0;
 				}
 				$arrSet['fd_user'] = $arrOldFormdata['fd_user'];
+				$arrSet['fd_user_group'] = $arrOldFormdata['fd_user_group'];
 
 				// set published to value of old record, if NO default value is defined
 				if ( !isset($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default']) )
