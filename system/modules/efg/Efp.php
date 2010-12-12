@@ -697,7 +697,6 @@ class Efp extends Frontend
 
 			$confEmail->subject = $subject;
 
-
 			// Thanks to Torben Schwellnus
 			// check if we want custom attachments...
 			if ($arrForm['addConfirmationMailAttachments'])
@@ -1031,6 +1030,33 @@ class Efp extends Frontend
 					$replyTo = '"'. $arrSubmitted['name'] .'" <' . $arrSubmitted['email'] . '>';
 				}
 				$infoEmail->replyTo($replyTo);
+			}
+
+			// check if we want custom attachments...
+			if ($arrForm['addFormattedMailAttachments'])
+			{
+				// check if we have custom attachments...
+				if($arrForm['formattedMailAttachments'])
+				{
+					$arrCustomAttachments = deserialize($arrForm['formattedMailAttachments'], true);
+					if(is_array($arrCustomAttachments))
+					{
+						foreach ($arrCustomAttachments as $strFile)
+						{
+							if(is_file($strFile))
+							{
+								if(is_readable($strFile))
+								{
+									$objFile = new File($strFile);
+									if ($objFile->size)
+									{
+										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 			if (is_array($attachments) && count($attachments)>0)

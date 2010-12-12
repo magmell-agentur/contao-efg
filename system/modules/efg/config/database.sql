@@ -32,6 +32,8 @@ CREATE TABLE `tl_form` (
   `formattedMailText` text NULL,
   `formattedMailTemplate` varchar(255) NOT NULL default '',
   `formattedMailSkipEmpty` char(1) NOT NULL default '',
+  `addFormattedMailAttachments` char(1) NOT NULL default '',
+  `formattedMailAttachments` blob NULL,
   `storeFormdata` char(1) NOT NULL default '',
   `efgStoreValues` char(1) NOT NULL default '',
   `efgAliasField` varchar(64) NOT NULL default '',
