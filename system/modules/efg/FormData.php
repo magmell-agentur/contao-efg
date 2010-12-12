@@ -544,7 +544,7 @@ class FormData extends Frontend
 						}
 					}
 
-					if ( $strVal == '')
+					if ($strVal == '')
 					{
 						$strVal = $varSubmitted;
 						if (is_array($strVal))
