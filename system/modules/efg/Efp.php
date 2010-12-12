@@ -429,7 +429,6 @@ class Efp extends Frontend
 		$_SESSION['EFP']['FORMDATA']['_formId_'] = $arrForm['id'];
 		// end store data in session
 
-
 		// Confirmation Mail
 		if ($arrForm['sendConfirmationMail'])
 		{
