@@ -506,7 +506,7 @@ class FormData extends Frontend
 		$strType = $arrField['type'];
 		$strVal = '';
 
-		if ( in_array($strType, $this->arrFFstorable) )
+		if (in_array($strType, $this->arrFFstorable))
 		{
 
 			switch ($strType)
@@ -1167,7 +1167,7 @@ class FormData extends Frontend
 
 		$varVal = $varValue;
 
-		if ( in_array($strType, $this->arrFFstorable) )
+		if (in_array($strType, $this->arrFFstorable))
 		{
 
 			switch ($strType)
