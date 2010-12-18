@@ -32,6 +32,6 @@
 /**
  * Miscellaneous
  */
-$GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'] = 'Total number of items: %s';
+$GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'] = 'Number of items: %s';
 
 ?>

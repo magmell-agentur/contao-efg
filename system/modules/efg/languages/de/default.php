@@ -32,6 +32,6 @@
 /**
  * Miscellaneous
  */
-$GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'] = 'Gesamtanzahl Einträge: %s';
+$GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'] = 'Anzahl Einträge: %s';
 
 ?>
