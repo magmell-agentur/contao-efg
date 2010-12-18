@@ -1042,7 +1042,6 @@ class ModuleFormdataListing extends Module
 		$rowTotalcount = $objTotal->row();
 		$intTotalcount = max(0, $rowTotalcount['count']);
 
-
 		/**
 		 * Get the selected records
 		 */
@@ -1658,6 +1657,13 @@ class ModuleFormdataListing extends Module
 					$j++;
 				}
 			}
+
+			$strTotalNumberOfItems = number_format((int) $intTotalcount, 0, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']);
+			$this->Template->totalNumberOfItems = array(
+				'raw' => (int) $intTotalcount,
+				'formatted' => $strTotalNumberOfItems,
+				'content' => sprintf($GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'], $strTotalNumberOfItems)
+			);
 
 			$this->Template->thead = $arrTh;
 			$this->Template->tbody = $arrTd;

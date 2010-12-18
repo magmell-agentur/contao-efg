@@ -89,6 +89,8 @@
 <!-- indexer::continue -->
 <?php endif; ?>
 
+<div class="list_totalnumber"><?php echo $this->totalNumberOfItems['content']; ?></div>
+
 <table cellpadding="2" cellspacing="0" border="0" class="all_records" summary="">
 <!-- indexer::stop -->
 <thead>

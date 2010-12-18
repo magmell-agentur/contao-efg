@@ -85,6 +85,8 @@
 </div>
 <?php endif; ?>
 
+<div class="list_totalnumber"><?php echo $this->totalNumberOfItems['content']; ?></div>
+
 <?php foreach ($this->listItems as $item => $fields): $intField = -1; ?>
 <?php foreach ($fields as $field): $intField++; ?>
 <?php if ($intField == 0): ?>
