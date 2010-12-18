@@ -20,7 +20,7 @@
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
- * Extended language file for table tl_form (en).
+ * Extended language file for table tl_module (en).
  *
  * PHP version 5
  * @copyright  Thomas Kuhn 2007 - 2010
