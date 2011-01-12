@@ -1784,7 +1784,6 @@ class FormData extends Frontend
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
 			// countryselectmenu
-			/*
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
@@ -1794,7 +1793,6 @@ class FormData extends Frontend
 				}
 				$arrOptions = $arrTempOptions;
 			break;
-			*/
 
 			default:
 				if ($arrField['options'])
