@@ -34,7 +34,7 @@
  * modified version of DC_Table by Leo Feyer
  *
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
