@@ -34,7 +34,7 @@ if (!defined('TL_ROOT'))
  * Class EfgLookupOptionWizard
  *
  * Provide methods to handle form field lookup option
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
 */

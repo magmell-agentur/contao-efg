@@ -33,7 +33,7 @@
  *
  * Form field "checkbox (DB)".
  * based on FormCheckbox by Leo Feyer
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */

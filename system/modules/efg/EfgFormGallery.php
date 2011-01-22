@@ -33,7 +33,7 @@
  * based on ContentGallery by Leo Feyer
  *
  * Renders gallery with radio buttons
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */

@@ -31,7 +31,7 @@
  *
  * Provide methods to handle data stored in tables tl_formdata and tl_formdata_details.
  *
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
