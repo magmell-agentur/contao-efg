@@ -217,6 +217,7 @@ class Efp extends Frontend
 			{
 				foreach ($GLOBALS['TL_HOOKS']['processEfgFormData'] as $key => $callback)
 				{
+
 					$this->import($callback[0]);
 					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm);
 					if (is_array($arrResult) && count($arrResult)>0)
@@ -511,7 +512,7 @@ class Efp extends Frontend
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
-			
+
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -830,7 +831,7 @@ class Efp extends Frontend
 					$messageHtml = $fileTemplate->getContent();
 				}
 			}
-	
+
 			// prepare insert tags to handle separate from 'condition tags'
 			if (strlen($messageText))
 			{
@@ -1097,6 +1098,7 @@ class Efp extends Frontend
 							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
 						}
 					}
+
 					$infoEmail->sendTo($recipient);
 				}
 			}
@@ -1122,12 +1124,19 @@ class Efp extends Frontend
 	{
 
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
-		
+
+		// fix: after submission of normal single page form array $_SESSION['EFP']['FORMDATA'] is empty
+		if (is_null($arrSubmitted) || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')) )
+		{
+			$arrSubmitted = $_SESSION['FORM_DATA'];
+			$arrSubmitted['_formId_'] = $_SESSION['EFP']['FORMDATA'];
+		}
+
 		$blnProcess = false;
 		if (preg_match('/\{\{form::/si', $strContent)) {
 			$blnProcess = true;
 		}
-		
+
  		if ($arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']) && $blnProcess)
 		{
 			$blnSkipEmpty = false;
@@ -1223,7 +1232,7 @@ class Efp extends Frontend
 					}
 
 					$strContent = str_replace($arrMatch[$m], $strTemp, $strContent);
-				
+
 				}
 			}
 
