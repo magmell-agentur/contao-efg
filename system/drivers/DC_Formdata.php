@@ -5350,7 +5350,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 				$session['filter'][$filter]['limit'] = $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
 			}
 
-			
+
 			// Build options
 			if ($total > 0)
 			{
@@ -6116,7 +6116,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		}
 
 		return $this->formImportSource();
-		
+
 	}
 
 	/**
@@ -6381,7 +6381,7 @@ Backend.makeParentViewSortable("ul_' . CURRENT_ID . '");
 		{
 			$ignoreFields = array_unique(array_merge($ignoreFields, $this->arrExportIgnoreFields));
 		}
-		
+
 		$table = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 6) ? $this->ptable : $this->strTable;
 		$table_alias = ($table == 'tl_formdata' ? ' f' : '');
 
