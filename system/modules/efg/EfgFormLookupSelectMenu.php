@@ -78,12 +78,12 @@ class EfgFormLookupSelectMenu extends Widget
 				$this->import('Database');
 				$this->import('String');
 				$this->import('FormData');
-				
+
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
-				
+
 			case 'multiple':
 				if (strlen($varValue))
 				{
@@ -104,7 +104,7 @@ class EfgFormLookupSelectMenu extends Widget
 		}
 	}
 
-	
+
 	/**
 	 * Return a parameter
 	 * @return string
@@ -123,15 +123,15 @@ class EfgFormLookupSelectMenu extends Widget
 				break;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Generate the widget and return it as string
 	 * @return string
 	 */
 	public function generate()
 	{
-		
+
 		$strOptions = '';
 		$strClass = 'select';
 		$strReferer = $this->getReferer();
