@@ -582,7 +582,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_id'] = <?php echo $varVals['id']; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['f_id'] = <?php echo $varVals['pid']; ?>;
 <?php if (isset($varVals['class']) && strlen($varVals['class'])): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_class'] = '<?php echo $varVals['class']; ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_class'] = '<?php echo addslashes($varVals['class']); ?>';
 <?php endif; ?>
 <?php endforeach; ?>
 
