@@ -212,7 +212,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
 			'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
-	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
@@ -225,7 +225,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			/*
 			 'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span></div>
-	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
@@ -623,7 +623,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 		$strRowLabel .= '<div class="fd_wrap">';
 		$strRowLabel .= '<div class="fd_head">' . $arrRow['date'] . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
 <?php if (count($this->arrFields) > 10): ?>
-		$strRowLabel .= '<div class="limit_height h64 block">';
+		$strRowLabel .= '<div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block">';
 <?php endif; ?>
 		$strRowLabel .= '<div class="fd_notes">' . $arrRow['be_notes'] . '</div>';
 		$strRowLabel .= '<div class="mark_links">';
