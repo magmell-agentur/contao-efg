@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2007
+ * @copyright  Leo Feyer 2007-2011
  * @author     Leo Feyer
  * @filesource
  */

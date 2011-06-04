@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2010
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <http://www.typolight.org>
  * @package    Frontend
  * @license    LGPL

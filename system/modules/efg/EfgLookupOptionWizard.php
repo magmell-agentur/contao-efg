@@ -23,7 +23,7 @@ if (!defined('TL_ROOT'))
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
