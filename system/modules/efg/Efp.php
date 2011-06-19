@@ -482,7 +482,7 @@ class Efp extends Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $arrForm['confirmationMailSubject'];
+			$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
 			$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 			if ( $messageHtmlTmpl != '' )
@@ -513,6 +513,7 @@ class Efp extends Frontend
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
 
+			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -670,6 +671,10 @@ class Efp extends Frontend
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
+				if ($blnEvalSubject)
+				{
+					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
@@ -819,7 +824,7 @@ class Efp extends Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $arrForm['formattedMailSubject'];
+			$subject = $this->String->decodeEntities($arrForm['formattedMailSubject']);
 			$messageText = $this->String->decodeEntities($arrForm['formattedMailText']);
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
@@ -850,6 +855,7 @@ class Efp extends Frontend
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
 
+			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -1004,6 +1010,10 @@ class Efp extends Frontend
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
+				if ($blnEvalSubject)
+				{
+					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
