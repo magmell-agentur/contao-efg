@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
+ * Copyright (C) 2005-2010 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2011
+ * @copyright  Leo Feyer 2005
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -33,7 +33,7 @@
  *
  * Form field "select menu (DB)".
  * based on FormSelectMenu by Leo Feyer
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007 - 2010
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */
@@ -78,12 +78,12 @@ class EfgFormLookupSelectMenu extends Widget
 				$this->import('Database');
 				$this->import('String');
 				$this->import('FormData');
-
+				
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
-
+				
 			case 'multiple':
 				if (strlen($varValue))
 				{
@@ -104,7 +104,7 @@ class EfgFormLookupSelectMenu extends Widget
 		}
 	}
 
-
+	
 	/**
 	 * Return a parameter
 	 * @return string
@@ -123,15 +123,15 @@ class EfgFormLookupSelectMenu extends Widget
 				break;
 		}
 	}
-
-
+	
+	
 	/**
 	 * Generate the widget and return it as string
 	 * @return string
 	 */
 	public function generate()
 	{
-
+		
 		$strOptions = '';
 		$strClass = 'select';
 		$strReferer = $this->getReferer();

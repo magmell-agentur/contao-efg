@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
+ * Copyright (C) 2005-2010 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2011
+ * @copyright  Leo Feyer 2005
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -33,7 +33,7 @@
  *
  * Form field "checkbox (DB)".
  * based on FormCheckbox by Leo Feyer
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007 - 2010
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */
@@ -190,7 +190,7 @@ class EfgFormLookupCheckbox extends Widget
 			{
 			  $checked = ' checked="checked"';
 			}
-
+			
 			$strOptions .= sprintf('<span><input type="checkbox" name="%s" id="opt_%s" class="checkbox" value="%s"%s /> <label for="opt_%s">%s</label></span>',
 									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
 									$this->strId.'_'.$i,
@@ -198,8 +198,8 @@ class EfgFormLookupCheckbox extends Widget
 									$checked,
 									$this->strId.'_'.$i,
 									$arrOption['label']);
-
-			// render as checked radio if used as lookup on tl_calendar_events and only one event available
+			
+			// render as checked radio if used as lookup on tl_calendar_events and only one event available						
 			if ($strLookupTable=='tl_calendar_events' && $blnSingleEvent)
 			{
 				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s /> <label for="opt_%s">%s</label></span>',
@@ -209,7 +209,7 @@ class EfgFormLookupCheckbox extends Widget
 									$checked,
 									$this->strId.'_'.$i,
 									$arrOption['label']);
-			}
+			}									
 		}
 
         return sprintf('<div id="ctrl_%s" class="checkbox_container%s">%s</div>',
