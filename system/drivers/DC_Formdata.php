@@ -1683,7 +1683,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 		}
 
-		$subject = $arrForm['confirmationMailSubject'];
+		$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
 		$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 
@@ -1697,6 +1697,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// prepare insert tags to handle separate from 'condition tags'
+		$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
 		if (strlen($messageText))
 		{
 			$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
@@ -1707,6 +1708,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// replace 'condition tags'
+		$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 		$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 		$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -1782,6 +1784,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 								$strLabel = '';
 							}
 
+							$subject = str_replace($tag, $strLabel . $varText, $subject);
 							$messageText = str_replace($tag, $strLabel . $varText, $messageText);
 		 					$messageHtml = str_replace($tag, $strLabel . $varHtml, $messageHtml);
 
@@ -1823,13 +1826,13 @@ class DC_Formdata extends DataContainer implements listable, editable
 							{
 								$strLabel = '';
 							}
+							$subject = str_replace($tag, $strLabel . $strVal, $subject);
 							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 		 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 
 						}
 						else
 						{
-
 							$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
@@ -1868,6 +1871,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 		}
 
 		// Replace standard insert tags and eval condition tags
+		if (strlen($subject))
+		{
+			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
+			$subject = $this->replaceInsertTags($subject);
+			if ($blnEvalSubject)
+			{
+				$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+			}
+		}
 		if (strlen($messageText))
 		{
 			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
@@ -1887,10 +1899,10 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 		}
 		// replace insert tags in subject
-		if (strlen($subject))
-		{
-			$subject = $this->replaceInsertTags($subject);
-		}
+//		if (strlen($subject))
+//		{
+//			$subject = $this->replaceInsertTags($subject);
+//		}
 		// replace insert tags in sender
 		if (strlen($sender))
 		{
