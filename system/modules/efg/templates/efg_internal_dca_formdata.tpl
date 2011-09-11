@@ -481,22 +481,22 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default
 <?php if (is_array($arrOpts)): ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php  if ($arrOpt['group']): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>'];
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $this->String->decodeEntities($strField); ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $this->String->decodeEntities($strField); ?>'];
 <?php break; endif; ?>
 <?php endforeach; ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
-<?php  if ($arrOpt['group']): $blnInGroup=true; $strGroupKey=$arrOpt['value']; $strGroupLabel=$arrOpt['label']; ?>
+<?php  if ($arrOpt['group']): $blnInGroup = true; $strGroupKey = $this->String->decodeEntities($arrOpt['value']); $strGroupLabel = $this->String->decodeEntities($arrOpt['label']); ?>
 <?php if ($varVals['type'] == 'conditionalselect'): ?>
 $GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>']['<?php echo $strGroupKey; ?>'] = '<?php echo str_replace("'", "\'", $strGroupKey); ?>';
 <?php else: ?>
-$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>']['<?php echo $strGroupKey; ?>'] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($strGroupLabel)); ?>';
+$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>']['<?php echo $strGroupKey; ?>'] = '<?php echo str_replace("'", "\'", $strGroupLabel); ?>';
 <?php endif; ?>
 <?php endif; ?>
 <?php  if ($blnInGroup && strlen($strGroupKey)): ?>
 <?php   if ($arrOpt['group']): continue; endif; ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo $strGroupKey; ?>']['<?php echo str_replace("'", "\'", $arrOpt['value']);?>'] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['label'])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo $strGroupKey; ?>']['<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['label'])); ?>';
 <?php  else: ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo str_replace("'", "\'", $arrOpt['value']);?>'] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['label'])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", $this->String->decodeEntities($arrOpt['label'])); ?>';
 <?php  endif; ?>
 <?php endforeach; ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
