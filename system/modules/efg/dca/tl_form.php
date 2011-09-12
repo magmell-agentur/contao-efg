@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -23,7 +23,7 @@
  * This is the extended data container array for table tl_form.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL
@@ -270,7 +270,7 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
  * Class tl_extform
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
@@ -287,9 +287,6 @@ class tl_ext_form extends Backend
 		$fields = array();
 
 		// Get all form fields which can be used to define recipient of confirmation mail
-//		$objFields = $this->Database->prepare("SELECT id,name,label FROM tl_form_field WHERE pid=? AND (type=? OR type=? OR type=? OR type=? OR type=?) ORDER BY name ASC")
-//							->execute($this->Input->get('id'), 'text', 'hidden', 'select', 'radio', 'checkbox');
-
 		$objFields = $this->Database->prepare("SELECT id,name,label FROM tl_form_field WHERE pid=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? AND `type`!=? ORDER BY name ASC")
 							->execute($this->Input->get('id'), 'calendar', 'captcha', 'condition', 'efgFormPaginator', 'explanation', 'headline', 'submit', 'upload', 'xdependentcalendarfields');
 
