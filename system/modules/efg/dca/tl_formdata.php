@@ -3,7 +3,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -24,7 +24,7 @@
  * This is the data container array for table tl_feedback.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL
@@ -239,7 +239,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
  * Class tl_formdata
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
