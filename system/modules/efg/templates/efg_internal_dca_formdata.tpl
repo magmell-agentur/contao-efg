@@ -591,8 +591,8 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_clas
  *
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @copyright  Thomas Kuhn 2007
- * @author     Thomas Kuhn
+ * @copyright  Thomas Kuhn 2007 - 2011
+ * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Controller
  */
 class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this->strFormKey) : 'feedback'); ?> extends Backend
