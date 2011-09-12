@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -23,16 +23,16 @@
  * This is the data container array for table tl_formdata_details.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
- * @package    efg 
- * @license    LGPL 
+ * @package    efg
+ * @license    LGPL
  * @filesource
  */
 
 
 /**
- * Table tl_formdata_details 
+ * Table tl_formdata_details
  */
 $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 (
@@ -46,8 +46,8 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		'enableVersioning'            => false,
 		'doNotCopyRecords'            => false,
 		'doNotDeleteRecords'          => false,
-		'switchToEdit'                => false,		
-		
+		'switchToEdit'                => false,
+
 	),
 	// List
 	'list' => array
