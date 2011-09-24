@@ -5,23 +5,23 @@
 <?php endif; ?>
 
 <table cellpadding="2" cellspacing="0" border="0" class="single_record" summary="">
-<tbody><?php foreach ($this->record as $class => $col): ?> 
+<tbody><?php foreach ($this->record as $class => $col): ?>
   <tr class="<?php echo $class; ?>">
     <td class="label"><?php echo $col['label']; ?>:&nbsp;</td>
     <td class="value">
 <?php if ($col['type']=='file' && $col['multiple']): ?>
 <?php foreach ($col['content'] as $file): ?>
-<?php if ($file['display']=='image'): ?><img src="<?php echo($this->getImage($file['src'], 160, null)); ?>" alt="<?php echo urldecode(basename($file['src'])); ?>" title="<?php echo urldecode(basename($file['src'])); ?>" /> 
+<?php if ($file['display']=='image'): ?><img src="<?php echo($this->getImage($file['src'], 160, null)); ?>" alt="<?php echo urldecode(basename($file['src'])); ?>" title="<?php echo urldecode(basename($file['src'])); ?>" />
 <?php else: ?><img src="<?php echo $file['icon']; ?>" alt="<?php echo $file['linkTitle']; ?>" />&nbsp;<a href="<?php echo $file['href']; ?>"><?php echo $file['linkTitle'] . $file['size']; ?></a>
 <?php endif; ?>
 <?php endforeach; ?>
 <?php elseif ($col['type']=='file' && $col['src']): ?>
-<?php if ($col['display']=='image'): ?><img src="<?php echo($this->getImage($col['src'], 160, null)); ?>" alt="<?php echo urldecode(basename($col['src'])); ?>" title="<?php echo urldecode(basename($col['src'])); ?>" /> 
+<?php if ($col['display']=='image'): ?><img src="<?php echo($this->getImage($col['src'], 160, null)); ?>" alt="<?php echo urldecode(basename($col['src'])); ?>" title="<?php echo urldecode(basename($col['src'])); ?>" />
 <?php else: ?><img src="<?php echo $col['icon']; ?>" alt="<?php echo $col['linkTitle']; ?>" />&nbsp;<a href="<?php echo $col['href']; ?>"><?php echo $col['linkTitle'] . $col['size']; ?></a>
 <?php endif; ?>
 <?php else: echo $col['content'].'&nbsp;'; endif; ?>
     </td>
-  </tr><?php endforeach; ?> 
+  </tr><?php endforeach; ?>
 </tbody>
 </table>
 
@@ -60,6 +60,7 @@
 <form action="<?php echo $this->action; ?>" id="<?php echo $this->formId; ?>" method="post">
 <div class="formbody">
 <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
+<input type="hidden" name="REQUEST_TOKEN" value="{{request_token}}" />
 <div class="widget">
   <?php echo $this->fields['name']->generateWithError(); ?> <?php echo $this->fields['name']->generateLabel(); ?>
 </div>
