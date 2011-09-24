@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -121,11 +121,12 @@ class EfgFormLookupRadio extends Widget
 
 		foreach ($this->arrOptions as $i=>$arrOption)
 		{
-			$strOptions .= sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s /> <label for="opt_%s">%s</label></span>',
+			$strOptions .= sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
 									$this->strName,
 									$this->strId.'_'.$i,
 									$arrOption['value'],
 									((is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']) ? ' checked="checked"' : ''),
+									$this->strTagEnding,
 									$this->strId.'_'.$i,
 									$arrOption['label']);
 		}
