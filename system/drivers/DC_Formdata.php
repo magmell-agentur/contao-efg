@@ -285,7 +285,11 @@ class DC_Formdata extends DataContainer implements listable, editable
 		// all field names of table tl_formdata
 		foreach ($this->Database->listFields('tl_formdata') as $arrField)
 		{
-			$this->arrBaseFields[] = $arrField['name'];
+			//$this->arrBaseFields[] = $arrField['name'];
+			if ($arrField['type'] != 'index')
+			{
+				$this->arrBaseFields[] = $arrField['name'];
+			}
 		}
 		$this->arrBaseFields = array_unique($this->arrBaseFields);
 
