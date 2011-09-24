@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2010
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <http://www.typolight.org>
  * @package    Frontend
  * @license    LGPL
@@ -216,8 +216,8 @@ class ExtendedForm extends Form
 
 		if ($this->blnMultipage || $this->blnEditform)
 		{
-			$this->Template->hidden .=  sprintf('<input type="%s" name="%s" value="%s" />',
-												'hidden', 'FORM_PAGE', $this->intActivePage);
+			$objPageWidget = new FormHidden(array('name' => 'FORM_PAGE', 'value' => $this->intActivePage));
+			$this->Template->hidden .= $objPageWidget->parse();
 		}
 
 		$this->initializeSession($formId);
@@ -229,9 +229,17 @@ class ExtendedForm extends Form
 
 		$row = 0;
 		$max_row = $objFields->numRows;
+		$arrLabels = array();
 
 		while ($objFields->next())
 		{
+
+			if ($objFields->name != '')
+			{
+				$arrLabels[$objWidget->name] = $objFields->label;
+			}
+
+
 			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 			{
 				// skip fields outside range of active page
@@ -506,7 +514,7 @@ class ExtendedForm extends Form
 		{
 			if ($this->intTotalPages == 1 || (!$this->blnMultipage && !$this->blnEditform))
 			{
-				$this->processFormData($arrSubmitted);
+				$this->processFormData($arrSubmitted, $arrLabels);
 			}
 			else
 			{
@@ -537,7 +545,7 @@ class ExtendedForm extends Form
 						unset($_SESSION['FORM_DATA']['FORM_BACK']);
 
 						$arrSubmitted = $_SESSION['FORM_DATA'];
-						$this->processFormData($arrSubmitted);
+						$this->processFormData($arrSubmitted, $arrLabels);
 					}
 				}
 			}
