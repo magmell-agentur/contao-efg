@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -78,12 +78,12 @@ class EfgFormLookupSelectMenu extends Widget
 				$this->import('Database');
 				$this->import('String');
 				$this->import('FormData');
-				
+
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
-				
+
 			case 'multiple':
 				if (strlen($varValue))
 				{
@@ -104,7 +104,7 @@ class EfgFormLookupSelectMenu extends Widget
 		}
 	}
 
-	
+
 	/**
 	 * Return a parameter
 	 * @return string
@@ -123,15 +123,15 @@ class EfgFormLookupSelectMenu extends Widget
 				break;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Generate the widget and return it as string
 	 * @return string
 	 */
 	public function generate()
 	{
-		
+
 		$strOptions = '';
 		$strClass = 'select';
 		$strReferer = $this->getReferer();
@@ -186,11 +186,12 @@ class EfgFormLookupSelectMenu extends Widget
 			if ($strLookupTable=='tl_calendar_events' && $blnSingleEvent)
 			{
 				$selected = ' checked="checked"';
-				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s /> <label for="opt_%s">%s</label></span>',
+				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
 									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
 									$this->strId.'_'.$i,
 									$arrOption['value'],
 									$selected,
+									$this->strTagEnding,
 									$this->strId.'_'.$i,
 									$arrOption['label']);
 
