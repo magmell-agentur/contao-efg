@@ -23,7 +23,7 @@ if (!defined('TL_ROOT'))
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -222,20 +222,20 @@ class EfgLookupOptionWizard extends Widget {
 
 		}
 
-		
+
 		// condition
 		$return .= '<div class="w50 clr"><h3><label for="' . $this->strId . '_lookup_where">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_where'][0] . '</label></h3>
-				<input type="text" name="' . $this->strId . '[lookup_where]" id="' . $this->strId . '_lookup_where" value="' . $this->varValue['lookup_where'] . '" class="tl_text" />';
+				<input type="text" name="' . $this->strId . '[lookup_where]" id="' . $this->strId . '_lookup_where" value="' . $this->varValue['lookup_where'] . '" class="tl_text"' . $this->strTagEnding;
 		$return .= '
 			<p class="tl_help tl_tip">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_where'][1] .'</p></div>';
 
-		
+
 		// order
 		$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_sort">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_sort'][0] . '</label></h3>
-				<input type="text" name="' . $this->strId . '[lookup_sort]" id="' . $this->strId . '_lookup_sort" value="' . $this->varValue['lookup_sort'] . '" class="tl_text" />';
+				<input type="text" name="' . $this->strId . '[lookup_sort]" id="' . $this->strId . '_lookup_sort" value="' . $this->varValue['lookup_sort'] . '" class="tl_text"' . $this->strTagEnding;
 		$return .= '
 			<p class="tl_help tl_tip">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_sort'][1] .'</p></div>';
-		
+
 		return $return;
 
 	}
