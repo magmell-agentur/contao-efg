@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2009
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Frontend
  * @license    LGPL
@@ -96,7 +96,7 @@ class EfgFormPaginator extends Widget
 		{
 			if ($this->efgBackImageSubmit && is_file(TL_ROOT . '/' . $this->efgBackSingleSRC))
 			{
-				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s />',
+				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
 								($this->formActivePage ? ' name="FORM_BACK"' : ''),
 								$this->efgBackSingleSRC,
 								$this->strId,
@@ -104,23 +104,25 @@ class EfgFormPaginator extends Widget
 								specialchars($this->efgBackSlabel),
 								specialchars($this->efgBackSlabel),
 								specialchars('submit_back'),
-								$this->getAttributes());
+								$this->getAttributes(),
+								$this->strTagEnding);
 			}
 			else
 			{
-				$return .= sprintf('<input type="submit"%s id="ctrl_%s_back" class="submit back%s" value="%s"%s />',
+				$return .= sprintf('<input type="submit"%s id="ctrl_%s_back" class="submit back%s" value="%s"%s%s',
 							($this->formActivePage ? ' name="FORM_BACK"' : ''),
 							$this->strId,
 							(strlen($this->strClass) ? ' ' . $this->strClass : ''),
 							specialchars($this->efgBackSlabel),
-							$this->getAttributes());
+							$this->getAttributes(),
+							$this->strTagEnding);
 			}
 		}
 
 
 		if ($this->imageSubmit && is_file(TL_ROOT . '/' . $this->singleSRC))
 		{
-			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s />',
+			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
 							($this->formActivePage ? ' name="FORM_NEXT"' : ''),
 							$this->singleSRC,
 							$this->strId,
@@ -128,16 +130,18 @@ class EfgFormPaginator extends Widget
 							specialchars($this->slabel),
 							specialchars($this->slabel),
 							specialchars('submit_next'),
-							$this->getAttributes());
+							$this->getAttributes(),
+							$this->strTagEnding);
 		}
 		else
 		{
-			$return .= sprintf('<input type="submit"%s id="ctrl_%s" class="submit next%s" value="%s"%s />',
+			$return .= sprintf('<input type="submit"%s id="ctrl_%s" class="submit next%s" value="%s"%s%s',
 							($this->formActivePage ? ' name="FORM_NEXT"' : ''),
 							$this->strId,
 							(strlen($this->strClass) ? ' ' . $this->strClass : ''),
 							specialchars($this->slabel),
-							$this->getAttributes());
+							$this->getAttributes(),
+							$this->strTagEnding);
 		}
 
 		return $return;
