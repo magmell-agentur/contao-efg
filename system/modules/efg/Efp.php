@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2007-2011
+ * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer
  * @filesource
  */
@@ -96,8 +96,9 @@ class Efp extends Frontend
 	 * @param array	Submitted data
 	 * @param array	Form configuration
 	 * @param array Files uploaded
+	 * @param array	Form field labels
 	 */
-	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false) {
+	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels) {
 
 		// Form config
 		if ( !$arrForm )
@@ -219,7 +220,7 @@ class Efp extends Frontend
 				{
 
 					$this->import($callback[0]);
-					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm);
+					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm, $arrLabels);
 					if (is_array($arrResult) && count($arrResult)>0)
 					{
 						$arrSubmitted = $arrResult;
