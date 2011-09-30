@@ -256,7 +256,7 @@ class tl_ext_module extends Backend
 	private $arrFormdataTables = null;
 	private $arrFormdataFields = null;
 
-	public function onloadModuleType($varValue, DC_Table $dc)
+	public function onloadModuleType($varValue, DataContainer $dc)
 	{
 		if ($varValue == 'formdatalisting')
 		{
@@ -287,7 +287,7 @@ class tl_ext_module extends Backend
 	 * Return all formdata tables as array
 	 * @return array
 	 */
-	public function getFormdataTables(DC_Table $dc)
+	public function getFormdataTables(DataContainer $dc)
 	{
 		if (is_null($this->arrFormdataTables) || is_null($this->arrFormdataFields))
 		{
@@ -320,17 +320,17 @@ class tl_ext_module extends Backend
 		return $this->arrFormdataTables;
 	}
 
-	public function optionsListFields(DC_Table $dc)
+	public function optionsListFields(DataContainer $dc)
 	{
 		return $this->getFieldsOptionsArray('list_fields');
 	}
 
-	public function optionsSearchFields(DC_Table $dc)
+	public function optionsSearchFields(DataContainer $dc)
 	{
 		return $this->getFieldsOptionsArray('list_search');
 	}
 
-	public function optionsInfoFields(DC_Table $dc)
+	public function optionsInfoFields(DataContainer $dc)
 	{
 		return $this->getFieldsOptionsArray('list_info');
 	}
@@ -355,17 +355,17 @@ class tl_ext_module extends Backend
 		return $arrReturn;
 	}
 
-	public function onloadListFields($varValue, DC_Table $dc)
+	public function onloadListFields($varValue, DataContainer $dc)
 	{
 		return $this->onloadFieldList('list_fields', $varValue);
 	}
 
-	public function onloadSearchFields($varValue, DC_Table $dc)
+	public function onloadSearchFields($varValue, DataContainer $dc)
 	{
 		return $this->onloadFieldList('list_search', $varValue);
 	}
 
-	public function onloadInfoFields($varValue, DC_Table $dc)
+	public function onloadInfoFields($varValue, DataContainer $dc)
 	{
 		return $this->onloadFieldList('list_info', $varValue);
 	}
