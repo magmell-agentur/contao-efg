@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -23,7 +23,7 @@
  * This is the data container array for table tl_formdata.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL
@@ -212,7 +212,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
 			'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
-	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
@@ -225,7 +225,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			/*
 			 'format'                  => '<div class="fd_wrap">
 	<div class="fd_head">%s<span>[%s]</span></div>
-	<?php if (count($this->arrFields) > 10): ?><div class="limit_height h64 block"><?php endif; ?>
+	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
@@ -478,7 +478,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default
 	case 'conditionalselect':
 	case 'countryselect':
 	case 'fp_preSelectMenu': $arrOpts = deserialize($varVals['options']); $blnInGroup=false; $strGroupKey=''; $strGroupLabel=''; ?>
-<?php if (is_array($arrOpts)): ?>		
+<?php if (is_array($arrOpts)): ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php  if ($arrOpt['group']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>'];
@@ -582,7 +582,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_id'] = <?php echo $varVals['id']; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['f_id'] = <?php echo $varVals['pid']; ?>;
 <?php if (isset($varVals['class']) && strlen($varVals['class'])): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_class'] = '<?php echo $varVals['class']; ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_class'] = '<?php echo addslashes($varVals['class']); ?>';
 <?php endif; ?>
 <?php endforeach; ?>
 
@@ -623,7 +623,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 		$strRowLabel .= '<div class="fd_wrap">';
 		$strRowLabel .= '<div class="fd_head">' . $arrRow['date'] . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
 <?php if (count($this->arrFields) > 10): ?>
-		$strRowLabel .= '<div class="limit_height h64 block">';
+		$strRowLabel .= '<div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block">';
 <?php endif; ?>
 		$strRowLabel .= '<div class="fd_notes">' . $arrRow['be_notes'] . '</div>';
 		$strRowLabel .= '<div class="mark_links">';

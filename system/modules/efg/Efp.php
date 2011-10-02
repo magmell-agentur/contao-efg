@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2007
+ * @copyright  Leo Feyer 2007-2011
  * @author     Leo Feyer
  * @filesource
  */
@@ -30,7 +30,7 @@
  * Class Efp
  * extended form processing
  *
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
@@ -217,6 +217,7 @@ class Efp extends Frontend
 			{
 				foreach ($GLOBALS['TL_HOOKS']['processEfgFormData'] as $key => $callback)
 				{
+
 					$this->import($callback[0]);
 					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm);
 					if (is_array($arrResult) && count($arrResult)>0)
@@ -481,7 +482,7 @@ class Efp extends Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $arrForm['confirmationMailSubject'];
+			$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
 			$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 			if ( $messageHtmlTmpl != '' )
@@ -511,7 +512,8 @@ class Efp extends Frontend
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
-			
+
+			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -669,6 +671,10 @@ class Efp extends Frontend
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
+				if ($blnEvalSubject)
+				{
+					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
@@ -818,7 +824,7 @@ class Efp extends Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $arrForm['formattedMailSubject'];
+			$subject = $this->String->decodeEntities($arrForm['formattedMailSubject']);
 			$messageText = $this->String->decodeEntities($arrForm['formattedMailText']);
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
@@ -830,7 +836,7 @@ class Efp extends Frontend
 					$messageHtml = $fileTemplate->getContent();
 				}
 			}
-	
+
 			// prepare insert tags to handle separate from 'condition tags'
 			if (strlen($messageText))
 			{
@@ -849,6 +855,7 @@ class Efp extends Frontend
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
 
+			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
 			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
 
@@ -1003,6 +1010,10 @@ class Efp extends Frontend
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
+				if ($blnEvalSubject)
+				{
+					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+				}
 			}
 			// replace insert tags in sender
 			if (strlen($sender))
@@ -1097,6 +1108,7 @@ class Efp extends Frontend
 							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
 						}
 					}
+
 					$infoEmail->sendTo($recipient);
 				}
 			}
@@ -1122,12 +1134,19 @@ class Efp extends Frontend
 	{
 
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
-		
+
+		// fix: after submission of normal single page form array $_SESSION['EFP']['FORMDATA'] is empty
+		if (is_null($arrSubmitted) || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')) )
+		{
+			$arrSubmitted = $_SESSION['FORM_DATA'];
+			$arrSubmitted['_formId_'] = $_SESSION['EFP']['FORMDATA'];
+		}
+
 		$blnProcess = false;
 		if (preg_match('/\{\{form::/si', $strContent)) {
 			$blnProcess = true;
 		}
-		
+
  		if ($arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']) && $blnProcess)
 		{
 			$blnSkipEmpty = false;
@@ -1223,7 +1242,7 @@ class Efp extends Frontend
 					}
 
 					$strContent = str_replace($arrMatch[$m], $strTemp, $strContent);
-				
+
 				}
 			}
 

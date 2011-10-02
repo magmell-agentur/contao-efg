@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2007
+ * @copyright  Leo Feyer 2007-2011
  * @author     Leo Feyer
  * @filesource
  */
@@ -31,7 +31,7 @@
  *
  * Provide methods to handle data stored in tables tl_formdata and tl_formdata_details.
  *
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
@@ -1784,7 +1784,6 @@ class FormData extends Frontend
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
 			// countryselectmenu
-			/*
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
@@ -1794,7 +1793,6 @@ class FormData extends Frontend
 				}
 				$arrOptions = $arrTempOptions;
 			break;
-			*/
 
 			default:
 				if ($arrField['options'])
