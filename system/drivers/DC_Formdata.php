@@ -536,7 +536,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 <form action="'.ampersand($this->Environment->request, true).'" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters_limit">
-
+<input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
 <div class="tl_panel_bottom">
 
 <div class="tl_submit_panel tl_subpanel">
