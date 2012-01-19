@@ -98,7 +98,7 @@ class Efp extends Frontend
 	 * @param array Files uploaded
 	 * @param array	Form field labels
 	 */
-	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels) {
+	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels=false) {
 
 		// Form config
 		if ( !$arrForm )
