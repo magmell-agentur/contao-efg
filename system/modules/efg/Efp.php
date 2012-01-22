@@ -435,7 +435,7 @@ class Efp extends Frontend
 			}
 
 			$_SESSION['EFP']['FORMDATA'][$k] = $strVal;
-		} 
+		}
 		$_SESSION['EFP']['FORMDATA']['_formId_'] = $arrForm['id'];
 		// end store data in session
 
