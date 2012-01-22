@@ -3614,7 +3614,6 @@ window.addEvent(\'domready\', function()
 	 * Generate the filter panel and return it as HTML string
 	 * @return string
 	 */
-// TODO @tom: FIX IT !
 	protected function filterMenu()
 	{
 		$fields = '';
