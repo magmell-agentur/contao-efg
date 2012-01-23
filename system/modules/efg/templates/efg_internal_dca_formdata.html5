@@ -570,6 +570,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['flag'] 
 <?php if ($varVals['type'] == 'textarea'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['cols'] = <?php echo $arrSize[1]; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['rows'] = <?php echo $arrSize[0]; ?>;
+<?php if (strlen($varVals['rte']) && $GLOBALS['TL_CONFIG']['useRTE']): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['rte'] = '<?php echo $varVals['rte']; ?>';
+<?php endif; ?>
 <?php endif; ?>
 <?php endif; ?>
 <?php if ($varVals['type'] == 'calendar'): ?>
