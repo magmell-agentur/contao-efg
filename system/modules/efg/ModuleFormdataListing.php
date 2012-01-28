@@ -3127,7 +3127,7 @@ class ModuleFormdataListing extends Module
 		$blnDeleteAllowed = false;
 		if ($this->efg_fe_delete_access == 'none')
 		{
-			$blnEditAllowed = false;
+			$blnDeleteAllowed = false;
 		}
 		elseif($this->efg_fe_delete_access == 'public')
 		{
