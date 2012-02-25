@@ -259,7 +259,8 @@ class ExtendedForm extends Form
 				}
 			}
 
-			// unset session values if no FORM_SUBMIT to avoid wrong validation against session values,
+			// unset session values if no FORM_SUBMIT or form page has not been completed
+			// (to avoid wrong validation against session values and to void usage of values of other forms)
 			// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
 			if ($strMode != 'reload' && strlen($objFields->name))
 			{
@@ -317,6 +318,12 @@ class ExtendedForm extends Form
 				$this->arrWidgetsFailedValidation[$objFields->name] = 0;
 			}
 
+			// always populate from existing session data if configured
+			if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
+			{
+				$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+			}
+
 			if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
 			{
 				// frontend editing
@@ -356,6 +363,7 @@ class ExtendedForm extends Form
 					}
 				}
 			}
+
 
 			// HOOK: load form field callback
 			if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
