@@ -260,7 +260,7 @@ class ExtendedForm extends Form
 			}
 
 			// unset session values if no FORM_SUBMIT or form page has not been completed
-			// (to avoid wrong validation against session values and to void usage of values of other forms)
+			// (to avoid wrong validation against session values and to avoid usage of values of other forms)
 			// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
 			if ($strMode != 'reload' && strlen($objFields->name))
 			{
