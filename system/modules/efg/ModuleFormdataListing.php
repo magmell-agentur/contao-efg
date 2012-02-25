@@ -1448,8 +1448,6 @@ class ModuleFormdataListing extends Module
 					$k = $strVal;
 					$v = $arrRows[$i][$k];
 
-					$arrItem = array();
-
 					// do not display some special fields
 					if ( in_array($k, $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'password' )
 					{
@@ -3127,7 +3125,7 @@ class ModuleFormdataListing extends Module
 		$blnDeleteAllowed = false;
 		if ($this->efg_fe_delete_access == 'none')
 		{
-			$blnDeleteAllowed = false;
+			$blnEditAllowed = false;
 		}
 		elseif($this->efg_fe_delete_access == 'public')
 		{
