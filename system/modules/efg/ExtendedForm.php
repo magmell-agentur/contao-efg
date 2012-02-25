@@ -259,12 +259,16 @@ class ExtendedForm extends Form
 				}
 			}
 
-			// unset session values if no FORM_SUBMIT to avoid wrong validation against session values
+			// unset session values if no FORM_SUBMIT to avoid wrong validation against session values,
+			// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
 			if ($strMode != 'reload' && strlen($objFields->name))
 			{
 				if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 				{
-					unset($_SESSION['FORM_DATA'][$objFields->name]);
+					if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
+					{
+						unset($_SESSION['FORM_DATA'][$objFields->name]);
+					}
 				}
 			}
 
@@ -342,11 +346,9 @@ class ExtendedForm extends Form
 					if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true)
 					{
 						$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
-						// unset($_SESSION['FORM_DATA'][$objFields->name]);
 					}
 					else
 					{
-						//unset($_SESSION['FORM_DATA'][$objFields->name]);
 						if ($objWidget instanceof uploadable)
 						{
 							unset($_SESSION['FILES'][$objFields->name]);
