@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
+ * Copyright (C) 2005-2012 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2011
+ * @copyright  Leo Feyer 2005-2012
  * @author     Leo Feyer <leo@typolight.org>
  * @package    System
  * @license    LGPL
@@ -34,7 +34,7 @@
  * modified version of DC_Table by Leo Feyer
  *
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007 - 2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
@@ -537,6 +537,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters_limit">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
+
 <div class="tl_panel_bottom">
 
 <div class="tl_submit_panel tl_subpanel">
@@ -2399,8 +2400,7 @@ window.addEvent(\'domready\', function()
 				$return .= '
 
 <script>
-window.addEvent(\'domready\', function()
-{
+window.addEvent(\'domready\', function() {
     Backend.vScrollTo(($(\'' . $this->strTable . '\').getElement(\'label.error\').getPosition().y - 20));
 });
 </script>';
@@ -3218,7 +3218,6 @@ window.addEvent(\'domready\', function()
 	 */
 	protected function panel()
 	{
-
 		$filter = $this->filterMenu();
 		$search = $this->searchMenu();
 		$limit = $this->limitMenu();
@@ -3261,6 +3260,7 @@ window.addEvent(\'domready\', function()
 			if ($i == $intLast)
 			{
 				$submit = '
+
 <div class="tl_submit_panel tl_subpanel">
 <input type="image" name="filter" id="filter" src="' . TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" title="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '" alt="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '">
 </div>';
@@ -3370,6 +3370,7 @@ window.addEvent(\'domready\', function()
 		$active = strlen($session['search'][$strSessionKey]['value']) ? true : false;
 
 		return '
+
 <div class="tl_search tl_subpanel">
 <strong>' . $GLOBALS['TL_LANG']['MSC']['search'] . ':</strong>
 <select name="tl_field" class="tl_select' . ($active ? ' active' : '') . '">
@@ -3472,6 +3473,7 @@ window.addEvent(\'domready\', function()
 
 	/**
 	 * Return a select menu to limit results
+	 * @param boolean
 	 * @return string
 	 */
 	protected function limitMenu($blnOptional=false)
@@ -3501,6 +3503,7 @@ window.addEvent(\'domready\', function()
 			}
 
 			$this->Session->setData($session);
+
 			if ($this->Input->post('FORM_SUBMIT') == 'tl_filters_limit')
 			{
 				$this->reload();
@@ -3553,7 +3556,6 @@ window.addEvent(\'domready\', function()
 				$session['filter'][$filter]['limit'] = $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
 			}
 
-
 			// Build options
 			if ($total > 0)
 			{
@@ -3594,7 +3596,6 @@ window.addEvent(\'domready\', function()
 				return '';
 			}
 
-
 			$fields .= '
 <select name="tl_limit" class="tl_select' . (($session['filter'][$filter]['limit'] != 'all' && $total > $GLOBALS['TL_CONFIG']['resultsPerPage']) ? ' active' : '') . '" onchange="this.form.submit()">
   <option value="tl_limit">'.$GLOBALS['TL_LANG']['MSC']['filterRecords'].'</option>'.$options.'
@@ -3604,10 +3605,9 @@ window.addEvent(\'domready\', function()
 		return '
 
 <div class="tl_limit tl_subpanel">
-<strong>' . $GLOBALS['TL_LANG']['MSC']['showOnly'] . ':</strong>'.$fields.'
+<strong>' . $GLOBALS['TL_LANG']['MSC']['showOnly'] . ':</strong> '.$fields.'
 </div>';
 	}
-
 
 
 	/**
@@ -3735,7 +3735,7 @@ window.addEvent(\'domready\', function()
 		}
 
 		// Add sorting options
-		foreach ($sortingFields as $field)
+		foreach ($sortingFields as $cnt => $field)
 		{
 			$arrValues = array();
 			$arrProcedure = array();
@@ -3774,7 +3774,6 @@ window.addEvent(\'domready\', function()
 				$arrProcedure[] = "id IN(" . implode(',', array_map('intval', $this->root)) . ")";
 			}
 
-
 			if (in_array($field, $this->arrBaseFields) )
 			{
 				$sqlField = $field;
@@ -3783,6 +3782,7 @@ window.addEvent(\'domready\', function()
 			{
 				$sqlField = "SELECT DISTINCT(value) FROM tl_formdata_details WHERE ff_name='" . $field . "' AND pid=f.id";
 			}
+
 
 			$objFields = $this->Database->prepare("SELECT DISTINCT(" . $sqlField . ") AS `". $field . "` FROM " . $this->strTable . " f ". ((is_array($arrProcedure) && strlen($arrProcedure[0])) ? ' WHERE ' . implode(' AND ', $arrProcedure) : ''))
 										->execute($arrValues);
@@ -3993,6 +3993,12 @@ window.addEvent(\'domready\', function()
 			// End select menu
 			$fields .= '
 </select> ';
+
+			// Force a line-break after six elements
+			if ((($cnt + 1) % 6) == 0)
+			{
+				$fields .= '<br>';
+			}
 		}
 
 		return '
