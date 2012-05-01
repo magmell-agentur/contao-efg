@@ -4,7 +4,7 @@ if (!defined('TL_ROOT'))
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2012 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -23,7 +23,7 @@ if (!defined('TL_ROOT'))
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2011
+ * @copyright  Leo Feyer 2005-2012
  * @author     Leo Feyer <leo@typolight.org>
  * @package    Backend
  * @license    GPL
@@ -34,7 +34,7 @@ if (!defined('TL_ROOT'))
  * Class EfgLookupOptionWizard
  *
  * Provide methods to handle form field lookup option
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
 */
@@ -123,11 +123,16 @@ class EfgLookupOptionWizard extends Widget {
 		$this->import('Database');
 		$arrTables = $this->Database->listTables();
 
-		foreach ($arrTables as $strTable) {
-			if (!in_array($strTable, $this->arrIgnoreTables)) {
+		foreach ($arrTables as $strTable)
+		{
+			if (!in_array($strTable, $this->arrIgnoreTables))
+			{
 				$arrFields = $this->Database->listFields($strTable);
-				foreach ($arrFields as $arrField) {
-					if (!in_array($arrField['name'], $this->arrIgnoreFields)) {
+
+				foreach ($arrFields as $arrField)
+				{
+					if (!in_array($arrField['name'], $this->arrIgnoreFields) && $arrField['type'] != 'index')
+					{
 						$this->arrDbStruct[$strTable][] = $arrField['name'];
 					}
 				}
@@ -139,17 +144,24 @@ class EfgLookupOptionWizard extends Widget {
 
 		// get all forms marked to store data
 		$objForms = $this->Database->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=?")->execute("1");
-		if ($objForms->numRows) {
-			while ($objForms->next()) {
-				if (strlen($objForms->formID)) {
+		if ($objForms->numRows)
+		{
+			while ($objForms->next())
+			{
+				if (strlen($objForms->formID))
+				{
 					$varKey = 'fd_' . $objForms->formID;
-				} else {
+				}
+				else
+				{
 					$varKey = 'fd_' . str_replace('-', '_', standardize($objForms->title));
 				}
 
-				if (!in_array($varKey, $this->arrIgnoreTables)) {
+				if (!in_array($varKey, $this->arrIgnoreTables))
+				{
 					$objFields = $this->Database->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.id=?")->execute($objForms->id);
-					if ($objFields->numRows) {
+					if ($objFields->numRows)
+					{
 						$this->arrDbStruct[$varKey][] = 'form';
 						$this->arrDbStruct[$varKey][] = 'published';
 						while ($objFields->next())
@@ -166,7 +178,8 @@ class EfgLookupOptionWizard extends Widget {
 		ksort($this->arrDbStruct);
 
 		// Make sure there is at least an empty array
-		if (!is_array($this->varValue) || !$this->varValue['lookup_field']) {
+		if (!is_array($this->varValue) || !$this->varValue['lookup_field'])
+		{
 			$this->varValue = array (
 				array (
 					''
@@ -185,9 +198,11 @@ class EfgLookupOptionWizard extends Widget {
 		// table field used as option label
 		$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_field">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_field'][0] . '</label></h3>
 				<select name="' . $this->strId . '[lookup_field]" id="' . $this->strId . '_lookup_field" class="tl_select" onchange="Backend.autoSubmit(\'tl_form_field\');" onfocus="Backend.getScrollOffset();">';
-		foreach ($this->arrDbStruct as $strTable => $arrFields) {
+		foreach ($this->arrDbStruct as $strTable => $arrFields)
+		{
 			$return .= '<optgroup label="' . $strTable . '">';
-			foreach ($arrFields as $strField) {
+			foreach ($arrFields as $strField)
+			{
 				if ($strField == 'id')
 				{
 					continue;
@@ -207,10 +222,12 @@ class EfgLookupOptionWizard extends Widget {
 		{
 			$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_val_field">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_val_field'][0] . '</label></h3>';
 			$return .= '<select name="' . $this->strId . '[lookup_val_field]" id="' . $this->strId . '_lookup_val_field" class="tl_select">';
-			foreach ($this->arrDbStruct as $strTable => $arrFields) {
+			foreach ($this->arrDbStruct as $strTable => $arrFields)
+			{
 				if ($strSelectedTable == $strTable)
 				{
-					foreach ($arrFields as $strField) {
+					foreach ($arrFields as $strField)
+					{
 						$strSelected = ($this->varValue['lookup_val_field'] == $strTable . '.' . $strField) ? " selected " : "";
 						$return .= '<option value="' . $strTable . '.' . $strField . '"' . $strSelected . '>' . $strTable . '.' . $strField . '</option>';
 					}
