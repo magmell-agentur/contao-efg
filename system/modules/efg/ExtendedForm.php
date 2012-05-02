@@ -22,7 +22,7 @@
  *
  * PHP version 5
  * @copyright  Leo Feyer 2005-2012
- * @author     Leo Feyer <http://www.typolight.org>
+ * @author     Leo Feyer <http://www.contao.org>
  * @package    Frontend
  * @license    LGPL
  * @filesource
@@ -33,7 +33,7 @@
  * Class ExtendedForm
  *
  * Provide methods to handle front end forms (multi page and formdata frontend editing)
- * @copyright  Thomas Kuhn 2007 - 2012
+ * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
@@ -513,7 +513,7 @@ class ExtendedForm extends Form
 
 		if ($doNotSubmit && $this->blnAllowSkipRequired)
 		{
-			if(count($this->arrWidgetsFailedValidation) && count(array_count_values($this->arrWidgetsFailedValidation)) == 1)
+			if (count($this->arrWidgetsFailedValidation) && count(array_count_values($this->arrWidgetsFailedValidation)) == 1)
 			{
 				$doNotSubmit = false;
 			}
