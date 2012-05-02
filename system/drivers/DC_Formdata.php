@@ -4972,12 +4972,12 @@ $return .= '
 			return '';
 		}
 
-		if (is_null($this->arrImportIgnoreFields))
+		if (null === $this->arrImportIgnoreFields)
 		{
 			$this->arrImportIgnoreFields = array('id', 'pid', 'sorting', 'tstamp', 'form', 'ip', 'date', 'confirmationSent', 'confirmationDate', 'import_source' );
 		}
 
-		if (is_null($this->arrImportableFields))
+		if (null === $this->arrImportableFields)
 		{
 			$arrFdFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 			$arrFdFields = array_diff($arrFdFields, $this->arrImportIgnoreFields);
@@ -4988,7 +4988,7 @@ $return .= '
 		}
 
 		$arrSessionData = $this->Session->get('EFG');
-		if (is_null($arrSessionData))
+		if (null == $arrSessionData)
 		{
 			$arrSessionData = array();
 		}
@@ -5075,7 +5075,7 @@ $return .= '
 
 				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
 				{
-					if (is_null($intTotal))
+					if (null === $intTotal)
 					{
 						$intTotal = 0;
 						if ($blnUseCsvHeader)
