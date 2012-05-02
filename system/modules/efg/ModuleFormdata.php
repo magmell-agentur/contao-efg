@@ -177,8 +177,6 @@ class ModuleFormdata extends Backend
 			$arrFields = array();
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
-			//$objFields = $this->Database->prepare("SELECT id,pid,type,name,label,value,options,efgLookupOptions,multiple,mSize,mandatory,rgxp,maxlength,extensions,size,storeFile,uploadFolder,useHomeDir,efgMultiSRC,efgImageMultiple,efgImageSortBy,efgImagePerRow,efgImageSize,efgImageFullsize,efgImageMargin".($this->Database->fieldExists('conditionField', 'tl_form_field') ? ', conditionField' : '')." FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
-			//					->execute($this->objForm['id']);
 			$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 								->execute($this->objForm['id']);
 			if ($objFields->numRows)
@@ -186,7 +184,7 @@ class ModuleFormdata extends Backend
 				while ($objFields->next())
 				{
 					$arrField = $objFields->row();
-					$strFieldKey = ( strlen($arrField['name']) ) ? $arrField['name'] : $arrField['id'];
+					$strFieldKey = (strlen($arrField['name'])) ? $arrField['name'] : $arrField['id'];
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
 						// ignore some special fields like checkbox CC, fields of type password ...
@@ -228,8 +226,6 @@ class ModuleFormdata extends Backend
 		{
 			$arrAllFields = array();
 			$arrFieldNamesById = array();
-			//$objAllFields = $this->Database->prepare("SELECT ff.id,ff.pid,ff.type,ff.name,ff.label,ff.value,ff.options,ff.efgLookupOptions,ff.multiple,ff.mSize,ff.mandatory,ff.rgxp,ff.maxlength,ff.extensions,ff.size,ff.storeFile,ff.uploadFolder,ff.useHomeDir,ff.efgMultiSRC,ff.efgImageSortBy,ff.efgImagePerRow,ff.efgImageSize,ff.efgImageFullsize,ff.efgImageMargin".($this->Database->fieldExists('conditionField', 'tl_form_field') ? ', ff.conditionField' : '')." FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
-			//					->execute("1");
 			$objAllFields = $this->Database->prepare("SELECT ff.* FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
 								->execute("1");
 			if ($objAllFields->numRows)
