@@ -30,7 +30,7 @@
  * Class Efp
  * extended form processing
  *
- * @copyright  Thomas Kuhn 2007 - 2012
+ * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */

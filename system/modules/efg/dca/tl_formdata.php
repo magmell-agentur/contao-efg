@@ -24,7 +24,7 @@
  * This is the data container array for table tl_feedback.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2012
+ * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL
