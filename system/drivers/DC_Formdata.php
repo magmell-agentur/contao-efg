@@ -1363,7 +1363,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					}
 
 					// field types radio, select, multi checkbox
-					elseif (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
+					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
 							|| ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
@@ -2520,7 +2520,7 @@ window.addEvent(\'domready\', function() {
 			return;
 		}
 
-		$arrData = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField];
+		$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField];
 
 		// table to write to tl_formdata (base fields) or tl_formdata_details (detail fields)
 		$strTargetTable = $this->strTable;
@@ -2535,19 +2535,19 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Convert date formats into timestamps
-		if ($varValue != '' && in_array($arrData['eval']['rgxp'], array('date', 'time', 'datim')))
+		if ($varValue != '' && in_array($arrField['eval']['rgxp'], array('date', 'time', 'datim')))
 		{
-			$objDate = new Date($varValue, $GLOBALS['TL_CONFIG'][$arrData['eval']['rgxp'] . 'Format']);
+			$objDate = new Date($varValue, $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format']);
 			$varValue = $objDate->tstamp;
 		}
 
 		// Convert checkbox, radio, select, conditionalselect to store the values instead of keys
-		if (($arrData['inputType']=='checkbox' && $arrData['eval']['multiple']) || $arrData['inputType']=='radio' || $arrData['inputType']=='select' || $arrData['inputType']=='conditionalselect')
+		if (($arrField['inputType']=='checkbox' && $arrField['eval']['multiple']) || $arrField['inputType']=='radio' || $arrField['inputType']=='select' || $arrField['inputType']=='conditionalselect')
 		{
 
 			if (!in_array($this->strField, $this->arrOwnerFields))
 			{
-				$arrOpts = $arrData['options'];
+				$arrOpts = $arrField['options'];
 
 				// OptGroups can not be saved
 				$arrNewOpts = array();
@@ -2574,7 +2574,7 @@ window.addEvent(\'domready\', function() {
 				{
 					$arrSel = array_flip($arrSel);
 					// use options value or options label
-					if ($arrData['eval']['efgStoreValues'])
+					if ($arrField['eval']['efgStoreValues'])
 					{
 						$arrVals = array_keys(array_intersect_key($arrOpts, $arrSel));
 					}
@@ -2587,11 +2587,11 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		if ($arrData['inputType']=='checkbox' && !$arrData['eval']['multiple'])
+		if ($arrField['inputType']=='checkbox' && !$arrField['eval']['multiple'])
 		{
-			if (is_array($arrData['options']))
+			if (is_array($arrField['options']))
 			{
-				$arrVals = ($arrData['eval']['efgStoreValues'] ? array_keys($arrData['options']) : array_values($arrData['options']));
+				$arrVals = ($arrField['eval']['efgStoreValues'] ? array_keys($arrField['options']) : array_values($arrField['options']));
 			}
 			else
 			{
@@ -2610,21 +2610,21 @@ window.addEvent(\'domready\', function() {
 
 
 		// Make sure unique fields are unique
-		if (strlen($varValue) && $arrData['eval']['unique'])
+		if (strlen($varValue) && $arrField['eval']['unique'])
 		{
 			$objUnique = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $this->strField . "=? AND id!=?")
 										->execute($varValue, $this->intId);
 
 			if ($objUnique->numRows)
 			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['unique'], (strlen($arrData['label'][0]) ? $arrData['label'][0] : $this->strField)));
+				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['unique'], (strlen($arrField['label'][0]) ? $arrField['label'][0] : $this->strField)));
 			}
 		}
 
 		// Trigger the save_callback
-		if (is_array($arrData['save_callback']))
+		if (is_array($arrField['save_callback']))
 		{
-			foreach ($arrData['save_callback'] as $callback)
+			foreach ($arrField['save_callback'] as $callback)
 			{
 				$this->import($callback[0]);
 				$varValue = $this->$callback[0]->$callback[1]($varValue, $this);
@@ -2632,10 +2632,10 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Save the value if there was no error
-		if (($varValue != '' || !$arrData['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrData['eval']['alwaysSave']))
+		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
 		{
 			// If the field is a fallback field, empty all other columns
-			if ($arrData['eval']['fallback'] && $varValue != '')
+			if ($arrField['eval']['fallback'] && $varValue != '')
 			{
 				$this->Database->execute("UPDATE " . $this->strTable . " SET " . $this->strField . "=''");
 			}
@@ -2674,7 +2674,14 @@ window.addEvent(\'domready\', function() {
 
 				if ($objExist->numRows == 0)
 				{
-					$arrSetInsert = array('pid' => $this->intId, 'tstamp' => time(), 'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['ff_id'], 'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['inputType'], 'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['label'][0] , 'ff_name' => $strTargetField );
+					$arrSetInsert = array(
+						'pid' => $this->intId,
+						'tstamp' => time(),
+						'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['ff_id'],
+						'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['inputType'],
+						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['label'][0] ,
+						'ff_name' => $strTargetField
+					);
 					$objInsertStmt = $this->Database->prepare("INSERT INTO " . $strTargetTable . " %s")
 										->set($arrSetInsert)
 										->execute();
@@ -2690,7 +2697,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if ($varValue != $this->varValue)
 				{
-					if (!$arrData['eval']['submitOnChange'])
+					if (!$arrField['eval']['submitOnChange'])
 					{
 						$this->blnCreateNewVersion = true;
 					}
@@ -4741,11 +4748,7 @@ window.addEvent(\'domready\', function() {
 				$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 			}
 		}
-		// replace insert tags in subject
-//		if (strlen($subject))
-//		{
-//			$subject = $this->replaceInsertTags($subject);
-//		}
+
 		// replace insert tags in sender
 		if (strlen($sender))
 		{
