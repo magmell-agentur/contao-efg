@@ -90,6 +90,15 @@ $arrListDefaults = array(
 		'flag'           => 'null',
 		'eval'           => 'null',
 	),
+	'xdependentcalendarfields' => array
+	(
+		'exclude'        => 'false',
+		'search'         => 'false',
+		'sorting'        => 'false',
+		'filter'         => 'false',
+		'flag'           => 'null',
+		'eval'           => 'null',
+	),
 	'conditionalselect' => array
 	(
 		'exclude'        => 'false',
@@ -331,7 +340,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
-			'eval'                    => array('rgxp' => 'datim', 'tl_class'=>'w50'),
+			'eval'                    => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
 		),
 		'ip' => array
 		(
@@ -411,7 +420,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => true,
 			'flag'                    => 8,
 			'inputType'               => 'text',
-			'eval'                    => array('tl_class'=>'w50', 'rgxp'=>'datim')
+			'eval'                    => array('rgxp'=>'datim', 'datepicker' => true, 'tl_class'=>'w50 wizard')
 		),
 		'be_notes' => array
 		(
@@ -449,8 +458,6 @@ endforeach; ?>),
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])) : $strField); ?>', '<?php echo '[' . $strField .'] ' .str_replace("'", "\'", $this->String->decodeEntities($varVals['label'])); ?>');
 <?php if (($varVals['type']=='upload' && $varVals['storeFile']) || $varVals['type']=='efgImageSelect'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = 'fileTree';
-<?php elseif ($varVals['type'] == 'calendar'): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = 'text';
 <?php elseif ($varVals['type'] == 'fp_preSelectMenu'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = 'select';
 <?php elseif ($varVals['type'] == 'countryselect'): ?>
@@ -560,11 +567,20 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 <?php if ($varVals['multiple'] == "1"): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['multiple'] = true;
 <?php endif; ?>
+<?php if ($varVals['type'] == 'xdependentcalendarfields'):
+	$varVals['rgxp'] = 'date';
+	if (!empty($varVals['xdateformat'])):
+		$varVals['dateFormat'] = $varVals['xdateformat'];
+	endif;
+endif; ?>
 <?php if ($varVals['rgxp']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['rgxp'] = '<?php echo $varVals['rgxp']; ?>';
 <?php endif; ?>
 <?php if ($varVals['rgxp'] == 'date' || $varVals['rgxp'] == 'datim'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['flag'] = 5;
+<?php endif; ?>
+<?php if ($varVals['dateFormat']): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['dateFormat'] = '<?php echo $varVals['dateFormat']; ?>';
 <?php endif; ?>
 <?php if ($varVals['size']): $arrSize = deserialize($varVals['size']); ?>
 <?php if ($varVals['type'] == 'textarea'): ?>
@@ -572,11 +588,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['rows'] = <?php echo $arrSize[0]; ?>;
 <?php endif; ?>
 <?php endif; ?>
-<?php if ($varVals['type'] == 'calendar'): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['rgxp'] = 'date';
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['flag'] = 5;
+<?php if ($varVals['type'] == 'calendar' || $varVals['type'] == 'xdependentcalendarfields'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['maxlength'] = 10;
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['datepicker'] = "<?php echo $this->getDatePickerString(); ?>";
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['datepicker'] = true;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['tl_class'] = 'wizard';
 <?php endif; ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_id'] = <?php echo $varVals['id']; ?>;

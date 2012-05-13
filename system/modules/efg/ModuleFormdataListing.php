@@ -2927,7 +2927,7 @@ class ModuleFormdataListing extends Module
 
 		$strVarConnector = $blnQuery ? '&amp;' : '?';
 		// check record
-		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
+		if ($this->intRecordId === null || intval($this->intRecordId)<1)
 		{
 			unset($_GET[$this->strDetailKey]);
 			unset($_GET['act']);
@@ -2942,7 +2942,7 @@ class ModuleFormdataListing extends Module
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check access
-		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
@@ -2961,7 +2961,7 @@ class ModuleFormdataListing extends Module
 		{
 			$blnEditAllowed = true;
 		}
-		elseif (strlen($this->efg_fe_edit_access) )
+		elseif (!empty($this->efg_fe_edit_access) )
 		{
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedEditOwnerIds))
 			{
@@ -2980,15 +2980,14 @@ class ModuleFormdataListing extends Module
 			$intListingId = intval($this->id);
 		}
 
-		$intEditId = 0;
 		$strForm = '';
 		$intFormId = 0;
-		$intFormCEid = 0;
 
 		// Fallback template
 		if (!strlen($this->list_edit_layout))
+		{
 			$this->list_edit_layout = 'edit_fd_default';
-
+		}
 
 		// get the form
 		$objCheckRecord = $this->Database->prepare("SELECT form FROM tl_formdata WHERE id=?")
@@ -3026,19 +3025,18 @@ class ModuleFormdataListing extends Module
 
 		$arrRecordFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 
-
 		$strQuery = "SELECT ";
 		$strWhere = '';
 		$strSep = '';
 
 		foreach($arrRecordFields as $field)
 		{
-			if ( in_array($field, $this->arrBaseFields) )
+			if (in_array($field, $this->arrBaseFields))
 			{
 				$strQuery .= $strSep . $field;
 				$strSep = ', ';
 			}
-			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+			if (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 			{
 				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				$strSep = ', ';
@@ -3204,6 +3202,8 @@ class ModuleFormdataListing extends Module
 			$rgxp = $this->arrFF[$k]['rgxp'];
 		}
 
+		global $objPage;
+
 		// Array
 		if (is_array($value))
 		{
@@ -3211,17 +3211,21 @@ class ModuleFormdataListing extends Module
 		}
 
 		// Date and time
-		if ($value && $rgxp == 'date')
+		elseif ($value && $rgxp == 'date')
 		{
-			$value = $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $value);
+			$value = $this->parseDate((!empty($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat']) ? $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat'] : $objPage->dateFormat), $value);
 		}
+
+		// Time
 		elseif ($value && $rgxp == 'time')
 		{
-			$value = $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $value);
+			$value = $this->parseDate($objPage->timeFormat, $value);
 		}
+
+		// Date and time
 		elseif ($value && $rgxp == 'datim')
 		{
-			$value = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
+			$value = $this->parseDate($objPage->datimFormat, $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='checkbox'
 				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupCheckbox'
@@ -3242,15 +3246,15 @@ class ModuleFormdataListing extends Module
 			{
 				$value = $this->arrMembers[$value];
 			}
-			if ($k == 'fd_user')
+			elseif ($k == 'fd_user')
 			{
 				$value = $this->arrUsers[$value];
 			}
-			if ($k == 'fd_member_group')
+			elseif ($k == 'fd_member_group')
 			{
 				$value = $this->arrMemberGroups[$value];
 			}
-			if ($k == 'fd_user_group')
+			elseif ($k == 'fd_user_group')
 			{
 				$value = $this->arrUserGroups[$value];
 			}
@@ -3259,7 +3263,7 @@ class ModuleFormdataListing extends Module
 		// URLs
 		if ($value && $rgxp == 'url' && preg_match('@^(https?://|ftp://)@i', $value))
 		{
-			$value = '<a href="' . $value . '" onclick="window.open(this.href); return false;">' . $value . '</a>';
+			$value = '<a href="' . $value . '"' . (($objPage->outputFormat == 'xhtml') ? ' onclick="return !window.open(this.href)"' : ' target="_blank"') . '>' . $value . '</a>';
 			return $value;
 		}
 
@@ -3267,7 +3271,7 @@ class ModuleFormdataListing extends Module
 		if ($value && ($rgxp == 'email' || strpos($this->arrFF[$k]['name'], 'mail') !== false || strpos($k, 'mail') !== false ) )
 		{
 			$value = $this->String->encodeEmail($value);
-			$value = '<a href="mailto:' . $value . '">' . $value . '</a>';
+			$value = '<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;' . $value . '">' . $value . '</a>';
 			return $value;
 		}
 

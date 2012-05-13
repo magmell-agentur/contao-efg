@@ -67,7 +67,7 @@ class FormData extends Frontend
 		// Types of form fields with storable data
 		$this->arrFFstorable = array(
 			'sessionText', 'sessionOption', 'sessionCalculator',
-			'hidden','text','calendar','password','textarea',
+			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
 			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
 			'radio','efgLookupRadio',
 			'checkbox','efgLookupCheckbox',
@@ -662,16 +662,19 @@ class FormData extends Frontend
 					}
 
 				break;
-				case 'password':
-				case 'hidden':
+
 				case 'text':
 				case 'calendar':
-				case 'textarea':
-				default:
+				case 'xdependentcalendarfields':
 					$strVal = $varSubmitted;
 					if (is_string($strVal) && strlen($strVal) && in_array($arrField['rgxp'], array('date', 'time', 'datim')))
 					{
-						$objDate = new Date($strVal, $GLOBALS['TL_CONFIG'][$arrField['rgxp'] . 'Format']);
+						$strFormat = $GLOBALS['TL_CONFIG'][$arrField['rgxp'] . 'Format'];
+						if (!empty($arrField['dateFormat']))
+						{
+							$strFormat = $arrField['dateFormat'];
+						}
+						$objDate = new Date($strVal, $strFormat);
 						$strVal = $objDate->tstamp;
 					}
 					else
@@ -679,6 +682,11 @@ class FormData extends Frontend
 						$strVal = $varSubmitted;
 					}
 				break;
+
+				default:
+					$strVal = $varSubmitted;
+					break;
+
 			}
 
 			if (is_array($strVal))
@@ -752,13 +760,9 @@ class FormData extends Frontend
 						$strVal = $varValue;
 					}
 				break;
-				case 'upload':
-				case 'password':
-				case 'hidden':
 				case 'text':
 				case 'calendar':
-				case 'textarea':
-				default:
+				case 'xdependentcalendarfields':
 					$strVal = $varValue;
 					// Convert date formats into timestamps
 					if (in_array($arrField['eval']['rgxp'], array('date', 'time', 'datim')))
@@ -769,11 +773,26 @@ class FormData extends Frontend
 						}
 						elseif (is_string($strVal) && strlen($strVal) )
 						{
-							$objDate = new Date($strVal, $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format']);
+							$strFormat = $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format'];
+//							if (!empty($arrField['eval']['dateFormat']))
+//							{
+//								$strFormat = $arrField['eval']['dateFormat'];
+//							}
+
+							$objDate = new Date($strVal, $strFormat);
 							$strVal = $objDate->tstamp;
 						}
 					}
 				break;
+
+				case 'hidden':
+				case 'textarea':
+				case 'upload':
+				case 'password':
+				default:
+					$strVal = $varValue;
+				break;
+
 			}
 
 			return (is_array($strVal) || is_object($strVal)) ? serialize($strVal) : $this->String->decodeEntities($strVal);
@@ -1149,7 +1168,7 @@ class FormData extends Frontend
 	/**
 	 * Prepare database value from tl_formdata / tl_formdata_details for widget
 	 * @param mixed stored value
-	 * @param array form field properties
+	 * @param array form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
 	 * @return mixed
 	 */
 	public function prepareDbValForWidget($varValue='', $arrField=false, $varFile=false)
@@ -1309,27 +1328,32 @@ class FormData extends Frontend
 						$varVal = $strVal;
 					}
 				break;
-				case 'password':
-				case 'hidden':
+
 				case 'text':
 				case 'calendar':
-				case 'textarea':
-				default:
+				case 'xdependentcalendarfields':
+					// NOTE: different array structure in Backend (set by dca) and Frontend (set from tl_form_field)
+					// .. in Frontend: one-dimensional array like $arrField['rgxp'], $arrField['dateFormat']
+					// .. in Backend: multidemsional array like $arrField['eval']['rgxp']
 					if ($arrField['rgxp'] && in_array($arrField['rgxp'], array('date', 'datim', 'time')))
 					{
 						if ($varVal)
 						{
+
 							if ($arrField['rgxp'] == 'date')
 							{
-								$varVal = date($GLOBALS['TL_CONFIG']['dateFormat'], $varVal);
+								// $varVal = date((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
+								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'datim')
 							{
-								$varVal = date($GLOBALS['TL_CONFIG']['datimFormat'], $varVal);
+								// $varVal = date($GLOBALS['TL_CONFIG']['datimFormat'], $varVal);
+								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'time')
 							{
-								$varVal = date($GLOBALS['TL_CONFIG']['timeFormat'], $varVal);
+								// $varVal = date($GLOBALS['TL_CONFIG']['timeFormat'], $varVal);
+								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['timeFormat']), $varVal);
 							}
 						}
 					}
@@ -1338,6 +1362,11 @@ class FormData extends Frontend
 						$varVal = $varValue;
 					}
 				break;
+
+				default:
+					$varVal = $varValue;
+				break;
+
 			}
 
 			return $varVal;

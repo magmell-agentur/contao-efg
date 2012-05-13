@@ -239,7 +239,6 @@ class ExtendedForm extends Form
 				$arrLabels[$objWidget->name] = $objFields->label;
 			}
 
-
 			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 			{
 				// skip fields outside range of active page
@@ -337,14 +336,24 @@ class ExtendedForm extends Form
 					// prepare options array
 					$arrData['options'] = $this->FormData->prepareDcaOptions($arrData);
 
-					// set rgxp 'date' for field type 'calendar'
+					// set rgxp 'date' for field type 'calendar' if not set
 					if ($arrData['type'] == 'calendar')
 					{
+						if (!isset($arrData['rgxp']))
+						{
+							$arrData['rgxp'] = 'date';
+						}
+					}
+					// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
+					elseif ($arrData['type'] == 'xdependentcalendarfields')
+					{
 						$arrData['rgxp'] = 'date';
+						$arrData['dateFormat'] = $arrData['xdateformat'];
 					}
 
 					// prepare value
 					$varFieldValue = $this->FormData->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
+
 					$objWidget->value = $varFieldValue;
 				}
 				else

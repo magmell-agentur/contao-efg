@@ -264,7 +264,10 @@ class tl_formdata extends Backend
 		$strName = 'feedback';
 		$strFileName = 'tl_formdata';
 
-		if ( $varFormKey != '' && is_string($varFormKey))
+		// fix config for xdependantcalendarfields
+		$GLOBALS['BE_FFL']['xdependentcalendarfields'] = 'TextField';
+
+		if ($varFormKey != '' && is_string($varFormKey))
 		{
 			$strFileName = $varFormKey;
 		}
@@ -273,11 +276,11 @@ class tl_formdata extends Backend
 			$strFileName = ($this->Input->get('do') == 'feedback' ? 'fd_feedback' : $this->Input->get('do'));
 		}
 
-		if ( $varFormKey != '' && is_string($varFormKey) )
+		if ($varFormKey != '' && is_string($varFormKey))
 		{
 			if ($varFormKey != 'tl_formdata' )
 			{
-				if ( array_key_exists($varFormKey, $GLOBALS['BE_MOD']['formdata']) )
+				if (array_key_exists($varFormKey, $GLOBALS['BE_MOD']['formdata']))
 				{
 					$strFile = sprintf('%s/system/modules/%s/dca/%s.php', TL_ROOT, $strModule, $strFileName);
 
@@ -310,7 +313,7 @@ class tl_formdata extends Backend
 		}
 		else
 		{
-			if ( array_key_exists($this->Input->get('do'), $GLOBALS['BE_MOD']['formdata']) )
+			if (array_key_exists($this->Input->get('do'), $GLOBALS['BE_MOD']['formdata']))
 			{
 				$strFile = sprintf('%s/system/modules/%s/dca/%s.php', TL_ROOT, $strModule, $strFileName);
 

@@ -101,7 +101,7 @@ class Efp extends Frontend
 	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels=false) {
 
 		// Form config
-		if ( !$arrForm )
+		if (!$arrForm)
 		{
 			return;
 		}
@@ -341,10 +341,19 @@ class Efp extends Frontend
 						$arrField['eval']['efgStoreValues'] = true;
 					}
 
-					// set rgxp 'date' for field type 'calendar'
+					// set rgxp 'date' for field type 'calendar' if not set
 					if ($arrField['type'] == 'calendar')
 					{
+						if (!isset($arrField['rgxp']))
+						{
+							$arrField['rgxp'] = 'date';
+						}
+					}
+					// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
+					elseif ($arrField['type'] == 'xdependentcalendarfields')
+					{
 						$arrField['rgxp'] = 'date';
+						$arrField['dateFormat'] = $arrField['xdateformat'];
 					}
 
 					$strVal = $this->FormData->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
@@ -418,7 +427,6 @@ class Efp extends Frontend
 								->set($arrUpd)
 								->execute($intNewId);
 			}
-
 		} // end form data storage
 
 		// store data in session to display on confirmation page
