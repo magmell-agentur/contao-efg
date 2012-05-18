@@ -79,9 +79,9 @@ class EfgFormImageSelect extends Widget
 	 */
 	public function generate()
 	{
-
 		$objGal = new EfgFormGallery($this, $this->arrConfiguration);
 		$objGal->generate();
+
 		return $objGal->Template->parse();
 	}
 

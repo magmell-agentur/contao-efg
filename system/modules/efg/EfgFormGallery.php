@@ -53,22 +53,21 @@ class EfgFormGallery extends ContentElement
 	 * @param object
 	 * @return string
 	 */
-	public function __construct(Widget $widget, $arrConfig)
+	public function __construct(Widget $objWidget, $arrConfig)
 	{
-
-		$this->widget = $widget;
+		$this->widget = $objWidget;
 		$this->import('Input');
-		$this->multiSRC = $widget->efgMultiSRC; //  $arrConfig['efgMultiSRC'];
-		$this->efgImageMultiple = $widget->efgImageMultiple;
-		$this->efgImageUseHomeDir = $widget->efgImageUseHomeDir;
-		$this->size = $widget->efgImageSize; // $arrConfig['efgImageSize'];
-		$this->fullsize = $widget->efgImageFullsize; // $arrConfig['efgImageFullsize'];
-		$this->perRow = (intval($widget->efgImagePerRow) > 0) ? $widget->efgImagePerRow : 4;  // intval($arrConfig['efgImagePerRow'] > 0) ? $arrConfig['efgImagePerRow'] : 4;
+		$this->multiSRC = $arrConfig['efgMultiSRC'];
+		$this->efgImageMultiple = $arrConfig['efgImageMultiple']; // $objWidget->efgImageMultiple;
+		$this->efgImageUseHomeDir = $arrConfig['efgImageUseHomeDir']; // $objWidget->efgImageUseHomeDir;
+		$this->size = $arrConfig['efgImageSize']; // $objWidget->efgImageSize;
+		$this->fullsize = $arrConfig['efgImageFullsize']; // $objWidget->efgImageFullsize;
+		$this->sortBy = (!empty($arrConfig['efgImageSortBy']) ? $arrConfig['efgImageSortBy'] : 'name_asc');
+		$this->perRow = (intval($arrConfig['efgImagePerRow']) > 0) ? intval($arrConfig['efgImagePerRow']) : 4;
 		$this->perPage = 0;
-		$this->imagemargin = $widget->efgImageMargin; // $arrConfig['efgImageMargin'];
+		$this->imagemargin = $arrConfig['efgImageMargin']; // $objWidget->efgImageMargin;
 
 		$this->arrData = $arrConfig;
-
 	}
 
 
@@ -80,6 +79,7 @@ class EfgFormGallery extends ContentElement
 			case 'efgImageMultiple':
 				$this->efgImageMultiple = strlen($varValue) ? true : false;
 				break;
+
 			case 'efgImageUseHomeDir':
 				$this->efgImageUseHomeDir = strlen($varValue) ? true : false;
 				break;
@@ -90,6 +90,10 @@ class EfgFormGallery extends ContentElement
 
 			case 'size':
 				$this->size = $varValue;
+				break;
+
+			case 'sortBy':
+				$this->sortBy = $varValue;
 				break;
 
 			case 'perRow':
@@ -134,10 +138,11 @@ class EfgFormGallery extends ContentElement
 			}
 		}
 
-		if (!is_array($this->multiSRC) || count($this->multiSRC) < 1)
+		if (!is_array($this->multiSRC) || empty($this->multiSRC))
 		{
 			return '';
 		}
+
 		return parent::generate();
 	}
 
@@ -165,16 +170,22 @@ class EfgFormGallery extends ContentElement
 			{
 				$objFile = new File($file);
 				$this->parseMetaFile(dirname($file), true);
+				$arrMeta = $this->arrMeta[$objFile->basename];
+
+				if ($arrMeta[0] == '')
+				{
+					$arrMeta[0] = str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename));
+				}
 
 				if ($objFile->isGdImage)
 				{
 					$images[$file] = array
 					(
 						'name' => $objFile->basename,
-						'src' => $file,
-						'alt' => (strlen($this->arrMeta[$objFile->basename][0]) ? $this->arrMeta[$objFile->basename][0] : ucfirst(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)))),
-						'link' => (strlen($this->arrMeta[$objFile->basename][1]) ? $this->arrMeta[$objFile->basename][1] : ''),
-						'caption' => (strlen($this->arrMeta[$objFile->basename][2]) ? $this->arrMeta[$objFile->basename][2] : '')
+						'singleSRC' => $file,
+						'alt' => $arrMeta[0],
+						'imageUrl' => $arrMeta[1],
+						'caption' => $arrMeta[2]
 					);
 
 					$auxName[] = $objFile->basename;
@@ -199,13 +210,20 @@ class EfgFormGallery extends ContentElement
 
 				if ($objFile->isGdImage)
 				{
+					$arrMeta = $this->arrMeta[$subfile];
+
+					if ($arrMeta[0] == '')
+					{
+						$arrMeta[0] = str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename));
+					}
+
 					$images[$file . '/' . $subfile] = array
 					(
 						'name' => $objFile->basename,
-						'src' => $file . '/' . $subfile,
-						'alt' => (strlen($this->arrMeta[$subfile][0]) ? $this->arrMeta[$subfile][0] : ucfirst(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)))),
-						'link' => (strlen($this->arrMeta[$subfile][1]) ? $this->arrMeta[$subfile][1] : ''),
-						'caption' => (strlen($this->arrMeta[$subfile][2]) ? $this->arrMeta[$subfile][2] : '')
+						'singleSRC' => $file . '/' . $subfile,
+						'alt' => $arrMeta[0],
+						'imageUrl' => $arrMeta[1],
+						'caption' => $arrMeta[2]
 					);
 
 					$auxName[] = $objFile->basename;
@@ -219,11 +237,11 @@ class EfgFormGallery extends ContentElement
 		{
 			default:
 			case 'name_asc':
-				array_multisort($images, SORT_ASC, $auxName);
+				uksort($images, 'basename_natcasecmp');
 				break;
 
 			case 'name_desc':
-				array_multisort($images, SORT_DESC, $auxName);
+				uksort($images, 'basename_natcasercmp');
 				break;
 
 			case 'date_asc':
@@ -245,16 +263,20 @@ class EfgFormGallery extends ContentElement
 				}
 				$images = $arrImages;
 				break;
-		}
 
-		// Fullsize template
-		if ($this->fullsize && TL_MODE == 'FE')
-		{
-			$this->strTemplate = 'form_efg_imageselect_fullsize';
-			$this->Template = new FrontendTemplate($this->strTemplate);
+			case 'random':
+				shuffle($images);
+				break;
 		}
 
 		$images = array_values($images);
+
+		// Limit the total number of items (see #2652)
+		if ($this->numberOfItems > 0)
+		{
+			$images = array_slice($images, 0, $this->numberOfItems);
+		}
+
 		$total = count($images);
 		$limit = $total;
 		$offset = 0;
@@ -262,7 +284,22 @@ class EfgFormGallery extends ContentElement
 		// Pagination
 		if ($this->perPage > 0)
 		{
+			// Get the current page
 			$page = $this->Input->get('page') ? $this->Input->get('page') : 1;
+
+			// Do not index or cache the page if the page number is outside the range
+			if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))
+			{
+				global $objPage;
+				$objPage->noSearch = 1;
+				$objPage->cache = 0;
+
+				// Send a 404 header
+				header('HTTP/1.1 404 Not Found');
+				return;
+			}
+
+			// Set limit and offset
 			$offset = ($page - 1) * $this->perPage;
 			$limit = min($this->perPage + $offset, $total);
 
@@ -270,19 +307,10 @@ class EfgFormGallery extends ContentElement
 			$this->Template->pagination = $objPagination->generate("\n  ");
 		}
 
-		$size = deserialize($this->size);
-		$arrMargin = deserialize($this->imagemargin);
-		$margin = $this->generateMargin($arrMargin);
-		$intWidth = floor((640 / $this->perRow) - $arrMargin['left'] - $arrMargin['right']);
-
-		$this->Template->lightboxId = 'lb' . $this->id;
-		$this->Template->fullsize = (TL_MODE == 'FE') ? true : false;
-
-		$this->Template->multiple = ($this->efgImageMultiple) ? true : false;
-
 		$rowcount = 0;
 		$colwidth = floor(100/$this->perRow);
-
+		$intMaxWidth = (TL_MODE == 'BE') ? floor((640 / $this->perRow)) : floor(($GLOBALS['TL_CONFIG']['maxImageWidth'] / $this->perRow));
+		$strLightboxId = 'lightbox[lb' . $this->id . ']';
 		$body = array();
 
 		// Rows
@@ -292,12 +320,12 @@ class EfgFormGallery extends ContentElement
 
 			if ($rowcount == 0)
 			{
-				$class_tr = ' row_first';
+				$class_tr .= ' row_first';
 			}
 
-			if (($i + $this->perRow) >= count($images))
+			if (($i + $this->perRow) >= $limit)
 			{
-				$class_tr = ' row_last';
+				$class_tr .= ' row_last';
 			}
 
 			$class_eo = (($rowcount % 2) == 0) ? ' even' : ' odd';
@@ -317,66 +345,59 @@ class EfgFormGallery extends ContentElement
 					$class_td = ' col_last';
 				}
 
+				$objCell = new stdClass();
+				$key = 'row_' . $rowcount . $class_tr . $class_eo;
+
+				// Empty cell
 				if (!is_array($images[($i+$j)]) || ($j+$i) >= $limit)
 				{
-					$body['row_' . $rowcount . $class_tr . $class_eo][$j]['hasImage'] = false;
-					$body['row_' . $rowcount . $class_tr . $class_eo][$j]['class'] = 'col_'.$j . $class_td;
+					$objCell->class = 'col_'.$j . $class_td;
+					$body[$key][$j] = $objCell;
 
 					continue;
 				}
 
-				$objFile = new File($images[($i+$j)]['src']);
+				// Add size and margin
+				$images[($i+$j)]['size'] = $this->size;
+				$images[($i+$j)]['imagemargin'] = $this->imagemargin;
+				$images[($i+$j)]['fullsize'] = $this->fullsize;
 
-				// Adjust image size in the back end
-				if (TL_MODE == 'BE' && $objFile->width > $intWidth && ($size[0] > $intWidth || !$size[0]))
-				{
-					$size[0] = $intWidth;
-					$size[1] = floor($intWidth * $objFile->height / $objFile->width);
-				}
+				$this->addImageToTemplate($objCell, $images[($i+$j)], $intMaxWidth, $strLightboxId);
 
-				$src = $this->getImage($this->urlEncode($images[($i+$j)]['src']), $size[0], $size[1]);
+				// Add column width and class
+				$objCell->colWidth = $colwidth . '%';
+				$objCell->class = 'col_'.$j . $class_td;
 
-				if (($imgSize = @getimagesize(TL_ROOT . '/' . $src)) !== false)
-				{
-					$imgSize = ' ' . $imgSize[3];
-				}
+				$objCell->optId = 'opt_' . $this->widget->id . '_' . ($i+$j);
+				$objCell->optName = $this->widget->name;
+				$objCell->srcFile = $images[($i+$j)]['singleSRC'];
 
 				$blnChecked = false;
 				if ($this->efgImageMultiple)
 				{
-					$blnChecked = (is_array($this->widget->value) && in_array($images[($i+$j)]['src'], $this->widget->value));
+					if (!is_array($this->widget->value))
+					{
+						$this->widget->value = array($this->widget->value);
+					}
+
+					$blnChecked = (is_array($this->widget->value) && in_array($objCell->srcFile, $this->widget->value));
 				}
 				else
 				{
-					$blnChecked = ($this->widget->value == $images[($i+$j)]['src']);
+					$blnChecked = ($this->widget->value == $objCell->srcFile);
 				}
+				$objCell->checked = ($blnChecked ? ' checked="checked"' : '');
 
-				$body['row_' . $rowcount . $class_tr . $class_eo][$j] = array
-				(
-					'hasImage' => true,
-					'margin' => $margin,
-					'href' => $images[($i+$j)]['src'],
-					'width' => $objFile->width,
-					'height' => $objFile->height,
-					'colWidth' => $colwidth . '%',
-					'class' => 'col_'.$j . $class_td,
-					'alt' => htmlspecialchars($images[($i+$j)]['alt']),
-					'link' => ((TL_MODE == 'BE') ? '' : $images[($i+$j)]['link']),
-					'caption' => $images[($i+$j)]['caption'],
-					'imgSize' => $imgSize,
-					'src' => $src,
-					'optId' => 'opt_' . $this->widget->id . '_' . ($i+$j),
-					'optName' => $this->widget->name,
-					'srcFile' => $images[($i+$j)]['src'],
-					//'checked' => ($this->widget->value == $images[($i+$j)]['src']) ? 'checked="checked"' : ''
-					'checked' => ($blnChecked) ? 'checked="checked"' : ''
-				);
+				$body[$key][$j] = $objCell;
 			}
 
 			++$rowcount;
 		}
-
+		
+		$this->Template->multiple = ($this->efgImageMultiple) ? true : false;
 		$this->Template->body = $body;
+		$this->Template->images = $images;
+
 	}
 
 }
