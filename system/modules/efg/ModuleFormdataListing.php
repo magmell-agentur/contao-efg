@@ -226,7 +226,7 @@ class ModuleFormdataListing extends Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id from tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -285,7 +285,7 @@ class ModuleFormdataListing extends Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id from tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -344,7 +344,7 @@ class ModuleFormdataListing extends Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id from tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -402,7 +402,7 @@ class ModuleFormdataListing extends Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id from tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -443,7 +443,7 @@ class ModuleFormdataListing extends Module
 
 			$strField = implode('.', $arrParams);
 			$objDownload = $this->Database->prepare("SELECT fd.fd_member, fd.fd_user, fdd.value FROM tl_formdata fd, tl_formdata_details fdd WHERE (fd.id=fdd.pid) AND fd.id=? AND fdd.ff_name=?")
-				->execute($intFdId,  $strField);
+										->execute($intFdId,  $strField);
 			if ($objDownload->numRows)
 			{
 				$arrDownload = $objDownload->fetchAssoc();
@@ -547,7 +547,7 @@ class ModuleFormdataListing extends Module
 			$blnExport = true;
 			$strExportMode = 'csv';
 		}
-		if ($this->Input->get('act') == 'exportxls')
+		elseif ($this->Input->get('act') == 'exportxls')
 		{
 			$blnExport = true;
 			$strExportMode = 'xls';
@@ -1109,11 +1109,11 @@ class ModuleFormdataListing extends Module
 			{
 				if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']=='digit')
 				{
-					$strQuery .= " ORDER BY CAST(" . $this->Input->get('order_by') . ' AS DECIMAL) ' . $this->Input->get('sort');
+					$strQuery .= " ORDER BY CAST(`" . $this->Input->get('order_by') . '` AS DECIMAL) ' . $this->Input->get('sort');
 				}
 				else
 				{
-					$strQuery .= " ORDER BY " . $this->Input->get('order_by') . ' ' . $this->Input->get('sort');
+					$strQuery .= " ORDER BY `" . $this->Input->get('order_by') . '` ' . $this->Input->get('sort');
 				}
 			}
 		}
@@ -1158,7 +1158,7 @@ class ModuleFormdataListing extends Module
 
 			if (count($arrSort)>0)
 			{
-				$strListSort = " ORDER BY " . implode(',', $arrSort);
+				$strListSort = 'ORDER BY ' . implode(',', $arrSort);
 			}
 			else
 			{
@@ -1449,7 +1449,7 @@ class ModuleFormdataListing extends Module
 					$v = $arrRows[$i][$k];
 
 					// do not display some special fields
-					if ( in_array($k, $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'password' )
+					if (in_array($k, $ignoreFields) || $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'password')
 					{
 						continue;
 					}
@@ -1533,18 +1533,18 @@ class ModuleFormdataListing extends Module
 
 					// store also as item
 					$arrListItems[$i][$k] = array(
-							'id'=>$arrRows[$i]['id'],
-							'alias' => $arrRows[$i]['alias'],
-							'name' => $k,
-							'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
-							'content' => ($value ? $value : '&nbsp;'),
-							'raw' => $v,
-							'class' => 'field_' . $j . $ff_class . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
-							'record_class' => str_replace('row_', 'record_', $class),
-							'link_details' => $strLinkDetails,
-							'link_edit' => $strLinkEdit,
-							'link_delete' => $strLinkDelete,
-							'link_export' => $strLinkExport
+						'id'=>$arrRows[$i]['id'],
+						'alias' => $arrRows[$i]['alias'],
+						'name' => $k,
+						'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
+						'content' => ($value ? $value : '&nbsp;'),
+						'raw' => $v,
+						'class' => 'field_' . $j . $ff_class . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
+						'record_class' => str_replace('row_', 'record_', $class),
+						'link_details' => $strLinkDetails,
+						'link_edit' => $strLinkEdit,
+						'link_delete' => $strLinkDelete,
+						'link_export' => $strLinkExport
 					);
 
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
@@ -1820,7 +1820,7 @@ class ModuleFormdataListing extends Module
 									{
 										array_push($fieldvalues, $options[$valuedesc]);
 									}
-									$strVal = join(",\n", $fieldvalues);
+									$strVal = implode(",\n", $fieldvalues);
 								}
 								else
 								{
@@ -1876,15 +1876,15 @@ class ModuleFormdataListing extends Module
 						{
 							$strVal = $this->arrMembers[intval($row[$v])];
 						}
-						if ($v == 'fd_user')
+						elseif ($v == 'fd_user')
 						{
 							$strVal = $this->arrUsers[intval($row[$v])];
 						}
-						if ($v == 'fd_member_group')
+						elseif ($v == 'fd_member_group')
 						{
 							$strVal = $this->arrMemberGroups[intval($row[$v])];
 						}
-						if ($v == 'fd_user_group')
+						elseif ($v == 'fd_user_group')
 						{
 							$strVal = $this->arrUserGroups[intval($row[$v])];
 						}
