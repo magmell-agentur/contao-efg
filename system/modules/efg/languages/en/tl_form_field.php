@@ -60,6 +60,7 @@ $GLOBALS['TL_LANG']['tl_form_field']['name_desc'] = 'File name (descending)';
 $GLOBALS['TL_LANG']['tl_form_field']['date_asc']  = 'Date (ascending)';
 $GLOBALS['TL_LANG']['tl_form_field']['date_desc'] = 'Date (descending)';
 $GLOBALS['TL_LANG']['tl_form_field']['meta']      = 'Meta file (meta.txt)';
+$GLOBALS['TL_LANG']['tl_form_field']['random']    = 'Random order';
 
 $GLOBALS['TL_LANG']['FFL']['efgFormPaginator'] = array('Submit field and page break', 'buttons and page break for a multipage form.');
 
