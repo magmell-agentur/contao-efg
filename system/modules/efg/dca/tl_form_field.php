@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageSortBy'],
 	'exclude'                 => true,
 	'inputType'               => 'select',
-	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'meta'),
+	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'meta', 'random'),
 	'reference'               => &$GLOBALS['TL_LANG']['tl_form_field'],
 	'eval'                    => array('tl_class' => 'w50')
 );
