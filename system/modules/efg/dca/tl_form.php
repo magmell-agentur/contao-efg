@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['efgAliasField'] = array
 	'filter'                  => false,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_form', 'getAliasFormFields'),
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>64)
+	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64)
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['sendConfirmationMail'] = array
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipientField'] = arra
 	'filter'                  => false,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_form', 'getEmailFormFields'),
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50')
+	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50')
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipient'] = array
 (

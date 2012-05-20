@@ -329,7 +329,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => <?php echo ($this->arrForm['key'] == 'feedback' ? 'true' : 'false' ); ?>,
 			'sorting'                 => <?php echo ($this->arrForm['key'] == 'feedback' ? 'true' : 'false' ); ?>,
 			'options_callback'        => array('tl_formdata', 'getFormsSelect'),
-			'eval'                    => array('tl_class'=> 'w50')
+			'eval'                    => array('chosen' => true, 'tl_class'=> 'w50')
 		),
 		'date' => array
 		(
@@ -357,7 +357,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'eval'                    => array('chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMembersSelect'),
 		),
 		'fd_user' => array
@@ -365,7 +365,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'eval'                    => array('chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
 		),
 		'fd_member_group' => array
@@ -373,7 +373,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'eval'                    => array('chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMemberGroupsSelect'),
 		),
 		'fd_user_group' => array
@@ -381,7 +381,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['fd_user_group'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
+			'eval'                    => array('chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUserGroupsSelect'),
 		),
 		'published' => array
@@ -592,6 +592,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['maxlength'] = 10;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['datepicker'] = true;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['tl_class'] = 'wizard';
+<?php endif; ?>
+<?php if (in_array($varVals['type'], array('select','efgLookupSelect','conditionalselect','countryselect','fp_preSelectMenu'))): ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['chosen'] = true;
 <?php endif; ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_id'] = <?php echo $varVals['id']; ?>;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['f_id'] = <?php echo $varVals['pid']; ?>;

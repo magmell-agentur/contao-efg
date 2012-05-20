@@ -197,7 +197,7 @@ class EfgLookupOptionWizard extends Widget {
 
 		// table field used as option label
 		$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_field">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_field'][0] . '</label></h3>
-				<select name="' . $this->strId . '[lookup_field]" id="' . $this->strId . '_lookup_field" class="tl_select" onchange="Backend.autoSubmit(\'tl_form_field\');" onfocus="Backend.getScrollOffset();">';
+				<select name="' . $this->strId . '[lookup_field]" id="' . $this->strId . '_lookup_field" class="tl_select tl_chosen" onchange="Backend.autoSubmit(\'tl_form_field\');" onfocus="Backend.getScrollOffset();">';
 		foreach ($this->arrDbStruct as $strTable => $arrFields)
 		{
 			$return .= '<optgroup label="' . $strTable . '">';
@@ -221,7 +221,7 @@ class EfgLookupOptionWizard extends Widget {
 		if ($strSelectedTable != '' && substr($strSelectedTable, 0, 3)!='fd_' )
 		{
 			$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_val_field">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_val_field'][0] . '</label></h3>';
-			$return .= '<select name="' . $this->strId . '[lookup_val_field]" id="' . $this->strId . '_lookup_val_field" class="tl_select">';
+			$return .= '<select name="' . $this->strId . '[lookup_val_field]" id="' . $this->strId . '_lookup_val_field" class="tl_select tl_chosen">';
 			foreach ($this->arrDbStruct as $strTable => $arrFields)
 			{
 				if ($strSelectedTable == $strTable)
