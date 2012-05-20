@@ -33,7 +33,7 @@
 /**
  * Add palettes to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{comments_legend:hide},efg_com_allow_comments;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,align,space,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{comments_legend:hide},efg_com_allow_comments;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,efg_fe_no_formatted_mail,efg_fe_no_confirmation_mail,align,space,cssID';
 $GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'efg_com_allow_comments';
@@ -164,8 +164,25 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_keep_id'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'clr m12 cbx')
+	'eval'                    => array('tl_class'=>'clr cbx')
 );
+$GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_formatted_mail'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_fe_no_formatted_mail'],
+	'exclude'                 => true,
+	'filter'                  => false,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'clr cbx')
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_confirmation_mail'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_fe_no_confirmation_mail'],
+	'exclude'                 => true,
+	'filter'                  => false,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'clr cbx')
+);
+
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_allow_comments'] = array
 (

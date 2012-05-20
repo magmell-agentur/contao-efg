@@ -108,6 +108,7 @@ class Efp extends Frontend
 
 		$arrFormFields = array();
 
+// NOTE: maybe use form alias instead in upcoming release
 		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
 
 		$this->import('FormData');
@@ -122,11 +123,15 @@ class Efp extends Frontend
 		$intListingId = intval($_SESSION['EFP']['LISTING_MOD']['id']);
 		if ($intListingId)
 		{
-			$objListing = $this->Database->prepare("SELECT id,list_formdata,efg_fe_edit_access,efg_fe_keep_id,efg_DetailsKey FROM tl_module WHERE id=?")
+			$objListing = $this->Database->prepare("SELECT * FROM tl_module WHERE id=?")
 								->execute($intListingId);
 			if ($objListing->numRows)
 			{
 				$arrListing = $objListing->fetchAssoc();
+
+				// mail delivery defined in frontend listing module
+				$arrForm['sendConfirmationMailOnFrontendEditing'] = ($arrListing['efg_fe_no_confirmation_mail']) ? false : true;
+				$arrForm['sendFormattedMailOnFrontendEditing'] = ($arrListing['efg_fe_no_formatted_mail']) ? false : true;
 			}
 		}
 
@@ -158,7 +163,7 @@ class Efp extends Frontend
 
 		if (in_array($arrListing['efg_fe_edit_access'], array('public','groupmembers','member')))
 		{
-			if ( $this->Input->get('act') == 'edit' )
+			if ($this->Input->get('act') == 'edit')
 			{
 				$blnFEedit = true;
 
@@ -179,7 +184,7 @@ class Efp extends Frontend
 		// Types of form fields with storable data
 		$arrFFstorable = $this->FormData->arrFFstorable;
 
-		if ( ($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0 )
+		if (($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0)
 		{
 			$timeNow = time();
 
@@ -403,9 +408,9 @@ class Efp extends Frontend
 			} // end foreach $arrFormFields
 
 			// after frontend editing delete old record
-			if ( $blnFEedit )
+			if ($blnFEedit)
 			{
-				if ( !isset($arrListing['efg_fe_keep_id']) || $arrListing['efg_fe_keep_id'] != "1")
+				if (!isset($arrListing['efg_fe_keep_id']) || $arrListing['efg_fe_keep_id'] != "1")
 				{
 					if ($intNewId > 0 && intval($intOldId)>0 && intval($intNewId) != intval($intOldId))
 					{
@@ -448,6 +453,12 @@ class Efp extends Frontend
 		// end store data in session
 
 		// Confirmation Mail
+
+		if ($blnFEedit && !$arrForm['sendConfirmationMailOnFrontendEditing'])
+		{
+			$arrForm['sendConfirmationMail'] = false;
+		}
+
 		if ($arrForm['sendConfirmationMail'])
 		{
 			$this->import('String');
@@ -796,6 +807,12 @@ class Efp extends Frontend
 		} // End confirmation mail
 
 		// Information (formatted) Mail
+
+		if ($blnFEedit && !$arrForm['sendFormattedMailOnFrontendEditing'])
+		{
+			$arrForm['sendFormattedMail'] = false;
+		}
+
 		if ($arrForm['sendFormattedMail'])
 		{
 			$this->import('String');

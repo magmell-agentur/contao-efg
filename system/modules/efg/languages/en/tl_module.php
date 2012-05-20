@@ -52,6 +52,9 @@ $GLOBALS['TL_LANG']['tl_module']['efg_list_search'] = array('Searchable fields',
 $GLOBALS['TL_LANG']['tl_module']['efg_list_info'] = array('Details page fields', 'Please select the fields you want to show on the details page. Select none to disable the details page feature.');
 $GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'] = array('Icons folder', 'Give in the directory containing your icons. If left blank the icons in folder "system/modules/efg/html/" will be used.');
 $GLOBALS['TL_LANG']['tl_module']['efg_fe_keep_id'] = array('Keep record ID on frontend editing', 'When editing in frontend normally a new record is created and therefore a new ID, then the old one is deleted. Choose this option if you rely on an unchanged record ID.');
+$GLOBALS['TL_LANG']['tl_module']['efg_fe_no_formatted_mail'] = array('Do not send via e-mail (formatted text or html) on frontend editing', 'Choose this option if you want to deactivate the delivery by e-mail (formatted Text / HTML) when editing in frontend.');
+$GLOBALS['TL_LANG']['tl_module']['efg_fe_no_confirmation_mail'] = array('Do not send confirmation via e-mail on frontend editing', 'Choose this option if you want to deactivate the confirmation by e-mail when editing in frontend.');
+
 $GLOBALS['TL_LANG']['tl_module']['efg_list_access'] = array('Display restriction', 'Choose which records should be visible.');
 $GLOBALS['TL_LANG']['tl_module']['efg_DetailsKey'] = array('URL fragment for detail page', 'Instead of the default key "details" you can define another key here used in URL for listing detail page.<br />This way an URL like www.domain.tld/page/<b>info</b>/alias.html can be generated, whereas standard URL would be www.domain.tld/page/<b>details</b>/alias.html');
 $GLOBALS['TL_LANG']['efg_list_access']['public'] = array('Public', 'Each visitor is allowed to see all records.');
