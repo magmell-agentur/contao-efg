@@ -324,7 +324,7 @@ class tl_ext_form extends Backend
 			$k = $objFields->name;
 			$v = $objFields->label;
 			$v = strlen($v) ? $v.' ['.$k.']' : $k;
-			$fields[$k] =$v;
+			$fields[$k] = $v;
 		}
 
 		return $fields;
