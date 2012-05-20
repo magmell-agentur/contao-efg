@@ -610,19 +610,18 @@ class ExtendedForm extends Form
 		// add Javascript to handle html5 input attribute 'required' on back button
 		if ($blnIsHtml5)
 		{
-			$this->Template->fields .= PHP_EOL
-				. '<script>' . PHP_EOL
-				. $this->getBackButtonJavascriptString() . PHP_EOL
-				. '</script>';
+			$this->Template->fields .= '
+<script>' . $this->getBackButtonJavascriptString() . '
+</script>';
 
 		}
 
 		if ($blnAddDateJS)
 		{
-			$this->Template->fields .= PHP_EOL
-				. (($blnIsHtml5) ? '<script>' : '<script type="text/javascript">') . PHP_EOL
-				. $this->getDateString() . PHP_EOL
-				. '</script>';
+			$this->Template->fields .= '
+<script'.((!$blnIsHtml5) ? ' type="text/javascript"' : '') .'>'
+. $this->getDateString() . '
+</script>';
 		}
 
 		return $this->Template->parse();
@@ -632,19 +631,20 @@ class ExtendedForm extends Form
 
 	protected function getBackButtonJavascriptString()
 	{
-		return 'window.addEvent(\'domready\', function(){' . PHP_EOL
-			. '	var elForm = document.id(\'{$this->Template->formId}\');' . PHP_EOL
-			. '	if (elForm){' . PHP_EOL
-			. '		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');' . PHP_EOL
-			. '		if (elBtnBack){' . PHP_EOL
-			. '			elBtnBack.addEvent(\'click\', function(){' . PHP_EOL
-			. '				elForm.getElements(\'input[required]\').each(function(item){' . PHP_EOL
-			. '					item.removeProperty(\'required\');' . PHP_EOL
-			. '				});' . PHP_EOL
-			. '			});' . PHP_EOL
-			. '		}' . PHP_EOL
-			. '	}' . PHP_EOL
-			. '});';
+		return '
+window.addEvent(\'domready\', function(){
+	var elForm = document.id(\'{$this->Template->formId}\');
+	if (elForm){
+		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
+		if (elBtnBack){
+			elBtnBack.addEvent(\'click\', function(){
+				elForm.getElements(\'input[required]\').each(function(item){
+					item.removeProperty(\'required\');
+				});
+			});
+		}
+	}
+});';
 
 	}
 
@@ -657,7 +657,8 @@ class ExtendedForm extends Form
 	 */
 	protected function getDateString()
 	{
-		return 'window.addEvent("domready",function(){'
+		return '
+window.addEvent("domready",function(){'
 			. 'Locale.define("en-US","Date",{'
 				. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
 				. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
