@@ -1084,7 +1084,7 @@ class ModuleFormdataListing extends Module
 
 				if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 				{
-					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
+					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id) AS `' . $field . '`';
 				}
 			}
 		}

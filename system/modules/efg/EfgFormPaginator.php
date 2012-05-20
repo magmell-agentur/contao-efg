@@ -90,6 +90,14 @@ class EfgFormPaginator extends Widget
 	public function generate()
 	{
 
+		global $objPage;
+
+		if ($objPage->outputFormat == 'html5')
+		{
+			$blnIsHtml5 = true;
+		}
+
+
 		$return = '';
 
 		if ($this->efgAddBackButton && (($this->formTotalPages > 1 && $this->formActivePage > 1) || TL_MODE == 'BE'))

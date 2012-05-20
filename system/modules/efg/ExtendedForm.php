@@ -111,6 +111,7 @@ class ExtendedForm extends Form
 		$hasUpload = false;
 		$doNotSubmit = false;
 		$arrSubmitted = array();
+		$blnAddDateJS = true;
 
 		$this->loadDataContainer('tl_form_field');
 		$formId = strlen($this->formID) ? 'auto_'.$this->formID : 'auto_form_'.$this->id;
@@ -148,6 +149,13 @@ class ExtendedForm extends Form
 		{
 			$this->strTemplate = 'form';
 			return parent::compile();
+		}
+
+		global $objPage;
+
+		if ($objPage->outputFormat == 'html5')
+		{
+			$blnIsHtml5 = true;
 		}
 
 		$this->blnAllowSkipRequired = false; // allow form submission, if ALL required fields are empty
@@ -598,8 +606,74 @@ class ExtendedForm extends Form
 			}
 		}
 
+
+		// add Javascript to handle html5 input attribute 'required' on back button
+		if ($blnIsHtml5)
+		{
+			$this->Template->fields .= PHP_EOL
+				. '<script>' . PHP_EOL
+				. $this->getBackButtonJavascriptString() . PHP_EOL
+				. '</script>';
+
+		}
+
+		if ($blnAddDateJS)
+		{
+			$this->Template->fields .= PHP_EOL
+				. (($blnIsHtml5) ? '<script>' : '<script type="text/javascript">') . PHP_EOL
+				. $this->getDateString() . PHP_EOL
+				. '</script>';
+		}
+
 		return $this->Template->parse();
 
 	}
+
+
+	protected function getBackButtonJavascriptString()
+	{
+		return 'window.addEvent(\'domready\', function(){' . PHP_EOL
+			. '	var elForm = document.id(\'{$this->Template->formId}\');' . PHP_EOL
+			. '	if (elForm){' . PHP_EOL
+			. '		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');' . PHP_EOL
+			. '		if (elBtnBack){' . PHP_EOL
+			. '			elBtnBack.addEvent(\'click\', function(){' . PHP_EOL
+			. '				elForm.getElements(\'input[required]\').each(function(item){' . PHP_EOL
+			. '					item.removeProperty(\'required\');' . PHP_EOL
+			. '				});' . PHP_EOL
+			. '			});' . PHP_EOL
+			. '		}' . PHP_EOL
+			. '	}' . PHP_EOL
+			. '});';
+
+	}
+
+
+	/* Return the datepicker string (method is copy from BackendTemplate)
+	 *
+	 * Fix the MooTools more parsers which incorrectly parse ISO-8601 and do
+	 * not handle German date formats at all.
+	 * @return string
+	 */
+	protected function getDateString()
+	{
+		return 'window.addEvent("domready",function(){'
+			. 'Locale.define("en-US","Date",{'
+				. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
+				. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
+				. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
+				. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
+			. '});'
+			. 'Locale.define("en-US","DatePicker",{'
+				. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
+				. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
+				. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
+				. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
+				. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
+				. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
+			. '});'
+		. '});';
+	}
+
 
 }
