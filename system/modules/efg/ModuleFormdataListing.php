@@ -787,7 +787,7 @@ class ModuleFormdataListing extends Module
 			{
 
 				case 'singlefield':
-					if ( strlen($this->Input->get('search')) && strlen($this->Input->get('for')) )
+					if (strlen($this->Input->get('search')) && strlen($this->Input->get('for')))
 					{
 						$varKeyword = '%' . $this->Input->get('for') . '%';
 
@@ -1070,7 +1070,7 @@ class ModuleFormdataListing extends Module
 			foreach ($arrListFields as $field)
 			{
 				// do not display field id
-				if ( $field == 'id' )
+				if ($field == 'id')
 				{
 					continue;
 				}
@@ -1082,7 +1082,7 @@ class ModuleFormdataListing extends Module
 					$strListFields .= ',' . $field;
 				}
 
-				if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
+				if (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 				{
 					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id) AS `' . $field . '`';
 				}
@@ -1245,7 +1245,7 @@ class ModuleFormdataListing extends Module
 
 				$class = '';
 				$sort = 'asc';
-				$strField = strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['label'][0]) ? $label : $arrFields[$i] ;
+				$strField = strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['label'][0]) ? $label : $arrFields[$i];
 
 				if ($this->Input->get('order_by') == $arrFields[$i])
 				{
@@ -1301,7 +1301,7 @@ class ModuleFormdataListing extends Module
 			{
 				$v = $arrFields[$i];
 
-				if (in_array($v, $ignoreFields) )
+				if (in_array($v, $ignoreFields))
 				{
 					continue;
 				}
@@ -1312,11 +1312,11 @@ class ModuleFormdataListing extends Module
 				{
 					$strName = $v;
 				}
-				elseif ( strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]) )
+				elseif (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]))
 				{
 					$strName = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0];
 				}
-				elseif ( strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]) )
+				elseif (strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]))
 				{
 					$strName = $GLOBALS['TL_LANG']['tl_formdata'][$v][0];
 				}
@@ -1388,7 +1388,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnEditAllowed = false;
 				}
-				elseif($this->efg_fe_edit_access == 'public')
+				elseif ($this->efg_fe_edit_access == 'public')
 				{
 					$blnEditAllowed = true;
 				}
@@ -1406,7 +1406,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnDeleteAllowed = false;
 				}
-				elseif($this->efg_fe_delete_access == 'public')
+				elseif ($this->efg_fe_delete_access == 'public')
 				{
 					$blnDeleteAllowed = true;
 				}
@@ -1424,7 +1424,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnExportAllowed = false;
 				}
-				elseif($this->efg_fe_export_access == 'public')
+				elseif ($this->efg_fe_export_access == 'public')
 				{
 					$blnExportAllowed = true;
 				}
