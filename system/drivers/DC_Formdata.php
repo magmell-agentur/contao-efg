@@ -1364,7 +1364,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 					// field types radio, select, multi checkbox
 					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
-							|| ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+							|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']))
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
 						{
@@ -1489,6 +1489,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 							}
 							else
 							{
+
 								// prepare values
 								$arrNewValues = array();
 
@@ -1498,7 +1499,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 									$strK = false;
 	 								if (strlen($vVal) && $strK == false)
 	 								{
-
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
 										{
@@ -1709,7 +1709,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 				$return .= "\n" . '</fieldset>';
 			}
 		}
-
 
 		$version = '';
 
