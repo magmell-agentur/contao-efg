@@ -264,7 +264,7 @@ class tl_formdata extends Backend
 		$strName = 'feedback';
 		$strFileName = 'tl_formdata';
 
-		// fix config for xdependantcalendarfields
+		// fix config for xdependentcalendarfields
 		$GLOBALS['BE_FFL']['xdependentcalendarfields'] = 'TextField';
 
 		if ($varFormKey != '' && is_string($varFormKey))
