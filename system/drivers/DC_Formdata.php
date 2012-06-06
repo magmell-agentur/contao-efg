@@ -2633,6 +2633,7 @@ window.addEvent(\'domready\', function() {
 		// Save the value if there was no error
 		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
 		{
+
 			// If the field is a fallback field, empty all other columns
 			if ($arrField['eval']['fallback'] && $varValue != '')
 			{
