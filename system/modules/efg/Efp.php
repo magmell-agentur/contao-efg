@@ -475,9 +475,11 @@ class Efp extends Frontend
 			$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			$sender = $arrForm['confirmationMailSender'];
-			if (strlen($sender)){
+			if (strlen($sender))
+			{
 				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-				if (strpos($sender, '<')>0) {
+				if (strpos($sender, '<')>0)
+				{
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
 					$sender = $parts[2];
 					$senderName = trim($parts[1]);
@@ -505,10 +507,10 @@ class Efp extends Frontend
 			$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
 			$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
-			if ( $messageHtmlTmpl != '' )
+			if ($messageHtmlTmpl != '')
 			{
 				$fileTemplate = new File($messageHtmlTmpl);
-				if ( $fileTemplate->mime == 'text/html' )
+				if ($fileTemplate->mime == 'text/html')
 				{
 					$messageHtml = $fileTemplate->getContent();
 				}
@@ -539,7 +541,6 @@ class Efp extends Frontend
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
@@ -547,7 +548,6 @@ class Efp extends Frontend
 			// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
-	 			//$elements = explode('::', str_replace(array('{{', '}}'), array('', ''), $tag));
 				$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 
 				switch (strtolower($elements[0]))
@@ -781,6 +781,7 @@ class Efp extends Frontend
 				{
 					if(strlen($recipient))
 					{
+						$recipient = $this->replaceInsertTags($recipient);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
 						if (strpos($recipient, '<')>0)
@@ -887,7 +888,6 @@ class Efp extends Frontend
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
- 			//preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
@@ -895,7 +895,6 @@ class Efp extends Frontend
 			// .. {{form::fieldname?label=Label for this field: }}
 	 		foreach ($tags[0] as $tag)
 	 		{
-	 			//$elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
 	 			$elements = explode('::', trim(str_replace(array('__BRCL__', '__BRCR__'), array('', ''), $tag)));
 	 			switch (strtolower($elements[0]))
 	 			{
@@ -1123,8 +1122,9 @@ class Efp extends Frontend
 			{
 				foreach ($arrRecipient as $recipient)
 				{
-					if(strlen($recipient))
+					if (strlen($recipient))
 					{
+						$recipient = $this->replaceInsertTags($recipient);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
 						if (strpos($recipient, '<')>0)
