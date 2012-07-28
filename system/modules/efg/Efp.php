@@ -146,7 +146,6 @@ class Efp extends Frontend
 
 		$strUrl = preg_replace('/\?.*$/', '', $this->Environment->request);
 		$strUrlParams = '';
-		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
 		$blnQuery = false;
 		foreach (preg_split('/&(amp;)?/', $_SERVER['QUERY_STRING']) as $fragment)
