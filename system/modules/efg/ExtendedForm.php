@@ -631,20 +631,23 @@ class ExtendedForm extends Form
 
 	protected function getBackButtonJavascriptString()
 	{
+//TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
 		return '
-window.addEvent(\'domready\', function(){
-	var elForm = document.id(\'{$this->Template->formId}\');
-	if (elForm){
-		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
-		if (elBtnBack){
-			elBtnBack.addEvent(\'click\', function(){
-				elForm.getElements(\'input[required]\').each(function(item){
-					item.removeProperty(\'required\');
+if(typeof(window.addEvent=="function")){
+	window.addEvent(\'domready\', function(){
+		var elForm = document.id(\'{$this->Template->formId}\');
+		if (elForm){
+			var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
+			if (elBtnBack){
+				elBtnBack.addEvent(\'click\', function(){
+					elForm.getElements(\'input[required]\').each(function(item){
+						item.removeProperty(\'required\');
+					});
 				});
-			});
+			}
 		}
-	}
-});';
+	});
+}';
 
 	}
 
@@ -657,7 +660,9 @@ window.addEvent(\'domready\', function(){
 	 */
 	protected function getDateString()
 	{
+//TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
 		return '
+if(typeof(window.addEvent=="function")){
 window.addEvent("domready",function(){'
 			. 'Locale.define("en-US","Date",{'
 				. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
@@ -673,7 +678,8 @@ window.addEvent("domready",function(){'
 				. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
 				. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
 			. '});'
-		. '});';
+		. '});'
+		.'}';
 	}
 
 
