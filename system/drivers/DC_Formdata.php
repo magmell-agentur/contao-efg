@@ -265,7 +265,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		// get all forms marked to store data
 		$objForms = $this->Database->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
 										->execute("1");
-		if ( !$this->arrStoreForms )
+		if (!$this->arrStoreForms)
 		{
 			while ($objForms->next())
 			{
@@ -856,13 +856,13 @@ class DC_Formdata extends DataContainer implements listable, editable
 					);
 
    					// default value
-   					if ( strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) )
+   					if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
    					{
    						$strVal = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default'];
    					}
 
 					// default value in case of field type checkbox, select, radio
-   					if ( is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default'])>0 )
+   					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) > 0)
    					{
    						$strVal = implode(',', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']);
    					}
@@ -1199,7 +1199,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		// Get current record
 		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
-		if ( $sqlWhere != '')
+		if ($sqlWhere != '')
 		{
 			$sqlQuery .= $sqlWhere;
 		}
@@ -1364,9 +1364,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 					// field types radio, select, multi checkbox
 					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
-							|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']))
+							|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
-						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
+						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
 							if ($this->strField == 'fd_user')
 							{
@@ -1456,7 +1456,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 								{
 									$blnAlias = $this->Database->fieldExists('alias', $strForeignTable);
 
-									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . ( strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '' ) . " ORDER BY " . $strForeignField;
+									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . (strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '') . " ORDER BY " . $strForeignField;
 
 									$objForeign = $this->Database->prepare($sqlForeign)->execute();
 
@@ -1465,9 +1465,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 										$arrForeignRecords = $objForeign->fetchAllAssoc();
 										if (!empty($arrForeignRecords))
 										{
-											foreach ($arrForeignRecords as $arrForeignRecord )
+											foreach ($arrForeignRecords as $arrForeignRecord)
 											{
-												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . ( ($blnAlias && strlen($arrForeignRecord['alias'])) ? $arrForeignRecord['alias'] : $arrForeignRecord['id'] ) . '~]';
+												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . (($blnAlias && strlen($arrForeignRecord['alias'])) ? $arrForeignRecord['alias'] : $arrForeignRecord['id']) . '~]';
 											}
 										}
 										unset($arrForeignRecords);
@@ -1489,7 +1489,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 							}
 							else
 							{
-
 								// prepare values
 								$arrNewValues = array();
 
@@ -1499,6 +1498,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 									$strK = false;
 	 								if (strlen($vVal) && $strK == false)
 	 								{
+
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
 										{
@@ -1709,6 +1709,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 				$return .= "\n" . '</fieldset>';
 			}
 		}
+
 
 		$version = '';
 
@@ -2004,9 +2005,9 @@ window.addEvent(\'domready\', function() {
 					}
 
 					// field types radio, select, multi checkbox
-					elseif ( $strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ( $strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] ) )
+					elseif ($strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ($strInputType=='checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']))
 					{
-						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields) )
+						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
 							if ($this->strField == 'fd_user')
 							{
@@ -2080,7 +2081,7 @@ window.addEvent(\'domready\', function() {
 										{
 											foreach ($arrForeignRecords as $arrForeignRecord )
 											{
-												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] .  ' [~' . $arrForeignRecord['id'] . '~]';
+												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . $arrForeignRecord['id'] . '~]';
 											}
 										}
 										unset($arrForeignRecords);
@@ -2095,7 +2096,7 @@ window.addEvent(\'domready\', function() {
 								{
 									$blnAlias = $this->Database->fieldExists('alias', $strForeignTable);
 
-									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . ( strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '' ) . " ORDER BY " . $strForeignField;
+									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . (strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '') . " ORDER BY " . $strForeignField;
 
 									$objForeign = $this->Database->prepare($sqlForeign)->execute();
 
@@ -2106,7 +2107,7 @@ window.addEvent(\'domready\', function() {
 										{
 											foreach ($arrForeignRecords as $arrForeignRecord )
 											{
-												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . ( ($blnAlias && strlen($arrForeignRecord['alias'])) ? $arrForeignRecord['alias'] : $arrForeignRecord['id'] ) . '~]';
+												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . (($blnAlias && strlen($arrForeignRecord['alias'])) ? $arrForeignRecord['alias'] : $arrForeignRecord['id']) . '~]';
 											}
 										}
 										unset($arrForeignRecords);
@@ -2260,7 +2261,8 @@ window.addEvent(\'domready\', function() {
 							{
 								$this->varValue = explode('|', $this->varValue);
 							}
-							foreach ($this->varValue as $k => $v) {
+							foreach ($this->varValue as $k => $v)
+							{
 								$sNewVal = array_search($v, $arrNewOptions);
 								if ($sNewVal)
 								{
@@ -2296,7 +2298,8 @@ window.addEvent(\'domready\', function() {
 							{
 								$this->varValue = explode('|', $this->varValue);
 							}
-							foreach ($this->varValue as $k => $v) {
+							foreach ($this->varValue as $k => $v)
+							{
 								$sNewVal = array_search($v, $arrNewOptions);
 								if ($sNewVal)
 								{
@@ -2332,7 +2335,7 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 					}
 					// input type efgLookupSelect: modify DCA to render as SelectMenu
-					elseif ( $strInputType=='efgLookupSelect' )
+					elseif ($strInputType=='efgLookupSelect')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 					}
@@ -2346,12 +2349,12 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupCheckbox';
 					}
 					// input type efgLookupRadio: reset DCA inputType
-					elseif ( $strInputType=='efgLookupRadio' )
+					elseif ($strInputType=='efgLookupRadio')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupRadio';
 					}
 					// input type efgLookupSelect: reset DCA inputType
-					elseif ( $strInputType=='efgLookupSelect' )
+					elseif ($strInputType=='efgLookupSelect')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupSelect';
 					}
@@ -2597,8 +2600,8 @@ window.addEvent(\'domready\', function() {
 				$arrVals = array("1");
 			}
 
-			if (strlen($varValue)) {
-
+			if (strlen($varValue))
+			{
 				$varValue =  $arrVals[0];
 			}
 			else
@@ -2633,7 +2636,6 @@ window.addEvent(\'domready\', function() {
 		// Save the value if there was no error
 		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
 		{
-
 			// If the field is a fallback field, empty all other columns
 			if ($arrField['eval']['fallback'] && $varValue != '')
 			{
@@ -2934,7 +2936,7 @@ window.addEvent(\'domready\', function() {
 				//$strProcField = substr($vProc, 0, strpos($vProc, '='));
 				$arrParts = preg_split('/[\s=><\!]/si', $vProc);
 				$strProcField = $arrParts[0];
-				if ( in_array($strProcField, $this->arrDetailFields) )
+				if (in_array($strProcField, $this->arrDetailFields))
 				{
 					$arrProcedure[$kProc] = "(SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id)=?";
 				}
@@ -3443,7 +3445,8 @@ window.addEvent(\'domready\', function() {
 		foreach ($searchFields as $field)
 		{
 			$option_label = strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0] : $GLOBALS['TL_LANG']['MSC'][$field];
-			$options_sorter[utf8_romanize($option_label).'_'.$field] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$this->strTable]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';		}
+			$options_sorter[utf8_romanize($option_label).'_'.$field] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$this->strTable]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';
+		}
 
 		// Sort by option values
 		$options_sorter = natcaseksort($options_sorter);
@@ -3607,7 +3610,7 @@ window.addEvent(\'domready\', function() {
 				{
 					$arrParts = preg_split('/[\s=><\!]/si', $vProc);
 					$strProcField = $arrParts[0];
-					if (in_array($strProcField, $this->arrDetailFields) )
+					if (in_array($strProcField, $this->arrDetailFields))
 					{
 						$arrProcedure[$kProc] = "(SELECT value FROM tl_formdata_details WHERE ff_name='" . $strProcField . "' AND pid=f.id)=?";
 					}
@@ -4342,15 +4345,15 @@ window.addEvent(\'domready\', function() {
 			{
 				$value = $this->arrMembers[$value];
 			}
-			if ($k == 'fd_user')
+			elseif ($k == 'fd_user')
 			{
 				$value = $this->arrUsers[$value];
 			}
-			if ($k == 'fd_member_group')
+			elseif ($k == 'fd_member_group')
 			{
 				$value = $this->arrMemberGroups[$value];
 			}
-			if ($k == 'fd_user_group')
+			elseif ($k == 'fd_user_group')
 			{
 				$value = $this->arrUserGroups[$value];
 			}
@@ -4393,7 +4396,7 @@ window.addEvent(\'domready\', function() {
 		// Get current record
 		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
-		if ( $sqlWhere != '')
+		if ($sqlWhere != '')
 		{
 			$sqlQuery .= $sqlWhere;
 		}
@@ -4421,7 +4424,7 @@ window.addEvent(\'domready\', function() {
 			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields'] as $strField)
 			{
 				if ($intFormId > 0) break;
-				if(strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
+				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
 				{
 					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']);
 					$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")
@@ -4537,10 +4540,10 @@ window.addEvent(\'domready\', function() {
 		$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
 		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 
-		if ( $messageHtmlTmpl != '' )
+		if ($messageHtmlTmpl != '')
 		{
 			$fileTemplate = new File($messageHtmlTmpl);
-			if ( $fileTemplate->mime == 'text/html' )
+			if ($fileTemplate->mime == 'text/html')
 			{
 				$messageHtml = $fileTemplate->getContent();
 			}
@@ -4807,13 +4810,13 @@ window.addEvent(\'domready\', function() {
 		{
 			$confEmail->imageDir = $dirImages;
 		}
-		if ( $messageText != '' )
+		if ($messageText != '')
 		{
 			$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
 			$messageText = strip_tags($messageText);
 			$confEmail->text = $messageText;
 		}
-		if ( $messageHtml != '' )
+		if ($messageHtml != '')
 		{
 			$confEmail->html = $messageHtml;
 		}
@@ -5594,7 +5597,7 @@ var Stylect = {
 		if (strlen($session['search'][$strSessionKey]['value']))
 		{
 			$sqlSearchField = $session['search'][$strSessionKey]['field'];
-			if (in_array($sqlSearchField, $this->arrDetailFields) )
+			if (in_array($sqlSearchField, $this->arrDetailFields))
 			{
 				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $session['search'][$strSessionKey]['field'] .'\' AND pid=f.id)';
 			}
@@ -5606,7 +5609,7 @@ var Stylect = {
 		$arrFilterFields = array();
 		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
 		{
-			if ($v['filter'] )
+			if ($v['filter'])
 			{
 				$arrFilterFields[] = $k;
 			}
@@ -5808,7 +5811,7 @@ var Stylect = {
 					$intColCounter = -1;
 					foreach ($showFields as $k=>$v)
 					{
-						if (in_array($v, $ignoreFields) )
+						if (in_array($v, $ignoreFields))
 						{
 							continue;
 						}
@@ -5819,11 +5822,11 @@ var Stylect = {
 						{
 							$strName = $v;
 						}
-						elseif ( strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]) )
+						elseif (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]))
 						{
 							$strName = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0];
 						}
-						elseif ( strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]) )
+						elseif (strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]))
 						{
 							$strName = $GLOBALS['TL_LANG']['tl_formdata'][$v][0];
 						}
@@ -5884,7 +5887,7 @@ var Stylect = {
 				foreach ($showFields as $k=>$v)
 				{
 
-					if (in_array($v, $ignoreFields) )
+					if (in_array($v, $ignoreFields))
 					{
 						continue;
 					}
@@ -5896,15 +5899,15 @@ var Stylect = {
 
 					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'date' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'datim' && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
 					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
