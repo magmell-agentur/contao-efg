@@ -856,16 +856,19 @@ class DC_Formdata extends DataContainer implements listable, editable
 					);
 
    					// default value
-   					if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
-   					{
-   						$strVal = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default'];
-   					}
-
-					// default value in case of field type checkbox, select, radio
-   					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']) > 0)
-   					{
-   						$strVal = implode(',', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']);
-   					}
+					if (!empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
+					{
+						// default value in case of field type checkbox, select, radio
+						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
+						{
+							$strVal = implode(',', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']);
+						}
+						// default value in case of other fields
+						else
+						{
+							$strVal = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default'];
+						}
+					}
 
 					$arrDetailSet['value'] = $strVal;
 
