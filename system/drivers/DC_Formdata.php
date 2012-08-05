@@ -750,9 +750,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 
 			// Get the field label
-			if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']))
+			if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']))
 			{
-				$label = is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
+				$label = is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'];
 			}
 			else
 			{
