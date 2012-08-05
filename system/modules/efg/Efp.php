@@ -533,6 +533,14 @@ class Efp extends Frontend
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
+			if (strlen($senderName))
+			{
+				$senderName = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $senderName);
+			}
+			foreach ($arrRecipient as $keyRcpt => $recipient)
+			{
+				$arrRecipient[$keyRcpt] = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $recipient);
+			}
 
 			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
@@ -540,7 +548,7 @@ class Efp extends Frontend
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
-			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender . $senderName . implode(' ', $arrRecipient), $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
@@ -660,6 +668,17 @@ class Efp extends Frontend
 							$sender = str_replace($tag, $strVal, $sender);
 						}
 
+						// replace insert tags in sender name
+						if (strlen($senderName))
+						{
+							$senderName = str_replace($tag, $strVal, $senderName);
+						}
+
+						// replace insert tags in recipients
+						foreach ($arrRecipient as $keyRcpt => $recipient)
+						{
+							$arrRecipient[$keyRcpt] = str_replace($tag, $strVal, $recipient);
+						}
  					break;
 				}
 			} // foreach tags
@@ -699,14 +718,24 @@ class Efp extends Frontend
 			if (strlen($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
-				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
+				$sender = trim($this->replaceInsertTags($sender));
 			}
-
+			// replace insert tags in sender name
+			if (strlen($senderName))
+			{
+				$senderName = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $senderName);
+				$senderName = trim($this->replaceInsertTags($senderName));
+			}
 			// replace insert tags in replyto
 			if (strlen($arrForm['confirmationMailReplyto']))
 			{
 				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto']);
+			}
+			// replace insert tags in recipients
+			foreach ($arrRecipient as $keyRcpt => $recipient)
+			{
+				$arrRecipient[$keyRcpt] = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $recipient);
+				$arrRecipient[$keyRcpt] = trim($this->replaceInsertTags($arrRecipient[$keyRcpt]));
 			}
 
 			$confEmail = new Email();
@@ -880,6 +909,14 @@ class Efp extends Frontend
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
+			if (strlen($senderName))
+			{
+				$senderName = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $senderName);
+			}
+			foreach ($arrRecipient as $keyRcpt => $recipient)
+			{
+				$arrRecipient[$keyRcpt] = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $recipient);
+			}
 
 			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
 			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
@@ -887,7 +924,7 @@ class Efp extends Frontend
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
-			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
+			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender . $senderName . implode(' ', $arrRecipient), $tags);
 
 	 		// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
@@ -922,9 +959,9 @@ class Efp extends Frontend
 							$strLabel = $arrTagParams['label'];
 						}
 
-						if ( in_array($strType, $arrFFstorable) )
+						if (in_array($strType, $arrFFstorable))
 						{
-							if ( $strType == 'efgImageSelect' )
+							if ($strType == 'efgImageSelect')
 							{
 								$strVal = '';
 								$varVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
@@ -946,7 +983,6 @@ class Efp extends Frontend
 								{
 									$strLabel = '';
 								}
-
 								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
 			 					$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
@@ -967,6 +1003,7 @@ class Efp extends Frontend
 								{
 									$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
+
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -1003,6 +1040,18 @@ class Efp extends Frontend
 						if (strlen($sender))
 						{
 							$sender = str_replace($tag, $strVal, $sender);
+						}
+
+						// replace insert tags in sender name
+						if (strlen($senderName))
+						{
+							$senderName = str_replace($tag, $strVal, $senderName);
+						}
+
+						// replace insert tags in recipients
+						foreach ($arrRecipient as $keyRcpt => $recipient)
+						{
+							$arrRecipient[$keyRcpt] = str_replace($tag, $strVal, $recipient);
 						}
 
  					break;
@@ -1043,8 +1092,19 @@ class Efp extends Frontend
 			if (strlen($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
-				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
+				$sender = trim($this->replaceInsertTags($sender));
+			}
+			// replace insert tags in sender name
+			if (strlen($senderName))
+			{
+				$senderName = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $senderName);
+				$senderName = trim($this->replaceInsertTags($senderName));
+			}
+			// replace insert tags in recipients
+			foreach ($arrRecipient as $keyRcpt => $recipient)
+			{
+				$arrRecipient[$keyRcpt] = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $recipient);
+				$arrRecipient[$keyRcpt] = trim($this->replaceInsertTags($arrRecipient[$keyRcpt]));
 			}
 
 			$infoEmail = new Email();
