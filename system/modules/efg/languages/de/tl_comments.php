@@ -12,4 +12,4 @@
  */
 
 
-$GLOBALS['TL_LANG']['tl_comments']['tl_formdata'] = "Formulardaten";
+$GLOBALS['TL_LANG']['tl_comments']['tl_formdata'] = 'Formulardaten';
