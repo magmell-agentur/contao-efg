@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
@@ -15,9 +15,8 @@
 /**
  * Namespace
  */
-namespace efg;
+namespace Efg;
 
-// TODO:
 /**
  * Class DC_Formdata
  * modified version of DC_Table by Leo Feyer
@@ -25,7 +24,7 @@ namespace efg;
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
  * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
- * @package    efg
+ * @package    Efg
  */
 class DC_Formdata extends DataContainer implements listable, editable
 {
@@ -6258,5 +6257,3 @@ var Stylect = {
 	}
 
 }
-
-?>

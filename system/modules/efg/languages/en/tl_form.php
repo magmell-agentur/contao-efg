@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
@@ -39,5 +39,3 @@ $GLOBALS['TL_LANG']['tl_form']['formattedMailTemplate'] = array('HTML-template f
 $GLOBALS['TL_LANG']['tl_form']['efgStoreFormdata_legend'] = '(EFG) Store form data';
 $GLOBALS['TL_LANG']['tl_form']['efgSendFormattedMail_legend'] = '(EFG) Send via e-mail';
 $GLOBALS['TL_LANG']['tl_form']['efgSendConfirmationMail_legend'] = '(EFG) Send confirmation via e-mail';
-
-?>

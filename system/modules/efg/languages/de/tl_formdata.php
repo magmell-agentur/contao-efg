@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
@@ -90,5 +90,3 @@ $GLOBALS['TL_LANG']['tl_formdata']['confirmation_legend'] = "Bestätigungs-Mail"
 $GLOBALS['TL_LANG']['tl_formdata']['fdNotes_legend'] = "Bemerkung";
 $GLOBALS['TL_LANG']['tl_formdata']['fdOwner_legend'] = "Besitzer";
 $GLOBALS['TL_LANG']['tl_formdata']['fdDetails_legend'] = "Details";
-
-?>

@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
@@ -234,5 +234,3 @@ $GLOBALS['TL_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['TL_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
 $GLOBALS['TL_FFL']['efgImageSelect'] = 'EfgFormImageSelect';
 $GLOBALS['TL_FFL']['efgFormPaginator'] = 'EfgFormPaginator';
-
-?>

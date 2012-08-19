@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
@@ -101,5 +101,3 @@ $GLOBALS['TL_LANG']['efg_fe_export_access']['member']['0'] = "Besitzer";
 $GLOBALS['TL_LANG']['efg_fe_export_access']['member']['1'] = "Mitglieder dürfen nur ihre eigenen Daten exportieren.";
 $GLOBALS['TL_LANG']['efg_fe_export_access']['groupmembers']['0'] = "Gruppen-Mitglieder";
 $GLOBALS['TL_LANG']['efg_fe_export_access']['groupmembers']['1'] = "Mitglieder dürfen ihre eigenen und die Daten ihrer Gruppen-Mitglieder exportieren.";
-
-?>

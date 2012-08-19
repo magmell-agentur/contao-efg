@@ -646,5 +646,3 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 	}
 
 }
-
-?>
