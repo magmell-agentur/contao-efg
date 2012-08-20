@@ -1,33 +1,21 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
+ *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * Formerly known as TYPOlight Open Source CMS.
- *
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * PHP version 5
- * @copyright  Leo Feyer 2005-2012
- * @author     Leo Feyer <http://www.contao.org>
- * @package    System
- * @license    LGPL
- * @filesource
+ * @package   Efg
+ * @author    Thomas Kuhn <mail@th-kuhn.de>
+ * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @copyright Thomas Kuhn 2007-2012
  */
 
+
+/**
+ * Namespace
+ */
+namespace Efg;
 
 /**
  * Class DC_Formdata
@@ -36,7 +24,7 @@
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
  * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
- * @package    efg
+ * @package    Efg
  */
 class DC_Formdata extends DataContainer implements listable, editable
 {
@@ -750,9 +738,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 
 			// Get the field label
-			if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']))
+			if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']))
 			{
-				$label = is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'];
+				$label = is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
 			}
 			else
 			{
@@ -6269,5 +6257,3 @@ var Stylect = {
 	}
 
 }
-
-?>

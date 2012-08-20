@@ -1,33 +1,14 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
  *
- * Formerly known as TYPOlight Open Source CMS.
+ * Copyright (C) 2005-2012 Leo Feyer
  *
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * Language file for table tl_formdata (en).
- *
- * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
- * @author     Thomas Kuhn <mail@th-kuhn.de>
- * @package    efg
- * @license    LGPL
- * @filesource
+ * @package   Efg
+ * @author    Thomas Kuhn <mail@th-kuhn.de>
+ * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @copyright Thomas Kuhn 2007-2012
  */
 
 
@@ -93,5 +74,3 @@ $GLOBALS['TL_LANG']['tl_formdata']['confirmation_legend'] = "Confirmation mail";
 $GLOBALS['TL_LANG']['tl_formdata']['fdNotes_legend'] = "Notes";
 $GLOBALS['TL_LANG']['tl_formdata']['fdOwner_legend'] = "Owner";
 $GLOBALS['TL_LANG']['tl_formdata']['fdDetails_legend'] = "Details";
-
-?>
