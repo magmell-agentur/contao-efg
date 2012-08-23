@@ -55,5 +55,4 @@ class FormDataComments extends Backend
 		return $strRet;
 	}
 
-
 }
