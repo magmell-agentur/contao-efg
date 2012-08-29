@@ -184,7 +184,7 @@ class ModuleFormdataListing extends Module
 		$this->getUserGroups();
 
 		$this->import('FrontendUser', 'Member');
-		$this->import('FormData');
+		$this->import('Formdata');
 
 		// check list access
 		if (strlen($this->efg_list_access))
@@ -548,8 +548,8 @@ class ModuleFormdataListing extends Module
 			$arrHookData = array();
 			$arrHookDataColumns = array();
 
-			$useFormValues = $this->FormData->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
-			$useFieldNames = $this->FormData->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
+			$useFormValues = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
+			$useFieldNames = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 			$this->blnExportUTF8Decode = true;
 			if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
@@ -2544,8 +2544,8 @@ class ModuleFormdataListing extends Module
 		$strExpEncl = '"';
 		$strExpSep = '';
 
-		$useFormValues = $this->FormData->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
-		$useFieldNames = $this->FormData->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
+		$useFormValues = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
+		$useFieldNames = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 		$blnCustomXlsExport = false;
 		$arrHookData = array();

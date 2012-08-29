@@ -102,8 +102,8 @@ class Efp extends Frontend
 // NOTE: maybe use form alias instead in upcoming release
 		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
 
-		$this->import('FormData');
-		$this->FormData->FdDcaKey = $this->strFdDcaKey;
+		$this->import('Formdata');
+		$this->Formdata->FdDcaKey = $this->strFdDcaKey;
 
 		$this->import('FrontendUser', 'Member');
 		$this->import('String');
@@ -172,7 +172,7 @@ class Efp extends Frontend
 		}
 
 		// Types of form fields with storable data
-		$arrFFstorable = $this->FormData->arrFFstorable;
+		$arrFFstorable = $this->Formdata->arrFFstorable;
 
 		if (($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0)
 		{
@@ -181,7 +181,7 @@ class Efp extends Frontend
 			$this->loadDataContainer($this->strFdDcaKey);
 			$this->loadDataContainer('tl_formdata_details');
 
-			$arrFormFields = $this->FormData->getFormfieldsAsArray($arrForm['id']);
+			$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
 			$arrBaseFields = array();
 			$arrDetailFields = array();
@@ -234,7 +234,7 @@ class Efp extends Frontend
 			// if frontend editing, get old record
 			if ($intOldId > 0)
 			{
-				$arrOldData = $this->FormData->getFormdataAsArray($intOldId);
+				$arrOldData = $this->Formdata->getFormdataAsArray($intOldId);
 				$arrOldFormdata = $arrOldData['fd_base'];
 				$arrOldFormdataDetails = $arrOldData['fd_details'];
 			}
@@ -351,7 +351,7 @@ class Efp extends Frontend
 						$arrField['dateFormat'] = $arrField['xdateformat'];
 					}
 
-					$strVal = $this->FormData->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
+					$strVal = $this->Formdata->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
 
 					// special treatment for type upload
 					// if frontend editing and no new upload, keep old file
@@ -414,7 +414,7 @@ class Efp extends Frontend
 			}
 
 			// auto generate alias
-			$strAlias = $this->FormData->generateAlias($arrOldFormdata['alias'], $arrForm['title'], $intNewId);
+			$strAlias = $this->Formdata->generateAlias($arrOldFormdata['alias'], $arrForm['title'], $intNewId);
 			if (strlen($strAlias))
 			{
 				$arrUpd = array('alias' => $strAlias);
@@ -434,7 +434,7 @@ class Efp extends Frontend
 			$strVal = '';
 			if (in_array($strType, $arrFFstorable))
 			{
-				$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$k], $arrField, $arrFiles[$k], $blnSkipEmpty);
+				$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$k], $arrField, $arrFiles[$k], $blnSkipEmpty);
 			}
 
 			$_SESSION['EFP']['FORMDATA'][$k] = $strVal;
@@ -525,9 +525,9 @@ class Efp extends Frontend
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
 
-			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
-			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
-			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
+			$blnEvalSubject = $this->Formdata->replaceConditionTags($subject);
+			$blnEvalMessageText = $this->Formdata->replaceConditionTags($messageText);
+			$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
@@ -551,7 +551,7 @@ class Efp extends Frontend
  						$arrTagParams = null;
 						if (isset($arrKey[1]) && strlen($arrKey[1]))
 						{
-							$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+							$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 						}
 
  						$arrField = $arrFormFields[$strKey];
@@ -572,7 +572,7 @@ class Efp extends Frontend
 							if ( $strType == 'efgImageSelect' )
 							{
 								$strVal = '';
-								$varVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$varTxt = array();
 								$varHtml = array();
 								if (is_string($varVal)) $varVal = array($varVal);
@@ -611,7 +611,7 @@ class Efp extends Frontend
 								}
 								else
 								{
-									$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+									$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
@@ -622,7 +622,7 @@ class Efp extends Frontend
 							}
 							else
 							{
-								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -662,7 +662,7 @@ class Efp extends Frontend
 				$messageText = $this->replaceInsertTags($messageText);
 				if ($blnEvalMessageText)
 				{
-					$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+					$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
 				}
 				$messageText = strip_tags($messageText);
 			}
@@ -673,7 +673,7 @@ class Efp extends Frontend
 				$messageHtml = $this->replaceInsertTags($messageHtml);
 				if ($blnEvalMessageHtml)
 				{
-					$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
 			// replace insert tags in subject
@@ -683,7 +683,7 @@ class Efp extends Frontend
 				$subject = $this->replaceInsertTags($subject);
 				if ($blnEvalSubject)
 				{
-					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+					$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
 			// replace insert tags in sender
@@ -872,9 +872,9 @@ class Efp extends Frontend
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
 
-			$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
-			$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
-			$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
+			$blnEvalSubject = $this->Formdata->replaceConditionTags($subject);
+			$blnEvalMessageText = $this->Formdata->replaceConditionTags($messageText);
+			$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
 	 		$tags = array();
@@ -897,7 +897,7 @@ class Efp extends Frontend
  						$arrTagParams = null;
 						if (isset($arrKey[1]) && strlen($arrKey[1]))
 						{
-							$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+							$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 						}
 
  						$arrField = $arrFormFields[$strKey];
@@ -918,7 +918,7 @@ class Efp extends Frontend
 							if ( $strType == 'efgImageSelect' )
 							{
 								$strVal = '';
-								$varVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$varTxt = array();
 								$varHtml = array();
 								if (is_string($varVal)) $varVal = array($varVal);
@@ -956,7 +956,7 @@ class Efp extends Frontend
 								}
 								else
 								{
-									$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+									$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
@@ -967,7 +967,7 @@ class Efp extends Frontend
 							}
 							else
 							{
-								$strVal = $this->FormData->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -1007,7 +1007,7 @@ class Efp extends Frontend
 				$messageText = $this->replaceInsertTags($messageText);
 				if ($blnEvalMessageText)
 				{
-					$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+					$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
 				}
 				$messageText = strip_tags($messageText);
 			}
@@ -1017,7 +1017,7 @@ class Efp extends Frontend
 				$messageHtml = $this->replaceInsertTags($messageHtml);
 				if ($blnEvalMessageHtml)
 				{
-					$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
 			// replace insert tags in subject
@@ -1027,7 +1027,7 @@ class Efp extends Frontend
 				$subject = $this->replaceInsertTags($subject);
 				if ($blnEvalSubject)
 				{
-					$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+					$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
 			// replace insert tags in sender
@@ -1173,8 +1173,8 @@ class Efp extends Frontend
 				$blnSkipEmpty = true;
 			}
 
-			$this->import('FormData');
-			$arrFormFields = $this->FormData->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
+			$this->import('Formdata');
+			$arrFormFields = $this->Formdata->getFormfieldsAsArray(intval($arrSubmitted['_formId_']));
 
 			preg_match('/<body[^>]*?>.*?<\/body>/si', $strContent, $arrMatch);
 
@@ -1185,7 +1185,7 @@ class Efp extends Frontend
 				{
 					$strTemp = $arrMatch[$m];
 					$strTemp = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $strTemp);
-					$blnEval = $this->FormData->replaceConditionTags($strTemp);
+					$blnEval = $this->Formdata->replaceConditionTags($strTemp);
 
 					// Replace tags
 					$tags = array();
@@ -1209,7 +1209,7 @@ class Efp extends Frontend
 								$arrTagParams = null;
 								if (isset($arrKey[1]) && strlen($arrKey[1]))
 								{
-									$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+									$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 								}
 
 								$arrField = $arrFormFields[$strKey];

@@ -18,15 +18,15 @@
 namespace Efg;
 
 /**
- * Class EfgFormLookupCheckbox
+ * Class EfgFormLookupSelectMenu
  *
- * Form field "checkbox (DB)".
- * based on FormCheckbox by Leo Feyer
+ * Form field "select menu (DB)".
+ * based on FormSelectMenu by Leo Feyer
  * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormLookupCheckbox extends Widget
+class EfgFormLookupSelectMenu extends Widget
 {
 
 	/**
@@ -57,13 +57,27 @@ class EfgFormLookupCheckbox extends Widget
 	{
 		switch ($strKey)
 		{
+			case 'mSize':
+				if ($this->multiple)
+				{
+					$this->arrAttributes['size'] = $varValue;
+				}
+				break;
 			case 'efgLookupOptions':
 				$this->import('Database');
 				$this->import('String');
-				$this->import('FormData');
+				$this->import('Formdata');
+
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
-				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
+				$arrOptions = $this->Formdata->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
+				break;
+
+			case 'multiple':
+				if (strlen($varValue))
+				{
+					$this->arrAttributes[$strKey] = 'multiple';
+				}
 				break;
 
 			case 'mandatory':
@@ -92,51 +106,10 @@ class EfgFormLookupCheckbox extends Widget
 			case 'options':
 				return $this->arrOptions;
 				break;
+
 			default:
 				return parent::__get($strKey);
 				break;
-		}
-	}
-
-
-	/**
-	 * Check options if the field is mandatory
-	 */
-	public function validate()
-	{
-		$mandatory = $this->mandatory;
-		$options = deserialize($this->getPost($this->strName));
-
-		// Check if there is at least one value
-		if ($mandatory && is_array($options))
-		{
-			foreach ($options as $option)
-			{
-				if (strlen($option))
-				{
-					$this->mandatory = false;
-					break;
-				}
-			}
-		}
-
-		$varInput = $this->validator($options);
-
-		if (!$this->hasErrors())
-		{
-			$this->varValue = $varInput;
-		}
-
-		// Reset the property
-		if ($mandatory)
-		{
-			$this->mandatory = true;
-		}
-
-		// Clear result if nothing has been submitted
-		if (!array_key_exists($this->strName, $_POST))
-		{
-			$this->varValue = '';
 		}
 	}
 
@@ -147,7 +120,9 @@ class EfgFormLookupCheckbox extends Widget
 	 */
 	public function generate()
 	{
+
 		$strOptions = '';
+		$strClass = 'select';
 		$strReferer = $this->getReferer();
 		$arrLookupOptions = deserialize($this->arrConfiguration['efgLookupOptions']);
 		$strLookupTable = substr($arrLookupOptions['lookup_field'], 0, strpos($arrLookupOptions['lookup_field'], '.'));
@@ -162,7 +137,7 @@ class EfgFormLookupCheckbox extends Widget
 				$blnSingleEvent = true;
 			}
 		}
-		// .. equivalent,  if linked from event reader page
+		// .. equivalent,  if linked from event reader or events list page
 		if ($strLookupTable=='tl_calendar_events' && (strpos($strReferer, '/event-reader/events/') || strpos($strReferer, '&events=') ) )
 		{
 			if (count($this->arrOptions)==1)
@@ -172,40 +147,60 @@ class EfgFormLookupCheckbox extends Widget
 			}
 		}
 
-		foreach ($this->arrOptions as $i=>$arrOption)
+		if ($this->multiple)
 		{
-			$checked = '';
+			$this->strName .= '[]';
+			$strClass = 'multiselect';
+		}
+
+		// Add empty option (XHTML) if there are none
+		if (!count($this->arrOptions) && !$blnSingleEvent )
+		{
+			$this->arrOptions = array(array('value'=>'', 'label'=>'-'));
+		}
+		foreach ($this->arrOptions as $i => $arrOption)
+		{
+			$selected = '';
 			if ( (is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']) )
 			{
-			  $checked = ' checked="checked"';
+			  $selected = ' selected="selected"';
 			}
 
-			$strOptions .= sprintf('<span><input type="checkbox" name="%s" id="opt_%s" class="checkbox" value="%s"%s%s <label for="opt_%s">%s</label></span>',
-									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
-									$this->strId.'_'.$i,
+			$strOptions .= sprintf('<option value="%s"%s>%s</option>',
 									$arrOption['value'],
-									$checked,
-									$this->strTagEnding,
-									$this->strId.'_'.$i,
+									$selected,
 									$arrOption['label']);
 
 			// render as checked radio if used as lookup on tl_calendar_events and only one event available
 			if ($strLookupTable=='tl_calendar_events' && $blnSingleEvent)
 			{
+				$selected = ' checked="checked"';
 				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
 									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
 									$this->strId.'_'.$i,
 									$arrOption['value'],
-									$checked,
+									$selected,
 									$this->strTagEnding,
 									$this->strId.'_'.$i,
 									$arrOption['label']);
+
+		        return sprintf('<div id="ctrl_%s" class="radio_container%s">%s</div>',
+								$this->strId,
+								(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+								$strOptions) . $this->addSubmit();
+
 			}
+
 		}
 
-        return sprintf('<div id="ctrl_%s" class="checkbox_container%s">%s</div>',
+
+
+		return sprintf('<select name="%s" id="ctrl_%s" class="%s%s"%s>%s</select>',
+						$this->strName,
 						$this->strId,
+						$strClass,
 						(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+						$this->getAttributes(),
 						$strOptions) . $this->addSubmit();
 	}
 

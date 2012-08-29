@@ -115,7 +115,7 @@ class ExtendedForm extends Form
 		{
 			$arrEditRecord = $this->objEditRecord->row();
 			$this->blnEditform = true;
-			$this->import('FormData');
+			$this->import('Formdata');
 		}
 
 		// Check multipage
@@ -330,7 +330,7 @@ class ExtendedForm extends Form
 					}
 
 					// prepare options array
-					$arrData['options'] = $this->FormData->prepareDcaOptions($arrData);
+					$arrData['options'] = $this->Formdata->prepareDcaOptions($arrData);
 
 					// set rgxp 'date' for field type 'calendar' if not set
 					if ($arrData['type'] == 'calendar')
@@ -348,7 +348,7 @@ class ExtendedForm extends Form
 					}
 
 					// prepare value
-					$varFieldValue = $this->FormData->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
+					$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
 
 					$objWidget->value = $varFieldValue;
 				}

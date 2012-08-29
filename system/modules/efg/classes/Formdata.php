@@ -18,7 +18,7 @@
 namespace Efg;
 
 /**
- * Class FormData
+ * Class Formdata
  *
  * Provide methods to handle data stored in tables tl_formdata and tl_formdata_details.
  *
@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class FormData extends Frontend
+class Formdata extends Frontend
 {
 	/**
 	 * Items in tl_form, all forms marked to store data in tl_formdata
@@ -1958,7 +1958,7 @@ class FormData extends Frontend
 		// Throw an exception if there is an eval() error
 		if ($blnEval === false)
 		{
-			throw new Exception("Error eval() in FormData::evalConditionTags ($strReturn)");
+			throw new Exception("Error eval() in Formdata::evalConditionTags ($strReturn)");
 		}
 
 		// Return the evaled code

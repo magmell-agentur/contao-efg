@@ -364,8 +364,8 @@ class tl_formdata extends Backend
 		{
 			$strFormTitle = $dc->strFormFilterValue;
 		}
-		$this->import('FormData');
-		return $this->FormData->generateAlias($varValue, $strFormTitle, $dc->id);
+		$this->import('Formdata');
+		return $this->Formdata->generateAlias($varValue, $strFormTitle, $dc->id);
 	}
 
 

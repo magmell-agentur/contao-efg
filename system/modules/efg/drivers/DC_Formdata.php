@@ -212,7 +212,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 		$this->import('String');
 		$this->loadDataContainer('tl_form_field');
-		$this->import('FormData');
+		$this->import('Formdata');
 
 		// in Backend: Check BE User, Admin...
 		if (TL_MODE == 'BE' || BE_USER_LOGGED_IN)
@@ -1553,7 +1553,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					// field type efgLookupSelect
 					elseif ($strInputType=='efgLookupSelect')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -1593,7 +1593,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -1633,7 +1633,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -1672,7 +1672,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 					else
 					{
-						$this->varValue = $this->FormData->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$this->varValue = $this->Formdata->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 					}
 
 					$this->objActiveRecord->{$this->strField} = $this->varValue;
@@ -2193,7 +2193,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupSelect
 					elseif ($strInputType=='efgLookupSelect')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -2230,7 +2230,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -2267,7 +2267,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
 					{
-						$arrFieldOptions = $this->FormData->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -4442,11 +4442,11 @@ window.addEvent(\'domready\', function() {
 
 		if (strlen($arrForm['id']))
 		{
-			$arrFormFields = $this->FormData->getFormfieldsAsArray($arrForm['id']);
+			$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 		}
 
 		// Types of form fields with storable data
-		$arrFFstorable = $this->FormData->arrFFstorable;
+		$arrFFstorable = $this->Formdata->arrFFstorable;
 
 		if (empty($arrForm['confirmationMailSubject']) || (empty($arrForm['confirmationMailText']) && empty($arrForm['confirmationMailTemplate'])))
 		{
@@ -4490,7 +4490,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if (!$blnStoreOptionsValues)
 				{
-					$arrRecipient = $this->FormData->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
+					$arrRecipient = $this->Formdata->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
 					if (count($arrRecipient))
 					{
 						$varRecipient = implode(', ', $arrRecipient);
@@ -4552,9 +4552,9 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// replace 'condition tags'
-		$blnEvalSubject = $this->FormData->replaceConditionTags($subject);
-		$blnEvalMessageText = $this->FormData->replaceConditionTags($messageText);
-		$blnEvalMessageHtml = $this->FormData->replaceConditionTags($messageHtml);
+		$blnEvalSubject = $this->Formdata->replaceConditionTags($subject);
+		$blnEvalMessageText = $this->Formdata->replaceConditionTags($messageText);
+		$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 		// Replace tags in messageText, messageHtml ...
  		$tags = array();
@@ -4579,7 +4579,7 @@ window.addEvent(\'domready\', function() {
  					$arrTagParams = null;
 					if (isset($arrKey[1]) && strlen($arrKey[1]))
 					{
-						$arrTagParams = $this->FormData->parseInsertTagParams($tag);
+						$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 					}
 
 					$arrField = $arrFormFields[$strKey];
@@ -4607,7 +4607,7 @@ window.addEvent(\'domready\', function() {
 
 							if (strlen($arrSubmitted[$strKey]) || is_array($arrSubmitted[$strKey]))
 							{
-								$varVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								foreach ($varVal as $k => $strVal)
 								{
 									if (strlen($strVal))
@@ -4663,7 +4663,7 @@ window.addEvent(\'domready\', function() {
 							}
 							else
 							{
-								$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$strVal = $this->formatValue($strKey, $strVal);
 							}
 							if (!strlen($strVal) && $blnSkipEmpty)
@@ -4677,7 +4677,7 @@ window.addEvent(\'domready\', function() {
 						}
 						else
 						{
-							$strVal = $this->FormData->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							$strVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
 							if (!strlen($strVal) && $blnSkipEmpty)
@@ -4721,7 +4721,7 @@ window.addEvent(\'domready\', function() {
 			$subject = $this->replaceInsertTags($subject);
 			if ($blnEvalSubject)
 			{
-				$subject = $this->FormData->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+				$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
 			}
 		}
 		if (strlen($messageText))
@@ -4730,7 +4730,7 @@ window.addEvent(\'domready\', function() {
 			$messageText = $this->replaceInsertTags($messageText);
 			if ($blnEvalMessageText)
 			{
-				$messageText = $this->FormData->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+				$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
 			}
 		}
 		if (strlen($messageHtml))
@@ -4739,7 +4739,7 @@ window.addEvent(\'domready\', function() {
 			$messageHtml = $this->replaceInsertTags($messageHtml);
 			if ($blnEvalMessageHtml)
 			{
-				$messageHtml = $this->FormData->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+				$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 			}
 		}
 
@@ -5067,7 +5067,7 @@ $return .= '
 				if ($objForm->numRows == 1)
 				{
 					$intFormId = intval($objForm->id);
-					$arrFormFields = $this->FormData->getFormfieldsAsArray($intFormId);
+					$arrFormFields = $this->Formdata->getFormfieldsAsArray($intFormId);
 				}
 
 				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
@@ -5183,7 +5183,7 @@ $return .= '
 							$arrField = $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField];
 							$arrField['type'] = $arrFormFields[$strField]['type'];
 
-							$varValue = $this->FormData->prepareImportValForDb($arrRow[$intCol], $arrField);
+							$varValue = $this->Formdata->prepareImportValForDb($arrRow[$intCol], $arrField);
 
 							// prepare details data
 							$arrDetailSet = array(
@@ -5209,7 +5209,7 @@ $return .= '
 						$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
 						$intNewId = $objNewFormdata->insertId;
 
-						$strAlias = $this->FormData->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
+						$strAlias = $this->Formdata->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
 						if (strlen($strAlias))
 						{
 							$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);

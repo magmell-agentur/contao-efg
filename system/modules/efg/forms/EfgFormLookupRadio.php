@@ -60,10 +60,10 @@ class EfgFormLookupRadio extends Widget
 			case 'efgLookupOptions':
 				$this->import('Database');
 				$this->import('String');
-				$this->import('FormData');
+				$this->import('Formdata');
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 
-				$arrOptions = $this->FormData->prepareDcaOptions($this->arrConfiguration);
+				$arrOptions = $this->Formdata->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
 

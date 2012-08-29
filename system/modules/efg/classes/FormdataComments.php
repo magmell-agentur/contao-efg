@@ -18,13 +18,13 @@
 namespace Efg;
 
 /**
- * Class FormDataComments
+ * Class FormdataComments
  *
  * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class FormDataComments extends Backend
+class FormdataComments extends Backend
 {
 
 	/**
@@ -34,7 +34,7 @@ class FormDataComments extends Backend
 	 */
 	public function listComments($arrRow)
 	{
-		$this->import('FormData');
+		$this->import('Formdata');
 
 		$strRet = '';
 

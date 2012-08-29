@@ -53,20 +53,20 @@ class ModuleFormdata extends Backend
 		parent::__construct();
 
 		$this->loadDataContainer('tl_form_field');
-		$this->import('FormData');
+		$this->import('Formdata');
 
 		// Types of form fields with storable data
-		$this->arrFFstorable = $this->FormData->arrFFstorable;
+		$this->arrFFstorable = $this->Formdata->arrFFstorable;
 	}
 
 	public function generate()
 	{
 		if ($this->Input->get('do') && $this->Input->get('do') != "feedback")
 		{
-			if ($this->FormData->arrStoreForms[$this->Input->get('do')])
+			if ($this->Formdata->arrStoreForms[$this->Input->get('do')])
 			{
 				$session = $this->Session->getData();
-				$session['filter']['tl_feedback']['form'] = $this->FormData->arrStoreForms[$this->Input->get('do')]['title'];
+				$session['filter']['tl_feedback']['form'] = $this->Formdata->arrStoreForms[$this->Input->get('do')]['title'];
 
 				$this->Session->setData($session);
 			}
@@ -104,7 +104,7 @@ class ModuleFormdata extends Backend
 	{
 		$return = '';
 
-		$strDcaKey = array_search($row['form'], $this->FormData->arrFormsDcaKey);
+		$strDcaKey = array_search($row['form'], $this->Formdata->arrFormsDcaKey);
 		if ($strDcaKey)
 		{
 			$return .= '<a href="'.$this->addToUrl($href.'&amp;do=fd_'.$strDcaKey.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
@@ -120,7 +120,7 @@ class ModuleFormdata extends Backend
 	{
 		$this->import('String');
 
-		$arrStoreForms = $this->FormData->arrStoreForms;
+		$arrStoreForms = $this->Formdata->arrStoreForms;
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
