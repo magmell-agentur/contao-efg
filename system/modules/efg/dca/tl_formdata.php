@@ -41,7 +41,6 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 				'form' => 'index'
 			)
 		)
-
 	),
 	// List
 	'list' => array

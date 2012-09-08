@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		(
 		//	'foreignKey'              => 'tl_formdata.alias',
 			'sql'                     => "int(10) unsigned NOT NULL default '0'",
-			'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
 		),
 		'sorting' => array
 		(
