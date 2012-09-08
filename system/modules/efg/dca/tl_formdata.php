@@ -29,10 +29,19 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 		'doNotDeleteRecords'          => true,
 		'switchToEdit'                => false,
 		'onload_callback'             => array
+		(
+			array('tl_formdata', 'loadDCA'),
+			array('tl_formdata', 'checkPermission')
+		),
+		'sql' => array
+		(
+			'keys' => array
 			(
-				array('tl_formdata', 'loadDCA'),
-				array('tl_formdata', 'checkPermission')
+				'id' => 'primary',
+				'form' => 'index'
 			)
+		)
+
 	),
 	// List
 	'list' => array
@@ -99,6 +108,18 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'sorting' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
 		'form' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_formdata']['form'],
@@ -107,6 +128,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'search'                  => true,
 			'filter'                  => true,
 			'sorting'                 => true,
+			'sql'                     => "varchar(64) NOT NULL default ''"
 		),
 		'date' => array
 		(
@@ -117,7 +139,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => true,
 			'filter'                  => true,
 			'flag'                    => 8,
-			'eval'                    => array('rgxp' => 'datim', 'tl_class'=>'w50')
+			'eval'                    => array('rgxp' => 'datim', 'tl_class'=>'w50'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'ip' => array
 		(
@@ -127,7 +150,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'search'                  => false,
 			'sorting'                 => false,
 			'filter'                  => false,
-			'eval'                    => array('tl_class'=>'w50')
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'                     => "varchar(64) NOT NULL default ''"
 		),
 		'fd_member' => array
 		(
@@ -136,6 +160,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'inputType'               => 'select',
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMembersSelect'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'fd_user' => array
 		(
@@ -144,6 +169,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'inputType'               => 'select',
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUsersSelect'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'fd_member_group' => array
 		(
@@ -152,6 +178,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'inputType'               => 'select',
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getMemberGroupsSelect'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'fd_user_group' => array
 		(
@@ -160,6 +187,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'inputType'               => 'select',
 			'eval'                    => array('mandatory' => false, 'includeBlankOption' => true, 'tl_class'=>'w50'),
 			'options_callback'        => array('tl_formdata', 'getUserGroupsSelect'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'published' => array
 		(
@@ -168,7 +196,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('tl_class' => 'clr'),
-			// 'default'                 => '1'
+			// 'default'                 => '1',
+			'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'alias' => array
 		(
@@ -180,7 +209,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'save_callback' => array
 			(
 				array('tl_formdata', 'generateAlias')
-			)
+			),
+			'sql'                     => "varchar(64) NOT NULL default ''"
 		),
 		'confirmationSent' => array
 		(
@@ -188,7 +218,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true)
+			'eval'                    => array('tl_class'=>'w50', 'doNotCopy'=>true, 'isBoolean'=>true),
+			'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'confirmationDate' => array
 		(
@@ -197,7 +228,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'filter'                  => true,
 			'flag'                    => 8,
 			'inputType'               => 'text',
-			'eval'                    => array('tl_class'=>'w50', 'rgxp'=>'datim')
+			'eval'                    => array('tl_class'=>'w50', 'rgxp'=>'datim'),
+			'sql'                     => "varchar(10) NOT NULL default ''"
 		),
 		'be_notes' => array
 		(
@@ -208,7 +240,8 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'sorting'                 => false,
 			'filter'                  => false,
 			'eval'                    => array('rows' => 5),
-			'class'                   => 'fd_notes'
+			'class'                   => 'fd_notes',
+			'sql'                     => "text NULL"
 		),
 	)
 );

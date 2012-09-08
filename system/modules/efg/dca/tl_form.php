@@ -25,7 +25,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['storeFormdata'] = array
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('helpwizard'=>true,'submitOnChange'=>true)
+	'eval'                    => array('helpwizard'=>true,'submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['efgStoreValues'] = array
@@ -34,6 +35,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['efgStoreValues'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['useFormValues'] = array
@@ -42,7 +44,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['useFormValues'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50 m12')
+	'eval'                    => array('tl_class'=>'w50 m12'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['useFieldNames'] = array
@@ -51,7 +54,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['useFieldNames'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50 m12')
+	'eval'                    => array('tl_class'=>'w50 m12'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['efgAliasField'] = array
 (
@@ -60,7 +64,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['efgAliasField'] = array
 	'filter'                  => false,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_form', 'getAliasFormFields'),
-	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64)
+	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64),
+	'sql'                     => "varchar(64) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['sendConfirmationMail'] = array
@@ -69,7 +74,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['sendConfirmationMail'] = array
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('helpwizard'=>true,'submitOnChange'=>true)
+	'eval'                    => array('helpwizard'=>true,'submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipientField'] = array
 (
@@ -78,7 +84,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipientField'] = arra
 	'filter'                  => false,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_form', 'getEmailFormFields'),
-	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50')
+	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(64) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipient'] = array
 (
@@ -86,7 +93,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipient'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 (
@@ -94,7 +102,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSender'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailReplyto'] = array
 (
@@ -102,7 +111,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailReplyto'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
 (
@@ -110,7 +120,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSubject'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailText'] = array
 (
@@ -118,7 +129,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailText'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'textarea',
-	'eval'                    => array('mandatory'=>true, 'rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr')
+	'eval'                    => array('mandatory'=>true, 'rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr'),
+	'sql'                     => "text NULL"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailTemplate'] = array
 (
@@ -126,14 +138,16 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailTemplate'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl')
+	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSkipEmpty'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['skipEmtpy'],
 	'exclude'                 => true,
 	'filter'                  => false,
-	'inputType'               => 'checkbox'
+	'inputType'               => 'checkbox',
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['sendFormattedMail'] = array
@@ -142,7 +156,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['sendFormattedMail'] = array
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailRecipient'] = array
@@ -151,7 +166,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailRecipient'] = array
 	'exclude'                 => true,
 	'search'                  => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'rgxp'=>'extnd', 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'rgxp'=>'extnd', 'tl_class'=>'w50'),
+	'sql'                     => "text NULL"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSubject'] = array
 (
@@ -159,7 +175,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSubject'] = array
 	'exclude'                 => true,
 	'search'                  => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'decodeEntities'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'decodeEntities'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailText'] = array
@@ -168,7 +185,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailText'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'textarea',
-	'eval'                    => array('rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr')
+	'eval'                    => array('rows'=>15, 'allowHTML'=>false, 'tl_class' => 'clr'),
+	'sql'                     => "text NULL"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailTemplate'] = array
 (
@@ -176,14 +194,16 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailTemplate'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl')
+	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSkipEmpty'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form']['skipEmtpy'],
 	'exclude'                 => true,
 	'filter'                  => false,
-	'inputType'               => 'checkbox'
+	'inputType'               => 'checkbox',
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['addConfirmationMailAttachments'] = array
@@ -192,7 +212,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['addConfirmationMailAttachments'] = arra
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailAttachments'] = array
 (
@@ -200,7 +221,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailAttachments'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true)
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true),
+	'sql'                     => "blob NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_form']['fields']['addFormattedMailAttachments'] = array
@@ -209,7 +231,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['addFormattedMailAttachments'] = array
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailAttachments'] = array
 (
@@ -217,7 +240,8 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailAttachments'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true)
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true),
+	'sql'                     => "blob NULL"
 );
 
 // Palettes
@@ -255,7 +279,7 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
-class tl_ext_form extends Backend
+class tl_ext_form extends \Backend
 {
 
 	/**

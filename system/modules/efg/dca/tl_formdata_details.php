@@ -28,7 +28,15 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		'doNotCopyRecords'            => false,
 		'doNotDeleteRecords'          => false,
 		'switchToEdit'                => false,
-
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary',
+				'pid' => 'index',
+				'ff_name' => 'index'
+			)
+		)
 	),
 	// List
 	'list' => array
@@ -78,14 +86,49 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 	// Fields
 	'fields' => array
 	(
-		'value' => array
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'pid' => array
+		(
+		//	'foreignKey'              => 'tl_formdata.alias',
+			'sql'                     => "int(10) unsigned NOT NULL default '0'",
+			'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+		),
+		'sorting' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'ff_id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'ff_type' => array
+		(
+			'sql'                     => "varchar(32) NOT NULL default ''"
+		),
+		'ff_name' => array
+		(
+			'sql'                     => "varchar(64) NOT NULL default ''"
+		),
+		'ff_label' => array
+		(
+			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+ 		'value' => array
 		(
 			'label'                   => array('Value', 'Wert des tl_formdata_details-Datensatzes'),
 			'inputType'               => 'text',
 			'exclude'                 => false,
 			'search'                  => false,
 			'sorting'                 => false,
-			'filter'                  => false
+			'filter'                  => false,
+			'sql'                     => "text NULL"
 		)
 	)
 );

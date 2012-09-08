@@ -31,7 +31,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_formdata'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_ext_module', 'getFormdataTables'),
-	'eval'                    => array('mandatory' => true, 'maxlength' => 64, 'includeBlankOption' => true, 'submitOnChange' => true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory' => true, 'maxlength' => 64, 'includeBlankOption' => true, 'submitOnChange' => true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(64) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_where'] = array
@@ -39,7 +40,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_where'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_where'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_sort'] = array
@@ -47,7 +49,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_sort'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_sort'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+	'eval'                    => array('decodeEntities'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields'] = array
@@ -56,6 +59,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_fields'] = array
 	'exclude'                 => true,
 	'inputType'               => 'text',
 	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'w50" style="height:auto'),
+	'sql'                     => "text NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_searchtype'] = array
@@ -65,7 +69,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_searchtype'] = array
 	'inputType'               => 'select',
 	'options'                 => array('dropdown', 'singlefield', 'multiplefields'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_list_searchtype'],
-	'eval'                    => array('mandatory'=>false, 'includeBlankOption'=>true, 'helpwizard'=>true,  'tl_class'=>'w50" style="height:auto')
+	'eval'                    => array('mandatory'=>false, 'includeBlankOption'=>true, 'helpwizard'=>true,  'tl_class'=>'w50" style="height:auto'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_search'] = array
@@ -73,7 +78,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_search'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_search'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto')
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
@@ -81,7 +87,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_info'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_info'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto')
+	'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50" style="height:auto'),
+	'sql'                     => "text NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_access'] = array
@@ -91,7 +98,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_list_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_list_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_edit_access'] = array
@@ -101,7 +109,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_edit_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_edit_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_delete_access'] = array
@@ -111,7 +120,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_delete_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_delete_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_export_access'] = array
@@ -121,7 +131,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_export_access'] = array
 	'inputType'               => 'select',
 	'options'                 => array('none','public','groupmembers','member'),
 	'reference'               => &$GLOBALS['TL_LANG']['efg_fe_export_access'],
-	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'includeBlankOption' => true, 'helpwizard'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_DetailsKey'] = array
@@ -130,7 +141,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_DetailsKey'] = array
 	'exclude'                 => false,
 	'filter'                  => false,
 	'inputType'               => 'text',
-	'eval'                    => array('default' => 'details', 'maxlength'=>64, 'tl_class'=>'w50')
+	'eval'                    => array('default' => 'details', 'maxlength'=>64, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(64) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_iconfolder'] = array
@@ -138,7 +150,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_iconfolder'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'trailingSlash'=>false, 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'trailingSlash'=>false, 'tl_class'=>'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_keep_id'] = array
 (
@@ -146,7 +159,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_keep_id'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'clr cbx')
+	'eval'                    => array('tl_class'=>'clr cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_formatted_mail'] = array
 (
@@ -154,7 +168,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_formatted_mail'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'clr cbx')
+	'eval'                    => array('tl_class'=>'clr cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_confirmation_mail'] = array
 (
@@ -162,9 +177,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_fe_no_confirmation_mail'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'clr cbx')
+	'eval'                    => array('tl_class'=>'clr cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
-
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_allow_comments'] = array
 (
@@ -172,42 +187,48 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_allow_comments'] = array
 	'exclude'                 => true,
 	'filter'                  => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true)
+	'eval'                    => array('submitOnChange'=>true),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_moderate'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_moderate'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_bbcode'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_bbcode'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_requireLogin'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_requireLogin'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_disableCaptcha'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['com_disableCaptcha'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_per_page'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['efg_com_per_page'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('rgxp'=>'digit', 'tl_class'=>'w50')
+	'eval'                    => array('rgxp'=>'digit', 'tl_class'=>'w50'),
+	'sql'                     => "smallint(5) unsigned NOT NULL default '0'"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_order'] = array
 (
@@ -217,7 +238,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['com_order'] = array
 	'inputType'               => 'select',
 	'options'                 => array('ascending', 'descending'),
 	'reference'               => &$GLOBALS['TL_LANG']['MSC'],
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['com_template'] = array
 (
@@ -226,7 +248,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['com_template'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_module_comments', 'getCommentTemplates'),
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
 (
@@ -236,7 +259,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
 	'inputType'               => 'select',
 	'options'                 => array('notify_admin', 'notify_author', 'notify_both'),
 	'reference'               => &$GLOBALS['TL_LANG']['tl_module'],
-	'eval'                    => array('tl_class' => 'w50')
+	'eval'                    => array('tl_class' => 'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 
@@ -249,7 +273,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
-class tl_ext_module extends Backend
+class tl_ext_module extends \Backend
 {
 
 	private $arrFormdataTables = null;

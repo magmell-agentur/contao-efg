@@ -20,7 +20,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgLookupOptions'] = array
 (
 	'label'        => &$GLOBALS['TL_LANG']['tl_form_field']['efgLookupOptions'],
 	'exclude'      => true,
-	'inputType'    => 'efgLookupOptionWizard'
+	'inputType'    => 'efgLookupOptionWizard',
+	'sql'          => "text NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgMultiSRC'] = array
@@ -28,7 +29,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgMultiSRC'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgMultiSRC'],
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'mandatory'=>true, 'extensions' => 'gif,jpg,png')
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'mandatory'=>true, 'extensions' => 'gif,jpg,png'),
+	'sql'                     => "text NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['mandatory']['eval']['tl_class'] = 'w50 cbx';
@@ -38,7 +40,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMultiple'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageMultiple'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class' => 'w50 cbx')
+	'eval'                    => array('tl_class' => 'w50 cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 
@@ -47,7 +50,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageUseHomeDir'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class' => 'w50 m12 cbx')
+	'eval'                    => array('tl_class' => 'w50 m12 cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
@@ -57,7 +61,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
 	'inputType'               => 'select',
 	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'meta', 'random'),
 	'reference'               => &$GLOBALS['TL_LANG']['tl_form_field'],
-	'eval'                    => array('tl_class' => 'w50')
+	'eval'                    => array('tl_class' => 'w50'),
+	'sql'                     => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSize'] = array
@@ -65,7 +70,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSize'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageSize'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('multiple'=>true, 'size'=>2, 'rgxp'=>'digit', 'tl_class' => 'w50')
+	'eval'                    => array('multiple'=>true, 'size'=>2, 'rgxp'=>'digit', 'tl_class' => 'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImagePerRow'] = array
@@ -75,7 +81,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImagePerRow'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options'                 => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-	'eval'                    => array('tl_class' => 'w50')
+	'eval'                    => array('tl_class' => 'w50'),
+	'sql'                     => "smallint(5) unsigned NOT NULL default '0'"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMargin'] = array
@@ -84,7 +91,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMargin'] = array
 	'exclude'                 => true,
 	'inputType'               => 'trbl',
 	'options'                 => array('px', '%', 'em', 'pt', 'pc', 'in', 'cm', 'mm'),
-	'eval'                    => array('includeBlankOption'=>true, 'tl_class' => 'w50')
+	'eval'                    => array('includeBlankOption'=>true, 'tl_class' => 'w50'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageFullsize'] = array
@@ -92,7 +100,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageFullsize'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageFullsize'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class' => 'w50 m12 cbx')
+	'eval'                    => array('tl_class' => 'w50 m12 cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 
@@ -101,7 +110,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgAddBackButton'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'w50')
+	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
@@ -109,7 +119,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'],
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr')
+	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
@@ -117,7 +128,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr')
+	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
@@ -125,7 +137,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackSingleSRC'],
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true,'extensions' => 'gif,jpg,png', 'mandatory'=>true, 'tl_class'=>'clr')
+	'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true,'extensions' => 'gif,jpg,png', 'mandatory'=>true, 'tl_class'=>'clr'),
+	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackStoreSessionValues'] = array
@@ -133,7 +146,8 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackStoreSessionValues'] = arr
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 
