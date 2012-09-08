@@ -24,7 +24,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class ModuleFormdata extends Backend
+class ModuleFormdata extends \Backend
 {
 
 	/**

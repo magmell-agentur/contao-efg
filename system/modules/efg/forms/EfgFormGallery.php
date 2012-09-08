@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormGallery extends ContentElement
+class EfgFormGallery extends \ContentElement
 {
 
 	/**

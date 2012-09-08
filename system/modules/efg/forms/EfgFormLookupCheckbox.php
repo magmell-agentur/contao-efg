@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormLookupCheckbox extends Widget
+class EfgFormLookupCheckbox extends \Widget
 {
 
 	/**

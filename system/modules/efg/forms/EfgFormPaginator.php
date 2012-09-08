@@ -24,7 +24,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormPaginator extends Widget
+class EfgFormPaginator extends \Widget
 {
 
 	/**

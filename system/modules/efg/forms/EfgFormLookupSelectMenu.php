@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormLookupSelectMenu extends Widget
+class EfgFormLookupSelectMenu extends \Widget
 {
 
 	/**

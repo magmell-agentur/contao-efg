@@ -25,7 +25,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class EfgFormImageSelect extends Widget
+class EfgFormImageSelect extends \Widget
 {
 
 	/**

@@ -25,7 +25,8 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
 */
-class EfgLookupOptionWizard extends Widget {
+class EfgLookupOptionWizard extends \Widget
+{
 
 	/**
 	 * Submit user input

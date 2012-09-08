@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class Formdata extends Frontend
+class Formdata extends \Frontend
 {
 	/**
 	 * Items in tl_form, all forms marked to store data in tl_formdata

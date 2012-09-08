@@ -26,7 +26,7 @@ namespace Efg;
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class DC_Formdata extends DataContainer implements listable, editable
+class DC_Formdata extends \DataContainer implements \listable, \editable
 {
 
 	/**
