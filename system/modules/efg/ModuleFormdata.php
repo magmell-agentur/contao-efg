@@ -61,24 +61,24 @@ class ModuleFormdata extends \Backend
 
 	public function generate()
 	{
-		if ($this->Input->get('do') && $this->Input->get('do') != "feedback")
+		if (\Input::get('do') && \Input::get('do') != "feedback")
 		{
-			if ($this->Formdata->arrStoreForms[$this->Input->get('do')])
+			if ($this->Formdata->arrStoreForms[\Input::get('do')])
 			{
 				$session = $this->Session->getData();
-				$session['filter']['tl_feedback']['form'] = $this->Formdata->arrStoreForms[$this->Input->get('do')]['title'];
+				$session['filter']['tl_feedback']['form'] = $this->Formdata->arrStoreForms[\Input::get('do')]['title'];
 
 				$this->Session->setData($session);
 			}
 		}
 
-		if ( $this->Input->get('act') == "" )
+		if (\Input::get('act') == "")
 		{
 			return $this->objDc->showAll();
 		}
 		else
 		{
-			$act = $this->Input->get('act');
+			$act = \Input::get('act');
 			return $this->objDc->$act();
 		}
 	}
@@ -90,7 +90,7 @@ class ModuleFormdata extends \Backend
 	{
 		$this->intFormId = $dc->id;
 
-		$this->objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")
+		$this->objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
 						->execute($this->intFormId)
 						->fetchAssoc();
 		$this->updateConfig();
@@ -118,8 +118,6 @@ class ModuleFormdata extends \Backend
 	 */
 	private function updateConfig()
 	{
-		$this->import('String');
-
 		$arrStoreForms = $this->Formdata->arrStoreForms;
 
 		// config/config.php
@@ -168,7 +166,7 @@ class ModuleFormdata extends \Backend
 			$arrFields = array();
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
-			$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
+			$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 								->execute($this->objForm['id']);
 			if ($objFields->numRows)
 			{
@@ -217,7 +215,7 @@ class ModuleFormdata extends \Backend
 		{
 			$arrAllFields = array();
 			$arrFieldNamesById = array();
-			$objAllFields = $this->Database->prepare("SELECT ff.* FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
+			$objAllFields = \Database::getInstance()->prepare("SELECT ff.* FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
 								->execute("1");
 			if ($objAllFields->numRows)
 			{
@@ -278,7 +276,7 @@ class ModuleFormdata extends \Backend
 	 */
 	public function importCsv($dc, $strTable, $arrModule)
 	{
-		if ($this->Input->get('key') != 'import')
+		if (\Input::get('key') != 'import')
 		{
 			return '';
 		}

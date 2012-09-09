@@ -108,14 +108,13 @@ class EfgLookupOptionWizard extends \Widget
 		);
 
 		// get all tables
-		$this->import('Database');
-		$arrTables = $this->Database->listTables();
+		$arrTables = \Database::getInstance()->listTables();
 
 		foreach ($arrTables as $strTable)
 		{
 			if (!in_array($strTable, $this->arrIgnoreTables))
 			{
-				$arrFields = $this->Database->listFields($strTable);
+				$arrFields = \Database::getInstance()->listFields($strTable);
 
 				foreach ($arrFields as $arrField)
 				{
@@ -131,7 +130,7 @@ class EfgLookupOptionWizard extends \Widget
 		unset ($arrFields);
 
 		// get all forms marked to store data
-		$objForms = $this->Database->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=?")->execute("1");
+		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=?")->execute("1");
 		if ($objForms->numRows)
 		{
 			while ($objForms->next())
@@ -147,7 +146,7 @@ class EfgLookupOptionWizard extends \Widget
 
 				if (!in_array($varKey, $this->arrIgnoreTables))
 				{
-					$objFields = $this->Database->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.id=?")->execute($objForms->id);
+					$objFields = \Database::getInstance()->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.id=?")->execute($objForms->id);
 					if ($objFields->numRows)
 					{
 						$this->arrDbStruct[$varKey][] = 'form';

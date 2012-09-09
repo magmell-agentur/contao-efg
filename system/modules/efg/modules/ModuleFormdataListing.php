@@ -165,7 +165,7 @@ class ModuleFormdataListing extends \Module
 		$session['referer']['current'] = preg_replace('@(\?|&amp;|&)act=export(&amp;|&|$)@si', '', $session['referer']['current']);
 		$this->Session->setData($session);
 
-		if ($this->Input->get($this->strDetailKey) && !strlen($this->list_info) && !strlen($this->Input->get('act')) )
+		if (\Input::get($this->strDetailKey) && !strlen($this->list_info) && !strlen(\Input::get('act')) )
 		{
 			return '';
 		}
@@ -215,7 +215,7 @@ class ModuleFormdataListing extends \Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -274,7 +274,7 @@ class ModuleFormdataListing extends \Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -333,7 +333,7 @@ class ModuleFormdataListing extends \Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -391,7 +391,7 @@ class ModuleFormdataListing extends \Module
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
-							$objGroupMembers = $this->Database->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
+							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (count($arrGroupMembers)>0)
@@ -422,16 +422,16 @@ class ModuleFormdataListing extends \Module
 
 
 		// file download
-		if (strlen($this->Input->get('download')))
+		if (strlen(\Input::get('download')))
 		{
 			$allowedDownload = trimsplit(',', strtolower($GLOBALS['TL_CONFIG']['allowedDownload']));
 
-			$arrParams = explode('.' , $this->Input->get('download'));
+			$arrParams = explode('.' , \Input::get('download'));
 			$intFdId = $arrParams[0];
 			unset($arrParams[0]);
 
 			$strField = implode('.', $arrParams);
-			$objDownload = $this->Database->prepare("SELECT fd.fd_member, fd.fd_user, fdd.value FROM tl_formdata fd, tl_formdata_details fdd WHERE (fd.id=fdd.pid) AND fd.id=? AND fdd.ff_name=?")
+			$objDownload = \Database::getInstance()->prepare("SELECT fd.fd_member, fd.fd_user, fdd.value FROM tl_formdata fd, tl_formdata_details fdd WHERE (fd.id=fdd.pid) AND fd.id=? AND fdd.ff_name=?")
 										->execute($intFdId,  $strField);
 			if ($objDownload->numRows)
 			{
@@ -478,7 +478,6 @@ class ModuleFormdataListing extends \Module
 			$strSearchFormType = $this->efg_list_searchtype;
 		}
 
-		$this->import('String');
 		$this->import('FrontendUser', 'Member');
 
 		$this->list_table = 'tl_formdata';
@@ -486,7 +485,7 @@ class ModuleFormdataListing extends \Module
 		$allowedDownload = trimsplit(',', strtolower($GLOBALS['TL_CONFIG']['allowedDownload']));
 
 		// get names of detail fields
-		$objFF = $this->Database->prepare("SELECT ff.name, ff.label, ff.type, ff.rgxp FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
+		$objFF = \Database::getInstance()->prepare("SELECT ff.name, ff.label, ff.type, ff.rgxp FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
 											->execute("1");
 		if ( $objFF->numRows)
 		{
@@ -531,12 +530,12 @@ class ModuleFormdataListing extends \Module
 		$this->loadLanguageFile('tl_formdata');
 
 		// Export
-		if ($this->Input->get('act') == 'export')
+		if (\Input::get('act') == 'export')
 		{
 			$blnExport = true;
 			$strExportMode = 'csv';
 		}
-		elseif ($this->Input->get('act') == 'exportxls')
+		elseif (\Input::get('act') == 'exportxls')
 		{
 			$blnExport = true;
 			$strExportMode = 'xls';
@@ -635,7 +634,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// List, edit or delete a single record
-		if (strlen($this->Input->get($this->strDetailKey)))
+		if (strlen(\Input::get($this->strDetailKey)))
 		{
 
 			// check details record
@@ -680,8 +679,8 @@ class ModuleFormdataListing extends \Module
 			$strWhere = $this->replaceInsertTags($strWhere);
 			$strQuery .=  $strWhere;
 
-			$objCheck = $this->Database->prepare($strQuery)
-							->execute($this->Input->get($this->strDetailKey), $this->Input->get($this->strDetailKey));
+			$objCheck = \Database::getInstance()->prepare($strQuery)
+							->execute(\Input::get($this->strDetailKey), \Input::get($this->strDetailKey));
 
 			if ($objCheck->numRows == 1)
 			{
@@ -689,9 +688,9 @@ class ModuleFormdataListing extends \Module
 			}
 			else
 			{
-				$this->log('Could not identify record by ID "'.$this->Input->get($this->strDetailKey).'"', 'ModuleFormdataListing compile()', TL_GENERAL);
+				$this->log('Could not identify record by ID "' . \Input::get($this->strDetailKey) . '"', 'ModuleFormdataListing compile()', TL_GENERAL);
 
-				$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+				$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 				$strUrlParams = '';
 				$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -708,37 +707,37 @@ class ModuleFormdataListing extends \Module
 					}
 				}
 
-				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
 				$this->redirect($strRed);
 			}
 
-			if ($this->Input->get('act') == 'edit' && intval($this->intRecordId) > 0 )
+			if (\Input::get('act') == 'edit' && intval($this->intRecordId) > 0)
 			{
 				$this->editSingleRecord();
 				return;
 			}
 
-			elseif ($this->Input->get('act') == 'delete' && intval($this->intRecordId) > 0 )
+			elseif (\Input::get('act') == 'delete' && intval($this->intRecordId) > 0)
 			{
 				$this->deleteSingleRecord();
 				return;
 			}
 
-			elseif ($this->Input->get('act') == 'export' && intval($this->intRecordId) > 0 )
+			elseif (\Input::get('act') == 'export' && intval($this->intRecordId) > 0)
 			{
 				$this->exportSingleRecord($strExportMode);
 				return;
 			}
 
-			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0 )
+			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0)
 			{
 				$this->listSingleRecord();
 				return;
 			}
 		}
 
-		$page = $this->Input->get('page') ? $this->Input->get('page') : 1;
-		$per_page = $this->Input->get('per_page') ? $this->Input->get('per_page') : $this->perPage;
+		$page = \Input::get('page') ? \Input::get('page') : 1;
+		$per_page = \Input::get('per_page') ? \Input::get('per_page') : $this->perPage;
 
 		/**
 		 * Add search query
@@ -749,7 +748,7 @@ class ModuleFormdataListing extends \Module
 
 		if (count($this->arrAllowedOwnerIds)>0)
 		{
-			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "fd_member IN (" . implode(',', $this->arrAllowedOwnerIds).")";
+			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "fd_member IN (" . implode(',', $this->arrAllowedOwnerIds) . ")";
 		}
 
 		if (!$blnExport)
@@ -776,12 +775,12 @@ class ModuleFormdataListing extends \Module
 			{
 
 				case 'singlefield':
-					if (strlen($this->Input->get('search')) && strlen($this->Input->get('for')))
+					if (strlen(\Input::get('search')) && strlen(\Input::get('for')))
 					{
-						$varKeyword = '%' . $this->Input->get('for') . '%';
+						$varKeyword = '%' . \Input::get('for') . '%';
 
 						$arrConds = array();
-						foreach (trimsplit(',', urldecode($this->Input->get('search'))) as $field)
+						foreach (trimsplit(',', urldecode(\Input::get('search'))) as $field)
 						{
 							if (in_array($field, $this->arrOwnerFields))
 							{
@@ -802,10 +801,10 @@ class ModuleFormdataListing extends \Module
 									$prop = 'arrUserGroups';
 								}
 
-								$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
+								$arrMatches = $this->array_filter_like($this->{$prop}, \Input::get('for'));
 								if (count($arrMatches))
 								{
-									$arrConds[] = $field ." IN(".implode(",", array_keys($arrMatches)).")";
+									$arrConds[] = $field . " IN(".implode(",", array_keys($arrMatches)).")";
 								}
 							}
 							elseif (in_array($field, $this->arrBaseFields))
@@ -814,14 +813,14 @@ class ModuleFormdataListing extends \Module
 							}
 							else
 							{
-								$arrConds[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) LIKE ?';
+								$arrConds[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="' . $field . '" AND pid=f.id ) LIKE ?';
 							}
 						}
 
 						if (count($arrConds)>0)
 						{
-							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" OR ", $arrConds) .')';
-							$varKeyword = array_fill(0, count($arrConds), '%' . $this->Input->get('for') . '%');
+							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" OR ", $arrConds) . ')';
+							$varKeyword = array_fill(0, count($arrConds), '%' . \Input::get('for') . '%');
 						}
 					}
 
@@ -832,11 +831,11 @@ class ModuleFormdataListing extends \Module
 				case 'multiplefields':
 					$arrOptions = array();
 
-					if (strlen($this->Input->get('search')) && is_array($this->Input->get('for')))
+					if (strlen(\Input::get('search')) && is_array(\Input::get('for')))
 					{
 						$arrConds = array();
 						$arrKeywords = array();
-						foreach ($this->Input->get('for') as $field => $for)
+						foreach (\Input::get('for') as $field => $for)
 						{
 							if (in_array($field, $arrSearchFields) && strlen($for))
 							{
@@ -859,10 +858,10 @@ class ModuleFormdataListing extends \Module
 										$prop = 'arrUserGroups';
 									}
 
-									$arrMatches = $this->array_filter_like($this->$prop, urldecode($for));
+									$arrMatches = $this->array_filter_like($this->{$prop}, urldecode($for));
 									if (count($arrMatches))
 									{
-										$arrConds[] = $field ." IN(".implode(",", array_keys($arrMatches)).")";
+										$arrConds[] = $field ." IN(" . implode(",", array_keys($arrMatches)) . ")";
 									}
 								}
 								elseif (in_array($field, $this->arrBaseFields))
@@ -880,7 +879,7 @@ class ModuleFormdataListing extends \Module
 
 						if (count($arrConds)>0)
 						{
-							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" AND ", $arrConds) .')';
+							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" AND ", $arrConds) . ')';
 							$varKeyword = $arrKeywords;
 						}
 
@@ -896,12 +895,12 @@ class ModuleFormdataListing extends \Module
 							}
 							else
 							{
-								$arrOptions[] = array('name' => $field, 'label' => ( $GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field ) );
+								$arrOptions[] = array('name' => $field, 'label' => ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field));
 							}
 						}
 						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 						{
-							$arrOptions[] = array('name' => $field, 'label' => htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) );
+							$arrOptions[] = array('name' => $field, 'label' => htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]));
 						}
 					}
 
@@ -913,13 +912,13 @@ class ModuleFormdataListing extends \Module
 
 				case 'dropdown':
 				default:
-					if ( strlen($this->Input->get('search')) && strlen($this->Input->get('for')) )
+					if ( strlen(\Input::get('search')) && strlen(\Input::get('for')) )
 					{
-						$varKeyword = '%' . $this->Input->get('for') . '%';
+						$varKeyword = '%' . \Input::get('for') . '%';
 
-						if (in_array($this->Input->get('search'), $this->arrOwnerFields))
+						if (in_array(\Input::get('search'), $this->arrOwnerFields))
 						{
-							$field = $this->Input->get('search');
+							$field = \Input::get('search');
 							if ($field == "fd_member")
 							{
 								$prop = 'arrMembers';
@@ -937,19 +936,19 @@ class ModuleFormdataListing extends \Module
 								$prop = 'arrUserGroups';
 							}
 
-							$arrMatches = $this->array_filter_like($this->$prop, $this->Input->get('for'));
+							$arrMatches = $this->array_filter_like($this->{$prop}, \Input::get('for'));
 							if (count($arrMatches))
 							{
-								$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $field ." IN(".implode(",", array_keys($arrMatches)).")";
+								$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $field ." IN(" . implode(",", array_keys($arrMatches)) . ")";
 							}
 						}
-						elseif (in_array($this->Input->get('search'), $this->arrBaseFields))
+						elseif (in_array(\Input::get('search'), $this->arrBaseFields))
 						{
-							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $this->Input->get('search') . " LIKE ?";
+							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . \Input::get('search') . " LIKE ?";
 						}
 						else
 						{
-							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(SELECT value FROM tl_formdata_details WHERE ff_name="' .$this->Input->get('search'). '" AND pid=f.id ) LIKE ?';
+							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(SELECT value FROM tl_formdata_details WHERE ff_name="' . \Input::get('search') . '" AND pid=f.id ) LIKE ?';
 						}
 					}
 
@@ -963,12 +962,12 @@ class ModuleFormdataListing extends \Module
 							}
 							else
 							{
-								$strOptions .= '  <option value="' . $field . '"' . (($field == $this->Input->get('search')) ? ' selected="selected"' : '') . '>' . htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) . '</option>' . "\n";
+								$strOptions .= '  <option value="' . $field . '"' . (($field == \Input::get('search')) ? ' selected="selected"' : '') . '>' . htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) . '</option>' . "\n";
 							}
 						}
 						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 						{
-							$strOptions .= '  <option value="' . $field . '"' . (($field == $this->Input->get('search')) ? ' selected="selected"' : '') . '>' . ( $GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field ) . '</option>' . "\n";
+							$strOptions .= '  <option value="' . $field . '"' . (($field == \Input::get('search')) ? ' selected="selected"' : '') . '>' . ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field) . '</option>' . "\n";
 						}
 					}
 
@@ -1006,13 +1005,13 @@ class ModuleFormdataListing extends \Module
 					if (in_array($strCondField, $this->arrDetailFields))
 					{
 						// handle numeric values
-						if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']=='digit')
+						if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp'] == 'digit')
 						{
-							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id )+0.0 ' . implode('', $arrListCond);
+							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id)+0.0 ' . implode('', $arrListCond);
 						}
 						else
 						{
-							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id ) ' . implode('', $arrListCond);
+							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id) ' . implode('', $arrListCond);
 						}
 					}
 					if (in_array($strCondField, $this->arrBaseFields))
@@ -1021,7 +1020,7 @@ class ModuleFormdataListing extends \Module
 					}
 				}
 			}
-			$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) .')' : '';
+			$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) . ')' : '';
 			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
 		}
 		if (strlen($this->strFormKey))
@@ -1035,7 +1034,7 @@ class ModuleFormdataListing extends \Module
 
 		$strQuery .=  $strWhere;
 
-		$objTotal = $this->Database->prepare($strQuery)->execute($varKeyword);
+		$objTotal = \Database::getInstance()->prepare($strQuery)->execute($varKeyword);
 		$rowTotalcount = $objTotal->row();
 		$intTotalcount = max(0, $rowTotalcount['count']);
 
@@ -1092,17 +1091,17 @@ class ModuleFormdataListing extends \Module
 		$strQuery .=  $strWhere;
 
 		// Order by
-		if (strlen($this->Input->get('order_by')))
+		if (strlen(\Input::get('order_by')))
 		{
-			if (in_array($this->Input->get('order_by'), $arrListFields) && (in_array($this->Input->get('order_by'), $this->arrBaseFields) || in_array($this->Input->get('order_by'), $this->arrDetailFields)))
+			if (in_array(\Input::get('order_by'), $arrListFields) && (in_array(\Input::get('order_by'), $this->arrBaseFields) || in_array(\Input::get('order_by'), $this->arrDetailFields)))
 			{
-				if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']=='digit')
+				if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::get('order_by')]['eval']['rgxp']=='digit')
 				{
-					$strQuery .= " ORDER BY CAST(`" . $this->Input->get('order_by') . '` AS DECIMAL) ' . $this->Input->get('sort');
+					$strQuery .= " ORDER BY CAST(`" . \Input::get('order_by') . '` AS DECIMAL) ' . \Input::get('sort');
 				}
 				else
 				{
-					$strQuery .= " ORDER BY `" . $this->Input->get('order_by') . '` ' . $this->Input->get('sort');
+					$strQuery .= " ORDER BY `" . \Input::get('order_by') . '` ' . \Input::get('sort');
 				}
 			}
 		}
@@ -1156,14 +1155,14 @@ class ModuleFormdataListing extends \Module
 			$strQuery .= $strListSort;
 		}
 
-		$objDataStmt = $this->Database->prepare($strQuery);
+		$objDataStmt = \Database::getInstance()->prepare($strQuery);
 
 		// Limit
 		if (!$blnExport)
 		{
-			if (intval($this->Input->get('per_page'))>0)
+			if (intval(\Input::get('per_page'))>0)
 			{
-				$objDataStmt->limit($this->Input->get('per_page'), (($page - 1) * $per_page));
+				$objDataStmt->limit(\Input::get('per_page'), (($page - 1) * $per_page));
 			}
 			elseif (intval($this->perPage)>0)
 			{
@@ -1177,7 +1176,7 @@ class ModuleFormdataListing extends \Module
 		 * Prepare URL
 		 */
 
-		//$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		//$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$strUrl = $this->generateFrontendUrl($objPage->row());
 		if ($strUrl == '/' || $strUrl == '//')
 		{
@@ -1236,10 +1235,10 @@ class ModuleFormdataListing extends \Module
 				$sort = 'asc';
 				$strField = strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$arrFields[$i]]['label'][0]) ? $label : $arrFields[$i];
 
-				if ($this->Input->get('order_by') == $arrFields[$i])
+				if (\Input::get('order_by') == $arrFields[$i])
 				{
-					$sort = ($this->Input->get('sort') == 'asc') ? 'desc' : 'asc';
-					$class = ' sorted ' . $this->Input->get('sort');
+					$sort = (\Input::get('sort') == 'asc') ? 'desc' : 'asc';
+					$class = ' sorted ' . \Input::get('sort');
 				}
 
 				// add CSS class defined in form generator
@@ -1316,7 +1315,7 @@ class ModuleFormdataListing extends \Module
 
 				if (strlen($strName))
 				{
-					$strName = $this->String->decodeEntities($strName);
+					$strName = \String::decodeEntities($strName);
 				}
 
 				if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
@@ -1446,11 +1445,11 @@ class ModuleFormdataListing extends \Module
 					$strLinkDetails = '';
 					if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 					{
-						$strLinkDetails = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
+						$strLinkDetails = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl) ? '/' : '') . $this->strDetailKey . '/' . $arrRows[$i]['alias'] . $strUrlSuffix . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 					}
 					else
 					{
-						$strLinkDetails = $strUrl .'?'.$this->strDetailKey.'=' . $arrRows[$i]['id'] . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+						$strLinkDetails = $strUrl . '?' . $this->strDetailKey .'=' . $arrRows[$i]['id'] . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 					}
 
 					$strLinkEdit = '';
@@ -1458,7 +1457,7 @@ class ModuleFormdataListing extends \Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkEdit = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=edit' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkEdit = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl) ? '/' : '') . $this->strDetailKey . '/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=edit' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
@@ -1471,11 +1470,11 @@ class ModuleFormdataListing extends \Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkDelete = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkDelete = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl) ? '/' : '') . $this->strDetailKey . '/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
-							$strLinkDelete = $strUrl .'?'.$this->strDetailKey.'=' . $arrRows[$i]['id'] . '&amp;act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkDelete = $strUrl . '?' . $this->strDetailKey . '=' . $arrRows[$i]['id'] . '&amp;act=delete' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 					}
 
@@ -1484,16 +1483,16 @@ class ModuleFormdataListing extends \Module
 					{
 						if (strlen($arrRows[$i]['alias']) && !$GLOBALS['TL_CONFIG']['disableAlias'])
 						{
-							$strLinkExport = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl)? '/' : '') .$this->strDetailKey.'/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkExport = str_replace($strUrlSuffix, '', $strUrl) . (strlen($strUrl) ? '/' : '') . $this->strDetailKey . '/' . $arrRows[$i]['alias'] . $strUrlSuffix . '?act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 						else
 						{
-							$strLinkExport = $strUrl .'?'.$this->strDetailKey.'=' . $arrRows[$i]['id'] . '&amp;act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
+							$strLinkExport = $strUrl . '?' . $this->strDetailKey . '=' . $arrRows[$i]['id'] . '&amp;act=export' . (strlen($strUrlParams) ? '&amp;' . $strUrlParams : '');
 						}
 					}
 
 					$value = $this->formatValue($k, $v);
-					$v = $this->String->decodeEntities($v);
+					$v = \String::decodeEntities($v);
 
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 					{
@@ -1569,7 +1568,7 @@ class ModuleFormdataListing extends \Module
 								{
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
 									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 									$href = ampersand($href);
 
@@ -1620,7 +1619,7 @@ class ModuleFormdataListing extends \Module
 										{
 											$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
 											$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 											$href = ampersand($href);
 
@@ -1681,18 +1680,18 @@ class ModuleFormdataListing extends \Module
 			/**
 			 * Template variables
 			 */
-			$this->Template->action = ampersand(urldecode($this->Environment->request));
+			$this->Template->action = ampersand(urldecode(\Environment::request()));
 			$this->Template->per_page_label = specialchars($GLOBALS['TL_LANG']['MSC']['list_perPage']);
 			$this->Template->search_label = specialchars($GLOBALS['TL_LANG']['MSC']['search']);
-			$this->Template->per_page = $this->Input->get('per_page');
+			$this->Template->per_page = \Input::get('per_page');
 			if (intval($this->perPage)>0)
 			{
 				$this->Template->list_perPage = $this->perPage;
 			}
-			$this->Template->search = $this->Input->get('search');
-			$this->Template->for = $this->Input->get('for');
-			$this->Template->order_by = $this->Input->get('order_by');
-			$this->Template->sort = $this->Input->get('sort');
+			$this->Template->search = \Input::get('search');
+			$this->Template->for = \Input::get('for');
+			$this->Template->order_by = \Input::get('order_by');
+			$this->Template->sort = \Input::get('sort');
 			//$this->Template->col_last = 'col_' . $j;
 			$this->Template->col_last = 'col_' . $intLastCol;
 
@@ -1881,7 +1880,7 @@ class ModuleFormdataListing extends \Module
 
 					if (strlen($strVal))
 					{
-						$strVal = $this->String->decodeEntities($strVal);
+						$strVal = \String::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
@@ -1954,7 +1953,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -1976,20 +1975,20 @@ class ModuleFormdataListing extends \Module
 		// check record
 		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
 		{
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
 		// check access
 		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 
 			$varOwner = $objOwner->fetchAssoc();
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
-				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}
@@ -2006,7 +2005,7 @@ class ModuleFormdataListing extends \Module
 		}
 		elseif (strlen($this->efg_fe_edit_access) )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedEditOwnerIds))
@@ -2027,7 +2026,7 @@ class ModuleFormdataListing extends \Module
 		}
 		elseif (strlen($this->efg_fe_delete_access) )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
@@ -2048,7 +2047,7 @@ class ModuleFormdataListing extends \Module
 		}
 		elseif (strlen($this->efg_fe_export_access) )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedExportOwnerIds))
@@ -2124,7 +2123,7 @@ class ModuleFormdataListing extends \Module
 		$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "id=?";
 		$strQuery .= $strWhere;
 
-		$objRecord = $this->Database->prepare($strQuery)
+		$objRecord = \Database::getInstance()->prepare($strQuery)
 									->limit(1)
 									->execute($this->intRecordId);
 
@@ -2185,7 +2184,7 @@ class ModuleFormdataListing extends \Module
 			$v = $arrRow[$k];
 
 			$value = $this->formatValue($k, $v);
-			$v = deserialize($this->String->decodeEntities($v));
+			$v = deserialize(\String::decodeEntities($v));
 
 			if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 			{
@@ -2204,7 +2203,7 @@ class ModuleFormdataListing extends \Module
 			(
 				'label' => (strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $value,
-				// 'raw' => deserialize($this->String->decodeEntities($v))
+				// 'raw' => deserialize(\String::decodeEntities($v))
 				'raw' => $v
 			);
 
@@ -2212,7 +2211,7 @@ class ModuleFormdataListing extends \Module
 				'name' => $k,
 				'label'=>(strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $value,
-				//'raw' => deserialize($this->String->decodeEntities($v)),
+				//'raw' => deserialize(\String::decodeEntities($v)),
 				'raw' => $v,
 				'class' => str_replace('row_', 'field_', $class)
 			);
@@ -2251,7 +2250,7 @@ class ModuleFormdataListing extends \Module
 						{
 							$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-							$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+							$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
 							$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 							$href = ampersand($href);
 
@@ -2303,7 +2302,7 @@ class ModuleFormdataListing extends \Module
 								{
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', $this->Environment->request);
+									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
 									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 									$href = ampersand($href);
 
@@ -2335,7 +2334,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$this->Template->url = $strUrl;
 		$this->Template->listItem = $arrItem;
 		$this->Template->record = $arrFields;
@@ -2375,7 +2374,7 @@ class ModuleFormdataListing extends \Module
 		{
 			if (intval($objRecord->fd_user) > 0)
 			{
-				$objUser = $this->Database->prepare("SELECT email FROM tl_user WHERE id=?")
+				$objUser = \Database::getInstance()->prepare("SELECT email FROM tl_user WHERE id=?")
 											->limit(1)
 											->execute($objRecord->fd_user);
 				if ($objUser->numRows)
@@ -2385,7 +2384,7 @@ class ModuleFormdataListing extends \Module
 			}
 			if (intval($objRecord->fd_member) > 0)
 			{
-				$objMember = $this->Database->prepare("SELECT email FROM tl_member WHERE id=?")
+				$objMember = \Database::getInstance()->prepare("SELECT email FROM tl_member WHERE id=?")
 											->limit(1)
 											->execute($objRecord->fd_member);
 				if ($objMember->numRows)
@@ -2418,7 +2417,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -2446,13 +2445,13 @@ class ModuleFormdataListing extends \Module
 		// check access
 		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 
 			$varOwner = $objOwner->fetchAssoc();
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
-				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}
@@ -2470,7 +2469,7 @@ class ModuleFormdataListing extends \Module
 		}
 		elseif (strlen($this->efg_fe_export_access) )
 		{
-			$objOwner = $this->Database->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
+			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedExportOwnerIds))
@@ -2526,7 +2525,7 @@ class ModuleFormdataListing extends \Module
 		$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "id=?";
 		$strQuery .= $strWhere;
 
-		$objRecords = $this->Database->prepare($strQuery)
+		$objRecords = \Database::getInstance()->prepare($strQuery)
 									->limit(1)
 									->execute($this->intRecordId);
 
@@ -2641,7 +2640,7 @@ class ModuleFormdataListing extends \Module
 
 						if (strlen($strName))
 						{
-							$strName = $this->String->decodeEntities($strName);
+							$strName = \String::decodeEntities($strName);
 
 							if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
 							{
@@ -2827,7 +2826,7 @@ class ModuleFormdataListing extends \Module
 
 					if (strlen($strVal))
 					{
-						$strVal = $this->String->decodeEntities($strVal);
+						$strVal = \String::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
@@ -2896,7 +2895,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -2921,12 +2920,12 @@ class ModuleFormdataListing extends \Module
 			unset($_GET[$this->strDetailKey]);
 			unset($_GET['act']);
 
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
 		// Check Owner and Alias
-		$objOwner = $this->Database->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
+		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 		$varOwner = $objOwner->fetchAssoc();
 
@@ -2935,7 +2934,7 @@ class ModuleFormdataListing extends \Module
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
-				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}
@@ -2959,7 +2958,7 @@ class ModuleFormdataListing extends \Module
 		}
 		if ($blnEditAllowed == false)
 		{
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
@@ -2979,7 +2978,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// get the form
-		$objCheckRecord = $this->Database->prepare("SELECT form FROM tl_formdata WHERE id=?")
+		$objCheckRecord = \Database::getInstance()->prepare("SELECT form FROM tl_formdata WHERE id=?")
 								->limit(1)
 								->execute($this->intRecordId);
 		if ($objCheckRecord->numRows == 1)
@@ -2988,7 +2987,7 @@ class ModuleFormdataListing extends \Module
 		}
 		if (strlen($strForm))
 		{
-			$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE title=?")
+			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
 							->limit(1)
 							->execute($strForm);
 			if ($objForm->numRows == 1)
@@ -2998,7 +2997,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// get ContentElement holding the form
-		$objFormElement = $this->Database->prepare("SELECT * FROM tl_content WHERE form=?")
+		$objFormElement = \Database::getInstance()->prepare("SELECT * FROM tl_content WHERE form=?")
 				->limit(1)
 				->execute($intFormId);
 
@@ -3006,7 +3005,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$this->log("Could not find a ContentElement containing the form \"".$strForm."\"", 'ModuleFormdataListing editSingleRecord()', 'ERROR');
 
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
@@ -3037,7 +3036,7 @@ class ModuleFormdataListing extends \Module
 		$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "id=?";
 		$strQuery .= $strWhere;
 
-		$objRecord = $this->Database->prepare($strQuery)
+		$objRecord = \Database::getInstance()->prepare($strQuery)
 									->limit(1)
 									->execute($this->intRecordId);
 		if ($objRecord->numRows < 1)
@@ -3063,7 +3062,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode($this->Environment->request));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -3089,12 +3088,12 @@ class ModuleFormdataListing extends \Module
 			unset($_GET[$this->strDetailKey]);
 			unset($_GET['act']);
 
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', 'act=delete'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', 'act=delete'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
 		// Check Owner and Alias
-		$objOwner = $this->Database->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
+		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
 							->execute($this->intRecordId);
 		$varOwner = $objOwner->fetchAssoc();
 
@@ -3103,7 +3102,7 @@ class ModuleFormdataListing extends \Module
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
-				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}
@@ -3130,22 +3129,22 @@ class ModuleFormdataListing extends \Module
 
 		if ($blnDeleteAllowed == false)
 		{
-			$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
 
 		if ($blnDeleteAllowed)
 		{
-			$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+			\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
 				->execute(array($intDeleteId));
-			$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")
+			\Database::getInstance()->prepare("DELETE FROM tl_formdata WHERE id=?")
 				->execute(array($intDeleteId));
 		}
 
 		$_SESSION['EFP']['LISTING_MOD']['id'] = $this->id;
 
 		// redirect to list
-		$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/'.$this->Input->get($this->strDetailKey).'/i', '/'.$this->strDetailKey.'='.$this->Input->get($this->strDetailKey).'/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+		$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 		$this->redirect($strRed);
 
 	}
@@ -3259,14 +3258,14 @@ class ModuleFormdataListing extends \Module
 		// E-mail addresses
 		if ($value && ($rgxp == 'email' || strpos($this->arrFF[$k]['name'], 'mail') !== false || strpos($k, 'mail') !== false ) )
 		{
-			$value = $this->String->encodeEmail($value);
+			$value = \String::encodeEmail($value);
 			$value = '<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;' . $value . '">' . $value . '</a>';
 			return $value;
 		}
 
 		if (strlen($value))
 		{
-			$value = $this->String->decodeEntities($value);
+			$value = \String::decodeEntities($value);
 			$value = ampersand($value);
 
 			if (!is_bool(strpos($value, "\n")))
@@ -3292,7 +3291,7 @@ class ModuleFormdataListing extends \Module
 		if (!$this->arrMembers)
 		{
 			$members = array();
-			$objMembers = $this->Database->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
+			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
 								->execute();
 			$members[] = '-';
 			if ($objMembers->numRows)
@@ -3316,7 +3315,7 @@ class ModuleFormdataListing extends \Module
 		if (!$this->arrUsers)
 		{
 			$users = array();
-			$objUsers = $this->Database->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
+			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
 								->execute();
 			$users[] = '-';
 			if ($objUsers->numRows)
@@ -3340,7 +3339,7 @@ class ModuleFormdataListing extends \Module
 		if (!$this->arrMemberGroups)
 		{
 			$groups = array();
-			$objGroups = $this->Database->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
+			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
 								->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
@@ -3364,7 +3363,7 @@ class ModuleFormdataListing extends \Module
 		if (!$this->arrUserGroups)
 		{
 			$groups = array();
-			$objGroups = $this->Database->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
+			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
 								->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
@@ -3425,14 +3424,14 @@ class ModuleFormdataListing extends \Module
 					$strKey = $elements[1];
 					$strNewVal = '';
 
-					$strVal = $this->Input->get($strKey);
+					$strVal = \Input::get($strKey);
 					if (!strlen($strVal))
 					{
-						$strVal = $this->Input->post($strKey);
+						$strVal = \Input::post($strKey);
 					}
 					if (!strlen($strVal))
 					{
-						$strVal = $this->Input->cookie($strKey);
+						$strVal = \Input::cookie($strKey);
 					}
 
 					if (strlen($strVal))

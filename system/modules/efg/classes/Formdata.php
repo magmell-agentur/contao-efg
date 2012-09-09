@@ -52,9 +52,6 @@ class Formdata extends \Frontend
 	{
 		parent::__construct();
 
-		$this->import('Database');
-		$this->import('String');
-
 		// Types of form fields with storable data
 		$this->arrFFstorable = array(
 			'sessionText', 'sessionOption', 'sessionCalculator',
@@ -121,7 +118,7 @@ class Formdata extends \Frontend
 		}
 
 		// get field used to build alias
-		$objForm = $this->Database->prepare("SELECT id, efgAliasField FROM tl_form WHERE title=?")
+		$objForm = \Database::getInstance()->prepare("SELECT id, efgAliasField FROM tl_form WHERE title=?")
 					->limit(1)
 					->execute($strFormTitle);
 		if ($objForm->numRows)
@@ -134,7 +131,7 @@ class Formdata extends \Frontend
 
 		if ($strAliasField == '')
 		{
-			$objFormField = $this->Database->prepare("SELECT ff.name FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.title=? AND ff.type=? AND ff.rgxp NOT IN ('email','date','datim','time') ORDER BY sorting")
+			$objFormField = \Database::getInstance()->prepare("SELECT ff.name FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.title=? AND ff.type=? AND ff.rgxp NOT IN ('email','date','datim','time') ORDER BY sorting")
 							->limit(1)
 							->execute($strFormTitle, 'text');
 
@@ -152,11 +149,11 @@ class Formdata extends \Frontend
 			{
 				// get value from post
 				$autoAlias = true;
-				$varValue = standardize($this->Input->post($strAliasField));
+				$varValue = standardize(\Input::post($strAliasField));
 			}
 		}
 
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_formdata WHERE alias=? AND id != ?")
+		$objAlias = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE alias=? AND id != ?")
 								   ->execute($varValue, $intRecId);
 
 		// Check whether the alias exists
@@ -258,12 +255,12 @@ class Formdata extends \Frontend
 						// Determine domain
 						if (intval($pageId)>0)
 						{
-							$domain = $this->Environment->base;
+							$domain = \Environment::base();
 							$objParent = $this->getPageDetails($pageId);
 
 							if (strlen($objParent->domain))
 							{
-								$domain = ($this->Environment->ssl ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
+								$domain = (\Environment::ssl() ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
 							}
 						}
 						$arrProcessed[$pageId] = $domain . $this->generateFrontendUrl($objParent->row(), '/'.$strFormdataDetailsKey.'/%s');
@@ -314,7 +311,7 @@ class Formdata extends \Frontend
 					$strQuery .=  $strWhere;
 
 					// add details pages to the indexer
-					$objData = $this->Database->prepare($strQuery)
+					$objData = \Database::getInstance()->prepare($strQuery)
 							->execute($strForm);
 
 					while ($objData->next())
@@ -341,7 +338,7 @@ class Formdata extends \Frontend
 		if (!$this->arrStoreForms)
 		{
 			// get all forms marked to store data
-			$objForms = $this->Database->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
+			$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
 											->execute("1");
 
 			while ($objForms->next())
@@ -368,7 +365,7 @@ class Formdata extends \Frontend
 		if (!$this->arrListingPages)
 		{
 			// get all pages containig listing formdata
-			$objListingPages = $this->Database->prepare("SELECT tl_page.id,tl_page.alias FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=?")
+			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=?")
 									->execute("module", "formdatalisting");
 			while ($objListingPages->next())
 			{
@@ -388,7 +385,7 @@ class Formdata extends \Frontend
 		if (!$this->arrSearchableListingPages)
 		{
 			// get all pages containig listing formdata with details page
-			$objListingPages = $this->Database->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
+			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
 									->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
 			while ($objListingPages->next())
 			{
@@ -415,13 +412,13 @@ class Formdata extends \Frontend
 
 		if($intId > 0)
 		{
-			$objFormdata = $this->Database->prepare("SELECT * FROM tl_formdata WHERE id=?")
+			$objFormdata = \Database::getInstance()->prepare("SELECT * FROM tl_formdata WHERE id=?")
 										->executeUncached($intId);
 			if ($objFormdata->numRows == 1)
 			{
 				$varReturn['fd_base'] = $objFormdata->fetchAssoc();
 
-				$objFormdataDetails = $this->Database->prepare("SELECT * FROM tl_formdata_details WHERE pid=?")
+				$objFormdataDetails = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=?")
 										->execute($intId);
 				if ($objFormdataDetails->numRows)
 				{
@@ -455,7 +452,7 @@ class Formdata extends \Frontend
 
 		if ($intId > 0)
 		{
-			$objFormFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
+			$objFormFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 											->execute($intId);
 
 			while ($objFormFields->next())
@@ -684,13 +681,13 @@ class Formdata extends \Frontend
 			{
 				foreach ($strVal as $k=>$value)
 				{
-					$strVal[$k] = $this->String->decodeEntities($value);
+					$strVal[$k] = \String::decodeEntities($value);
 				}
 				$strVal = serialize($strVal);
 			}
 			else
 			{
-				$strVal = $this->String->decodeEntities($strVal);
+				$strVal = \String::decodeEntities($strVal);
 			}
 
 			return $strVal;
@@ -786,12 +783,12 @@ class Formdata extends \Frontend
 
 			}
 
-			return (is_array($strVal) || is_object($strVal)) ? serialize($strVal) : $this->String->decodeEntities($strVal);
+			return (is_array($strVal) || is_object($strVal)) ? serialize($strVal) : \String::decodeEntities($strVal);
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return (is_array($strVal) || is_object($strVal)) ? serialize($varValue) : $this->String->decodeEntities($varValue);
+			return (is_array($strVal) || is_object($strVal)) ? serialize($varValue) : \String::decodeEntities($varValue);
 		}
 
 	}
@@ -944,12 +941,12 @@ class Formdata extends \Frontend
 				break;
 			}
 
-			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($strVal) : $strVal;
+			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return (is_string($varSubmitted) && strlen($varSubmitted)) ? $this->String->decodeEntities($varSubmitted) : $varSubmitted;
+			return (is_string($varSubmitted) && strlen($varSubmitted)) ? \String::decodeEntities($varSubmitted) : $varSubmitted;
 		}
 
 	}
@@ -1146,12 +1143,12 @@ class Formdata extends \Frontend
 					$strVal = $varValue;
 				break;
 			}
-			return (is_string($strVal) && strlen($strVal)) ? $this->String->decodeEntities($strVal) : $strVal;
+			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
 
 		} // if in_array arrFFstorable
 		else
 		{
-			return (is_string($varValue) && strlen($varValue)) ? $this->String->decodeEntities($varValue) : $varValue;
+			return (is_string($varValue) && strlen($varValue)) ? \String::decodeEntities($varValue) : $varValue;
 		}
 
 	}
@@ -1411,7 +1408,7 @@ class Formdata extends \Frontend
 				$strLookupField = $arrLookupOptions['lookup_field'];
 				$strLookupValField = (strlen($arrLookupOptions['lookup_val_field'])) ? $arrLookupOptions['lookup_val_field'] : null;
 
-				$strLookupWhere = $this->String->decodeEntities($arrLookupOptions['lookup_where']);
+				$strLookupWhere = \String::decodeEntities($arrLookupOptions['lookup_where']);
 				if (strlen($strLookupWhere))
 				{
 					$strLookupWhere = $this->replaceInsertTags($strLookupWhere);
@@ -1449,7 +1446,7 @@ class Formdata extends \Frontend
 					$arrDetailFields = array();
 					if (strlen($strLookupWhere) || strlen($arrLookupOptions['lookup_sort']))
 					{
-						$objDetailFields = $this->Database->prepare("SELECT DISTINCT(ff.`name`) FROM tl_form f, tl_form_field ff WHERE f.storeFormdata=? AND (f.id=ff.pid) AND ff.`type` IN ('".implode("','", $this->arrFFstorable)."')")
+						$objDetailFields = \Database::getInstance()->prepare("SELECT DISTINCT(ff.`name`) FROM tl_form f, tl_form_field ff WHERE f.storeFormdata=? AND (f.id=ff.pid) AND ff.`type` IN ('".implode("','", $this->arrFFstorable)."')")
 														->execute('1');
 						if ($objDetailFields->numRows)
 						{
@@ -1517,15 +1514,15 @@ class Formdata extends \Frontend
 					$strReferer = $this->getReferer();
 
 					// if form is placed on an events detail page, automatically add restriction to event(s)
-					if (strlen($this->Input->get('events')))
+					if (strlen(\Input::get('events')))
 					{
-						if (is_numeric($this->Input->get('events')))
+						if (is_numeric(\Input::get('events')))
 						{
-							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=".intval($this->Input->get('events'))." ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=" . intval(\Input::get('events')) . " ";
 						}
-						elseif (is_string($this->Input->get('events')))
+						elseif (is_string(\Input::get('events')))
 						{
-							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$this->Input->get('events')."' ";
+							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='" . \Input::get('events') . "' ";
 						}
 					}
 					// if linked from event reader page
@@ -1554,7 +1551,7 @@ class Formdata extends \Frontend
 
 					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
 
-					$objEvents = $this->Database->prepare($sqlLookup)->execute();
+					$objEvents = \Database::getInstance()->prepare($sqlLookup)->execute();
 
 					$arrEvents = array();
 
@@ -1764,7 +1761,7 @@ class Formdata extends \Frontend
 
 					if (strlen($sqlLookupTable))
 					{
-						$objOptions = $this->Database->prepare($sqlLookup)->execute();
+						$objOptions = \Database::getInstance()->prepare($sqlLookup)->execute();
 					}
 					if ($objOptions->numRows)
 					{
@@ -1871,7 +1868,7 @@ class Formdata extends \Frontend
 		if (isset($arrTag[1]) && strlen($arrTag[1]))
 		{
 			$arrTag[1] = str_replace('[&]', '__AMP__', $arrTag[1]);
-			$strParams = $this->String->decodeEntities($arrTag[1]);
+			$strParams = \String::decodeEntities($arrTag[1]);
 			$arrParams = preg_split('/&/sim', $strParams);
 
 			$arrReturn = array();

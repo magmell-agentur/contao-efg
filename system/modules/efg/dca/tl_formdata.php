@@ -285,7 +285,7 @@ class tl_formdata extends Backend
 		}
 		else
 		{
-			$strFileName = ($this->Input->get('do') == 'feedback' ? 'fd_feedback' : $this->Input->get('do'));
+			$strFileName = (\Input::get('do') == 'feedback' ? 'fd_feedback' : \Input::get('do'));
 		}
 
 		if ($varFormKey != '' && is_string($varFormKey))
@@ -325,13 +325,13 @@ class tl_formdata extends Backend
 		}
 		else
 		{
-			if (array_key_exists($this->Input->get('do'), $GLOBALS['BE_MOD']['formdata']))
+			if (array_key_exists(\Input::get('do'), $GLOBALS['BE_MOD']['formdata']))
 			{
 				$strFile = sprintf('%s/system/modules/%s/dca/%s.php', TL_ROOT, $strModule, $strFileName);
 
 				if (file_exists($strFile))
 				{
-					$strName = $this->Input->get('do');
+					$strName = \Input::get('do');
 					include_once($strFile);
 
 					// now replace standard dca tl_formdata by form-dependent dca
@@ -412,7 +412,7 @@ class tl_formdata extends Backend
 		if (is_null($this->arrData))
 		{
 			$strSql = "SELECT id,title FROM tl_form";
-			$objForms = $this->Database->prepare($strSql)->execute();
+			$objForms = \Database::getInstance()->prepare($strSql)->execute();
 
 			while ($objForms->next())
 			{
@@ -430,7 +430,7 @@ class tl_formdata extends Backend
 		$strRet .= '<div class="mark_links">';
 		// Details from table tl_formdata_details
 		$strSql = "SELECT ff_type,ff_name,ff_label,value FROM tl_formdata_details WHERE pid=? ORDER BY sorting ASC";
-		$objDetails = $this->Database->prepare($strSql)->execute($arrRow['id']);
+		$objDetails = \Database::getInstance()->prepare($strSql)->execute($arrRow['id']);
 
 		while ($objDetails->next())
 		{
@@ -453,7 +453,7 @@ class tl_formdata extends Backend
 		$forms = array();
 
 		// Get all forms
-		$objForms = $this->Database->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=? ORDER BY title ASC")
+		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=? ORDER BY title ASC")
 							->execute("1");
 		$forms[] = '-';
 		if ($objForms->numRows)
@@ -478,7 +478,7 @@ class tl_formdata extends Backend
 		$items = array();
 
 		// Get all members
-		$objItems = $this->Database->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS fullname FROM tl_member ORDER BY fullname ASC")
+		$objItems = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS fullname FROM tl_member ORDER BY fullname ASC")
 							->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
@@ -503,7 +503,7 @@ class tl_formdata extends Backend
 		$items = array();
 
 		// Get all users
-		$objItems = $this->Database->prepare("SELECT id, name FROM tl_user ORDER BY name ASC")
+		$objItems = \Database::getInstance()->prepare("SELECT id, name FROM tl_user ORDER BY name ASC")
 							->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
@@ -527,7 +527,7 @@ class tl_formdata extends Backend
 		$items = array();
 
 		// Get all member groups
-		$objItems = $this->Database->prepare("SELECT id,`name` FROM tl_member_group ORDER BY `name` ASC")
+		$objItems = \Database::getInstance()->prepare("SELECT id,`name` FROM tl_member_group ORDER BY `name` ASC")
 							->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
@@ -551,7 +551,7 @@ class tl_formdata extends Backend
 		$items = array();
 
 		// Get all user groups
-		$objItems = $this->Database->prepare("SELECT id,`name` FROM tl_user_group ORDER BY `name` ASC")
+		$objItems = \Database::getInstance()->prepare("SELECT id,`name` FROM tl_user_group ORDER BY `name` ASC")
 							->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)

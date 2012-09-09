@@ -201,7 +201,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	public function __construct($strTable)
 	{
 		parent::__construct();
-		$this->intId = $this->Input->get('id');
+		$this->intId = \Input::get('id');
 
 		// Clear the clipboard
 		if (isset($_GET['clipboard']))
@@ -210,7 +210,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$this->redirect($this->getReferer());
 		}
 
-		$this->import('String');
 		$this->loadDataContainer('tl_form_field');
 		$this->import('Formdata');
 
@@ -226,12 +225,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$this->import('FrontendUser', 'Member');
 		}
 
-		if ($this->Input->get('key') == 'export')
+		if (\Input::get('key') == 'export')
 		{
 			$this->strMode = 'export';
 		}
 
-		if ($this->Input->get('key') == 'exportxls')
+		if (\Input::get('key') == 'exportxls')
 		{
 			$this->strMode = 'exportxls';
 		}
@@ -251,7 +250,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// get all forms marked to store data
-		$objForms = $this->Database->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
+		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
 										->execute("1");
 		if (!$this->arrStoreForms)
 		{
@@ -271,7 +270,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// all field names of table tl_formdata
-		foreach ($this->Database->listFields('tl_formdata') as $arrField)
+		foreach (\Database::getInstance()->listFields('tl_formdata') as $arrField)
 		{
 
 			if ($arrField['type'] != 'index')
@@ -296,9 +295,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// Set IDs and redirect
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_select')
+		if (\Input::post('FORM_SUBMIT') == 'tl_select')
 		{
-			$ids = deserialize($this->Input->post('IDS'));
+			$ids = deserialize(\Input::post('IDS'));
 
 			if (!is_array($ids) || empty($ids))
 			{
@@ -306,20 +305,20 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 
 			$session = $this->Session->getData();
-			$session['CURRENT']['IDS'] = deserialize($this->Input->post('IDS'));
+			$session['CURRENT']['IDS'] = deserialize(\Input::post('IDS'));
 			$this->Session->setData($session);
 
 			if (isset($_POST['edit']))
 			{
-				$this->redirect(str_replace('act=select', 'act=editAll', $this->Environment->request));
+				$this->redirect(str_replace('act=select', 'act=editAll', \Environment::request()));
 			}
 			elseif (isset($_POST['delete']))
 			{
-				$this->redirect(str_replace('act=select', 'act=deleteAll', $this->Environment->request));
+				$this->redirect(str_replace('act=select', 'act=deleteAll', \Environment::request()));
 			}
 			elseif (isset($_POST['override']))
 			{
-				$this->redirect(str_replace('act=select', 'act=overrideAll', $this->Environment->request));
+				$this->redirect(str_replace('act=select', 'act=overrideAll', \Environment::request()));
 			}
 			elseif (isset($_POST['cut']) || isset($_POST['copy']))
 			{
@@ -347,13 +346,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$this->strFormFilterKey = '';
 		$this->strFormFilterValue = '';
 
-		if ($this->Input->get('do'))
+		if (\Input::get('do'))
 		{
-			if ($this->Input->get('do') != 'feedback' )
+			if (\Input::get('do') != 'feedback' )
 			{
-				if (array_key_exists($this->Input->get('do'), $GLOBALS['BE_MOD']['formdata']) )
+				if (array_key_exists(\Input::get('do'), $GLOBALS['BE_MOD']['formdata']) )
 				{
-					$this->strFormKey = $this->Input->get('do');
+					$this->strFormKey = \Input::get('do');
 					$this->strFormFilterKey = 'form';
 					$this->strFormFilterValue = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 					$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
@@ -391,7 +390,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// get all FormField names of forms storing formdata
 		else
 		{
-			$objFFNames = $this->Database->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
+			$objFFNames = \Database::getInstance()->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
 											->execute("1");
 			if ( $objFFNames->numRows)
 			{
@@ -415,10 +414,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// Store the current referer
-		if (!empty($this->ctable) && !$this->Input->get('act') && !$this->Input->get('key') && !$this->Input->get('token'))
+		if (!empty($this->ctable) && !\Input::get('act') && !\Input::get('key') && !\Input::get('token'))
 		{
 			$session = $this->Session->get('referer');
-			$session[$this->strTable] = $this->Environment->requestUri;
+			$session[$this->strTable] = \Environment::requestUri();
 			$this->Session->set('referer', $session);
 		}
 	}
@@ -481,27 +480,27 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Clean up old tl_undo and tl_log entries
 		if ($this->strTable == 'tl_undo' && strlen($GLOBALS['TL_CONFIG']['undoPeriod']))
 		{
-			$this->Database->prepare("DELETE FROM tl_undo WHERE tstamp<?")
+			\Database::getInstance()->prepare("DELETE FROM tl_undo WHERE tstamp<?")
 							->execute(intval(time() - $GLOBALS['TL_CONFIG']['undoPeriod']));
 		}
 		elseif ($this->strTable == 'tl_log' && strlen($GLOBALS['TL_CONFIG']['logPeriod']))
 		{
-			$this->Database->prepare("DELETE FROM tl_log WHERE tstamp<?")
+			\Database::getInstance()->prepare("DELETE FROM tl_log WHERE tstamp<?")
 							->execute(intval(time() - $GLOBALS['TL_CONFIG']['logPeriod']));
 		}
 
 		$this->reviseTable();
 
 		// Add to clipboard
-		if ($this->Input->get('act') == 'paste')
+		if (\Input::get('act') == 'paste')
 		{
 			$arrClipboard = $this->Session->get('CLIPBOARD');
 
 			$arrClipboard[$this->strTable] = array
 			(
-				'id' => $this->Input->get('id'),
-				'childs' => $this->Input->get('childs'),
-				'mode' => $this->Input->get('mode')
+				'id' => \Input::get('id'),
+				'childs' => \Input::get('childs'),
+				'mode' => \Input::get('mode')
 			);
 
 			$this->Session->set('CLIPBOARD', $arrClipboard);
@@ -532,7 +531,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$return .= '
 
-<form action="'.ampersand($this->Environment->request, true).'" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters_limit">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -582,7 +581,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$sqlQuery .= $sqlWhere;
 		}
 
-		$objRow = $this->Database->prepare($sqlQuery)
+		$objRow = \Database::getInstance()->prepare($sqlQuery)
 								 ->limit(1)
 								 ->execute($this->intId);
 
@@ -716,7 +715,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				}
 				else
 				{
-					$objKey = $this->Database->prepare("SELECT " . $chunks[1] . " FROM " . $chunks[0] . " WHERE id=?")
+					$objKey = \Database::getInstance()->prepare("SELECT " . $chunks[1] . " FROM " . $chunks[0] . " WHERE id=?")
 											 ->limit(1)
 											 ->execute($row[$i]);
 					if ($objKey->numRows)
@@ -783,7 +782,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$set['form'] = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 			$set['date'] = time();
-			$set['ip'] = $this->Environment->ip;
+			$set['ip'] = \Environment::ip();
 
 			if ($this->User && intval($this->User->id)>0)
 			{
@@ -821,7 +820,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$this->set['tstamp'] = 0;
 
-			$objInsertStmt = $this->Database->prepare("INSERT INTO " . $this->strTable . " %s")
+			$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $this->strTable . " %s")
 											->set($this->set)
 											->execute();
 
@@ -860,7 +859,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 					$arrDetailSet['value'] = $strVal;
 
-					$objInsertStmt = $this->Database->prepare("INSERT INTO tl_formdata_details %s")
+					$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")
 											->set($arrDetailSet)
 											->execute();
 				}
@@ -925,7 +924,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Do not save records from tl_undo itself
 		if ($this->strTable == 'tl_undo')
 		{
-			$this->Database->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
+			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
 							->limit(1)
 							->execute($this->intId);
 
@@ -933,7 +932,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// If there is a PID field but no parent table
-		if ($this->Database->fieldExists('pid', $this->strTable) && !strlen($this->ptable))
+		if (\Database::getInstance()->fieldExists('pid', $this->strTable) && !strlen($this->ptable))
 		{
 			$delete[$this->strTable] = $this->getChildRecords($this->intId, $this->strTable);
 			array_unshift($delete[$this->strTable], $this->intId);
@@ -959,7 +958,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			foreach ($fields as $k=>$v)
 			{
-				$objSave = $this->Database->prepare("SELECT * FROM " . $table . " WHERE id=?")
+				$objSave = \Database::getInstance()->prepare("SELECT * FROM " . $table . " WHERE id=?")
 										->limit(1)
 										->execute($v);
 
@@ -980,7 +979,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		$this->import('BackendUser', 'User');
 
-		$objUndoStmt = $this->Database->prepare("INSERT INTO tl_undo (pid, tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?, ?)")
+		$objUndoStmt = \Database::getInstance()->prepare("INSERT INTO tl_undo (pid, tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?, ?)")
 									  ->execute($this->User->id, time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
 
 		// Delete the records
@@ -1004,7 +1003,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				foreach ($fields as $k=>$v)
 				{
-					$this->Database->prepare("DELETE FROM " . $table . " WHERE id=?")
+					\Database::getInstance()->prepare("DELETE FROM " . $table . " WHERE id=?")
 								   ->limit(1)
 								   ->execute($v);
 				}
@@ -1073,7 +1072,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$this->loadDataContainer($v);
 			$cctable[$v] = $GLOBALS['TL_DCA'][$v]['config']['ctable'];
 
-			$objDelete = $this->Database->prepare("SELECT id FROM " . $v . " WHERE pid=?")
+			$objDelete = \Database::getInstance()->prepare("SELECT id FROM " . $v . " WHERE pid=?")
 										->execute($id);
 
 			if (!$GLOBALS['TL_DCA'][$v]['config']['doNotDeleteRecords'] && strlen($v) && $objDelete->numRows)
@@ -1097,7 +1096,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	 */
 	public function undo()
 	{
-		$objRecords = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
+		$objRecords = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
 									 ->limit(1)
 								 	 ->execute($this->intId);
 
@@ -1128,7 +1127,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					$restore[$k] = $v;
 				}
 
-				$objInsertStmt = $this->Database->prepare("INSERT INTO " . $table . " %s")
+				$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $table . " %s")
 												->set($restore)
 												->execute();
 
@@ -1145,7 +1144,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$this->log('Undone '. $query, 'DC_Table undo()', TL_GENERAL);
 
-			$this->Database->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
+			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
 							->limit(1)
 							->execute($this->intId);
 		}
@@ -1195,7 +1194,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$sqlQuery .= $sqlWhere;
 		}
 
-		$objRow = $this->Database->prepare($sqlQuery)
+		$objRow = \Database::getInstance()->prepare($sqlQuery)
 								 ->limit(1)
 								 ->executeUncached($this->intId);
 
@@ -1280,7 +1279,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					if ($vv == '[EOF]')
 					{
-						if ($blnAjax && $this->Environment->isAjaxRequest)
+						if ($blnAjax && \Environment::isAjaxRequest())
 						{
 							return $strAjax . '<input type="hidden" name="FORM_FIELDS[]" value="'.specialchars($this->strPalette).'">';
 						}
@@ -1294,7 +1293,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (preg_match('/^\[.*\]$/i', $vv))
 					{
 						$thisId = 'sub_' . substr($vv, 1, -1);
-						$blnAjax = ($ajaxId == $thisId && $this->Environment->isAjaxRequest) ? true : false;
+						$blnAjax = ($ajaxId == $thisId && \Environment::isAjaxRequest()) ? true : false;
 						$return .= "\n" . '<div id="'.$thisId.'">';
 
 						continue;
@@ -1419,7 +1418,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 										}
 									}
 
-									$objForeignFd = $this->Database->prepare($sqlForeignFd)->execute();
+									$objForeignFd = \Database::getInstance()->prepare($sqlForeignFd)->execute();
 
 									// reset current dca
 									$GLOBALS['TL_DCA'][$this->strTable] = $BAK_DCA;
@@ -1443,13 +1442,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 									unset($objForeignFd);
 								}
 								// foreignKey table is 'normal' table
-								elseif ($this->Database->fieldExists($strForeignField, $strForeignTable))
+								elseif (\Database::getInstance()->fieldExists($strForeignField, $strForeignTable))
 								{
-									$blnAlias = $this->Database->fieldExists('alias', $strForeignTable);
+									$blnAlias = \Database::getInstance()->fieldExists('alias', $strForeignTable);
 
 									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . (strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '') . " ORDER BY " . $strForeignField;
 
-									$objForeign = $this->Database->prepare($sqlForeign)->execute();
+									$objForeign = \Database::getInstance()->prepare($sqlForeign)->execute();
 
 									if ($objForeign->numRows)
 									{
@@ -1713,7 +1712,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div class="tl_submit_container">
 <input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">
 <input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'"> ' . (!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '
-<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'"> ' : '') . ($this->Input->get('s2e') ? '
+<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'"> ' : '') . (\Input::get('s2e') ? '
 <input type="submit" name="saveNedit" id="saveNedit" class="tl_submit" accesskey="e" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNedit']).'"> ' : '') .'
 </div>
 
@@ -1728,7 +1727,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 <h2 class="sub_headline">'.sprintf($GLOBALS['TL_LANG']['MSC']['editRecord'], ($this->intId ? 'ID '.$this->intId : '')).'</h2>
 '.$this->getMessages().'
-<form action="'.ampersand($this->Environment->request, true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '"'.(!empty($this->onsubmit) ? ' onsubmit="'.implode(' ', $this->onsubmit).'"' : '').'>
+<form action="'.ampersand(\Environment::request(), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '"'.(!empty($this->onsubmit) ? ' onsubmit="'.implode(' ', $this->onsubmit).'"' : '').'>
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.specialchars($this->strTable).'">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -1737,7 +1736,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <p class="tl_error">'.$GLOBALS['TL_LANG']['ERR']['general'].'</p>' : '').$return;
 
 		// Reload the page to prevent _POST variables from being sent twice
-		if ($this->Input->post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
+		if (\Input::post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
 		{
 			$arrValues = $this->values;
 			array_unshift($arrValues, time());
@@ -1753,7 +1752,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 
 			// Set the current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
-			$this->Database->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE " . implode(' AND ', $this->procedure))
+			\Database::getInstance()->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE " . implode(' AND ', $this->procedure))
 							->execute($arrValues);
 
 			// Redirect
@@ -1779,18 +1778,18 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$this->resetMessages();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 
-				$this->redirect($this->Environment->script . '?do=' . $this->Input->get('do'));
+				$this->redirect(\Environment::script() . '?do=' . \Input::get('do'));
 			}
 
 			elseif (isset($_POST['saveNcreate']))
 			{
 				$this->resetMessages();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-				$strUrl = $this->Environment->script . '?do=' . $this->Input->get('do');
+				$strUrl = \Environment::script() . '?do=' . \Input::get('do');
 
 				if (isset($_GET['table']))
 				{
-					$strUrl .= '&amp;table=' . $this->Input->get('table');
+					$strUrl .= '&amp;table=' . \Input::get('table');
 				}
 
 				$strUrl .= strlen($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) ? '&amp;act=create&amp;mode=2&amp;pid=' . CURRENT_ID : '&amp;act=create';
@@ -1838,22 +1837,22 @@ window.addEvent(\'domready\', function() {
 		$session = $this->Session->getData();
 		$ids = $session['CURRENT']['IDS'];
 
-		if ($intId != '' && $this->Environment->isAjaxRequest)
+		if ($intId != '' && \Environment::isAjaxRequest())
 		{
 			$ids = array($intId);
 		}
 
 		// Save field selection in session
-		if ($this->Input->post('FORM_SUBMIT') == $this->strTable.'_all' && $this->Input->get('fields'))
+		if (\Input::post('FORM_SUBMIT') == $this->strTable.'_all' && \Input::get('fields'))
 		{
-			$session['CURRENT'][$this->strTable] = deserialize($this->Input->post('all_fields'));
+			$session['CURRENT'][$this->strTable] = deserialize(\Input::post('all_fields'));
 			$this->Session->setData($session);
 		}
 
 		// Add fields
 		$fields = $session['CURRENT'][$this->strTable];
 
-		if (is_array($fields) && !empty($fields) && $this->Input->get('fields'))
+		if (is_array($fields) && !empty($fields) && \Input::get('fields'))
 		{
 			$class = 'tl_tbox';
 			$this->checkForTinyMce();
@@ -1870,12 +1869,12 @@ window.addEvent(\'domready\', function() {
 				// Add meta fields if the current user is an administrator
 				if ($this->User->isAdmin)
 				{
-					if ($this->Database->fieldExists('sorting', $this->strTable))
+					if (\Database::getInstance()->fieldExists('sorting', $this->strTable))
 					{
 						array_unshift($this->strPalette, 'sorting');
 					}
 
-					if ($this->Database->fieldExists('pid', $this->strTable))
+					if (\Database::getInstance()->fieldExists('pid', $this->strTable))
 					{
 						array_unshift($this->strPalette, 'pid');
 					}
@@ -1914,7 +1913,7 @@ window.addEvent(\'domready\', function() {
 				$strSqlFields .= (count($arrSqlDetails)>0 ? (strlen($strSqlFields) ? ', ' : '') . implode(', ', $arrSqlDetails) : '');
 
 				// Get the field values
-				$objRow = $this->Database->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
+				$objRow = \Database::getInstance()->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
 											->limit(1)
 											->execute($this->intId);
 
@@ -1932,7 +1931,7 @@ window.addEvent(\'domready\', function() {
 
 					if ($v == '[EOF]')
 					{
-						if ($blnAjax && $this->Environment->isAjaxRequest)
+						if ($blnAjax && \Environment::isAjaxRequest())
 						{
 							return $strAjax . '<input type="hidden" name="FORM_FIELDS_'.$id.'[]" value="'.specialchars(implode(',', $formFields)).'">';
 						}
@@ -1946,7 +1945,7 @@ window.addEvent(\'domready\', function() {
 					if (preg_match('/^\[.*\]$/i', $v))
 					{
 						$thisId = 'sub_' . substr($v, 1, -1) . '_' . $id;
-						$blnAjax = ($ajaxId == $thisId && $this->Environment->isAjaxRequest) ? true : false;
+						$blnAjax = ($ajaxId == $thisId && \Environment::isAjaxRequest()) ? true : false;
 						$return .= "\n  " . '<div id="'.$thisId.'">';
 
 						continue;
@@ -2059,7 +2058,7 @@ window.addEvent(\'domready\', function() {
 										}
 									}
 
-									$objForeignFd = $this->Database->prepare($sqlForeignFd)->execute();
+									$objForeignFd = \Database::getInstance()->prepare($sqlForeignFd)->execute();
 
 									// reset current dca
 									$GLOBALS['TL_DCA'][$this->strTable] = $BAK_DCA;
@@ -2083,13 +2082,13 @@ window.addEvent(\'domready\', function() {
 									unset($objForeignFd);
 								}
 								// foreignKey table is 'normal' table
-								elseif ($this->Database->fieldExists($strForeignField, $strForeignTable))
+								elseif (\Database::getInstance()->fieldExists($strForeignField, $strForeignTable))
 								{
-									$blnAlias = $this->Database->fieldExists('alias', $strForeignTable);
+									$blnAlias = \Database::getInstance()->fieldExists('alias', $strForeignTable);
 
 									$sqlForeign = "SELECT id," . ($blnAlias ? "alias," : "") . $strForeignField . " FROM " . $strForeignTable . (strlen($strForeignKeyCond) ? " WHERE ".$strForeignKeyCond : '') . " ORDER BY " . $strForeignField;
 
-									$objForeign = $this->Database->prepare($sqlForeign)->execute();
+									$objForeign = \Database::getInstance()->prepare($sqlForeign)->execute();
 
 									if ($objForeign->numRows)
 									{
@@ -2358,7 +2357,7 @@ window.addEvent(\'domready\', function() {
 </div>';
 
 				// Save record
-				if ($this->Input->post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
+				if (\Input::post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
 				{
 					// Call onsubmit_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback']))
@@ -2371,7 +2370,7 @@ window.addEvent(\'domready\', function() {
 					}
 
 					// Set current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
-					$this->Database->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE id=?")
+					\Database::getInstance()->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE id=?")
 								   ->execute(time(), $this->intId);
 				}
 			}
@@ -2381,7 +2380,7 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline_all">'.sprintf($GLOBALS['TL_LANG']['MSC']['all_info'], $this->strTable).'</h2>
 
-<form action="'.ampersand($this->Environment->request, true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '">
+<form action="'.ampersand(\Environment::request(), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.$this->strTable.'">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">'.($this->noReload ? '
@@ -2413,9 +2412,9 @@ window.addEvent(\'domready\', function() {
 			}
 
 			// Reload the page to prevent _POST variables from being sent twice
-			if ($this->Input->post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
+			if (\Input::post('FORM_SUBMIT') == $this->strTable && !$this->noReload)
 			{
-				if ($this->Input->post('saveNclose'))
+				if (\Input::post('saveNclose'))
 				{
 					setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 					$this->redirect($this->getReferer());
@@ -2437,12 +2436,12 @@ window.addEvent(\'domready\', function() {
 			// Add meta fields if the current user is an administrator
 			if ($this->User->isAdmin)
 			{
-				if ($this->Database->fieldExists('sorting', $this->strTable) && !in_array('sorting', $fields))
+				if (\Database::getInstance()->fieldExists('sorting', $this->strTable) && !in_array('sorting', $fields))
 				{
 					array_unshift($fields, 'sorting');
 				}
 
-				if ($this->Database->fieldExists('pid', $this->strTable) && !in_array('pid', $fields))
+				if (\Database::getInstance()->fieldExists('pid', $this->strTable) && !in_array('pid', $fields))
 				{
 					array_unshift($fields, 'pid');
 				}
@@ -2465,7 +2464,7 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline_all">'.sprintf($GLOBALS['TL_LANG']['MSC']['all_info'], $this->strTable).'</h2>
 
-<form action="'.ampersand($this->Environment->request, true).'&amp;fields=1" id="'.$this->strTable.'_all" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'&amp;fields=1" id="'.$this->strTable.'_all" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.$this->strTable.'_all">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">'.($blnIsError ? '
@@ -2508,7 +2507,7 @@ window.addEvent(\'domready\', function() {
 	 */
 	protected function save($varValue)
 	{
-		if ($this->Input->post('FORM_SUBMIT') != $this->strTable)
+		if (\Input::post('FORM_SUBMIT') != $this->strTable)
 		{
 			return;
 		}
@@ -2605,7 +2604,7 @@ window.addEvent(\'domready\', function() {
 		// Make sure unique fields are unique
 		if (strlen($varValue) && $arrField['eval']['unique'])
 		{
-			$objUnique = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $this->strField . "=? AND id!=?")
+			$objUnique = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $this->strField . "=? AND id!=?")
 										->execute($varValue, $this->intId);
 
 			if ($objUnique->numRows)
@@ -2630,7 +2629,7 @@ window.addEvent(\'domready\', function() {
 			// If the field is a fallback field, empty all other columns
 			if ($arrField['eval']['fallback'] && $varValue != '')
 			{
-				$this->Database->execute("UPDATE " . $this->strTable . " SET " . $this->strField . "=''");
+				\Database::getInstance()->execute("UPDATE " . $this->strTable . " SET " . $this->strField . "=''");
 			}
 
 			$arrValues = $this->values;
@@ -2662,7 +2661,7 @@ window.addEvent(\'domready\', function() {
 			if ($blnDetailField)
 			{
 				// if record does not exist insert an empty record
-				$objExist = $this->Database->prepare("SELECT id FROM tl_formdata_details WHERE pid=? AND ff_name=?")
+				$objExist = \Database::getInstance()->prepare("SELECT id FROM tl_formdata_details WHERE pid=? AND ff_name=?")
 											->execute(array($this->intId, $strTargetField));
 
 				if ($objExist->numRows == 0)
@@ -2675,7 +2674,7 @@ window.addEvent(\'domready\', function() {
 						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['label'][0] ,
 						'ff_name' => $strTargetField
 					);
-					$objInsertStmt = $this->Database->prepare("INSERT INTO " . $strTargetTable . " %s")
+					$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $strTargetTable . " %s")
 										->set($arrSetInsert)
 										->execute();
 				}
@@ -2683,7 +2682,7 @@ window.addEvent(\'domready\', function() {
 				$sqlUpd = "UPDATE " . $strTargetTable . " SET value=? WHERE " . implode(' AND ', $arrProcedures);
 			}
 
-			$objUpdateStmt = $this->Database->prepare($sqlUpd)
+			$objUpdateStmt = \Database::getInstance()->prepare($sqlUpd)
 											->execute($arrValues);
 
 			if ($objUpdateStmt->affectedRows)
@@ -2722,7 +2721,7 @@ window.addEvent(\'domready\', function() {
 			$sValues = array();
 			$subpalettes = array();
 
-			$objFields = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
+			$objFields = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
 										->limit(1)
 										->executeUncached($this->intId);
 
@@ -2734,13 +2733,13 @@ window.addEvent(\'domready\', function() {
 					$trigger = $objFields->$name;
 
 					// Overwrite the trigger
-					if ($this->Input->post('FORM_SUBMIT') == $this->strTable)
+					if (\Input::post('FORM_SUBMIT') == $this->strTable)
 					{
-						$key = ($this->Input->get('act') == 'editAll') ? $name.'_'.$this->intId : $name;
+						$key = (\Input::get('act') == 'editAll') ? $name.'_'.$this->intId : $name;
 
 						if (isset($_POST[$key]))
 						{
-							$trigger = $this->Input->post($key);
+							$trigger = \Input::post($key);
 						}
 					}
 
@@ -2846,7 +2845,7 @@ window.addEvent(\'domready\', function() {
 		// Delete all new but incomplete records (tstamp=0)
 		if (is_array($new_records[$this->strTable]) && !empty($new_records[$this->strTable]))
 		{
-			$objStmt = $this->Database->execute("DELETE FROM " . $this->strTable . " WHERE id IN(" . implode(',', array_map('intval', $new_records[$this->strTable])) . ") AND tstamp=0");
+			$objStmt = \Database::getInstance()->execute("DELETE FROM " . $this->strTable . " WHERE id IN(" . implode(',', array_map('intval', $new_records[$this->strTable])) . ") AND tstamp=0");
 
 			if ($objStmt->affectedRows > 0)
 			{
@@ -2857,7 +2856,7 @@ window.addEvent(\'domready\', function() {
 		// Delete all records of the current table that are not related to the parent table
 		if (strlen($ptable))
 		{
-			$objStmt = $this->Database->execute("DELETE FROM " . $this->strTable . " WHERE NOT EXISTS (SELECT * FROM " . $ptable . " WHERE " . $this->strTable . ".pid = " . $ptable . ".id)");
+			$objStmt = \Database::getInstance()->execute("DELETE FROM " . $this->strTable . " WHERE NOT EXISTS (SELECT * FROM " . $ptable . " WHERE " . $this->strTable . ".pid = " . $ptable . ".id)");
 
 			if ($objStmt->affectedRows > 0)
 			{
@@ -2872,7 +2871,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if (strlen($v))
 				{
-					$objStmt = $this->Database->execute("DELETE FROM " . $v . " WHERE NOT EXISTS (SELECT * FROM " . $this->strTable . " WHERE " . $v . ".pid = " . $this->strTable . ".id)");
+					$objStmt = \Database::getInstance()->execute("DELETE FROM " . $v . " WHERE NOT EXISTS (SELECT * FROM " . $this->strTable . " WHERE " . $v . ".pid = " . $this->strTable . ".id)");
 
 					if ($objStmt->affectedRows > 0)
 					{
@@ -2908,10 +2907,10 @@ window.addEvent(\'domready\', function() {
 			$firstOrderBy = $this->firstOrderBy;
 		}
 
-		if ($this->Input->get('table') && $GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'] && $this->Database->fieldExists('pid', $this->strTable))
+		if (\Input::get('table') && $GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'] && \Database::getInstance()->fieldExists('pid', $this->strTable))
 		{
 			$this->procedure[] = 'pid=?';
-			$this->values[] = $this->Input->get('id');
+			$this->values[] = \Input::get('id');
 		}
 
 		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
@@ -2961,7 +2960,7 @@ window.addEvent(\'domready\', function() {
 			$query .= " DESC";
 		}
 
-		$objRowStmt = $this->Database->prepare($query);
+		$objRowStmt = \Database::getInstance()->prepare($query);
 
 		if ($this->limit != '')
 		{
@@ -2977,8 +2976,8 @@ window.addEvent(\'domready\', function() {
 		{
 			$return .= '
 
-<div id="'.$this->bid.'">'.(($this->Input->get('act') == 'select' || $this->ptable) ? '
-<a href="'.$this->getReferer(true, $this->ptable).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>' : '') . (($this->ptable && $this->Input->get('act') != 'select') ? ' &nbsp; :: &nbsp;' : '') . (($this->Input->get('act') != 'select') ? '
+<div id="'.$this->bid.'">'.((\Input::get('act') == 'select' || $this->ptable) ? '
+<a href="'.$this->getReferer(true, $this->ptable).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>' : '') . (($this->ptable && \Input::get('act') != 'select') ? ' &nbsp; :: &nbsp;' : '') . ((\Input::get('act') != 'select') ? '
 '.(!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<a href="'.(strlen($this->ptable) ? $this->addToUrl('act=create' . (($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] < 4) ? '&amp;mode=2' : '') . '&amp;pid=' . $this->intId) : $this->addToUrl('act=create')).'" class="header_new" title="'.specialchars($GLOBALS['TL_LANG'][$this->strTable]['new'][1]).'" accesskey="n" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG'][$this->strTable]['new'][0].'</a>' : '') . $this->generateGlobalButtons() : '') . '
 </div>' . $this->getMessages(true);
 		}
@@ -2994,14 +2993,14 @@ window.addEvent(\'domready\', function() {
 		else
 		{
 			$result = $objRow->fetchAllAssoc();
-			$return .= (($this->Input->get('act') == 'select') ? '
+			$return .= ((\Input::get('act') == 'select') ? '
 
-<form action="'.ampersand($this->Environment->request, true).'" id="tl_select" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'" id="tl_select" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_select">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">' : '').'
 
-<div class="tl_listing_container list_view">'.(($this->Input->get('act') == 'select') ? '
+<div class="tl_listing_container list_view">'.((\Input::get('act') == 'select') ? '
 
 <div class="tl_select_trigger">
 <label for="tl_select_trigger" class="tl_select_label">'.$GLOBALS['TL_LANG']['MSC']['selectAll'].'</label> <input type="checkbox" id="tl_select_trigger" onclick="Backend.toggleCheckboxes(this)" class="tl_tree_checkbox">
@@ -3023,7 +3022,7 @@ window.addEvent(\'domready\', function() {
 
 				foreach ($result as $k=>$v)
 				{
-					$objField = $this->Database->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
+					$objField = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
 											   ->limit(1)
 											   ->execute($v['pid']);
 
@@ -3175,8 +3174,7 @@ window.addEvent(\'domready\', function() {
 
 				if ($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] > 0 && $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] < strlen(strip_tags($label)))
 				{
-					$this->import('String');
-					$label = trim($this->String->substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
+					$label = trim(\String::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
 				}
 
 				// Remove empty brackets (), [], {}, <> and empty tags from the label
@@ -3247,7 +3245,7 @@ window.addEvent(\'domready\', function() {
 				}
 
 				// Buttons ($row, $table, $root, $blnCircularReference, $childs, $previous, $next)
-				$return .= (($this->Input->get('act') == 'select') ? '
+				$return .= ((\Input::get('act') == 'select') ? '
     <td class="tl_file_list tl_right_nowrap"><input type="checkbox" name="IDS[]" id="ids_'.$row['id'].'" class="tl_tree_checkbox" value="'.$row['id'].'"></td>' : '
     <td class="tl_file_list tl_right_nowrap">'.$this->generateButtons($row, $this->strTable, $this->root).'</td>') . '
   </tr>';
@@ -3260,7 +3258,7 @@ window.addEvent(\'domready\', function() {
 </div>';
 
 			// Close the form
-			if ($this->Input->get('act') == 'select')
+			if (\Input::get('act') == 'select')
 			{
 				$return .= '
 
@@ -3302,7 +3300,7 @@ window.addEvent(\'domready\', function() {
 			return '';
 		}
 
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters')
+		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
 			$this->reload();
 		}
@@ -3347,7 +3345,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		$return = '
-<form action="'.ampersand($this->Environment->request, true).'" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -3387,23 +3385,23 @@ window.addEvent(\'domready\', function() {
 		$strSessionKey = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 
 		// Store search value in the current session
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters')
+		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
 
 			$session['search'][$strSessionKey]['value'] = '';
-			$session['search'][$strSessionKey]['field'] = $this->Input->post('tl_field', true);
+			$session['search'][$strSessionKey]['field'] = \Input::post('tl_field', true);
 
 			// Make sure the regular expression is valid
-			if ($this->Input->postRaw('tl_value') != '')
+			if (\Input::postRaw('tl_value') != '')
 			{
-				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $this->Input->post('tl_field', true) .'\' AND pid=f.id)';
+				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . \Input::post('tl_field', true) .'\' AND pid=f.id)';
 				try
 				{
-					$this->Database->prepare("SELECT * ".(count($this->arrSqlDetails) > 0 ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
+					\Database::getInstance()->prepare("SELECT * ".(count($this->arrSqlDetails) > 0 ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
 								   ->limit(1)
-								   ->execute($this->Input->postRaw('tl_value'));
+								   ->execute(\Input::postRaw('tl_value'));
 
-					$session['search'][$strSessionKey]['value'] = $this->Input->postRaw('tl_value');
+					$session['search'][$strSessionKey]['value'] = \Input::postRaw('tl_value');
 				}
 				catch (Exception $e) {}
 			}
@@ -3492,15 +3490,15 @@ window.addEvent(\'domready\', function() {
 		$strSessionKey = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 
 		// Add PID to order fields
-		if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 3 && $this->Database->fieldExists('pid', $this->strTable))
+		if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 3 && \Database::getInstance()->fieldExists('pid', $this->strTable))
 		{
 			array_unshift($orderBy, 'pid');
 		}
 
 		// Set sorting from user input
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters')
+		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
-			$session['sorting'][$strSessionKey] = in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->Input->post('tl_sort')]['flag'], array(2, 4, 6, 8, 10, 12)) ? $this->Input->post('tl_sort').' DESC' : $this->Input->post('tl_sort');
+			$session['sorting'][$strSessionKey] = in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][\Input::post('tl_sort')]['flag'], array(2, 4, 6, 8, 10, 12)) ? \Input::post('tl_sort').' DESC' : \Input::post('tl_sort');
 			$this->Session->setData($session);
 		}
 
@@ -3565,11 +3563,11 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Set limit from user input
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters' || $this->Input->post('FORM_SUBMIT') == 'tl_filters_limit')
+		if (\Input::post('FORM_SUBMIT') == 'tl_filters' || \Input::post('FORM_SUBMIT') == 'tl_filters_limit')
 		{
-			if ($this->Input->post('tl_limit') != 'tl_limit')
+			if (\Input::post('tl_limit') != 'tl_limit')
 			{
-				$session['filter'][$filter]['limit'] = $this->Input->post('tl_limit');
+				$session['filter'][$filter]['limit'] = \Input::post('tl_limit');
 			}
 			else
 			{
@@ -3578,7 +3576,7 @@ window.addEvent(\'domready\', function() {
 
 			$this->Session->setData($session);
 
-			if ($this->Input->post('FORM_SUBMIT') == 'tl_filters_limit')
+			if (\Input::post('FORM_SUBMIT') == 'tl_filters_limit')
 			{
 				$this->reload();
 			}
@@ -3612,7 +3610,7 @@ window.addEvent(\'domready\', function() {
 			$sqlSelect = "SELECT COUNT(*) AS total FROM " . $this->strTable . " f";
 			$sqlQuery = $sqlSelect . $sqlWhere;
 
-			$objTotal = $this->Database->prepare($sqlQuery)
+			$objTotal = \Database::getInstance()->prepare($sqlQuery)
 									   ->execute($this->values);
 			$total = $objTotal->total;
 			$blnIsMaxResultsPerPage = false;
@@ -3712,13 +3710,13 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Set filter from user input
-		if ($this->Input->post('FORM_SUBMIT') == 'tl_filters')
+		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
 			foreach ($sortingFields as $field)
 			{
-				if ($this->Input->post($field, true) != 'tl_'.$field)
+				if (\Input::post($field, true) != 'tl_'.$field)
 				{
-					$session['filter'][$filter][$field] = $this->Input->post($field, true);
+					$session['filter'][$filter][$field] = \Input::post($field, true);
 				}
 				else
 				{
@@ -3796,7 +3794,7 @@ window.addEvent(\'domready\', function() {
 						// CSV lists (see #2890)
 						if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['csv']))
 						{
-							$this->procedure[] = $this->Database->findInSet('?', $field, true);
+							$this->procedure[] = \Database::getInstance()->findInSet('?', $field, true);
 							$this->values[] = $session['filter'][$filter][$field];
 						}
 						else
@@ -3849,7 +3847,7 @@ window.addEvent(\'domready\', function() {
 				$sqlField = "SELECT DISTINCT(value) FROM tl_formdata_details WHERE ff_name='" . $field . "' AND pid=f.id";
 			}
 
-			$objFields = $this->Database->prepare("SELECT DISTINCT(" . $sqlField . ") AS `". $field . "` FROM " . $this->strTable . " f ". ((is_array($arrProcedure) && strlen($arrProcedure[0])) ? ' WHERE ' . implode(' AND ', $arrProcedure) : ''))
+			$objFields = \Database::getInstance()->prepare("SELECT DISTINCT(" . $sqlField . ") AS `". $field . "` FROM " . $this->strTable . " f ". ((is_array($arrProcedure) && strlen($arrProcedure[0])) ? ' WHERE ' . implode(' AND ', $arrProcedure) : ''))
 										->execute($arrValues);
 
 			// Begin select menu
@@ -3983,7 +3981,7 @@ window.addEvent(\'domready\', function() {
 					{
 						$key = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['foreignKey'], 2);
 
-						$objParent = $this->Database->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
+						$objParent = \Database::getInstance()->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
 													->limit(1)
 													->execute($vv);
 
@@ -4016,7 +4014,7 @@ window.addEvent(\'domready\', function() {
 							$showFields[0] = 'id';
 						}
 
-						$objShowFields = $this->Database->prepare("SELECT " . $showFields[0] . " FROM ". $this->ptable . " WHERE id=?")
+						$objShowFields = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM ". $this->ptable . " WHERE id=?")
 														->limit(1)
 														->execute($vv);
 
@@ -4101,7 +4099,7 @@ window.addEvent(\'domready\', function() {
 		{
 			$key = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['foreignKey'], 2);
 
-			$objParent = $this->Database->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
+			$objParent = \Database::getInstance()->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
 										->limit(1)
 										->execute($value);
 
@@ -4365,7 +4363,7 @@ window.addEvent(\'domready\', function() {
 
 		$blnSend = false;
 
-		if (strlen($this->Input->get('token')) && $this->Input->get('token') == $this->Session->get('fd_mail_send'))
+		if (strlen(\Input::get('token')) && \Input::get('token') == $this->Session->get('fd_mail_send'))
 		{
 			$blnSend = true;
 		}
@@ -4392,7 +4390,7 @@ window.addEvent(\'domready\', function() {
 			$sqlQuery .= $sqlWhere;
 		}
 
-		$objRow = $this->Database->prepare($sqlQuery)
+		$objRow = \Database::getInstance()->prepare($sqlQuery)
 								->limit(1)
 								->execute($this->intId);
 
@@ -4418,7 +4416,7 @@ window.addEvent(\'domready\', function() {
 				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
 				{
 					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']);
-					$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")
+					$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
 						->limit(1)
 						->execute($intFormId);
 				}
@@ -4427,7 +4425,7 @@ window.addEvent(\'domready\', function() {
 
 		if ($intFormId == 0)
 		{
-			$objForm = $this->Database->prepare("SELECT * FROM tl_form WHERE title=?")
+			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
 					->limit(1)
 					->execute($arrSubmitted['form']);
 		}
@@ -4453,7 +4451,6 @@ window.addEvent(\'domready\', function() {
 			return '<p class="tl_error">Can not send this form data record.<br>Missing "Subject", "Text of confirmation mail" or "HTML-template for confirmation mail"<br>Please check configuration of form in form generator.</p>';
 		}
 
-		$this->import('String');
 		$messageText = '';
 		$messageHtml = '';
 		$messageHtmlTmpl = '';
@@ -4506,9 +4503,9 @@ window.addEvent(\'domready\', function() {
 			$arrRecipient = array_unique(array_merge(trimsplit(',', $varRecipient), trimsplit(',', $arrForm['confirmationMailRecipient'])));
 		}
 
-		if ($this->Input->get('recipient'))
+		if (\Input::get('recipient'))
 		{
-			$arrRecipient = array_unique(trimsplit(',', $this->Input->get('recipient')));
+			$arrRecipient = array_unique(trimsplit(',', \Input::get('recipient')));
 		}
 
 		if (is_array($arrRecipient))
@@ -4518,7 +4515,7 @@ window.addEvent(\'domready\', function() {
 			// handle insert tag {{user::email}} in recipient fields
 			if (!is_bool(strpos($strRecipient, "{{user::email}}")) && $arrSubmitted['fd_member'] > 0)
 			{
-				$objUser = $this->Database->prepare("SELECT `email` FROM `tl_member` WHERE id=?")
+				$objUser = \Database::getInstance()->prepare("SELECT `email` FROM `tl_member` WHERE id=?")
 									->limit(1)
 									->execute($arrSubmitted['fd_member']);
 
@@ -4527,8 +4524,8 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
-		$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
+		$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
+		$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
 		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 
 		if ($messageHtmlTmpl != '')
@@ -4612,7 +4609,7 @@ window.addEvent(\'domready\', function() {
 								{
 									if (strlen($strVal))
 									{
-										$varText[] = $this->Environment->base . $strVal;
+										$varText[] = \Environment::base() . $strVal;
 										$varHtml[] = '<img src="' . $strVal . '">';
 									}
 								}
@@ -4813,7 +4810,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Send Mail
-		if (strlen($this->Input->get('token')) && $this->Input->get('token') == $this->Session->get('fd_mail_send'))
+		if (strlen(\Input::get('token')) && \Input::get('token') == $this->Session->get('fd_mail_send'))
 		{
 
 			$this->Session->set('fd_mail_send', null);
@@ -4847,12 +4844,12 @@ window.addEvent(\'domready\', function() {
 					}
 				}
 
-				$url = $this->Environment->base . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', $this->Environment->request);
+				$url = \Environment::base() . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::request());
 
 				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
 				{
 					$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => time());
-					$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
+					$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
 									->set($arrUpd)
 									->execute($this->intId);
 				}
@@ -4890,12 +4887,12 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages(). $strHint .'
 
-<form action="'.ampersand($this->Environment->script, ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
+<form action="'.ampersand(\Environment::script(), ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
 <div class="tl_formbody_edit fd_mail_send">
-<input type="hidden" name="do" value="' . $this->Input->get('do') . '">
-<input type="hidden" name="table" value="' . $this->Input->get('table') . '">
-<input type="hidden" name="act" value="' . $this->Input->get('act') . '">
-<input type="hidden" name="id" value="' . $this->Input->get('id') . '">
+<input type="hidden" name="do" value="' . \Input::get('do') . '">
+<input type="hidden" name="table" value="' . \Input::get('table') . '">
+<input type="hidden" name="act" value="' . \Input::get('act') . '">
+<input type="hidden" name="id" value="' . \Input::get('id') . '">
 <input type="hidden" name="token" value="' . $strToken . '">
 
 <table cellpadding="0" cellspacing="0" class="prev_header" summary="">
@@ -4964,7 +4961,7 @@ $return .= '
 
 	public function importFile()
 	{
-		if ($this->Input->get('key') != 'import')
+		if (\Input::get('key') != 'import')
 		{
 			return '';
 		}
@@ -5000,13 +4997,13 @@ $return .= '
 			$arrSessionData['import'][$this->strFormKey]['csv_has_header'] = ($_POST['csv_has_header'] == '1' ? '1' : '');
 			$this->Session->set('EFG', $arrSessionData);
 
-			if (!$this->Input->post('import_source') || $this->Input->post('import_source') == '')
+			if (!\Input::post('import_source') || \Input::post('import_source') == '')
 			{
 				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['tl_formdata']['error_select_source'];
 				$this->reload();
 			}
 
-			$strCsvFile = $this->Input->post('import_source');
+			$strCsvFile = \Input::post('import_source');
 			$objFile = new File($strCsvFile);
 
 			if ($objFile->extension != 'csv')
@@ -5017,7 +5014,7 @@ $return .= '
 			}
 
 			// Get separator
-			switch ($this->Input->post('separator'))
+			switch (\Input::post('separator'))
 			{
 				case 'semicolon':
 					$strSeparator = ';';
@@ -5041,7 +5038,7 @@ $return .= '
 				$intInvalid = 0;
 				$intValid = 0;
 
-				$arrImportCols = $this->Input->post('import_cols');
+				$arrImportCols = \Input::post('import_cols');
 				$arrSessionData['import'][$this->strFormKey]['import_cols'] = $arrImportCols;
 				$this->Session->set('EFG', $arrSessionData);
 
@@ -5061,7 +5058,7 @@ $return .= '
 
 				$strAliasField = (strlen($this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
 
-				$objForm = $this->Database->prepare("SELECT id FROM tl_form WHERE `title`=?")
+				$objForm = \Database::getInstance()->prepare("SELECT id FROM tl_form WHERE `title`=?")
 									->limit(1)
 									->execute($strFormTitle);
 				if ($objForm->numRows == 1)
@@ -5088,7 +5085,7 @@ $return .= '
 					}
 					elseif (isset($arrRow[$arrMapFields[$strAliasField]]) && strlen($arrRow[$arrMapFields[$strAliasField]]))
 					{
-						$this->Input->setPost($strAliasField, $arrRow[$arrMapFields[$strAliasField]]);
+						\Input::setPost($strAliasField, $arrRow[$arrMapFields[$strAliasField]]);
 					}
 
 					$arrDetailSets = array();
@@ -5100,7 +5097,7 @@ $return .= '
 						'fd_member' => 0,
 						'fd_user' => intval($this->User->id),
 						'form' => $strFormTitle,
-						'ip' => $this->Environment->ip,
+						'ip' => \Environment::ip(),
 						'date' => $timeNow,
 						'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 						// 'alias' => '',
@@ -5206,13 +5203,13 @@ $return .= '
 
 					if (count($arrDetailSets))
 					{
-						$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+						$objNewFormdata = \Database::getInstance()->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
 						$intNewId = $objNewFormdata->insertId;
 
 						$strAlias = $this->Formdata->generateAlias($strAlias, $this->strFormFilterValue, $intNewId);
 						if (strlen($strAlias))
 						{
-							$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);
+							\Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")->set(array('alias' => $strAlias))->execute($intNewId);
 						}
 
 						foreach ($arrDetailSets as $kD => $arrDetailSet)
@@ -5220,7 +5217,7 @@ $return .= '
 							$arrDetailSet['pid'] = $intNewId;
 							try
 							{
-								$objNewFormdataDetails = $this->Database->prepare("INSERT INTO tl_formdata_details %s")
+								$objNewFormdataDetails = \Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")
 																		->set($arrDetailSet)
 																		->execute();
 							}
@@ -5232,7 +5229,7 @@ $return .= '
 
 						if ($blnSaved === false && $intNewId > 0)
 						{
-							$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")->execute($intNewId);
+							\Database::getInstance()->prepare("DELETE FROM tl_formdata WHERE id=?")->execute($intNewId);
 						}
 					}
 					else
@@ -5297,12 +5294,12 @@ $return .= '
 		// Return form
 		return '
 <div id="tl_buttons">
-<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.ampersand(str_replace('&key=import', '', \Environment::request())).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>
 '.$this->getMessages().'
-<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
 <input type="hidden" name="FORM_MODE" value="preview">
@@ -5413,19 +5410,19 @@ var Stylect = {
 
 		$return .= '
 <div id="tl_buttons">
-<a href="'.ampersand(str_replace('&key=import', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.ampersand(str_replace('&key=import', '', \Environment::request())).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'
 .$this->getMessages().'
-<form action="'.ampersand($this->Environment->request, true).'" id="tl_formdata_import" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::request(), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit tl_formdata_import">
 	<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
 	<input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
 	<input type="hidden" name="FORM_MODE" value="import">
-	<input type="hidden" name="import_source" value="'.$this->Input->post('import_source').'">
-	<input type="hidden" name="separator" value="'.$this->Input->post('separator').'">
-	<input type="hidden" name="csv_has_header" value="'.$this->Input->post('csv_has_header').'">
+	<input type="hidden" name="import_source" value="'.\Input::post('import_source').'">
+	<input type="hidden" name="separator" value="'.\Input::post('separator').'">
+	<input type="hidden" name="csv_has_header" value="'.\Input::post('csv_has_header').'">
 
 	<div class="tl_tbox block">
 		<h3>'.$GLOBALS['TL_LANG']['tl_formdata']['import_preview'][0].'</h3>
@@ -5521,9 +5518,9 @@ var Stylect = {
 	public function export($strMode='csv')
 	{
 
-		if (strlen($this->Input->get('expmode')))
+		if (strlen(\Input::get('expmode')))
 		{
-			$strMode = $this->Input->get('expmode');
+			$strMode = \Input::get('expmode');
 		}
 
 		$return = '';
@@ -5573,10 +5570,10 @@ var Stylect = {
 			$firstOrderBy = $this->firstOrderBy;
 		}
 
-		if ($this->Input->get('table') && $GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'] && $this->Database->fieldExists('pid', $this->strTable))
+		if (\Input::get('table') && $GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'] && \Database::getInstance()->fieldExists('pid', $this->strTable))
 		{
 			$this->procedure[] = 'pid=?';
-			$this->values[] = $this->Input->get('id');
+			$this->values[] = \Input::get('id');
 		}
 
 		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
@@ -5721,7 +5718,7 @@ var Stylect = {
 			$query .= " DESC";
 		}
 
-		$objRowStmt = $this->Database->prepare($query);
+		$objRowStmt = \Database::getInstance()->prepare($query);
 		$objRow = $objRowStmt->execute($this->values);
 
 		$intRowCounter = -1;
@@ -5757,13 +5754,13 @@ var Stylect = {
 			$result = $objRow->fetchAllAssoc();
 
 			// Rename each pid to its label and resort the result (sort by parent table)
-			if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 3 && $this->Database->fieldExists('pid', $this->strTable))
+			if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 3 && \Database::getInstance()->fieldExists('pid', $this->strTable))
 			{
 				$firstOrderBy = 'pid';
 
 				foreach ($result as $k=>$v)
 				{
-					$objField = $this->Database->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
+					$objField = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
 											   ->limit(1)
 											   ->execute($v['pid']);
 					$result[$k]['pid'] = $objField->$showFields[0];
@@ -5828,7 +5825,7 @@ var Stylect = {
 
 						if (strlen($strName))
 						{
-							$strName = $this->String->decodeEntities($strName);
+							$strName = \String::decodeEntities($strName);
 						}
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
@@ -6044,7 +6041,7 @@ var Stylect = {
 
 					if (strlen($strVal))
 					{
-						$strVal = $this->String->decodeEntities($strVal);
+						$strVal = \String::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
@@ -6159,7 +6156,7 @@ var Stylect = {
 		if (!$this->arrMembers)
 		{
 			$members = array();
-			$objMembers = $this->Database->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
+			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
 								->execute();
 			$members[] = '-';
 			if ($objMembers->numRows)
@@ -6186,7 +6183,7 @@ var Stylect = {
 			$users = array();
 
 			// Get all users
-			$objUsers = $this->Database->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
+			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
 								->execute();
 			$users[] = '-';
 			if ($objUsers->numRows)
@@ -6213,7 +6210,7 @@ var Stylect = {
 			$groups = array();
 
 			// Get all member groups
-			$objGroups = $this->Database->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
+			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
 								->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
@@ -6240,7 +6237,7 @@ var Stylect = {
 			$groups = array();
 
 			// Get all user groups
-			$objGroups = $this->Database->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
+			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
 								->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)

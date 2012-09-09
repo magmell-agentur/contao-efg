@@ -45,7 +45,6 @@ class EfgFormGallery extends \ContentElement
 	public function __construct(Widget $objWidget, $arrConfig)
 	{
 		$this->widget = $objWidget;
-		$this->import('Input');
 		$this->multiSRC = $arrConfig['efgMultiSRC'];
 		$this->efgImageMultiple = $arrConfig['efgImageMultiple']; // $objWidget->efgImageMultiple;
 		$this->efgImageUseHomeDir = $arrConfig['efgImageUseHomeDir']; // $objWidget->efgImageUseHomeDir;
@@ -274,7 +273,7 @@ class EfgFormGallery extends \ContentElement
 		if ($this->perPage > 0)
 		{
 			// Get the current page
-			$page = $this->Input->get('page') ? $this->Input->get('page') : 1;
+			$page = \Input::get('page') ? \Input::get('page') : 1;
 
 			// Do not index or cache the page if the page number is outside the range
 			if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))

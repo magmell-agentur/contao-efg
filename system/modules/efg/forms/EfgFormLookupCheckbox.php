@@ -58,8 +58,6 @@ class EfgFormLookupCheckbox extends \Widget
 		switch ($strKey)
 		{
 			case 'efgLookupOptions':
-				$this->import('Database');
-				$this->import('String');
 				$this->import('Formdata');
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 				$arrOptions = $this->Formdata->prepareDcaOptions($this->arrConfiguration);
@@ -154,7 +152,7 @@ class EfgFormLookupCheckbox extends \Widget
 		$blnSingleEvent = false;
 
 		// if used as lookup on table tl_calendar_events and placed on events detail page
-		if ($strLookupTable=='tl_calendar_events' && strlen($this->Input->get('events')) )
+		if ($strLookupTable=='tl_calendar_events' && strlen(\Input::get('events')) )
 		{
 			if (count($this->arrOptions)==1)
 			{

@@ -38,7 +38,7 @@ class FormdataComments extends \Backend
 
 		$strRet = '';
 
-		$objParent = $this->Database->prepare("SELECT `id`, `form`, `alias`  FROM tl_formdata WHERE id=?")
+		$objParent = \Database::getInstance()->prepare("SELECT `id`, `form`, `alias`  FROM tl_formdata WHERE id=?")
 											->execute($arrRow['parent']);
 
 		if ($objParent->numRows)

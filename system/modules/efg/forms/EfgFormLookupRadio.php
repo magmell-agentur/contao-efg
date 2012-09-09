@@ -58,8 +58,6 @@ class EfgFormLookupRadio extends \Widget
 		switch ($strKey)
 		{
 			case 'efgLookupOptions':
-				$this->import('Database');
-				$this->import('String');
 				$this->import('Formdata');
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
 

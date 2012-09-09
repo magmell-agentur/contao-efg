@@ -119,7 +119,7 @@ class ExtendedForm extends \Form
 		}
 
 		// Check multipage
-		$objPaginators = $this->Database->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
+		$objPaginators = \Database::getInstance()->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
 									->execute($this->id, 'efgFormPaginator');
 		if ($objPaginators->numRows)
 		{
@@ -170,7 +170,7 @@ class ExtendedForm extends \Form
 			unset($_SESSION['EFP'][$formId]['completed']);
 		}
 
-		if ($this->Input->post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
+		if (\Input::post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
 		{
 			$intActivePage = (int) $_POST['FORM_PAGE'];
 			$intGoto = 0;
@@ -220,7 +220,7 @@ class ExtendedForm extends \Form
 		$this->getMaxFileSize();
 
 		// Get all form fields
-		$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? AND invisible!=1 ORDER BY sorting")
+		$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? AND invisible!=1 ORDER BY sorting")
 									->execute($this->id);
 
 		$row = 0;
@@ -384,7 +384,7 @@ class ExtendedForm extends \Form
 			}
 
 			// Validate input
-			if ($this->Input->post('FORM_SUBMIT') == $formId)
+			if (\Input::post('FORM_SUBMIT') == $formId)
 			{
 				// populate field
 				if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
@@ -392,7 +392,7 @@ class ExtendedForm extends \Form
 					if ($strMode == 'back' && strlen($this->arrPaginators[($this->intActivePage-1)]['efgBackStoreSessionValues']))
 					{
 						unset($_SESSION['FORM_DATA'][$objFields->name]);
-						$objWidget->value = $this->Input->post($objFields->name);
+						$objWidget->value = \Input::post($objFields->name);
 					}
 					elseif ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
 					{
@@ -469,7 +469,7 @@ class ExtendedForm extends \Form
 				}
 
 				unset($_POST[$objFields->name]);
-			} // if ($this->Input->post('FORM_SUBMIT') == $formId)
+			} // if (\Input::post('FORM_SUBMIT') == $formId)
 
 
 			if ($objWidget instanceof FormHidden)
@@ -525,7 +525,7 @@ class ExtendedForm extends \Form
 		}
 
 		// Process form data
-		if ($this->Input->post('FORM_SUBMIT') == $formId && !$doNotSubmit)
+		if (\Input::post('FORM_SUBMIT') == $formId && !$doNotSubmit)
 		{
 			if ($this->intTotalPages == 1 || (!$this->blnMultipage && !$this->blnEditform))
 			{
@@ -578,13 +578,13 @@ class ExtendedForm extends \Form
 		$this->Template->attributes = $strAttributes;
 		$this->Template->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
-		//$this->Template->action = ampersand($this->Environment->request, true);
+		//$this->Template->action = ampersand(\Environment::request(), true);
 		$this->Template->action = $this->getIndexFreeRequest();
 
 		// Get target URL
 		if ($this->method == 'GET')
 		{
-			$objNextPage = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=?")
+			$objNextPage = \Database::getInstance()->prepare("SELECT id, alias FROM tl_page WHERE id=?")
 										  ->limit(1)
 										  ->execute($this->jumpTo);
 

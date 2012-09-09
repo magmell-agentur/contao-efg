@@ -106,7 +106,6 @@ class Efp extends \Frontend
 		$this->Formdata->FdDcaKey = $this->strFdDcaKey;
 
 		$this->import('FrontendUser', 'Member');
-		$this->import('String');
 
 		$dirImages = '';
 
@@ -114,7 +113,7 @@ class Efp extends \Frontend
 		$intListingId = intval($_SESSION['EFP']['LISTING_MOD']['id']);
 		if ($intListingId)
 		{
-			$objListing = $this->Database->prepare("SELECT * FROM tl_module WHERE id=?")
+			$objListing = \Database::getInstance()->prepare("SELECT * FROM tl_module WHERE id=?")
 								->execute($intListingId);
 			if ($objListing->numRows)
 			{
@@ -135,7 +134,7 @@ class Efp extends \Frontend
 		$intOldId = 0;
 		$strRedirectTo = '';
 
-		$strUrl = preg_replace('/\?.*$/', '', $this->Environment->request);
+		$strUrl = preg_replace('/\?.*$/', '', \Environment::request());
 		$strUrlParams = '';
 
 		$blnQuery = false;
@@ -153,12 +152,12 @@ class Efp extends \Frontend
 
 		if (in_array($arrListing['efg_fe_edit_access'], array('public','groupmembers','member')))
 		{
-			if ($this->Input->get('act') == 'edit')
+			if (\Input::get('act') == 'edit')
 			{
 				$blnFEedit = true;
 
-				$objCheck = $this->Database->prepare("SELECT id FROM tl_formdata WHERE id=? OR alias=?")
-								->execute($this->Input->get($this->strFormdataDetailsKey), $this->Input->get($this->strFormdataDetailsKey));
+				$objCheck = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE id=? OR alias=?")
+								->execute(\Input::get($this->strFormdataDetailsKey), \Input::get($this->strFormdataDetailsKey));
 
 				if ($objCheck->numRows == 1)
 				{
@@ -166,7 +165,7 @@ class Efp extends \Frontend
 				}
 				else
 				{
-					$this->log('Could not identify record by ID "'.$this->Input->get($this->strFormdataDetailsKey).'"', 'Efp processSubmittedData()', TL_GENERAL);
+					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', 'Efp processSubmittedData()', TL_GENERAL);
 				}
 			}
 		}
@@ -262,7 +261,7 @@ class Efp extends \Frontend
 				'form' => $arrForm['title'],
 				'tstamp' => $timeNow,
 				'date' => $timeNow,
-				'ip' => $this->Environment->ip,
+				'ip' => \Environment::ip(),
 				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 				'fd_member' => intval($this->Member->id),
 				'fd_member_group' => intval($this->Member->groups[0]),
@@ -304,19 +303,19 @@ class Efp extends \Frontend
 			if ($blnFEedit && strlen($arrListing['efg_fe_keep_id']))
 			{
 				$intNewId = $intOldId;
-				$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
- 				$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+				\Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
+ 				\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
 								->execute($intOldId);
 			}
 			else
 			{
-				$objNewFormdata = $this->Database->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
+				$objNewFormdata = \Database::getInstance()->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
 				$intNewId = $objNewFormdata->insertId;
 
 				// update related comments
 				if (in_array('comments', $this->Config->getActiveModules()))
 				{
-					$this->Database->prepare("UPDATE tl_comments %s WHERE `source` = 'tl_formdata' AND parent=?")
+					\Database::getInstance()->prepare("UPDATE tl_comments %s WHERE `source` = 'tl_formdata' AND parent=?")
 								->set(array('parent' => $intNewId))
 								->execute($intOldId);
 				}
@@ -383,7 +382,7 @@ class Efp extends \Frontend
 							'value' => $strVal
 						);
 
-						$objNewFormdataDetails = $this->Database
+						$objNewFormdataDetails = \Database::getInstance()
 								->prepare("INSERT INTO tl_formdata_details %s")
 								->set($arrFieldSet)
 								->execute();
@@ -404,13 +403,13 @@ class Efp extends \Frontend
 				{
 					if ($intNewId > 0 && intval($intOldId)>0 && intval($intNewId) != intval($intOldId))
 					{
-	 					$this->Database->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+	 					\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
 	 							->execute($intOldId);
-	 					$this->Database->prepare("DELETE FROM tl_formdata WHERE id=?")
+	 					\Database::getInstance()->prepare("DELETE FROM tl_formdata WHERE id=?")
 	 							->execute($intOldId);
 					}
 				}
-				$strRedirectTo = preg_replace('/\?.*$/', '', $this->Environment->request);
+				$strRedirectTo = preg_replace('/\?.*$/', '', \Environment::request());
 			}
 
 			// auto generate alias
@@ -418,7 +417,7 @@ class Efp extends \Frontend
 			if (strlen($strAlias))
 			{
 				$arrUpd = array('alias' => $strAlias);
-				$this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
+				\Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
 								->set($arrUpd)
 								->execute($intNewId);
 			}
@@ -451,7 +450,6 @@ class Efp extends \Frontend
 
 		if ($arrForm['sendConfirmationMail'])
 		{
-			$this->import('String');
 			$messageText = '';
 			$messageHtml = '';
 			$messageHtmlTmpl = '';
@@ -494,8 +492,8 @@ class Efp extends \Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $this->String->decodeEntities($arrForm['confirmationMailSubject']);
-			$messageText = $this->String->decodeEntities($arrForm['confirmationMailText']);
+			$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
+			$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 			if ($messageHtmlTmpl != '')
 			{
@@ -582,7 +580,7 @@ class Efp extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = $this->Environment->base . $strVal;
+											$varTxt[] = \Environment::base() . $strVal;
 											$varHtml[] = '<img src="' . $strVal . '" />';
 										}
 									}
@@ -790,7 +788,7 @@ class Efp extends \Frontend
 			if ($blnConfirmationSent && isset($intNewId) && intval($intNewId)>0)
 			{
 				$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => $timeNow);
-				$res = $this->Database->prepare("UPDATE tl_formdata %s WHERE id=?")
+				$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
 								->set($arrUpd)
 								->execute($intNewId);
 			}
@@ -806,7 +804,6 @@ class Efp extends \Frontend
 
 		if ($arrForm['sendFormattedMail'])
 		{
-			$this->import('String');
 			$messageText = '';
 			$messageHtml = '';
 			$messageHtmlTmpl = '';
@@ -841,8 +838,8 @@ class Efp extends \Frontend
 			}
 			$arrRecipient = array_unique($arrRecipient);
 
-			$subject = $this->String->decodeEntities($arrForm['formattedMailSubject']);
-			$messageText = $this->String->decodeEntities($arrForm['formattedMailText']);
+			$subject = \String::decodeEntities($arrForm['formattedMailSubject']);
+			$messageText = \String::decodeEntities($arrForm['formattedMailText']);
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
 			if ( $messageHtmlTmpl != '' )
@@ -928,7 +925,7 @@ class Efp extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = $this->Environment->base . $strVal;
+											$varTxt[] = \Environment::base() . $strVal;
 											$varHtml[] = '<img src="' . $strVal . '" />';
 										}
 									}
@@ -1136,7 +1133,7 @@ class Efp extends \Frontend
 		{
 			if (strlen($strRedirectTo))
 			{
-				$strRed = preg_replace(array('/\/'.$this->strFormdataDetailsKey.'\/'.$this->Input->get($this->strFormdataDetailsKey).'/i', '/'.$this->strFormdataDetailsKey.'='.$this->Input->get($this->strFormdataDetailsKey).'/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/' . $this->strFormdataDetailsKey . '\/' . \Input::get($this->strFormdataDetailsKey) . '/i', '/' . $this->strFormdataDetailsKey . '=' . \Input::get($this->strFormdataDetailsKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}
@@ -1167,7 +1164,7 @@ class Efp extends \Frontend
 		{
 			$blnSkipEmpty = false;
 
-			$objSkip = $this->Database->prepare("SELECT confirmationMailSkipEmpty FROM tl_form WHERE id=?")->execute($arrSubmitted['_formId_']);
+			$objSkip = \Database::getInstance()->prepare("SELECT confirmationMailSkipEmpty FROM tl_form WHERE id=?")->execute($arrSubmitted['_formId_']);
 			if ($objSkip->confirmationMailSkipEmpty == 1)
 			{
 				$blnSkipEmpty = true;
