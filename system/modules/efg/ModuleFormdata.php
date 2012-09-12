@@ -86,7 +86,7 @@ class ModuleFormdata extends \Backend
 	/**
 	 * Create DCA files
 	 */
-	public function createFormdataDca(DataContainer $dc)
+	public function createFormdataDca(\DataContainer $dc)
 	{
 		$this->intFormId = $dc->id;
 
@@ -125,7 +125,7 @@ class ModuleFormdata extends \Backend
 		$tplConfig->arrForm = $this->objForm;
 		$tplConfig->arrStoreForms = $arrStoreForms;
 
-		$objConfig = new File('system/modules/efg/config/config.php');
+		$objConfig = new \File('system/modules/efg/config/config.php');
 		$objConfig->write($tplConfig->parse());
 		$objConfig->close();
 
@@ -154,7 +154,7 @@ class ModuleFormdata extends \Backend
 				$tplMod->arrStoreForms = $arrStoreForms;
 
 				$objMod = 'objMod_' . $strModLang;
-				$objMod = new File('system/modules/efg/languages/'.$strModLang.'/modules.php');
+				$objMod = new \File('system/modules/efg/languages/'.$strModLang.'/modules.php');
 				$objMod->write($tplMod->parse());
 				$objMod->close();
 			}
@@ -204,7 +204,7 @@ class ModuleFormdata extends \Backend
 			$tplDca->blnBackendMail = $blnBackendMail;
 
 			$objDca = 'objDca_' . $strFormKey;
-			$objDca = new File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
+			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
 		}
@@ -246,7 +246,7 @@ class ModuleFormdata extends \Backend
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
 
 			$objDca = 'objDca_' . $strFormKey;
-			$objDca = new File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
+			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
 
@@ -260,7 +260,7 @@ class ModuleFormdata extends \Backend
 	 */
 	private function newTemplate($strTemplate)
 	{
-		$objTemplate = new BackendTemplate($strTemplate);
+		$objTemplate = new \BackendTemplate($strTemplate);
 		$objTemplate->folder = 'efg';
 
 		return $objTemplate;
