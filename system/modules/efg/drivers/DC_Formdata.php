@@ -782,7 +782,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$set['form'] = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 			$set['date'] = time();
-			$set['ip'] = \Environment::ip();
+			$set['ip'] = \Environment::get('ip');
 
 			if ($this->User && intval($this->User->id)>0)
 			{
@@ -1778,14 +1778,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$this->resetMessages();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 
-				$this->redirect(\Environment::script() . '?do=' . \Input::get('do'));
+				$this->redirect(\Environment::get('script') . '?do=' . \Input::get('do'));
 			}
 
 			elseif (isset($_POST['saveNcreate']))
 			{
 				$this->resetMessages();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-				$strUrl = \Environment::script() . '?do=' . \Input::get('do');
+				$strUrl = \Environment::get('script') . '?do=' . \Input::get('do');
 
 				if (isset($_GET['table']))
 				{
@@ -2529,7 +2529,7 @@ window.addEvent(\'domready\', function() {
 		// Convert date formats into timestamps
 		if ($varValue != '' && in_array($arrField['eval']['rgxp'], array('date', 'time', 'datim')))
 		{
-			$objDate = new Date($varValue, $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format']);
+			$objDate = new \Date($varValue, $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format']);
 			$varValue = $objDate->tstamp;
 		}
 
@@ -2609,7 +2609,7 @@ window.addEvent(\'domready\', function() {
 
 			if ($objUnique->numRows)
 			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['unique'], (strlen($arrField['label'][0]) ? $arrField['label'][0] : $this->strField)));
+				throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['unique'], (strlen($arrField['label'][0]) ? $arrField['label'][0] : $this->strField)));
 			}
 		}
 
@@ -3749,7 +3749,7 @@ window.addEvent(\'domready\', function() {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$filter][$field]);
+							$objDate = new \Date($session['filter'][$filter][$field]);
 							$this->procedure[] = $field . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->dayBegin;
 							$this->values[] = $objDate->dayEnd;
@@ -3765,7 +3765,7 @@ window.addEvent(\'domready\', function() {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$filter][$field]);
+							$objDate = new \Date($session['filter'][$filter][$field]);
 							$this->procedure[] = $field . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->monthBegin;
 							$this->values[] = $objDate->monthEnd;
@@ -3781,7 +3781,7 @@ window.addEvent(\'domready\', function() {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$filter][$field]);
+							$objDate = new \Date($session['filter'][$filter][$field]);
 							$this->procedure[] = $field . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->yearBegin;
 							$this->values[] = $objDate->yearEnd;
@@ -4530,7 +4530,7 @@ window.addEvent(\'domready\', function() {
 
 		if ($messageHtmlTmpl != '')
 		{
-			$fileTemplate = new File($messageHtmlTmpl);
+			$fileTemplate = new \File($messageHtmlTmpl);
 			if ($fileTemplate->mime == 'text/html')
 			{
 				$messageHtml = $fileTemplate->getContent();
@@ -4609,7 +4609,7 @@ window.addEvent(\'domready\', function() {
 								{
 									if (strlen($strVal))
 									{
-										$varText[] = \Environment::base() . $strVal;
+										$varText[] = \Environment::get('base') . $strVal;
 										$varHtml[] = '<img src="' . $strVal . '">';
 									}
 								}
@@ -4639,7 +4639,7 @@ window.addEvent(\'domready\', function() {
 							{
 								if (!array_key_exists($strKey, $arrFiles))
 								{
-									$objFile = new File($arrSubmitted[$strKey]);
+									$objFile = new \File($arrSubmitted[$strKey]);
 									if ($objFile->size)
 									{
 										$arrFiles[$strKey] = array('tmp_name' => $objFile->value, 'file'=>$objFile->value,  'name' => $objFile->basename, 'mime' => $objFile->mime);
@@ -4746,7 +4746,7 @@ window.addEvent(\'domready\', function() {
 			$sender = $this->replaceInsertTags($sender);
 		}
 
-		$confEmail = new Email();
+		$confEmail = new \Email();
 		$confEmail->from = $sender;
 		if (strlen($senderName))
 		{
@@ -4774,7 +4774,7 @@ window.addEvent(\'domready\', function() {
 							// can we read the file?
 							if(is_readable(TL_ROOT .'/' .$strFile))
 							{
-								$objFile = new File($strFile);
+								$objFile = new \File($strFile);
 								if ($objFile->size)
 								{
 									$attachments[] = $objFile->value;
@@ -4844,7 +4844,7 @@ window.addEvent(\'domready\', function() {
 					}
 				}
 
-				$url = \Environment::base() . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::get('request'));
+				$url = \Environment::get('base') . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::get('request'));
 
 				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
 				{
@@ -4869,7 +4869,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if (strlen($objRow->confirmationDate))
 				{
-					$dateConfirmation = new Date($objRow->confirmationDate);
+					$dateConfirmation = new \Date($objRow->confirmationDate);
 					$strHint .= '<div class="tl_message"><p class="tl_info">'. sprintf($GLOBALS['TL_LANG']['tl_formdata']['confirmation_sent'], $dateConfirmation->date, $dateConfirmation->time) .'</p></div>';
 				}
 				else
@@ -4887,7 +4887,7 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages(). $strHint .'
 
-<form action="'.ampersand(\Environment::script(), ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
+<form action="'.ampersand(\Environment::get('script'), ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
 <div class="tl_formbody_edit fd_mail_send">
 <input type="hidden" name="do" value="' . \Input::get('do') . '">
 <input type="hidden" name="table" value="' . \Input::get('table') . '">
@@ -5004,7 +5004,7 @@ $return .= '
 			}
 
 			$strCsvFile = \Input::post('import_source');
-			$objFile = new File($strCsvFile);
+			$objFile = new \File($strCsvFile);
 
 			if ($objFile->extension != 'csv')
 			{
@@ -5097,7 +5097,7 @@ $return .= '
 						'fd_member' => 0,
 						'fd_user' => intval($this->User->id),
 						'form' => $strFormTitle,
-						'ip' => \Environment::ip(),
+						'ip' => \Environment::get('ip'),
 						'date' => $timeNow,
 						'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 						// 'alias' => '',
@@ -5289,7 +5289,7 @@ $return .= '
 	{
 		$arrSessionData = $this->Session->get('EFG');
 
-		$objTree = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
+		$objTree = new \FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
 
 		// Return form
 		return '
@@ -5623,7 +5623,7 @@ var Stylect = {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$objDate = new \Date($session['filter'][$strSessionKey][$field]);
 							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->dayBegin;
 							$this->values[] = $objDate->dayEnd;
@@ -5639,7 +5639,7 @@ var Stylect = {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$objDate = new \Date($session['filter'][$strSessionKey][$field]);
 							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->monthBegin;
 							$this->values[] = $objDate->monthEnd;
@@ -5655,7 +5655,7 @@ var Stylect = {
 						}
 						else
 						{
-							$objDate = new Date($session['filter'][$strSessionKey][$field]);
+							$objDate = new \Date($session['filter'][$strSessionKey][$field]);
 							$this->procedure[] = $sqlFilterField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->yearBegin;
 							$this->values[] = $objDate->yearEnd;
