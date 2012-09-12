@@ -417,7 +417,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if (!empty($this->ctable) && !\Input::get('act') && !\Input::get('key') && !\Input::get('token'))
 		{
 			$session = $this->Session->get('referer');
-			$session[$this->strTable] = \Environment::requestUri();
+			$session[$this->strTable] = \Environment::get('requestUri');
 			$this->Session->set('referer', $session);
 		}
 	}
