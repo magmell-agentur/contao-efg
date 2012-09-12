@@ -134,7 +134,7 @@ class Efp extends \Frontend
 		$intOldId = 0;
 		$strRedirectTo = '';
 
-		$strUrl = preg_replace('/\?.*$/', '', \Environment::request());
+		$strUrl = preg_replace('/\?.*$/', '', \Environment::get('request'));
 		$strUrlParams = '';
 
 		$blnQuery = false;
@@ -409,7 +409,7 @@ class Efp extends \Frontend
 	 							->execute($intOldId);
 					}
 				}
-				$strRedirectTo = preg_replace('/\?.*$/', '', \Environment::request());
+				$strRedirectTo = preg_replace('/\?.*$/', '', \Environment::get('request'));
 			}
 
 			// auto generate alias

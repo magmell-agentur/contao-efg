@@ -578,7 +578,7 @@ class ExtendedForm extends \Form
 		$this->Template->attributes = $strAttributes;
 		$this->Template->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
-		//$this->Template->action = ampersand(\Environment::request(), true);
+		//$this->Template->action = ampersand(\Environment::get('request'), true);
 		$this->Template->action = $this->getIndexFreeRequest();
 
 		// Get target URL

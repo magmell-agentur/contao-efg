@@ -690,7 +690,7 @@ class ModuleFormdataListing extends \Module
 			{
 				$this->log('Could not identify record by ID "' . \Input::get($this->strDetailKey) . '"', 'ModuleFormdataListing compile()', TL_GENERAL);
 
-				$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+				$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 				$strUrlParams = '';
 				$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -1176,7 +1176,7 @@ class ModuleFormdataListing extends \Module
 		 * Prepare URL
 		 */
 
-		//$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		//$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrl = $this->generateFrontendUrl($objPage->row());
 		if ($strUrl == '/' || $strUrl == '//')
 		{
@@ -1568,7 +1568,7 @@ class ModuleFormdataListing extends \Module
 								{
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
+									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
 									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 									$href = ampersand($href);
 
@@ -1619,7 +1619,7 @@ class ModuleFormdataListing extends \Module
 										{
 											$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
+											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
 											$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 											$href = ampersand($href);
 
@@ -1680,7 +1680,7 @@ class ModuleFormdataListing extends \Module
 			/**
 			 * Template variables
 			 */
-			$this->Template->action = ampersand(urldecode(\Environment::request()));
+			$this->Template->action = ampersand(urldecode(\Environment::get('request')));
 			$this->Template->per_page_label = specialchars($GLOBALS['TL_LANG']['MSC']['list_perPage']);
 			$this->Template->search_label = specialchars($GLOBALS['TL_LANG']['MSC']['search']);
 			$this->Template->per_page = \Input::get('per_page');
@@ -1953,7 +1953,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -2250,7 +2250,7 @@ class ModuleFormdataListing extends \Module
 						{
 							$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-							$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
+							$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
 							$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 							$href = ampersand($href);
 
@@ -2302,7 +2302,7 @@ class ModuleFormdataListing extends \Module
 								{
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
-									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::request());
+									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
 									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 									$href = ampersand($href);
 
@@ -2334,7 +2334,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$this->Template->url = $strUrl;
 		$this->Template->listItem = $arrItem;
 		$this->Template->record = $arrFields;
@@ -2417,7 +2417,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -2895,7 +2895,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
@@ -3062,7 +3062,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::request()));
+		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
 		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 

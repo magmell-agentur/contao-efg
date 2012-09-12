@@ -310,15 +310,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			if (isset($_POST['edit']))
 			{
-				$this->redirect(str_replace('act=select', 'act=editAll', \Environment::request()));
+				$this->redirect(str_replace('act=select', 'act=editAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['delete']))
 			{
-				$this->redirect(str_replace('act=select', 'act=deleteAll', \Environment::request()));
+				$this->redirect(str_replace('act=select', 'act=deleteAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['override']))
 			{
-				$this->redirect(str_replace('act=select', 'act=overrideAll', \Environment::request()));
+				$this->redirect(str_replace('act=select', 'act=overrideAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['cut']) || isset($_POST['copy']))
 			{
@@ -531,7 +531,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$return .= '
 
-<form action="'.ampersand(\Environment::request(), true).'" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters_limit">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -1727,7 +1727,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 <h2 class="sub_headline">'.sprintf($GLOBALS['TL_LANG']['MSC']['editRecord'], ($this->intId ? 'ID '.$this->intId : '')).'</h2>
 '.$this->getMessages().'
-<form action="'.ampersand(\Environment::request(), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '"'.(!empty($this->onsubmit) ? ' onsubmit="'.implode(' ', $this->onsubmit).'"' : '').'>
+<form action="'.ampersand(\Environment::get('request'), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '"'.(!empty($this->onsubmit) ? ' onsubmit="'.implode(' ', $this->onsubmit).'"' : '').'>
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.specialchars($this->strTable).'">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -2380,7 +2380,7 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline_all">'.sprintf($GLOBALS['TL_LANG']['MSC']['all_info'], $this->strTable).'</h2>
 
-<form action="'.ampersand(\Environment::request(), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '">
+<form action="'.ampersand(\Environment::get('request'), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.$this->strTable.'">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">'.($this->noReload ? '
@@ -2464,7 +2464,7 @@ window.addEvent(\'domready\', function() {
 
 <h2 class="sub_headline_all">'.sprintf($GLOBALS['TL_LANG']['MSC']['all_info'], $this->strTable).'</h2>
 
-<form action="'.ampersand(\Environment::request(), true).'&amp;fields=1" id="'.$this->strTable.'_all" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'&amp;fields=1" id="'.$this->strTable.'_all" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.$this->strTable.'_all">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">'.($blnIsError ? '
@@ -2995,7 +2995,7 @@ window.addEvent(\'domready\', function() {
 			$result = $objRow->fetchAllAssoc();
 			$return .= ((\Input::get('act') == 'select') ? '
 
-<form action="'.ampersand(\Environment::request(), true).'" id="tl_select" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'" id="tl_select" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_select">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">' : '').'
@@ -3345,7 +3345,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		$return = '
-<form action="'.ampersand(\Environment::request(), true).'" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'" class="tl_form" method="post">
 <div class="tl_formbody">
 <input type="hidden" name="FORM_SUBMIT" value="tl_filters">
 <input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
@@ -4844,7 +4844,7 @@ window.addEvent(\'domready\', function() {
 					}
 				}
 
-				$url = \Environment::base() . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::request());
+				$url = \Environment::base() . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::get('request'));
 
 				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
 				{
@@ -5294,12 +5294,12 @@ $return .= '
 		// Return form
 		return '
 <div id="tl_buttons">
-<a href="'.ampersand(str_replace('&key=import', '', \Environment::request())).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.ampersand(str_replace('&key=import', '', \Environment::get('request'))).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>
 '.$this->getMessages().'
-<form action="'.ampersand(\Environment::request(), true).'" id="tl_formdata_import" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
 <input type="hidden" name="FORM_MODE" value="preview">
@@ -5410,12 +5410,12 @@ var Stylect = {
 
 		$return .= '
 <div id="tl_buttons">
-<a href="'.ampersand(str_replace('&key=import', '', \Environment::request())).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.ampersand(str_replace('&key=import', '', \Environment::get('request'))).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'
 .$this->getMessages().'
-<form action="'.ampersand(\Environment::request(), true).'" id="tl_formdata_import" class="tl_form" method="post">
+<form action="'.ampersand(\Environment::get('request'), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit tl_formdata_import">
 	<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
 	<input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
