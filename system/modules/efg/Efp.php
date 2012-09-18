@@ -985,7 +985,7 @@ class Efp extends \Frontend
 				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
 			}
 
-			$infoEmail = new Email();
+			$infoEmail = new \Email();
 			$infoEmail->from = $sender;
 			if (strlen($senderName))
 			{
