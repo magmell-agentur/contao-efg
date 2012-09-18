@@ -28,58 +28,9 @@ namespace Efg;
 class Efp extends \Frontend
 {
 
-	/**
-	 * Key
-	 * @var string
-	 */
-	protected $strKey = 'form';
-
-	/**
-	 * Table
-	 * @var string
-	 */
-	protected $strTable = 'tl_form';
-
-	/**
-	 * Template
-	 * @var string
-	 */
-	protected $strTemplate = 'form';
-
 	protected $strFdDcaKey = '';
 
 	protected $strFormdataDetailsKey = 'details';
-
-	/**
-	 * Data array
-	 * @var array
-	 */
-	protected $arrData = array();
-
-	public function __construct()
-	{
-		parent::__construct();
-	}
-
-	/**
-	 * Set an object property
-	 * @param string
-	 * @param mixed
-	 */
-	public function __set($strKey, $varValue)
-	{
-		$this->arrData[$strKey] = $varValue;
-	}
-
-	/**
-	 * Return an object property
-	 * @param string
-	 * @return mixed
-	 */
-	public function __get($strKey)
-	{
-		return $this->arrData[$strKey];
-	}
 
 
 	/**
@@ -226,9 +177,9 @@ class Efp extends \Frontend
 		}
 
 		// Formdata storage
-		if ($arrForm['storeFormdata'] && count($arrSubmitted)>0 )
+		if ($arrForm['storeFormdata'] && count($arrSubmitted) > 0)
 		{
-			$blnStoreOptionsValue = ($arrForm['efgStoreValues']=="1" ? true : false);
+			$blnStoreOptionsValue = ($arrForm['efgStoreValues'] == "1" ? true : false);
 
 			// if frontend editing, get old record
 			if ($intOldId > 0)
@@ -261,7 +212,7 @@ class Efp extends \Frontend
 				'form' => $arrForm['title'],
 				'tstamp' => $timeNow,
 				'date' => $timeNow,
-				'ip' => \Environment::ip(),
+				'ip' => \Environment::get('ip'),
 				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 				'fd_member' => intval($this->Member->id),
 				'fd_member_group' => intval($this->Member->groups[0]),
@@ -688,8 +639,7 @@ class Efp extends \Frontend
 			if (strlen($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
-				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
+				$sender = $this->replaceInsertTags($sender);
 			}
 
 			// replace insert tags in replyto
@@ -698,7 +648,7 @@ class Efp extends \Frontend
 				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto']);
 			}
 
-			$confEmail = new Email();
+			$confEmail = new \Email();
 			$confEmail->from = $sender;
 			if (strlen($senderName))
 			{
@@ -1156,7 +1106,8 @@ class Efp extends \Frontend
 		}
 
 		$blnProcess = false;
-		if (preg_match('/\{\{form::/si', $strContent)) {
+		if (preg_match('/\{\{form::/si', $strContent))
+		{
 			$blnProcess = true;
 		}
 
@@ -1235,12 +1186,10 @@ class Efp extends \Frontend
 									$strLabel = '';
 								}
 
-								// $strContent = str_replace($tag, $strLabel . $strVal, $strContent);
 								$strTemp = str_replace($tag, $strLabel . $strVal, $strTemp);
 							break;
 						}
 					}
-					// unset($_SESSION['EFP']['FORMDATA']);
 
 					$strTemp = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $strTemp);
 
