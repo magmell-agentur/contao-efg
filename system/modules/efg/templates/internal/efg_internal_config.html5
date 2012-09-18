@@ -11,9 +11,9 @@
  * @copyright Thomas Kuhn 2007-2012
  */
 
-
 <?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
 <?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
+
 
 /**
 * to fix height of style class w50 in backend
@@ -35,11 +35,6 @@ $GLOBALS['TL_CTE']['includes']['form'] = 'ExtendedForm';
  * -------------------------------------------------------------------------
  * BACK END MODULES
  * -------------------------------------------------------------------------
- *
- * Back end modules are stored in a global array called "BE_MOD". Each module
- * has certain properties like an icon, an optional callback function and one
- * or more tables. Each module belongs to a particular group.
- *
  */
 
 <?php if ($this->arrStoreForms && count($this->arrStoreForms) > 0): ?>
@@ -70,7 +65,6 @@ $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
  * -------------------------------------------------------------------------
  * FRONT END MODULES
  * -------------------------------------------------------------------------
- *
  */
 
 array_insert($GLOBALS['FE_MOD']['application'], count($GLOBALS['FE_MOD']['application']), array
@@ -78,16 +72,11 @@ array_insert($GLOBALS['FE_MOD']['application'], count($GLOBALS['FE_MOD']['applic
 	'formdatalisting' => 'ModuleFormdataListing'
 ));
 
+
 /**
  * -------------------------------------------------------------------------
  * HOOKS
  * -------------------------------------------------------------------------
- *
- * Hooking allows you to register one or more callback functions that are
- * called on a particular event in a specific order. Thus, third party
- * extensions can add functionality to the core system without having to
- * modify the source code.
- *
  */
 
 $GLOBALS['TL_HOOKS']['processFormData'][] = array('Efp', 'processSubmittedData');
