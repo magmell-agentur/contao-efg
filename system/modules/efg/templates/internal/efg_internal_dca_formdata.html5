@@ -5,14 +5,14 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
  */
 
-<?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
-<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
+<?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
+<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . PHP_EOL; ?>
 
 <?php
 // default list config
@@ -421,7 +421,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate' /*,'importSource'*/),
+		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate'),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . str_replace("'", "\'", \String::decodeEntities($varKey)) . "'"; $strSep = ',';
 endforeach; ?>),
@@ -585,15 +585,15 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_clas
 <?php endforeach; ?>
 
 /**
- * Class tl_fd_<?php echo $this->strFormKey."\n"; ?>
+ * Class tl_fd_<?php echo $this->strFormKey . PHP_EOL; ?>
  *
  * Provide miscellaneous methods that are used by the data configuration array.
  *
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007 - 2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
- * @package    Controller
+ * @package    Efg
  */
-class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this->strFormKey) : 'feedback'); ?> extends Backend
+class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this->strFormKey) : 'feedback'); ?> extends \Backend
 {
 
 	/**
@@ -609,7 +609,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 
 
 	/*
-	* Create List Label for formdata item
+	* Create list label for formdata item
 	* This can be used to customize the backend list view for formdata "<?php echo $this->arrForm['title']; ?>"
 	*/
 	public function getRowLabel($arrRow)

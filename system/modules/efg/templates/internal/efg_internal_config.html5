@@ -11,8 +11,8 @@
  * @copyright Thomas Kuhn 2007-2012
  */
 
-<?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
-<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
+<?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
+<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . PHP_EOL; ?>
 
 
 /**
@@ -80,10 +80,6 @@ array_insert($GLOBALS['FE_MOD']['application'], count($GLOBALS['FE_MOD']['applic
  */
 
 $GLOBALS['TL_HOOKS']['processFormData'][] = array('Efp', 'processSubmittedData');
-<?php if (VERSION == '2.5' && intval(BUILD) <= 9): ?>
-$GLOBALS['TL_HOOKS']['outputTemplate'][] = array('Efp', 'processConfirmationContent');
-<?php else: ?>
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('Efp', 'processConfirmationContent');
-<?php endif; ?>
 $GLOBALS['TL_HOOKS']['listComments'][] = array('FormdataComments', 'listComments');
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = array('Formdata', 'getSearchablePages');

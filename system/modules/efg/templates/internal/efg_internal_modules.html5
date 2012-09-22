@@ -5,15 +5,15 @@
  *
  * Copyright (C) 2005-2012 Leo Feyer
  *
- * @package   efg
+ * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  * @copyright Thomas Kuhn 2007-2012
  */
 
 
-<?php echo '// This file is created when saving a form in form generator' . "\n"; ?>
-<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . "\n"; ?>
+<?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
+<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . PHP_EOL; ?>
 
 
 /**
