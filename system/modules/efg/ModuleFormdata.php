@@ -270,11 +270,9 @@ class ModuleFormdata extends \Backend
 	/**
 	 * Import Form data from CSV file
 	 * @param object Datacontainer
-	 * @param string Table name
-	 * @param array Module
-	 * @return string
+	 * @return string CSV imort form
 	 */
-	public function importCsv($dc, $strTable, $arrModule)
+	public function importCsv($dc)
 	{
 		if (\Input::get('key') != 'import')
 		{
