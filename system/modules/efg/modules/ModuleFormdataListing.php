@@ -3098,7 +3098,7 @@ class ModuleFormdataListing extends \Module
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check list access
-		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
@@ -3120,7 +3120,7 @@ class ModuleFormdataListing extends \Module
 		}
 		elseif (strlen($this->efg_fe_delete_access) )
 		{
-			if (intval($varOwner['fd_member'])>0 && intval($varOwner['fd_member']) === intval($this->Member->id) )
+			if (intval($varOwner['fd_member'])>0 && in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
 			{
 				$blnDeleteAllowed = true;
 				$intDeleteId = intval($this->intRecordId);
