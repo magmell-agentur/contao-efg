@@ -154,7 +154,7 @@ class Formdata extends \Frontend
 		}
 
 		$objAlias = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE alias=? AND id != ?")
-								   ->execute($varValue, $intRecId);
+								   ->executeUncached($varValue, $intRecId);
 
 		// Check whether the alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
