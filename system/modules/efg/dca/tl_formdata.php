@@ -255,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
-class tl_formdata extends Backend
+class tl_formdata extends \Backend
 {
 
 	/**
@@ -265,13 +265,13 @@ class tl_formdata extends Backend
 	protected $arrData = null;
 
 
-	/*
-	 * Loads $GLOBALS['TL_DCA']['tl_formdata'] or overwrites with form-specific dca-config
-	 * @string specific form if called from ModuleFormdataListing
+	/**
+	 * Loads $GLOBALS['TL_DCA']['tl_formdata'] or overwrites with form specific DCA config
+	 * @param object $dca DataContainer
+	 * @param string $varFormKey specific form if called from ModuleFormdataListing
 	 */
-	function loadDCA(DC_Formdata $dca, $varFormKey = '')
+	function loadDCA(\DataContainer $dca, $varFormKey = '')
 	{
-
 		$strModule = 'efg';
 		$strName = 'feedback';
 		$strFileName = 'tl_formdata';
