@@ -115,7 +115,7 @@ class FormdataProcessor extends \Frontend
 				}
 				else
 				{
-					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', 'Efp processSubmittedData()', TL_GENERAL);
+					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', 'FormdataProcessor processSubmittedData()', TL_GENERAL);
 				}
 			}
 		}
