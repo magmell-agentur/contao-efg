@@ -576,7 +576,7 @@ class ModuleFormdataListing extends \Module
 			$this->Template->textlink_delete = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_delete'];
 			$this->Template->text_confirmDelete = $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'];
 			$this->Template->textlink_export = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export'];
-			$this->Template->iconFolder = (strlen($this->efg_iconfolder) ? $this->efg_iconfolder : 'system/modules/efg/html');
+			$this->Template->iconFolder = (strlen($this->efg_iconfolder) ? $this->efg_iconfolder : 'system/modules/efg/assets');
 
 			$this->Template->details = strlen($this->list_info) ? true : false;
 
@@ -1576,13 +1576,13 @@ class ModuleFormdataListing extends \Module
 									$arrTd[$class][count($arrTd[$class])-1]['size'] = $size;
 									$arrTd[$class][count($arrTd[$class])-1]['href'] = $href;
 									$arrTd[$class][count($arrTd[$class])-1]['linkTitle'] = basename($objFile->basename);
-									$arrTd[$class][count($arrTd[$class])-1]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/html/') . $objFile->icon;
+									$arrTd[$class][count($arrTd[$class])-1]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/assets/') . $objFile->icon;
 
 									$arrListItems[$i][$k]['display'] = 'download';
 									$arrListItems[$i][$k]['size'] = $size;
 									$arrListItems[$i][$k]['href'] = $href;
 									$arrListItems[$i][$k]['linkTitle'] = basename($objFile->basename);
-									$arrListItems[$i][$k]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/html/') . $objFile->icon;
+									$arrListItems[$i][$k]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/assets/') . $objFile->icon;
 								}
 							}
 						}
