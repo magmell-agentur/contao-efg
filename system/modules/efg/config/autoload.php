@@ -28,11 +28,10 @@ ClassLoader::addClasses(array
 	// Classes
 	'Efg\Formdata'                     => 'system/modules/efg/classes/Formdata.php',
 	'Efg\FormdataComments'             => 'system/modules/efg/classes/FormdataComments.php',
+	'Efg\FormdataProcessor'            => 'system/modules/efg/classes/FormdataProcessor.php',
 
 	// Drivers
 	'Efg\DC_Formdata'                  => 'system/modules/efg/drivers/DC_Formdata.php',
-
-	// Elements
 
 	// Forms
 	'Efg\EfgFormGallery'               => 'system/modules/efg/forms/EfgFormGallery.php',
@@ -43,22 +42,12 @@ ClassLoader::addClasses(array
 	'Efg\EfgFormPaginator'             => 'system/modules/efg/forms/EfgFormPaginator.php',
 	'Efg\ExtendedForm'                 => 'system/modules/efg/forms/ExtendedForm.php',
 
-	// Models
-
 	// Modules
 	'Efg\ModuleFormdata'               => 'system/modules/efg/modules/ModuleFormdata.php',
 	'Efg\ModuleFormdataListing'        => 'system/modules/efg/modules/ModuleFormdataListing.php',
 
-	// Pages
-
 	// Widgets
 	'Efg\EfgLookupOptionWizard'        => 'system/modules/efg/widgets/EfgLookupOptionWizard.php',
-
-//TODO
-	// Others
-	'Efg\Efp'                          => 'system/modules/efg/Efp.php',
-
-
 
 ));
 

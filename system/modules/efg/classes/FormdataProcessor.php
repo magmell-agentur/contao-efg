@@ -18,14 +18,13 @@
 namespace Efg;
 
 /**
- * Class Efp
- * extended form processing
+ * Class FormdataProcessor
  *
  * @copyright  Thomas Kuhn 2007-2012
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class Efp extends \Frontend
+class FormdataProcessor extends \Frontend
 {
 
 	protected $strFdDcaKey = '';
@@ -448,7 +447,7 @@ class Efp extends \Frontend
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 			if ($messageHtmlTmpl != '')
 			{
-				$fileTemplate = new File($messageHtmlTmpl);
+				$fileTemplate = new \File($messageHtmlTmpl);
 				if ($fileTemplate->mime == 'text/html')
 				{
 					$messageHtml = $fileTemplate->getContent();
@@ -677,7 +676,7 @@ class Efp extends \Frontend
 							{
 								if(is_readable($strFile))
 								{
-									$objFile = new File($strFile);
+									$objFile = new \File($strFile);
 									if ($objFile->size)
 									{
 										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
@@ -794,7 +793,7 @@ class Efp extends \Frontend
 
 			if ( $messageHtmlTmpl != '' )
 			{
-				$fileTemplate = new File($messageHtmlTmpl);
+				$fileTemplate = new \File($messageHtmlTmpl);
 				if ( $fileTemplate->mime == 'text/html' )
 				{
 					$messageHtml = $fileTemplate->getContent();
@@ -1020,7 +1019,7 @@ class Efp extends \Frontend
 							{
 								if(is_readable($strFile))
 								{
-									$objFile = new File($strFile);
+									$objFile = new \File($strFile);
 									if ($objFile->size)
 									{
 										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
