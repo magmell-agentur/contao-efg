@@ -46,7 +46,7 @@ ClassLoader::addClasses(array
 	// Models
 
 	// Modules
-	'Efg\ModuleFormdata'               => 'system/modules/efg/ModuleFormdata.php',
+	'Efg\ModuleFormdata'               => 'system/modules/efg/modules/ModuleFormdata.php',
 	'Efg\ModuleFormdataListing'        => 'system/modules/efg/modules/ModuleFormdataListing.php',
 
 	// Pages
