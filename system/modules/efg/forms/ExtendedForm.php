@@ -111,7 +111,7 @@ class ExtendedForm extends \Form
 		}
 
 		// form used to edit existing formdata record
-		if ($this->objEditRecord instanceof Database_Result)
+		if ($this->objEditRecord instanceof \Database\Result)
 		{
 			$arrEditRecord = $this->objEditRecord->row();
 			$this->blnEditform = true;
@@ -153,7 +153,7 @@ class ExtendedForm extends \Form
 		$strMode = '';
 		$intActivePage = 1;
 
-		$this->Template = new FrontendTemplate($this->strTemplate);
+		$this->Template = new \FrontendTemplate($this->strTemplate);
 		$this->loadLanguageFile('tl_form');
 
 		// render a previous completed page
@@ -212,7 +212,7 @@ class ExtendedForm extends \Form
 
 		if ($this->blnMultipage || $this->blnEditform)
 		{
-			$objPageWidget = new FormHidden(array('name' => 'FORM_PAGE', 'value' => $this->intActivePage));
+			$objPageWidget = new \FormHidden(array('name' => 'FORM_PAGE', 'value' => $this->intActivePage));
 			$this->Template->hidden .= $objPageWidget->parse();
 		}
 
@@ -361,7 +361,7 @@ class ExtendedForm extends \Form
 					}
 					else
 					{
-						if ($objWidget instanceof uploadable)
+						if ($objWidget instanceof \uploadable)
 						{
 							unset($_SESSION['FILES'][$objFields->name]);
 						}
@@ -403,7 +403,7 @@ class ExtendedForm extends \Form
 
 				if (!$doNotValidate)
 				{
-					if ($objWidget instanceof uploadable)
+					if ($objWidget instanceof \uploadable)
 					{
 						// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
 						if (!$objWidget->storeFile)
@@ -472,13 +472,13 @@ class ExtendedForm extends \Form
 			} // if (\Input::post('FORM_SUBMIT') == $formId)
 
 
-			if ($objWidget instanceof FormHidden)
+			if ($objWidget instanceof \FormHidden)
 			{
 				$this->Template->hidden .= $objWidget->parse();
 				continue;
 			}
 
-			if ($objWidget instanceof uploadable)
+			if ($objWidget instanceof \uploadable)
 			{
 				$hasUpload = true;
 
@@ -487,7 +487,7 @@ class ExtendedForm extends \Form
 					// save file info in session in frontend edit mode
 					if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name]) ))
 					{
-						$objFile = new File($arrEditRecord[$objFields->name]);
+						$objFile = new \File($arrEditRecord[$objFields->name]);
 						if ($objFile->size)
 						{
 							$_SESSION['FILES'][$objFields->name] = array(
@@ -578,7 +578,6 @@ class ExtendedForm extends \Form
 		$this->Template->attributes = $strAttributes;
 		$this->Template->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
-		//$this->Template->action = ampersand(\Environment::get('request'), true);
 		$this->Template->action = $this->getIndexFreeRequest();
 
 		// Get target URL
