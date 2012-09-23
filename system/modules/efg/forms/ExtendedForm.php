@@ -17,6 +17,7 @@
  */
 namespace Efg;
 
+
 /**
  * Class ExtendedForm
  *
@@ -90,6 +91,7 @@ class ExtendedForm extends \Form
 		}
 	}
 
+
 	/**
 	 * Generate the form
 	 * @return string
@@ -102,7 +104,7 @@ class ExtendedForm extends \Form
 		$blnAddDateJS = true;
 
 		$this->loadDataContainer('tl_form_field');
-		$formId = strlen($this->formID) ? 'auto_'.$this->formID : 'auto_form_'.$this->id;
+		$formId = ($this->formID != '') ? 'auto_'.$this->formID : 'auto_form_'.$this->id;
 
 		$arrUnset = array('FORM_NEXT', 'FORM_BACK');
 		foreach ($arrUnset as $strKey)
@@ -217,235 +219,172 @@ class ExtendedForm extends \Form
 		}
 
 		$this->initializeSession($formId);
+		$arrLabels = array();
 		$this->getMaxFileSize();
 
 		// Get all form fields
-		$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? AND invisible!=1 ORDER BY sorting")
-									->execute($this->id);
+//		$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? AND invisible!=1 ORDER BY sorting")
+//									->execute($this->id);
 
-		$row = 0;
-		$max_row = $objFields->numRows;
-		$arrLabels = array();
+//		$row = 0;
+//		$max_row = $objFields->numRows;
 
-		while ($objFields->next())
+		$objFields = \FormFieldModel::findPublishedById($this->id);
+
+		if ($objFields !== null)
 		{
+			$row = 0;
+			$max_row = $objFields->count();
 
-			if ($objFields->name != '')
+			while ($objFields->next())
 			{
-				$arrLabels[$objWidget->name] = $objFields->label;
-			}
 
-			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
-			{
-				// skip fields outside range of active page
-				$intFieldSorting = (int) $objFields->sorting;
-				if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'])
+				if ($objFields->name != '')
 				{
-					continue;
+					$arrLabels[$objWidget->name] = $objFields->label;
 				}
-				elseif ($this->intActivePage > 1 && $this->intActivePage < $this->intTotalPages
-						&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'] ))
-				{
-					continue;
-				}
-				elseif ($this->intActivePage == $this->intTotalPages && $intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'])
-				{
-					continue;
-				}
-			}
 
-			// unset session values if no FORM_SUBMIT or form page has not been completed
-			// (to avoid wrong validation against session values and to avoid usage of values of other forms)
-			// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
-			if ($strMode != 'reload' && strlen($objFields->name))
-			{
-				if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
+				if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 				{
-					if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
+					// skip fields outside range of active page
+					$intFieldSorting = (int) $objFields->sorting;
+					if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'])
 					{
-						unset($_SESSION['FORM_DATA'][$objFields->name]);
+						continue;
+					}
+					elseif ($this->intActivePage > 1 && $this->intActivePage < $this->intTotalPages
+							&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'] ))
+					{
+						continue;
+					}
+					elseif ($this->intActivePage == $this->intTotalPages && $intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'])
+					{
+						continue;
 					}
 				}
-			}
 
-			$strClass = $GLOBALS['TL_FFL'][$objFields->type];
-
-			// Continue if the class is not defined
-			if (!$this->classFileExists($strClass))
-			{
-				continue;
-			}
-
-			$arrData = $objFields->row();
-
-			$arrData['decodeEntities'] = true;
-			$arrData['allowHtml'] = $this->allowTags;
-			$arrData['rowClass'] = 'row_'.$row . (($row == 0) ? ' row_first' : (($row == ($max_row - 1)) ? ' row_last' : '')) . ((($row % 2) == 0) ? ' even' : ' odd');
-			$arrData['tableless'] = $this->tableless;
-
-			if ($this->blnMultipage || $this->blnEditform)
-			{
-				$arrData['formMultipage'] = $this->blnMultipage;
-				$arrData['formActivePage'] = $this->intActivePage;
-				$arrData['formTotalPages'] = $this->intTotalPages;
-			}
-
-			// Increase the row count if it is a password field
-			if ($objFields->type == 'password')
-			{
-				++$row;
-				++$max_row;
-
-				$arrData['rowClassConfirm'] = 'row_'.$row . (($row == ($max_row - 1)) ? ' row_last' : '') . ((($row % 2) == 0) ? ' even' : ' odd');
-			}
-
-			// Submit buttons do not use the name attribute
-			if ($objFields->type == 'submit')
-			{
-				$arrData['name'] = '';
-			}
-
-			$objWidget = new $strClass($arrData);
-			$objWidget->required = $objFields->mandatory ? true : false;
-
-			if ($objWidget->required)
-			{
-				$this->arrWidgetsFailedValidation[$objFields->name] = 0;
-			}
-
-			// always populate from existing session data if configured
-			if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
-			{
-				$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
-			}
-
-			if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
-			{
-				// frontend editing
-				if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
+				// unset session values if no FORM_SUBMIT or form page has not been completed
+				// (to avoid wrong validation against session values and to avoid usage of values of other forms)
+				// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
+				if ($strMode != 'reload' && strlen($objFields->name))
 				{
-					if (is_array($objWidget->options))
+					if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 					{
-						$arrData['options'] = $objWidget->options;
-					}
-
-					// prepare options array
-					$arrData['options'] = $this->Formdata->prepareDcaOptions($arrData);
-
-					// set rgxp 'date' for field type 'calendar' if not set
-					if ($arrData['type'] == 'calendar')
-					{
-						if (!isset($arrData['rgxp']))
+						if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
 						{
-							$arrData['rgxp'] = 'date';
+							unset($_SESSION['FORM_DATA'][$objFields->name]);
 						}
 					}
-					// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
-					elseif ($arrData['type'] == 'xdependentcalendarfields')
-					{
-						$arrData['rgxp'] = 'date';
-						$arrData['dateFormat'] = $arrData['xdateformat'];
-					}
-
-					// prepare value
-					$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
-
-					$objWidget->value = $varFieldValue;
 				}
-				else
+
+				$strClass = $GLOBALS['TL_FFL'][$objFields->type];
+
+				// Continue if the class is not defined
+				if (!class_exists($strClass))
 				{
-					// populate field if page has been completed
-					if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true)
+					continue;
+				}
+
+				$arrData = $objFields->row();
+
+				$arrData['decodeEntities'] = true;
+				$arrData['allowHtml'] = $this->allowTags;
+				$arrData['rowClass'] = 'row_'.$row . (($row == 0) ? ' row_first' : (($row == ($max_row - 1)) ? ' row_last' : '')) . ((($row % 2) == 0) ? ' even' : ' odd');
+				$arrData['tableless'] = $this->tableless;
+
+				if ($this->blnMultipage || $this->blnEditform)
+				{
+					$arrData['formMultipage'] = $this->blnMultipage;
+					$arrData['formActivePage'] = $this->intActivePage;
+					$arrData['formTotalPages'] = $this->intTotalPages;
+				}
+
+				// Increase the row count if it is a password field
+				if ($objFields->type == 'password')
+				{
+					++$row;
+					++$max_row;
+
+					$arrData['rowClassConfirm'] = 'row_'.$row . (($row == ($max_row - 1)) ? ' row_last' : '') . ((($row % 2) == 0) ? ' even' : ' odd');
+				}
+
+				// Submit buttons do not use the name attribute
+				if ($objFields->type == 'submit')
+				{
+					$arrData['name'] = '';
+				}
+
+				$objWidget = new $strClass($arrData);
+				$objWidget->required = $objFields->mandatory ? true : false;
+
+				if ($objWidget->required)
+				{
+					$this->arrWidgetsFailedValidation[$objFields->name] = 0;
+				}
+
+				// always populate from existing session data if configured
+				if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
+				{
+					$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+				}
+
+				if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
+				{
+					// frontend editing
+					if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 					{
-						$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+						if (is_array($objWidget->options))
+						{
+							$arrData['options'] = $objWidget->options;
+						}
+
+						// prepare options array
+						$arrData['options'] = $this->Formdata->prepareDcaOptions($arrData);
+
+						// set rgxp 'date' for field type 'calendar' if not set
+						if ($arrData['type'] == 'calendar')
+						{
+							if (!isset($arrData['rgxp']))
+							{
+								$arrData['rgxp'] = 'date';
+							}
+						}
+						// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
+						elseif ($arrData['type'] == 'xdependentcalendarfields')
+						{
+							$arrData['rgxp'] = 'date';
+							$arrData['dateFormat'] = $arrData['xdateformat'];
+						}
+
+						// prepare value
+						$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
+
+						$objWidget->value = $varFieldValue;
 					}
 					else
 					{
-						if ($objWidget instanceof \uploadable)
+						// populate field if page has been completed
+						if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true)
 						{
-							unset($_SESSION['FILES'][$objFields->name]);
-						}
-					}
-				}
-			}
-
-
-			// HOOK: load form field callback
-			if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
-			{
-				if (isset($GLOBALS['TL_HOOKS']['loadFormField']) && is_array($GLOBALS['TL_HOOKS']['loadFormField']))
-				{
-					foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
-					{
-						$this->import($callback[0]);
-						$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
-					}
-				}
-			}
-
-			// Validate input
-			if (\Input::post('FORM_SUBMIT') == $formId)
-			{
-				// populate field
-				if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
-				{
-					if ($strMode == 'back' && strlen($this->arrPaginators[($this->intActivePage-1)]['efgBackStoreSessionValues']))
-					{
-						unset($_SESSION['FORM_DATA'][$objFields->name]);
-						$objWidget->value = \Input::post($objFields->name);
-					}
-					elseif ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
-					{
-						$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
-						unset($_SESSION['FORM_DATA'][$objFields->name]);
-					}
-				}
-
-				if (!$doNotValidate)
-				{
-					if ($objWidget instanceof \uploadable)
-					{
-						// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
-						if (!$objWidget->storeFile)
-						{
-							if ($this->intActivePage < $this->intTotalPages)
-							{
-								// unset file in session, if this page has not been completed
-								if (! $_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
-								{
-									unset($_SESSION['FILES'][$objFields->name]);
-								}
-
-								$objWidget->validate();
-
-								// file has been uploaded, store it in temp folder
-								if (is_uploaded_file($_SESSION['FILES'][$objFields->name]['tmp_name']))
-								{
-									$this->import('Files');
-									$strDstFile = TL_ROOT. '/system/tmp/' .md5_file($_SESSION['FILES'][$objFields->name]['tmp_name']);
-									if (@copy($_SESSION['FILES'][$objFields->name]['tmp_name'], $strDstFile))
-									{
-										$_SESSION['FILES'][$objFields->name]['tmp_name'] = $strDstFile;
-										$_SESSION['FILES'][$objFields->name]['uploaded'] = true;
-										$this->Files->chmod($strDstFile, 0644);
-									}
-								}
-							}
+							$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
 						}
 						else
 						{
-							$objWidget->validate();
+							if ($objWidget instanceof \uploadable)
+							{
+								unset($_SESSION['FILES'][$objFields->name]);
+							}
 						}
-					} // if instance of uploadable
-					else
-					{
-						$objWidget->validate();
 					}
+				}
 
-					// HOOK: validate form field callback
-					if (isset($GLOBALS['TL_HOOKS']['validateFormField']) && is_array($GLOBALS['TL_HOOKS']['validateFormField']))
+
+				// HOOK: load form field callback
+				if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
+				{
+					if (isset($GLOBALS['TL_HOOKS']['loadFormField']) && is_array($GLOBALS['TL_HOOKS']['loadFormField']))
 					{
-						foreach ($GLOBALS['TL_HOOKS']['validateFormField'] as $callback)
+						foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
 						{
 							$this->import($callback[0]);
 							$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
@@ -453,68 +392,139 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				if ($objWidget->hasErrors())
+				// Validate input
+				if (\Input::post('FORM_SUBMIT') == $formId)
 				{
-					if($objWidget->required)
+					// populate field
+					if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
 					{
-						$this->arrWidgetsFailedValidation[$objFields->name] = 1;
-					}
-					$doNotSubmit = true;
-				}
-				// Store current value in the session
-				elseif ($objWidget->submitInput() || $strMode == 'back')
-				{
-					$arrSubmitted[$objFields->name] = $objWidget->value;
-					$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
-				}
-
-				unset($_POST[$objFields->name]);
-			} // if (\Input::post('FORM_SUBMIT') == $formId)
-
-
-			if ($objWidget instanceof \FormHidden)
-			{
-				$this->Template->hidden .= $objWidget->parse();
-				continue;
-			}
-
-			if ($objWidget instanceof \uploadable)
-			{
-				$hasUpload = true;
-
-				if ($this->blnMultipage)
-				{
-					// save file info in session in frontend edit mode
-					if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name]) ))
-					{
-						$objFile = new \File($arrEditRecord[$objFields->name]);
-						if ($objFile->size)
+						if ($strMode == 'back' && strlen($this->arrPaginators[($this->intActivePage-1)]['efgBackStoreSessionValues']))
 						{
-							$_SESSION['FILES'][$objFields->name] = array(
-								'name' => $objFile->basename,
-								'type' => $objFile->mime,
-								'tmp_name' => TL_ROOT . '/' . $objFile->value,
-								'size' => $objFile->size,
-								'uploaded' => true
-							);
+							unset($_SESSION['FORM_DATA'][$objFields->name]);
+							$objWidget->value = \Input::post($objFields->name);
+						}
+						elseif ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
+						{
+							$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+							unset($_SESSION['FORM_DATA'][$objFields->name]);
 						}
 					}
 
-					// add info about uploaded file to upload input
-					if (isset($_SESSION['FILES'][$objFields->name]) && $_SESSION['FILES'][$objFields->name]['uploaded'])
+					if (!$doNotValidate)
 					{
-						$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
+						if ($objWidget instanceof \uploadable)
+						{
+							// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
+							if (!$objWidget->storeFile)
+							{
+								if ($this->intActivePage < $this->intTotalPages)
+								{
+									// unset file in session, if this page has not been completed
+									if (! $_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
+									{
+										unset($_SESSION['FILES'][$objFields->name]);
+									}
 
-						++$row;
-						continue;
+									$objWidget->validate();
+
+									// file has been uploaded, store it in temp folder
+									if (is_uploaded_file($_SESSION['FILES'][$objFields->name]['tmp_name']))
+									{
+										$this->import('Files');
+										$strDstFile = TL_ROOT. '/system/tmp/' .md5_file($_SESSION['FILES'][$objFields->name]['tmp_name']);
+										if (@copy($_SESSION['FILES'][$objFields->name]['tmp_name'], $strDstFile))
+										{
+											$_SESSION['FILES'][$objFields->name]['tmp_name'] = $strDstFile;
+											$_SESSION['FILES'][$objFields->name]['uploaded'] = true;
+											$this->Files->chmod($strDstFile, 0644);
+										}
+									}
+								}
+							}
+							else
+							{
+								$objWidget->validate();
+							}
+						} // if instance of uploadable
+						else
+						{
+							$objWidget->validate();
+						}
+
+						// HOOK: validate form field callback
+						if (isset($GLOBALS['TL_HOOKS']['validateFormField']) && is_array($GLOBALS['TL_HOOKS']['validateFormField']))
+						{
+							foreach ($GLOBALS['TL_HOOKS']['validateFormField'] as $callback)
+							{
+								$this->import($callback[0]);
+								$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
+							}
+						}
 					}
+
+					if ($objWidget->hasErrors())
+					{
+						if($objWidget->required)
+						{
+							$this->arrWidgetsFailedValidation[$objFields->name] = 1;
+						}
+						$doNotSubmit = true;
+					}
+					// Store current value in the session
+					elseif ($objWidget->submitInput() || $strMode == 'back')
+					{
+						$arrSubmitted[$objFields->name] = $objWidget->value;
+						$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
+					}
+
+					unset($_POST[$objFields->name]);
+				} // if (\Input::post('FORM_SUBMIT') == $formId)
+
+
+				if ($objWidget instanceof \FormHidden)
+				{
+					$this->Template->hidden .= $objWidget->parse();
+					continue;
 				}
-			} // objWidget instanceof uploadable
 
-			$this->Template->fields .= $objWidget->parse();
+				if ($objWidget instanceof \uploadable)
+				{
+					$hasUpload = true;
 
-			++$row;
-		} // while $objFields
+					if ($this->blnMultipage)
+					{
+						// save file info in session in frontend edit mode
+						if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name]) ))
+						{
+							$objFile = new \File($arrEditRecord[$objFields->name]);
+							if ($objFile->size)
+							{
+								$_SESSION['FILES'][$objFields->name] = array(
+									'name' => $objFile->basename,
+									'type' => $objFile->mime,
+									'tmp_name' => TL_ROOT . '/' . $objFile->value,
+									'size' => $objFile->size,
+									'uploaded' => true
+								);
+							}
+						}
+
+						// add info about uploaded file to upload input
+						if (isset($_SESSION['FILES'][$objFields->name]) && $_SESSION['FILES'][$objFields->name]['uploaded'])
+						{
+							$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
+
+							++$row;
+							continue;
+						}
+					}
+				} // objWidget instanceof uploadable
+
+				$this->Template->fields .= $objWidget->parse();
+
+				++$row;
+			} // while $objFields
+		}
 
 		if ($doNotSubmit && $this->blnAllowSkipRequired)
 		{
