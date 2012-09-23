@@ -39,4 +39,6 @@ $GLOBALS['TL_LANG']['tl_form_field']['random'] = 'Zufällige Reihenfolge';
 $GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'] = array('Zurück-Schaltfläche erstellen', 'Eine Schaltfläche erstellen, die zur vorherigen Formular-Seite führt.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'] = array('Formulareingaben bei \'Zurück\' erhalten', 'Eingaben im Frontend-Formular auch bei \'Zurück\' zwischenspeichern für die Vorbelegung bei erneutem Aufruf dieser Formular-Seite.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'] = array('Bezeichnung der Zurück-Schaltfläche', 'Bitte geben Sie die Bezeichnung der Zurück-Schaltfläche ein.');
+$GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'] = $GLOBALS['TL_LANG']['tl_form_field']['imageSubmit'];
+$GLOBALS['TL_LANG']['tl_form_field']['efgBackSingleSRC'] = $GLOBALS['TL_LANG']['tl_form_field']['singleSRC'];
 $GLOBALS['TL_LANG']['tl_form_field']['backbutton_legend'] = 'Zurück-Schaltfläche';
