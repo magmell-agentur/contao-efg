@@ -17,6 +17,7 @@
  */
 namespace Efg;
 
+
 /**
  * Class DC_Formdata
  * modified version of DC_Table by Leo Feyer
@@ -108,6 +109,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	protected $blnUploadable = false;
 
 	/**
+	 * The current back end module
+	 * @param array
+	 */
+	protected $arrModule = array();
+
+	/**
 	 * Related form, like fd_frm_contact
 	 * @param string
 	 */
@@ -197,10 +204,22 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	/**
 	 * Initialize the object
 	 * @param string
+	 * @param array
 	 */
-	public function __construct($strTable)
+	public function __construct($strTable, $arrModule=array())
 	{
 		parent::__construct();
+
+		// Check the request token (see #4007)
+		if (isset($_GET['act']))
+		{
+			if (!isset($_GET['rt']) || !\RequestToken::validate(\Input::get('rt')))
+			{
+				$this->Session->set('INVALID_TOKEN_URL', \Environment::get('request'));
+				$this->redirect('contao/confirm.php');
+			}
+		}
+
 		$this->intId = \Input::get('id');
 
 		// Clear the clipboard
@@ -229,8 +248,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			$this->strMode = 'export';
 		}
-
-		if (\Input::get('key') == 'exportxls')
+		elseif (\Input::get('key') == 'exportxls')
 		{
 			$this->strMode = 'exportxls';
 		}
@@ -340,6 +358,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$this->ctable = $GLOBALS['TL_DCA'][$this->strTable]['config']['ctable'];
 		$this->treeView = false;
 		$this->root = null;
+		$this->arrModule = $arrModule;
 
 		// Key of a form or '' for no specific form
 		$this->strFormKey = '';
@@ -459,11 +478,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			case 'arrFieldConfig':
 				return $this->arrFieldConfig;
 				break;
-
-			default:
-				return parent::__get($strKey);
-				break;
 		}
+
+		return parent::__get($strKey);
 	}
 
 
@@ -476,18 +493,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$return = '';
 		$this->limit = '';
 		$this->bid = 'tl_buttons';
-
-		// Clean up old tl_undo and tl_log entries
-		if ($this->strTable == 'tl_undo' && strlen($GLOBALS['TL_CONFIG']['undoPeriod']))
-		{
-			\Database::getInstance()->prepare("DELETE FROM tl_undo WHERE tstamp<?")
-							->execute(intval(time() - $GLOBALS['TL_CONFIG']['undoPeriod']));
-		}
-		elseif ($this->strTable == 'tl_log' && strlen($GLOBALS['TL_CONFIG']['logPeriod']))
-		{
-			\Database::getInstance()->prepare("DELETE FROM tl_log WHERE tstamp<?")
-							->execute(intval(time() - $GLOBALS['TL_CONFIG']['logPeriod']));
-		}
 
 		$this->reviseTable();
 
@@ -539,7 +544,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div class="tl_panel_bottom">
 
 <div class="tl_submit_panel tl_subpanel">
-<input type="image" name="btfilter" id="btfilter" src="' . TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" title="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '" alt="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '">
+<input type="image" name="btfilter" id="btfilter" src="' . TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['applyTitle']) . '" alt="' . specialchars($GLOBALS['TL_LANG']['MSC']['apply']) . '">
 </div>' . $strLimit . '
 
 <div class="clear"></div>
@@ -629,7 +634,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				continue;
 			}
 
-			// Get field value
+			// Get the field value
 			if (is_array($value))
 			{
 				foreach ($value as $kk=>$vv)
@@ -754,14 +759,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$return .= '
   <tr>
     <td'.$class.'><span class="tl_label">'.$label.': </span></td>
-    <td'.$class.'>'.$row[$i].'</td>
+    <td'.$class.'>'.specialchars($row[$i]).'</td>
   </tr>';
 		}
 
 		// Return table
 		return '
 <div id="tl_buttons">
-<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.sprintf($GLOBALS['TL_LANG']['MSC']['showRecord'], ($this->intId ? 'ID '.$this->intId : '')).'</h2>
@@ -934,7 +939,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// If there is a PID field but no parent table
 		if (\Database::getInstance()->fieldExists('pid', $this->strTable) && !strlen($this->ptable))
 		{
-			$delete[$this->strTable] = $this->getChildRecords($this->intId, $this->strTable);
+			$delete[$this->strTable] = \Database::getInstance()->getChildRecords($this->intId, $this->strTable);
 			array_unshift($delete[$this->strTable], $this->intId);
 		}
 		else
@@ -1024,13 +1029,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 
 	/**
-	 * Delete all records that are currently shown
+	 * Delete all selected records
 	 */
 	public function deleteAll()
 	{
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notDeletable'])
 		{
-			$this->log('Table "'.$this->strTable.'" is not deletable', 'DC_Table deleteAll()', TL_ERROR);
+			$this->log('Table "'.$this->strTable.'" is not deletable', 'DC_Formdata deleteAll()', TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -1142,7 +1147,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Add log entry and delete record from tl_undo if there was no error
 		if (!$error)
 		{
-			$this->log('Undone '. $query, 'DC_Table undo()', TL_GENERAL);
+			$this->log('Undone '. $query, 'DC_Formdata undo()', TL_GENERAL);
 
 			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
 							->limit(1)
@@ -1201,7 +1206,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
-			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Formdata edit()', TL_ERROR);
+			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata edit()', TL_ERROR);
 			$this->redirect('typolight/main.php?act=error');
 		}
 
@@ -1222,13 +1227,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				foreach ($boxes[$k] as $kk=>$vv)
 				{
-					if (preg_match('/^\[.*\]$/i', $vv))
+					if (preg_match('/^\[.*\]$/', $vv))
 					{
 						++$eCount;
 						continue;
 					}
 
-					if (preg_match('/^\{.*\}$/i', $vv))
+					if (preg_match('/^\{.*\}$/', $vv))
 					{
 						$legends[$k] = substr($vv, 1, -1);
 						unset($boxes[$k][$kk]);
@@ -1255,6 +1260,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				$strAjax = '';
 				$blnAjax = false;
+				$key = '';
+				$cls = '';
 				$legend = '';
 
 				if (isset($legends[$k]))
@@ -1279,7 +1286,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					if ($vv == '[EOF]')
 					{
-						if ($blnAjax && \Environment::isAjaxRequest())
+						if ($blnAjax && \Environment::get('isAjaxRequest'))
 						{
 							return $strAjax . '<input type="hidden" name="FORM_FIELDS[]" value="'.specialchars($this->strPalette).'">';
 						}
@@ -1290,10 +1297,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						continue;
 					}
 
-					if (preg_match('/^\[.*\]$/i', $vv))
+					if (preg_match('/^\[.*\]$/', $vv))
 					{
 						$thisId = 'sub_' . substr($vv, 1, -1);
-						$blnAjax = ($ajaxId == $thisId && \Environment::isAjaxRequest()) ? true : false;
+						$blnAjax = ($ajaxId == $thisId && \Environment::get('isAjaxRequest')) ? true : false;
 						$return .= "\n" . '<div id="'.$thisId.'">';
 
 						continue;
@@ -1717,16 +1724,22 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 </div>
 
 </div>
-</form>';
+</form>
+
+<script>
+window.addEvent(\'domready\', function() {
+  (inp = $(\''.$this->strTable.'\').getElement(\'input[class^="tl_text"]\')) && inp.focus();
+});
+</script>';
 
 		// Begin the form (-> DO NOT CHANGE THIS ORDER -> this way the onsubmit attribute of the form can be changed by a field)
 		$return = $version . '
 <div id="tl_buttons">
-<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.sprintf($GLOBALS['TL_LANG']['MSC']['editRecord'], ($this->intId ? 'ID '.$this->intId : '')).'</h2>
-'.$this->getMessages().'
+'.\Message::generate().'
 <form action="'.ampersand(\Environment::get('request'), true).'" id="'.$this->strTable.'" class="tl_form" method="post" enctype="' . ($this->blnUploadable ? 'multipart/form-data' : 'application/x-www-form-urlencoded') . '"'.(!empty($this->onsubmit) ? ' onsubmit="'.implode(' ', $this->onsubmit).'"' : '').'>
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="'.specialchars($this->strTable).'">
@@ -1758,13 +1771,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			// Redirect
 			if (isset($_POST['saveNclose']))
 			{
-				$this->resetMessages();
+				\Message::reset();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$this->redirect($this->getReferer());
 			}
 			elseif (isset($_POST['saveNedit']))
 			{
-				$this->resetMessages();
+				\Message::reset();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$strUrl = $this->addToUrl($GLOBALS['TL_DCA'][$this->strTable]['list']['operations']['edit']['href']);
 
@@ -1775,7 +1788,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 			elseif (isset($_POST['saveNback']))
 			{
-				$this->resetMessages();
+				\Message::reset();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 
 				$this->redirect(\Environment::get('script') . '?do=' . \Input::get('do'));
@@ -1783,7 +1796,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			elseif (isset($_POST['saveNcreate']))
 			{
-				$this->resetMessages();
+				\Message::reset();
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$strUrl = \Environment::get('script') . '?do=' . \Input::get('do');
 
@@ -1817,7 +1830,7 @@ window.addEvent(\'domready\', function() {
 
 
 	/**
-	 * Auto-Generate a form to edit all records that are currently shown
+	 * Auto-generate a form to edit all records that are currently shown
 	 * @param integer
 	 * @param integer
 	 * @return string
@@ -1837,7 +1850,7 @@ window.addEvent(\'domready\', function() {
 		$session = $this->Session->getData();
 		$ids = $session['CURRENT']['IDS'];
 
-		if ($intId != '' && \Environment::isAjaxRequest())
+		if ($intId != '' && \Environment::get('isAjaxRequest'))
 		{
 			$ids = array($intId);
 		}
@@ -1915,7 +1928,7 @@ window.addEvent(\'domready\', function() {
 				// Get the field values
 				$objRow = \Database::getInstance()->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
 											->limit(1)
-											->execute($this->intId);
+											->executeUncached($this->intId);
 
 				// Store the active record
 				$this->objActiveRecord = $objRow;
@@ -1931,7 +1944,7 @@ window.addEvent(\'domready\', function() {
 
 					if ($v == '[EOF]')
 					{
-						if ($blnAjax && \Environment::isAjaxRequest())
+						if ($blnAjax && \Environment::get('isAjaxRequest'))
 						{
 							return $strAjax . '<input type="hidden" name="FORM_FIELDS_'.$id.'[]" value="'.specialchars(implode(',', $formFields)).'">';
 						}
@@ -1942,10 +1955,10 @@ window.addEvent(\'domready\', function() {
 						continue;
 					}
 
-					if (preg_match('/^\[.*\]$/i', $v))
+					if (preg_match('/^\[.*\]$/', $v))
 					{
 						$thisId = 'sub_' . substr($v, 1, -1) . '_' . $id;
-						$blnAjax = ($ajaxId == $thisId && \Environment::isAjaxRequest()) ? true : false;
+						$blnAjax = ($ajaxId == $thisId && \Environment::get('isAjaxRequest')) ? true : false;
 						$return .= "\n  " . '<div id="'.$thisId.'">';
 
 						continue;
@@ -2495,7 +2508,7 @@ window.addEvent(\'domready\', function() {
 		// Return
 		return '
 <div id="tl_buttons">
-<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.$this->getReferer(true).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>'.$return;
 	}
 
@@ -2503,7 +2516,7 @@ window.addEvent(\'domready\', function() {
 	/**
 	 * Save the current value
 	 * @param mixed
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	protected function save($varValue)
 	{
@@ -2798,9 +2811,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['palettes'][$paletteName]))
 				{
-					$palette = $paletteName;
 					$strPalette = $GLOBALS['TL_DCA'][$this->strTable]['palettes'][$paletteName];
-
 					break;
 				}
 			}
@@ -2854,7 +2865,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Delete all records of the current table that are not related to the parent table
-		if (strlen($ptable))
+		if ($ptable != '')
 		{
 			$objStmt = \Database::getInstance()->execute("DELETE FROM " . $this->strTable . " WHERE NOT EXISTS (SELECT * FROM " . $ptable . " WHERE " . $this->strTable . ".pid = " . $ptable . ".id)");
 
@@ -2869,7 +2880,7 @@ window.addEvent(\'domready\', function() {
 		{
 			foreach ($ctable as $v)
 			{
-				if (strlen($v))
+				if ($v != '')
 				{
 					$objStmt = \Database::getInstance()->execute("DELETE FROM " . $v . " WHERE NOT EXISTS (SELECT * FROM " . $this->strTable . " WHERE " . $v . ".pid = " . $this->strTable . ".id)");
 
@@ -2901,7 +2912,7 @@ window.addEvent(\'domready\', function() {
 		$orderBy = $GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['fields'];
 		$firstOrderBy = preg_replace('/\s+.*$/i', '', $orderBy[0]);
 
-		if (is_array($this->orderBy) && strlen($this->orderBy[0]))
+		if (is_array($this->orderBy) && $this->orderBy[0] != '')
 		{
 			$orderBy = $this->orderBy;
 			$firstOrderBy = $this->firstOrderBy;
@@ -2969,7 +2980,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		$objRow = $objRowStmt->execute($this->values);
-		$this->bid = strlen($return) ? $this->bid : 'tl_buttons';
+		$this->bid = ($return != '') ? $this->bid : 'tl_buttons';
 
 		// Display buttons
 		if (!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] || !empty($GLOBALS['TL_DCA'][$this->strTable]['list']['global_operations']))
@@ -2977,9 +2988,9 @@ window.addEvent(\'domready\', function() {
 			$return .= '
 
 <div id="'.$this->bid.'">'.((\Input::get('act') == 'select' || $this->ptable) ? '
-<a href="'.$this->getReferer(true, $this->ptable).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>' : '') . (($this->ptable && \Input::get('act') != 'select') ? ' &nbsp; :: &nbsp;' : '') . ((\Input::get('act') != 'select') ? '
+<a href="'.$this->getReferer(true, $this->ptable).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>' : '') . (($this->ptable && \Input::get('act') != 'select') ? ' &nbsp; :: &nbsp;' : '') . ((\Input::get('act') != 'select') ? '
 '.(!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<a href="'.(strlen($this->ptable) ? $this->addToUrl('act=create' . (($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] < 4) ? '&amp;mode=2' : '') . '&amp;pid=' . $this->intId) : $this->addToUrl('act=create')).'" class="header_new" title="'.specialchars($GLOBALS['TL_LANG'][$this->strTable]['new'][1]).'" accesskey="n" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG'][$this->strTable]['new'][0].'</a>' : '') . $this->generateGlobalButtons() : '') . '
-</div>' . $this->getMessages(true);
+</div>' . \Message::generate(true);
 		}
 
 		// Return "no records found" message
@@ -3140,7 +3151,6 @@ window.addEvent(\'domready\', function() {
 
 							$args[$k] = implode(', ', $args_k);
 							$rowFormatted[$v] = $args[$k];
-
 						}
 						elseif (isset($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]))
 						{
@@ -3166,7 +3176,6 @@ window.addEvent(\'domready\', function() {
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
-
 				} // foreach ($showFields as $k=>$v)
 
 				// Shorten the label it if it is too long
@@ -3285,17 +3294,17 @@ window.addEvent(\'domready\', function() {
 	 */
 	protected function panel()
 	{
+		if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['panelLayout'] == '')
+		{
+			return '';
+		}
+
 		$filter = $this->filterMenu();
 		$search = $this->searchMenu();
 		$limit = $this->limitMenu();
 		$sort = $this->sortMenu();
 
-		if (!strlen($filter) && !strlen($search) && !strlen($limit) && !strlen($sort))
-		{
-			return '';
-		}
-
-		if (!strlen($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['panelLayout']))
+		if ($filter == '' && $search == '' && $limit == '' && $sort == '')
 		{
 			return '';
 		}
@@ -3318,7 +3327,7 @@ window.addEvent(\'domready\', function() {
 
 			foreach ($arrSubPanels as $strSubPanel)
 			{
-				if (strlen($$strSubPanel))
+				if ($$strSubPanel != '')
 				{
 					$panels = $$strSubPanel . $panels;
 				}
@@ -3329,11 +3338,11 @@ window.addEvent(\'domready\', function() {
 				$submit = '
 
 <div class="tl_submit_panel tl_subpanel">
-<input type="image" name="filter" id="filter" src="' . TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" title="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '" alt="' . $GLOBALS['TL_LANG']['MSC']['apply'] . '">
+<input type="image" name="filter" id="filter" src="' . TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/reload.gif" class="tl_img_submit" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['applyTitle']) . '" alt="' . specialchars($GLOBALS['TL_LANG']['MSC']['apply']) . '">
 </div>';
 			}
 
-			if (strlen($panels))
+			if ($panels != '')
 			{
 				$return .= '
 <div class="tl_panel">'.$submit.$panels.'
@@ -3387,7 +3396,6 @@ window.addEvent(\'domready\', function() {
 		// Store search value in the current session
 		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
-
 			$session['search'][$strSessionKey]['value'] = '';
 			$session['search'][$strSessionKey]['field'] = \Input::post('tl_field', true);
 
@@ -3403,7 +3411,7 @@ window.addEvent(\'domready\', function() {
 
 					$session['search'][$strSessionKey]['value'] = \Input::postRaw('tl_value');
 				}
-				catch (Exception $e) {}
+				catch (\Exception $e) {}
 			}
 
 			$this->Session->setData($session);
@@ -3485,7 +3493,7 @@ window.addEvent(\'domready\', function() {
 		$this->bid = 'tl_buttons_a';
 		$session = $this->Session->getData();
 		$orderBy = $GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['fields'];
-		$firstOrderBy = preg_replace('/\s+.*$/i', '', $orderBy[0]);
+		$firstOrderBy = preg_replace('/\s+.*$/', '', $orderBy[0]);
 
 		$strSessionKey = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 
@@ -3505,7 +3513,7 @@ window.addEvent(\'domready\', function() {
 		// Overwrite the "orderBy" value with the session value
 		elseif (strlen($session['sorting'][$strSessionKey]))
 		{
-			$overwrite = preg_quote(preg_replace('/\s+.*$/i', '', $session['sorting'][$strSessionKey]), '/');
+			$overwrite = preg_quote(preg_replace('/\s+.*$/', '', $session['sorting'][$strSessionKey]), '/');
 			$orderBy = array_diff($orderBy, preg_grep('/^'.$overwrite.'/i', $orderBy));
 
 			array_unshift($orderBy, $session['sorting'][$strSessionKey]);
@@ -3552,6 +3560,7 @@ window.addEvent(\'domready\', function() {
 	{
 		$session = $this->Session->getData();
 		$filter = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
+		$fields = '';
 
 		if (is_array($this->procedure))
 		{
@@ -3607,16 +3616,17 @@ window.addEvent(\'domready\', function() {
 				}
 				$sqlWhere = " WHERE " . implode(' AND ', $arrProcedure);
 			}
-			$sqlSelect = "SELECT COUNT(*) AS total FROM " . $this->strTable . " f";
+			$sqlSelect = "SELECT COUNT(*) AS count FROM " . $this->strTable . " f";
 			$sqlQuery = $sqlSelect . $sqlWhere;
 
 			$objTotal = \Database::getInstance()->prepare($sqlQuery)
 									   ->execute($this->values);
-			$total = $objTotal->total;
+			$total = $objTotal->count;
+			$options_total = 0;
 			$blnIsMaxResultsPerPage = false;
 
 			// Overall limit
-			if ($total > $GLOBALS['TL_CONFIG']['maxResultsPerPage'] && ($this->limit === null || preg_replace('/^.*,/i', '', $this->limit) == $GLOBALS['TL_CONFIG']['maxResultsPerPage']))
+			if ($total > $GLOBALS['TL_CONFIG']['maxResultsPerPage'] && ($this->limit === null || preg_replace('/^.*,/', '', $this->limit) == $GLOBALS['TL_CONFIG']['maxResultsPerPage']))
 			{
 				if ($this->limit === null)
 				{
@@ -3628,6 +3638,8 @@ window.addEvent(\'domready\', function() {
 				$session['filter'][$filter]['limit'] = $GLOBALS['TL_CONFIG']['maxResultsPerPage'];
 			}
 
+			$options = '';
+
 			// Build options
 			if ($total > 0)
 			{
@@ -3635,7 +3647,7 @@ window.addEvent(\'domready\', function() {
 				$options_total = ceil($total / $GLOBALS['TL_CONFIG']['resultsPerPage']);
 
 				// Reset limit if other parameters have decreased the number of results
-				if ($this->limit !== null && ($this->limit == '' || preg_replace('/,.*$/i', '', $this->limit) > $total))
+				if ($this->limit !== null && ($this->limit == '' || preg_replace('/,.*$/', '', $this->limit) > $total))
 				{
 					$this->limit = '0,'.$GLOBALS['TL_CONFIG']['resultsPerPage'];
 				}
@@ -3694,7 +3706,7 @@ window.addEvent(\'domready\', function() {
 		$session = $this->Session->getData();
 		$filter = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 
-		// Get sorting fields
+		// Get the sorting fields
 		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
 		{
 			if ($v['filter'])
@@ -4183,7 +4195,6 @@ window.addEvent(\'domready\', function() {
 	 */
 	protected function formatGroupHeader($field, $value, $mode, $row)
 	{
-		$group = '';
 		static $lookup = array();
 
 		if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['isAssociative'] || array_is_assoc($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options']))
@@ -4882,7 +4893,7 @@ window.addEvent(\'domready\', function() {
 		// Preview Mail
 		$return = '
 <div id="tl_buttons">
-<a href="'.$this->getReferer(ENCODE_AMPERSANDS).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+<a href="'.$this->getReferer(ENCODE_AMPERSANDS).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages(). $strHint .'
@@ -5243,7 +5254,6 @@ $return .= '
 					}
 					else
 					{
-
 						$intInvalid++;
 					}
 
@@ -5298,7 +5308,7 @@ $return .= '
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>
-'.$this->getMessages().'
+'.\Message::generate().'
 <form action="'.ampersand(\Environment::get('request'), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit">
 <input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
@@ -5414,7 +5424,7 @@ var Stylect = {
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'
-.$this->getMessages().'
+.\Message::generate().'
 <form action="'.ampersand(\Environment::get('request'), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit tl_formdata_import">
 	<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
