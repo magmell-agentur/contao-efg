@@ -128,7 +128,7 @@ class ModuleFormdataListing extends \Module
 
 		if (TL_MODE == 'BE')
 		{
-			$objTemplate = new BackendTemplate('be_wildcard');
+			$objTemplate = new \BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### LISTING FORMDATA ###';
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
@@ -446,7 +446,7 @@ class ModuleFormdataListing extends \Module
 					// Send file to the browser
 					if (is_file(TL_ROOT . '/' . $arrDownload['value']))
 					{
-						$objFile = new File($arrDownload['value']);
+						$objFile = new \File($arrDownload['value']);
 						if (in_array($objFile->extension, $allowedDownload) )
 						{
 							$this->sendFileToBrowser($arrDownload['value']);
@@ -1547,7 +1547,7 @@ class ModuleFormdataListing extends \Module
 						// single file
 						elseif (is_string($value) && strlen($value) && is_file(TL_ROOT . '/' . $value))
 						{
-							$objFile = new File($value);
+							$objFile = new \File($value);
 							if (!in_array($objFile->extension, $allowedDownload) )
 							{
 								$arrTd[$class][count($arrTd[$class])-1]['content'] = '&nbsp;';
@@ -1598,7 +1598,7 @@ class ModuleFormdataListing extends \Module
 							foreach ($value as $kF => $strFile)
 							{
 								if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
-									$objFile = new File($strFile);
+									$objFile = new \File($strFile);
 
 									if (!in_array($objFile->extension, $allowedDownload) )
 									{
@@ -1673,7 +1673,7 @@ class ModuleFormdataListing extends \Module
 			 */
 			if (intval($per_page)>0)
 			{
-				$objPagination = new Pagination($intTotalcount, $per_page);
+				$objPagination = new \Pagination($intTotalcount, $per_page);
 				$this->Template->pagination = $objPagination->generate("\n  ");
 			}
 
@@ -2062,7 +2062,7 @@ class ModuleFormdataListing extends \Module
 		if (!strlen($this->list_info_layout))
 			$this->list_info_layout = 'info_default';
 
-		$this->Template = new FrontendTemplate($this->list_info_layout);
+		$this->Template = new \FrontendTemplate($this->list_info_layout);
 
 		$this->Template->textlink_details = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_details'];
 		$this->Template->textlink_edit = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_edit'];
@@ -2228,7 +2228,7 @@ class ModuleFormdataListing extends \Module
 				// single file
 				elseif (!is_array($arrFields[$class]['raw']) && strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
 				{
-					$objFile = new File($arrFields[$class]['content']);
+					$objFile = new \File($arrFields[$class]['content']);
 
 					if (!in_array($objFile->extension, $allowedDownload) )
 					{
@@ -2281,7 +2281,7 @@ class ModuleFormdataListing extends \Module
 					foreach ($arrFields[$class]['raw'] as $kF => $strFile)
 					{
 						if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
-							$objFile = new File($strFile);
+							$objFile = new \File($strFile);
 
 							if (!in_array($objFile->extension, $allowedDownload) )
 							{
@@ -3009,7 +3009,7 @@ class ModuleFormdataListing extends \Module
 			$this->redirect($strRed);
 		}
 
-		$this->Template = new FrontendTemplate($this->list_edit_layout);
+		$this->Template = new \FrontendTemplate($this->list_edit_layout);
 
 		$arrRecordFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 
