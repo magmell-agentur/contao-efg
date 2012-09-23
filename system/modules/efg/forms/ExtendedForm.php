@@ -134,6 +134,7 @@ class ExtendedForm extends \Form
 			}
 		}
 
+
 		// use core class Form if this is not a multi page form and not frontend edit form
 		if ((!$this->blnMultipage && !$this->blnEditform) || $this->method == 'GET' || TL_MODE == 'BE')
 		{
@@ -223,13 +224,7 @@ class ExtendedForm extends \Form
 		$this->getMaxFileSize();
 
 		// Get all form fields
-//		$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? AND invisible!=1 ORDER BY sorting")
-//									->execute($this->id);
-
-//		$row = 0;
-//		$max_row = $objFields->numRows;
-
-		$objFields = \FormFieldModel::findPublishedById($this->id);
+		$objFields = \FormFieldModel::findPublishedByPid($this->id);
 
 		if ($objFields !== null)
 		{
