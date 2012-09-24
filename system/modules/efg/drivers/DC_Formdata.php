@@ -736,7 +736,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$strVal = $row[$i];
 				$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 				$strVal = nl2br($strVal, false);
-				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)(>)/si', "\\1\\2\\3\n", $strVal);
+				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 				$row[$i] = $strVal;
 				unset($strVal);
 			}
@@ -1207,7 +1207,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata edit()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$this->objActiveRecord = $objRow;
@@ -3169,7 +3169,7 @@ window.addEvent(\'domready\', function() {
 								$strVal = $row[$v];
 								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 								$strVal = nl2br($strVal, false);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)(>)/si', "\\1\\2\\3\n", $strVal);
+								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 								$row[$v] = $strVal;
 								unset($strVal);
 							}
@@ -4409,8 +4409,9 @@ window.addEvent(\'domready\', function() {
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
-			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Table edit()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			//"'.$this->strTable.'.id='.$this->intId.'"'
+			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata mail()', TL_ERROR);
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$arrSubmitted = $objRow->fetchAssoc();
@@ -4444,8 +4445,8 @@ window.addEvent(\'domready\', function() {
 
 		if ($objForm->numRows < 1)
 		{
-			$this->log('Could not load form by ID ' . $intFormId . ' or title "'.$arrSubmitted['form'].'" of table "tl_form"!', 'DC_Formdata mail()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			$this->log('Could not load record "tl_form.id='.$intFormId.'" / "tl_form.title='.$arrSubmitted['form'].'"', 'DC_Formdata mail()', TL_ERROR);
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$arrForm = $objForm->fetchAssoc();
@@ -4698,9 +4699,9 @@ window.addEvent(\'domready\', function() {
 
 							if (!is_bool(strpos($strVal, "\n")))
 							{
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 								$strVal = nl2br($strVal);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li)([^>]*)(>)/si', "\\1\\2\\3\\4\n", $strVal);
+								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 							}
 		 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 
