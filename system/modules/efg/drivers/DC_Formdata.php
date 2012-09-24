@@ -376,7 +376,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					$this->strFormFilterValue = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 					$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 
-					// add sql where condition 'form'=TILTE_OF_FORM
+					// add sql where condition 'form'=TITLE_OF_FORM
 					if ($this->strTable == 'tl_formdata')
 					{
 						$this->procedure[] = $this->strFormFilterKey . '=?';
@@ -581,7 +581,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
-		if ( $sqlWhere != '')
+		if ($sqlWhere != '')
 		{
 			$sqlQuery .= $sqlWhere;
 		}
@@ -741,17 +741,17 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				unset($strVal);
 			}
 
-			// Get the field label
-			if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']))
+			// Label
+			if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']))
 			{
-				$label = is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
+				$label = is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'];
 			}
 			else
 			{
 				$label = is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
 			}
 
-			if (!strlen($label))
+			if (null === $label)
 			{
 				$label = $i;
 			}
@@ -2906,6 +2906,7 @@ window.addEvent(\'domready\', function() {
 	 */
 	protected function listView()
 	{
+
 		$return = '';
 		$table = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 6) ? $this->ptable : $this->strTable;
 		$table_alias = ($table == 'tl_formdata' ? ' f' : '');
