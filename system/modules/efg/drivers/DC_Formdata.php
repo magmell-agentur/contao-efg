@@ -734,9 +734,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			if (!is_bool(strpos($row[$i], "\n")))
 			{
 				$strVal = $row[$i];
-				$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-				$strVal = nl2br($strVal);
-				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li)([^>]*)(>)/si', "\\1\\2\\3\\4\n", $strVal);
+				$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+				$strVal = nl2br($strVal, false);
+				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)(>)/si', "\\1\\2\\3\n", $strVal);
 				$row[$i] = $strVal;
 				unset($strVal);
 			}
@@ -759,7 +759,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$return .= '
   <tr>
     <td'.$class.'><span class="tl_label">'.$label.': </span></td>
-    <td'.$class.'>'.specialchars($row[$i]).'</td>
+    <td'.$class.'>'.$row[$i].'</td>
   </tr>';
 		}
 
@@ -3167,9 +3167,9 @@ window.addEvent(\'domready\', function() {
 							if (!is_bool(strpos($row[$v], "\n")))
 							{
 								$strVal = $row[$v];
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li)(>)(\n)/si', "\\1\\2\\3", $strVal);
-								$strVal = nl2br($strVal);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li)(>)/si', "\\1\\2\\3\n", $strVal);
+								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+								$strVal = nl2br($strVal, false);
+								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)(>)/si', "\\1\\2\\3\n", $strVal);
 								$row[$v] = $strVal;
 								unset($strVal);
 							}
