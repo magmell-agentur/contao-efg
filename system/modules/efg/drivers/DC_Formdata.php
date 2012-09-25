@@ -4906,6 +4906,7 @@ window.addEvent(\'domready\', function() {
 <input type="hidden" name="table" value="' . \Input::get('table') . '">
 <input type="hidden" name="act" value="' . \Input::get('act') . '">
 <input type="hidden" name="id" value="' . \Input::get('id') . '">
+<input type="hidden" name="rt" value="'.REQUEST_TOKEN.'">
 <input type="hidden" name="token" value="' . $strToken . '">
 
 <table cellpadding="0" cellspacing="0" class="prev_header" summary="">
