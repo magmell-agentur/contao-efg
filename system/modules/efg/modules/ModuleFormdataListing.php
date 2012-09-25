@@ -2394,7 +2394,7 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$objConfig = new stdClass();
+		$objConfig = new \stdClass();
 
 		$objConfig->perPage = $this->efg_com_per_page;
 		$objConfig->order = $this->com_order;
