@@ -114,7 +114,7 @@ class ModuleFormdata extends \Backend
 	}
 
 	/**
-	 * Update efg/config.php, dca-files
+	 * Update efg/config/config.php, dca and language files
 	 */
 	private function updateConfig()
 	{
@@ -161,7 +161,7 @@ class ModuleFormdata extends \Backend
 		}
 
 		// dca/fd_FORMKEY.php
-		if ($this->objForm && count($this->objForm)>0 )
+		if ($this->objForm && count($this->objForm) > 0)
 		{
 			$arrFields = array();
 			$arrFieldNamesById = array();
@@ -177,7 +177,7 @@ class ModuleFormdata extends \Backend
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
 						// ignore some special fields like checkbox CC, fields of type password ...
-						if (($arrField['type']=='checkbox' && $strFieldKey=='cc') || $arrField['type']=='password' )
+						if (($arrField['type'] == 'checkbox' && $strFieldKey == 'cc') || $arrField['type'] == 'password')
 						{
 							continue;
 						}
@@ -187,7 +187,7 @@ class ModuleFormdata extends \Backend
 				}
 			}
 
-			$strFormKey = ( isset($this->objForm['formID']) && strlen($this->objForm['formID']) ) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
+			$strFormKey = (isset($this->objForm['formID']) && strlen($this->objForm['formID'])) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
 			$tplDca = 'tplDca_' . $strFormKey;
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
@@ -197,7 +197,7 @@ class ModuleFormdata extends \Backend
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
 
 			$blnBackendMail = false;
-			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']) )
+			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']))
 			{
 				$blnBackendMail = true;
 			}
@@ -211,7 +211,7 @@ class ModuleFormdata extends \Backend
 
 		// overall dca/fd_feedback.php
 		// Get all form fields of all storing forms
-		if (count($arrStoreForms)>0)
+		if (count($arrStoreForms) > 0)
 		{
 			$arrAllFields = array();
 			$arrFieldNamesById = array();
@@ -226,7 +226,7 @@ class ModuleFormdata extends \Backend
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
 						// ignore some special fields like checkbox CC, fields of type password ...
-						if (($arrField['type']=='checkbox' && $strFieldKey=='cc') || $arrField['type']=='password' )
+						if (($arrField['type'] == 'checkbox' && $strFieldKey == 'cc') || $arrField['type'] == 'password')
 						{
 							continue;
 						}
@@ -239,7 +239,6 @@ class ModuleFormdata extends \Backend
 			$strFormKey = 'feedback';
 			$tplDca = 'tplDca_' . $strFormKey;
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
-			// $tplDca->arrForm = array('key' => 'feedback', 'title'=>"Feedback");
 			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->objForm['title']);
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrAllFields;
