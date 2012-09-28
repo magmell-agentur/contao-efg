@@ -85,7 +85,6 @@ class EfgFormPaginator extends \Widget
 			$blnIsHtml5 = true;
 		}
 
-
 		$return = '';
 
 		if ($this->efgAddBackButton && (($this->formTotalPages > 1 && $this->formActivePage > 1) || TL_MODE == 'BE'))

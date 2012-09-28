@@ -42,7 +42,7 @@ class EfgFormGallery extends \ContentElement
 	 * @param object
 	 * @return string
 	 */
-	public function __construct(Widget $objWidget, $arrConfig)
+	public function __construct(\Widget $objWidget, $arrConfig)
 	{
 		$this->widget = $objWidget;
 		$this->multiSRC = $arrConfig['efgMultiSRC'];
@@ -156,7 +156,7 @@ class EfgFormGallery extends \ContentElement
 			// Single files
 			if (is_file(TL_ROOT . '/' . $file))
 			{
-				$objFile = new File($file);
+				$objFile = new \File($file);
 				$this->parseMetaFile(dirname($file), true);
 				$arrMeta = $this->arrMeta[$objFile->basename];
 
@@ -194,7 +194,7 @@ class EfgFormGallery extends \ContentElement
 					continue;
 				}
 
-				$objFile = new File($file . '/' . $subfile);
+				$objFile = new \File($file . '/' . $subfile);
 
 				if ($objFile->isGdImage)
 				{
@@ -291,7 +291,7 @@ class EfgFormGallery extends \ContentElement
 			$offset = ($page - 1) * $this->perPage;
 			$limit = min($this->perPage + $offset, $total);
 
-			$objPagination = new Pagination($total, $this->perPage);
+			$objPagination = new \Pagination($total, $this->perPage);
 			$this->Template->pagination = $objPagination->generate("\n  ");
 		}
 
@@ -302,7 +302,7 @@ class EfgFormGallery extends \ContentElement
 		$body = array();
 
 		// Rows
-		for ($i=$offset; $i<$limit; $i=($i+$this->perRow))
+		for ($i = $offset; $i < $limit; $i = ($i+$this->perRow))
 		{
 			$class_tr = '';
 
@@ -319,7 +319,7 @@ class EfgFormGallery extends \ContentElement
 			$class_eo = (($rowcount % 2) == 0) ? ' even' : ' odd';
 
 			// Columns
-			for ($j=0; $j<$this->perRow; $j++)
+			for ($j = 0; $j < $this->perRow; $j++)
 			{
 				$class_td = '';
 
@@ -333,7 +333,7 @@ class EfgFormGallery extends \ContentElement
 					$class_td = ' col_last';
 				}
 
-				$objCell = new stdClass();
+				$objCell = new \stdClass();
 				$key = 'row_' . $rowcount . $class_tr . $class_eo;
 
 				// Empty cell

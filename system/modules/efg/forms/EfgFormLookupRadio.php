@@ -106,7 +106,7 @@ class EfgFormLookupRadio extends \Widget
 	{
 		$strOptions = '';
 
-		foreach ($this->arrOptions as $i=>$arrOption)
+		foreach ($this->arrOptions as $i => $arrOption)
 		{
 			$strOptions .= sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
 									$this->strName,

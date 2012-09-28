@@ -127,18 +127,18 @@ class EfgFormLookupSelectMenu extends \Widget
 		$blnSingleEvent = false;
 
 		// if used as lookup on table tl_calendar_events and placed on events detail page
-		if ($strLookupTable=='tl_calendar_events' && strlen(\Input::get('events')) )
+		if ($strLookupTable == 'tl_calendar_events' && strlen(\Input::get('events')))
 		{
-			if (count($this->arrOptions)==1)
+			if (count($this->arrOptions) == 1)
 			{
 				$this->varValue = array($this->arrOptions[0]['value']);
 				$blnSingleEvent = true;
 			}
 		}
 		// .. equivalent,  if linked from event reader or events list page
-		if ($strLookupTable=='tl_calendar_events' && (strpos($strReferer, '/event-reader/events/') || strpos($strReferer, '&events=') ) )
+		if ($strLookupTable == 'tl_calendar_events' && (strpos($strReferer, '/event-reader/events/') || strpos($strReferer, '&events=')))
 		{
-			if (count($this->arrOptions)==1)
+			if (count($this->arrOptions) == 1)
 			{
 				$this->varValue = array($this->arrOptions[0]['value']);
 				$blnSingleEvent = true;
@@ -154,12 +154,12 @@ class EfgFormLookupSelectMenu extends \Widget
 		// Add empty option (XHTML) if there are none
 		if (!count($this->arrOptions) && !$blnSingleEvent )
 		{
-			$this->arrOptions = array(array('value'=>'', 'label'=>'-'));
+			$this->arrOptions = array(array('value' => '', 'label' => '-'));
 		}
 		foreach ($this->arrOptions as $i => $arrOption)
 		{
 			$selected = '';
-			if ( (is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']) )
+			if ((is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']))
 			{
 			  $selected = ' selected="selected"';
 			}
@@ -170,7 +170,7 @@ class EfgFormLookupSelectMenu extends \Widget
 									$arrOption['label']);
 
 			// render as checked radio if used as lookup on tl_calendar_events and only one event available
-			if ($strLookupTable=='tl_calendar_events' && $blnSingleEvent)
+			if ($strLookupTable == 'tl_calendar_events' && $blnSingleEvent)
 			{
 				$selected = ' checked="checked"';
 				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',

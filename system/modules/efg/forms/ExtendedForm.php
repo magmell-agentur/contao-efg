@@ -173,12 +173,12 @@ class ExtendedForm extends \Form
 			unset($_SESSION['EFP'][$formId]['completed']);
 		}
 
-		if (\Input::post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP']) ))
+		if (\Input::post('FORM_SUBMIT') == $formId && (strlen($_POST['FORM_PAGE']) || is_array($_POST['FORM_STEP'])))
 		{
 			$intActivePage = (int) $_POST['FORM_PAGE'];
 			$intGoto = 0;
 
-			if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']) )
+			if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
 			{
 				$intActivePage = ((int) $_POST['FORM_PAGE']);
 				$doNotValidate = true;
@@ -191,7 +191,7 @@ class ExtendedForm extends \Form
 				$intGoto = (is_array($_POST['FORM_STEP']) ? key($_POST['FORM_STEP']) : key($_POST['FORM_STEP_x']));
 				if ($intGoto < $intActivePage)
 				{
-					$_SESSION['EFP'][$formId]['render_page'] = ($intGoto<1 ? 1 : $intGoto);
+					$_SESSION['EFP'][$formId]['render_page'] = ($intGoto < 1 ? 1 : $intGoto);
 					$this->reload();
 				}
 				elseif ($intGoto > $intActivePage && $_SESSION['EFP'][$formId]['completed']['page_'.$intGoto])
@@ -248,7 +248,7 @@ class ExtendedForm extends \Form
 						continue;
 					}
 					elseif ($this->intActivePage > 1 && $this->intActivePage < $this->intTotalPages
-							&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'] ))
+							&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting']))
 					{
 						continue;
 					}
@@ -323,7 +323,7 @@ class ExtendedForm extends \Form
 					$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
 				}
 
-				if ($strMode=='reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
+				if ($strMode == 'reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
 				{
 					// frontend editing
 					if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
@@ -440,7 +440,7 @@ class ExtendedForm extends \Form
 							{
 								$objWidget->validate();
 							}
-						} // if instance of uploadable
+						}
 						else
 						{
 							$objWidget->validate();
@@ -473,7 +473,7 @@ class ExtendedForm extends \Form
 					}
 
 					unset($_POST[$objFields->name]);
-				} // if (\Input::post('FORM_SUBMIT') == $formId)
+				}
 
 
 				if ($objWidget instanceof \FormHidden)
@@ -513,12 +513,12 @@ class ExtendedForm extends \Form
 							continue;
 						}
 					}
-				} // objWidget instanceof uploadable
+				}
 
 				$this->Template->fields .= $objWidget->parse();
 
 				++$row;
-			} // while $objFields
+			}
 		}
 
 		if ($doNotSubmit && $this->blnAllowSkipRequired)
