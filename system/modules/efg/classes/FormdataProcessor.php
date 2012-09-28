@@ -337,10 +337,6 @@ class FormdataProcessor extends \Frontend
 								->set($arrFieldSet)
 								->execute();
 
-						if (strlen($_SESSION['EFP_ERROR']))
-						{
-							unset($_SESSION['EFP_ERROR']);
-						}
 					}
 
 				}
