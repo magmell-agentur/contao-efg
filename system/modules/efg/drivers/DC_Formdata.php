@@ -1806,7 +1806,7 @@ window.addEvent(\'domready\', function() {
 
 				$strUrl .= strlen($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) ? '&amp;act=create&amp;mode=2&amp;pid=' . CURRENT_ID : '&amp;act=create';
 
-				$this->redirect($strUrl);
+				$this->redirect($strUrl . '&amp;rt=' . REQUEST_TOKEN);
 			}
 
 			$this->reload();
@@ -4852,7 +4852,7 @@ window.addEvent(\'domready\', function() {
 						$confEmail->sendTo($recipient);
 						$blnConfirmationSent = true;
 
-						$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient));
+						\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient)));
 					}
 				}
 
@@ -4897,7 +4897,7 @@ window.addEvent(\'domready\', function() {
 <a href="'.$this->getReferer(ENCODE_AMPERSANDS).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 </div>
 
-<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>'.$this->getMessages(). $strHint .'
+<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['mail'][0].'</h2>' . \Message::generate() . $strHint .'
 
 <form action="'.ampersand(\Environment::get('script'), ENCODE_AMPERSANDS).'" id="tl_formdata_send" class="tl_form" method="get">
 <div class="tl_formbody_edit fd_mail_send">
@@ -5012,7 +5012,7 @@ $return .= '
 
 			if (!\Input::post('import_source') || \Input::post('import_source') == '')
 			{
-				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['tl_formdata']['error_select_source'];
+				\Message::addError($GLOBALS['TL_LANG']['tl_formdata']['error_select_source']);
 				$this->reload();
 			}
 
@@ -5021,7 +5021,7 @@ $return .= '
 
 			if ($objFile->extension != 'csv')
 			{
-				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension);
+				\Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension));
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$this->reload();
 			}
@@ -5263,11 +5263,11 @@ $return .= '
 
 				} // while $arrRow
 
-				$_SESSION['TL_CONFIRM'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_confirm'], $intValid);
+				\Message::addConfirmation(sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_confirm'], $intValid));
 
 				if ($intInvalid > 0)
 				{
-					$_SESSION['TL_INFO'][] = sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_invalid'], $intInvalid);
+					\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_invalid'], $intInvalid));
 				}
 
 				$objFile->close();
