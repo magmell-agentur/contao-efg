@@ -1,1 +1,15 @@
-nbproject
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.buildpath
+.project
+.settings/
+.build/
+.idea/
+nbproject/
+
+# Contao
+system/modules/efg/dca/fd_*
+system/modules/efg/config/config.php
