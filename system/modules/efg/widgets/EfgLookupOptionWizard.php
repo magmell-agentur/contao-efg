@@ -44,35 +44,37 @@ class EfgLookupOptionWizard extends \Widget
 	 * DB Tables and fields
 	 * @var array
 	 */
-	protected $arrDbStruct = array ();
+	protected $arrDbStruct = array();
 
 	/**
 	 * DB Tables to ignore
 	 * @var array
 	 */
-	protected $arrIgnoreTables = array ();
+	protected $arrIgnoreTables = array();
 
 	/**
 	 * DB Fields to ignore
 	 * @var array
 	 */
-	protected $arrIgnoreFields = array ();
+	protected $arrIgnoreFields = array();
 
 	/**
 	 * Add specific attributes
 	 * @param string
 	 * @param mixed
 	 */
-	public function __set($strKey, $varValue) {
-		switch ($strKey) {
-			case 'value' :
+	public function __set($strKey, $varValue)
+	{
+		switch ($strKey)
+		{
+			case 'value':
 				$this->varValue = deserialize($varValue);
 				break;
-			case 'mandatory' :
+			case 'mandatory':
 				$this->arrConfiguration['mandatory'] = $varValue ? true : false;
 				break;
-			default :
-				parent :: __set($strKey, $varValue);
+			default:
+				parent::__set($strKey, $varValue);
 				break;
 		}
 	}
@@ -81,9 +83,11 @@ class EfgLookupOptionWizard extends \Widget
 	 * Generate the widget and return it as string
 	 * @return string
 	 */
-	public function generate() {
+	public function generate()
+	{
 
-		$this->arrIgnoreTables = array (
+		$this->arrIgnoreTables = array
+		(
 			'tl_formdata',
 			'tl_formdata_details',
 			'tl_cache',
@@ -102,7 +106,8 @@ class EfgLookupOptionWizard extends \Widget
 			'tl_version'
 
 		);
-		$this->arrIgnoreFields = array (
+		$this->arrIgnoreFields = array
+		(
 			/* 'id', */
 			'pid', 'tstamp', 'sorting'
 		);
@@ -205,7 +210,7 @@ class EfgLookupOptionWizard extends \Widget
 			<p class="tl_help tl_tip">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_field'][1] .'</p></div>';
 
 		// table field used as option value
-		if ($strSelectedTable != '' && substr($strSelectedTable, 0, 3)!='fd_' )
+		if ($strSelectedTable != '' && substr($strSelectedTable, 0, 3)!='fd_')
 		{
 			$return .= '<div class="w50"><h3><label for="' . $this->strId . '_lookup_val_field">' . $GLOBALS['TL_LANG'][$this->strTable]['lookup_val_field'][0] . '</label></h3>';
 			$return .= '<select name="' . $this->strId . '[lookup_val_field]" id="' . $this->strId . '_lookup_val_field" class="tl_select tl_chosen">';
