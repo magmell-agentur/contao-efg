@@ -17,6 +17,7 @@
  */
 namespace Efg;
 
+
 /**
  * Class EfgFormGallery
  * based on ContentGallery by Leo Feyer
@@ -30,12 +31,19 @@ class EfgFormGallery extends \ContentElement
 {
 
 	/**
+	 * Files object
+	 * @var \FilesModel
+	 */
+	protected $objFiles;
+
+	/**
 	 * Template
 	 * @var string
 	 */
 	protected $strTemplate = 'form_efg_imageselect';
 
 	protected $widget = null;
+
 
 	/**
 	 * Initialize the object
@@ -61,6 +69,7 @@ class EfgFormGallery extends \ContentElement
 
 	public function __set($strKey, $varValue)
 	{
+
 		switch ($strKey)
 		{
 
@@ -113,10 +122,9 @@ class EfgFormGallery extends \ContentElement
 	 */
 	public function generate()
 	{
-		$this->multiSRC = deserialize($this->multiSRC);
 
 		// Use the home directory of the current user as file source
-		if ($this->efgImageUseHomeDir && FE_USER_LOGGED_IN)
+		if ($this->useHomeDir && FE_USER_LOGGED_IN)
 		{
 			$this->import('FrontendUser', 'User');
 
@@ -125,8 +133,27 @@ class EfgFormGallery extends \ContentElement
 				$this->multiSRC = array($this->User->homeDir);
 			}
 		}
+		else
+		{
+			$this->multiSRC = deserialize($this->multiSRC, true);
+		}
 
+		// Return if there are no files
 		if (!is_array($this->multiSRC) || empty($this->multiSRC))
+		{
+			return '';
+		}
+
+		// Check for version 3 format
+		if (!is_numeric($this->multiSRC[0]))
+		{
+			return '<p class="error">'.$GLOBALS['TL_LANG']['ERR']['version2format'].'</p>';
+		}
+
+		// Get the file entries from the database
+		$this->objFiles = \FilesModel::findMultipleByIds($this->multiSRC);
+
+		if ($this->objFiles === null)
 		{
 			return '';
 		}
@@ -135,87 +162,107 @@ class EfgFormGallery extends \ContentElement
 	}
 
 
-
 	/**
-	 * Generate gallery
+	 * Generate the gallery
 	 */
 	protected function compile()
 	{
+
+		global $objPage;
+
 		$images = array();
-		$auxName = array();
 		$auxDate = array();
+		$auxId = array();
+		$objFiles = $this->objFiles;
 
 		// Get all images
-		foreach ($this->multiSRC as $file)
+		while ($objFiles->next())
 		{
-			if (!is_dir(TL_ROOT . '/' . $file) && !file_exists(TL_ROOT . '/' . $file) || array_key_exists($file, $images))
+			// Continue if the files has been processed or does not exist
+			if (isset($images[$objFiles->path]) || !file_exists(TL_ROOT . '/' . $objFiles->path))
 			{
 				continue;
 			}
 
 			// Single files
-			if (is_file(TL_ROOT . '/' . $file))
+			if ($objFiles->type == 'file')
 			{
-				$objFile = new \File($file);
-				$this->parseMetaFile(dirname($file), true);
-				$arrMeta = $this->arrMeta[$objFile->basename];
+				$objFile = new \File($objFiles->path);
 
-				if ($arrMeta[0] == '')
-				{
-					$arrMeta[0] = str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename));
-				}
-
-				if ($objFile->isGdImage)
-				{
-					$images[$file] = array
-					(
-						'name' => $objFile->basename,
-						'singleSRC' => $file,
-						'alt' => $arrMeta[0],
-						'imageUrl' => $arrMeta[1],
-						'caption' => $arrMeta[2]
-					);
-
-					$auxName[] = $objFile->basename;
-					$auxDate[] = $objFile->mtime;
-				}
-
-				continue;
-			}
-
-			$subfiles = scan(TL_ROOT . '/' . $file);
-			$this->parseMetaFile($file);
-
-			// Folders
-			foreach ($subfiles as $subfile)
-			{
-				if (is_dir(TL_ROOT . '/' . $file . '/' . $subfile))
+				if (!$objFile->isGdImage)
 				{
 					continue;
 				}
 
-				$objFile = new \File($file . '/' . $subfile);
+				$arrMeta = $this->getMetaData($objFiles->meta, $objPage->language);
 
-				if ($objFile->isGdImage)
+				// Use the file name as title if none is given
+				if ($arrMeta['title'] == '')
 				{
-					$arrMeta = $this->arrMeta[$subfile];
+					$arrMeta['title'] = specialchars(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)));
+				}
 
-					if ($arrMeta[0] == '')
+				// Add the image
+				$images[$objFiles->path] = array
+				(
+					'id'        => $objFiles->id,
+					'name'      => $objFile->basename,
+					'singleSRC' => $objFiles->path,
+					'alt'       => $arrMeta['title'],
+					'imageUrl'  => $arrMeta['link'],
+					'caption'   => $arrMeta['caption']
+				);
+
+				$auxDate[] = $objFile->mtime;
+				$auxId[] = $objFiles->id;
+			}
+
+			// Folders
+			else
+			{
+				$objSubfiles = \FilesModel::findByPid($objFiles->id);
+
+				if ($objSubfiles === null)
+				{
+					continue;
+				}
+
+				while ($objSubfiles->next())
+				{
+					// Skip subfolders
+					if ($objSubfiles->type == 'folder')
 					{
-						$arrMeta[0] = str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename));
+						continue;
 					}
 
-					$images[$file . '/' . $subfile] = array
+					$objFile = new \File($objSubfiles->path);
+
+					if (!$objFile->isGdImage)
+					{
+						continue;
+					}
+
+					$arrMeta = $this->getMetaData($objSubfiles->meta, $objPage->language);
+
+					// Use the file name as title if none is given
+					if ($arrMeta['title'] == '')
+					{
+						$arrMeta['title'] = specialchars(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)));
+					}
+
+					// Add the image
+					$images[$objSubfiles->path] = array
 					(
-						'name' => $objFile->basename,
-						'singleSRC' => $file . '/' . $subfile,
-						'alt' => $arrMeta[0],
-						'imageUrl' => $arrMeta[1],
-						'caption' => $arrMeta[2]
+						'id'        => $objSubfiles->id,
+						'name'      => $objFile->basename,
+						'singleSRC' => $objSubfiles->path,
+						'alt'       => $arrMeta['title'],
+						'imageUrl'  => $arrMeta['link'],
+						'caption'   => $arrMeta['caption']
 					);
 
-					$auxName[] = $objFile->basename;
 					$auxDate[] = $objFile->mtime;
+					$auxId[] = $objSubfiles->id;
 				}
 			}
 		}
@@ -240,16 +287,41 @@ class EfgFormGallery extends \ContentElement
 				array_multisort($images, SORT_NUMERIC, $auxDate, SORT_DESC);
 				break;
 
-			case 'meta':
-				$arrImages = array();
-				foreach ($this->arrAux as $k)
+			case 'meta': // Backwards compatibility
+			case 'custom':
+				if ($this->orderSRC != '')
 				{
-					if (strlen($k))
+					// Turn the order string into an array
+					$arrOrder = array_flip(array_map('intval', explode(',', $this->orderSRC)));
+
+					// Move the matching elements to their position in $arrOrder
+					foreach ($images as $k=>$v)
 					{
-						$arrImages[] = $images[$k];
+						if (isset($arrOrder[$v['id']]))
+						{
+							$arrOrder[$v['id']] = $v;
+							unset($images[$k]);
+						}
 					}
+
+					// Append the left-over images at the end
+					if (!empty($images))
+					{
+						$arrOrder = array_merge($arrOrder, $images);
+					}
+
+					// Remove empty or numeric (not replaced) entries
+					foreach ($arrOrder as $k=>$v)
+					{
+						if ($v == '' || is_numeric($v))
+						{
+							unset($arrOrder[$k]);
+						}
+					}
+
+					$images = $arrOrder;
+					unset($arrOrder);
 				}
-				$images = $arrImages;
 				break;
 
 			case 'random':
@@ -265,15 +337,16 @@ class EfgFormGallery extends \ContentElement
 			$images = array_slice($images, 0, $this->numberOfItems);
 		}
 
+		$offset = 0;
 		$total = count($images);
 		$limit = $total;
-		$offset = 0;
 
 		// Pagination
 		if ($this->perPage > 0)
 		{
 			// Get the current page
-			$page = \Input::get('page') ? \Input::get('page') : 1;
+			$id = 'page_g' . $this->id;
+			$page = \Input::get($id) ?: 1;
 
 			// Do not index or cache the page if the page number is outside the range
 			if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))
@@ -291,7 +364,7 @@ class EfgFormGallery extends \ContentElement
 			$offset = ($page - 1) * $this->perPage;
 			$limit = min($this->perPage + $offset, $total);
 
-			$objPagination = new \Pagination($total, $this->perPage);
+			$objPagination = new \Pagination($total, $this->perPage, 7, $id);
 			$this->Template->pagination = $objPagination->generate("\n  ");
 		}
 
@@ -302,7 +375,7 @@ class EfgFormGallery extends \ContentElement
 		$body = array();
 
 		// Rows
-		for ($i = $offset; $i < $limit; $i = ($i+$this->perRow))
+		for ($i = $offset; $i < $limit; $i = ($i + $this->perRow))
 		{
 			$class_tr = '';
 
@@ -337,44 +410,48 @@ class EfgFormGallery extends \ContentElement
 				$key = 'row_' . $rowcount . $class_tr . $class_eo;
 
 				// Empty cell
-				if (!is_array($images[($i+$j)]) || ($j+$i) >= $limit)
+				if (!is_array($images[($i + $j)]) || ($j + $i) >= $limit)
 				{
 					$objCell->class = 'col_'.$j . $class_td;
-					$body[$key][$j] = $objCell;
-
-					continue;
-				}
-
-				// Add size and margin
-				$images[($i+$j)]['size'] = $this->size;
-				$images[($i+$j)]['imagemargin'] = $this->imagemargin;
-				$images[($i+$j)]['fullsize'] = $this->fullsize;
-
-				$this->addImageToTemplate($objCell, $images[($i+$j)], $intMaxWidth, $strLightboxId);
-
-				// Add column width and class
-				$objCell->colWidth = $colwidth . '%';
-				$objCell->class = 'col_'.$j . $class_td;
-
-				$objCell->optId = 'opt_' . $this->widget->id . '_' . ($i+$j);
-				$objCell->optName = $this->widget->name;
-				$objCell->srcFile = $images[($i+$j)]['singleSRC'];
-
-				$blnChecked = false;
-				if ($this->efgImageMultiple)
-				{
-					if (!is_array($this->widget->value))
-					{
-						$this->widget->value = array($this->widget->value);
-					}
-
-					$blnChecked = (is_array($this->widget->value) && in_array($objCell->srcFile, $this->widget->value));
 				}
 				else
 				{
-					$blnChecked = ($this->widget->value == $objCell->srcFile);
+					// Add size and margin
+					$images[($i + $j)]['size'] = $this->size;
+					$images[($i + $j)]['imagemargin'] = $this->imagemargin;
+					$images[($i + $j)]['fullsize'] = $this->fullsize;
+
+					$this->addImageToTemplate($objCell, $images[($i + $j)], $intMaxWidth, $strLightboxId);
+
+					// Add column width and class
+					$objCell->colWidth = $colwidth . '%';
+					$objCell->class = 'col_'.$j . $class_td;
+//TODO: use file ID or file path as option value? store ID or path in tl_formdata_details ?
+					$objCell->optId = 'opt_' . $this->widget->id . '_' . ($i + $j);
+					$objCell->optName = $this->widget->name;
+					$objCell->srcFile = $images[($i + $j)]['singleSRC'];
+					$objCell->srcFileId = $images[($i + $j)]['id'];
+					$objCell->value = $images[($i + $j)]['id'];
+
+					$blnChecked = false;
+					if ($this->efgImageMultiple)
+					{
+						if (!is_array($this->widget->value))
+						{
+							$this->widget->value = array($this->widget->value);
+						}
+
+						// $blnChecked = (is_array($this->widget->value) && in_array($objCell->srcFile, $this->widget->value));
+						$blnChecked = (is_array($this->widget->value) && (in_array($objCell->srcFile, $this->widget->value) || in_array($objCell->srcFileId, $this->widget->value)));
+					}
+					else
+					{
+						// $blnChecked = ($this->widget->value == $objCell->srcFile);
+						$blnChecked = ($this->widget->value == $objCell->srcFile || $this->widget->value == $objCell->srcFileId);
+					}
+					$objCell->checked = ($blnChecked ? ' checked="checked"' : '');
+
 				}
-				$objCell->checked = ($blnChecked ? ' checked="checked"' : '');
 
 				$body[$key][$j] = $objCell;
 			}
@@ -382,10 +459,26 @@ class EfgFormGallery extends \ContentElement
 			++$rowcount;
 		}
 
+/*
+		$strTemplate = 'gallery_default';
+
+		// Use a custom template
+		if (TL_MODE == 'FE' && $this->galleryTpl != '')
+		{
+			$strTemplate = $this->galleryTpl;
+		}
+
+		$objTemplate = new \FrontendTemplate($strTemplate);
+		$objTemplate->setData($this->arrData);
+
+		$objTemplate->body = $body;
+		$objTemplate->headline = $this->headline; // see #1603
+
+		$this->Template->images = $objTemplate->parse();
+*/
 		$this->Template->multiple = ($this->efgImageMultiple) ? true : false;
 		$this->Template->body = $body;
 		$this->Template->images = $images;
 
 	}
-
 }
