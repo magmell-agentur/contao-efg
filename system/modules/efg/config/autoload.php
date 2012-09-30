@@ -58,9 +58,9 @@ ClassLoader::addClasses(array
 TemplateLoader::addFiles(array
 (
 	'edit_fd_default'               => 'system/modules/efg/templates/',
-	'efg_internal_config'           => 'system/modules/efg/templates/internal/',
-	'efg_internal_dca_formdata'     => 'system/modules/efg/templates/internal/',
-	'efg_internal_modules'          => 'system/modules/efg/templates/internal/',
+	'efg_internal_config'           => 'system/modules/efg/templates/',
+	'efg_internal_dca_formdata'     => 'system/modules/efg/templates/',
+	'efg_internal_modules'          => 'system/modules/efg/templates/',
 	'form_efg_imageselect'          => 'system/modules/efg/templates/',
 	'form_paginator'                => 'system/modules/efg/templates/',
 	'info_fd_simple_default'        => 'system/modules/efg/templates/',
