@@ -625,7 +625,7 @@ class ExtendedForm extends \Form
 	{
 //TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
 		return '
-if(typeof(window.addEvent=="function")){
+if(typeof(window.addEvent)=="function"){
 	window.addEvent(\'domready\', function(){
 		var elForm = document.id(\'{$this->Template->formId}\');
 		if (elForm){
@@ -654,7 +654,7 @@ if(typeof(window.addEvent=="function")){
 	{
 //TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
 		return '
-if(typeof(window.addEvent=="function")){
+if(typeof(window.addEvent)=="function"){
 window.addEvent("domready",function(){'
 			. 'Locale.define("en-US","Date",{'
 				. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
