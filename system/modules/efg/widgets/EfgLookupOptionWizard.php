@@ -92,11 +92,11 @@ class EfgLookupOptionWizard extends \Widget
 			'tl_formdata_details',
 			'tl_cache',
 			'tl_extension',
-			//'tl_form',
-			//'tl_form_field',
 			'tl_layout',
 			'tl_log',
-			//'tl_module',
+			'tl_lock',
+			'tl_repository_installs',
+			'tl_repository_instfiles',
 			'tl_search',
 			'tl_search_index',
 			'tl_session',
@@ -104,7 +104,6 @@ class EfgLookupOptionWizard extends \Widget
 			'tl_style_sheet',
 			'tl_undo',
 			'tl_version'
-
 		);
 		$this->arrIgnoreFields = array
 		(
