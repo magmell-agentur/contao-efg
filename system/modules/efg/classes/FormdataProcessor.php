@@ -33,11 +33,13 @@ class FormdataProcessor extends \Frontend
 
 
 	/**
-	 * Optional confirmation mail, optional store data in backend
-	 * @param array	Submitted data
-	 * @param array	Form configuration
-	 * @param array Files uploaded
-	 * @param array	Form field labels
+	 * Process submitted form data
+	 * Send mail, store data in backend
+	 * @param array $arrSubmitted Submitted data
+	 * @param array|bool $arrForm Form configuration
+	 * @param array|bool $arrFiles Files uploaded
+	 * @param array|bool $arrLabels    Form field labels
+	 * @return void
 	 */
 	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels=false) {
 
