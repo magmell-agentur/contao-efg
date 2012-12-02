@@ -2190,7 +2190,7 @@ window.addEvent(\'domready\', function() {
 
 						// tom, 2007-09-27, bugfix:
 						// .. not if value is empty or does not exist at all
-						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exisits
+						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
 						if (strlen($arrVals[0]) && strlen($this->varValue))
 						{
 							$this->varValue = $arrVals[0];
