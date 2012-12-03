@@ -244,7 +244,7 @@ class ExtendedForm extends Form
 
 			if ($objFields->name != '')
 			{
-				$arrLabels[$objWidget->name] = $objFields->label;
+				$arrLabels[$objFields->name] = $objFields->label;
 			}
 
 			if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
