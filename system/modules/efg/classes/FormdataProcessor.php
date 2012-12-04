@@ -213,7 +213,7 @@ class FormdataProcessor extends \Frontend
 				'form' => $arrForm['title'],
 				'tstamp' => $timeNow,
 				'date' => $timeNow,
-				'ip' => \Environment::get('ip'),
+				'ip' => \System::anonymizeIp(\Environment::get('ip')),
 				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
 				'fd_member' => intval($this->Member->id),
 				'fd_member_group' => intval($this->Member->groups[0]),
