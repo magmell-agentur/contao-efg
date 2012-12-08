@@ -152,7 +152,7 @@ class EfgFormLookupSelectMenu extends \Widget
 		}
 
 		// Add empty option (XHTML) if there are none
-		if (!count($this->arrOptions) && !$blnSingleEvent )
+		if (empty($this->arrOptions) && !$blnSingleEvent )
 		{
 			$this->arrOptions = array(array('value' => '', 'label' => '-'));
 		}

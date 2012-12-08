@@ -579,7 +579,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$strFormFilter = ($this->strTable == 'tl_formdata' && strlen($this->strFormKey) ? $this->sqlFormFilter : '');
 		$table_alias = ($this->strTable == 'tl_formdata' ? ' f' : '');
 
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ($sqlWhere != '')
 		{
@@ -1192,7 +1192,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$this->blnCreateNewVersion = false;
 
 		// Get current record
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ($sqlWhere != '')
 		{
@@ -1921,8 +1921,8 @@ window.addEvent(\'domready\', function() {
 					}
 				}
 
-				$strSqlFields = (count($arrBaseFields)>0 ? implode(', ', $arrBaseFields) : '');
-				$strSqlFields .= (count($arrSqlDetails)>0 ? (strlen($strSqlFields) ? ', ' : '') . implode(', ', $arrSqlDetails) : '');
+				$strSqlFields = (!empty($arrBaseFields) ? implode(', ', $arrBaseFields) : '');
+				$strSqlFields .= (!empty($arrSqlDetails) ? (strlen($strSqlFields) ? ', ' : '') . implode(', ', $arrSqlDetails) : '');
 
 				// Get the field values
 				$objRow = \Database::getInstance()->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
@@ -2558,7 +2558,7 @@ window.addEvent(\'domready\', function() {
 
 				foreach ($arrOpts as $strKey => $varOpt)
 				{
-					if (is_array($varOpt) && count($varOpt))
+					if (is_array($varOpt) && !empty($varOpt))
 					{
 						foreach ($varOpt as $keyOpt => $valOpt)
 						{
@@ -2783,7 +2783,7 @@ window.addEvent(\'domready\', function() {
 			}
 
 			// Build possible palette names from the selector values
-			if (!count($sValues))
+			if (empty($sValues))
 			{
 				$names = array('default');
 			}
@@ -2924,11 +2924,11 @@ window.addEvent(\'domready\', function() {
 			$this->values[] = \Input::get('id');
 		}
 
-		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
+		$query = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 
 		$sqlWhere = '';
 
-		if (count($this->procedure))
+		if (!empty($this->procedure))
 		{
 			$arrProcedure = $this->procedure;
 
@@ -3405,7 +3405,7 @@ window.addEvent(\'domready\', function() {
 				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . \Input::post('tl_field', true) .'\' AND pid=f.id)';
 				try
 				{
-					\Database::getInstance()->prepare("SELECT * ".(count($this->arrSqlDetails) > 0 ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
+					\Database::getInstance()->prepare("SELECT * ".(!empty($this->arrSqlDetails) ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
 								   ->limit(1)
 								   ->execute(\Input::postRaw('tl_value'));
 
@@ -4394,7 +4394,7 @@ window.addEvent(\'domready\', function() {
 
 
 		// Get current record
-		$sqlQuery = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
+		$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
 		if ($sqlWhere != '')
 		{
@@ -4419,7 +4419,7 @@ window.addEvent(\'domready\', function() {
 		// Form
 		$intFormId = 0;
 
-		if (count($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields']))
+		if (!empty($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields']))
 		{
 			// try to get Form ID
 			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields'] as $strField)
@@ -4500,7 +4500,7 @@ window.addEvent(\'domready\', function() {
 				if (!$blnStoreOptionsValues)
 				{
 					$arrRecipient = $this->Formdata->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
-					if (count($arrRecipient))
+					if (!empty($arrRecipient))
 					{
 						$varRecipient = implode(', ', $arrRecipient);
 					}
@@ -4663,7 +4663,7 @@ window.addEvent(\'domready\', function() {
 							{
 								if (array_key_exists($strKey, $arrFiles) && strlen($arrFiles[$strKey]['name']))
 								{
-									if (!count($attachments) || !in_array($arrFiles[$strKey]['file'], $attachments))
+									if (empty($attachments) || !in_array($arrFiles[$strKey]['file'], $attachments))
 									{
 										$attachments[] = $arrFiles[$strKey]['file'];
 									}
@@ -4798,7 +4798,7 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		if (is_array($attachments) && count($attachments)>0)
+		if (!empty($attachments))
 		{
 			foreach ($attachments as $attachment)
 			{
@@ -4832,7 +4832,7 @@ window.addEvent(\'domready\', function() {
 			if ($blnSend)
 			{
 				// Send e-mail
-				if (count($arrRecipient)>0)
+				if (!empty($arrRecipient))
 				{
 					$arrSentTo = array();
 					foreach ($arrRecipient as $recipient)
@@ -4924,7 +4924,7 @@ window.addEvent(\'domready\', function() {
     <td class="col_1">' . $subject . '</td>
   </tr>';
 
-		if (is_array($attachments) && count($attachments) > 0)
+		if (!empty($attachments))
 		{
   	$return .= '
   <tr class="row_3">
@@ -5214,7 +5214,7 @@ $return .= '
 					$intNewId = 0;
 					$blnSaved = true;
 
-					if (count($arrDetailSets))
+					if (!empty($arrDetailSets))
 					{
 						$objNewFormdata = \Database::getInstance()->prepare("INSERT INTO tl_formdata %s")->set($arrSet)->execute();
 						$intNewId = $objNewFormdata->insertId;
@@ -5504,7 +5504,7 @@ var Stylect = {
 		$return = '
 <select name="import_cols['.$col.']">
 	<option value="__IGNORE__"'.((!isset($arrSessionData['import'][$this->strFormKey]['import_cols'][$col]) || $arrSessionData['import'][$this->strFormKey]['import_cols'][$col] == '__IGNORE__') ? ' selected="SELECTED"' : '').'>'.$GLOBALS['TL_LANG']['tl_formdata']['option_import_ignore'].'</option>';
-		if (count($this->arrImportableFields) > 0)
+		if (!empty($this->arrImportableFields))
 		{
 			foreach (array_keys($this->arrImportableFields) as $strFdField)
 			{
@@ -5565,7 +5565,7 @@ var Stylect = {
 		$showFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
 		$ignoreFields = array('tstamp', 'sorting');
 
-		if (is_array($this->arrExportIgnoreFields) && count($this->arrExportIgnoreFields) > 0)
+		if (!empty($this->arrExportIgnoreFields))
 		{
 			$ignoreFields = array_unique(array_merge($ignoreFields, $this->arrExportIgnoreFields));
 		}
@@ -5588,7 +5588,7 @@ var Stylect = {
 			$this->values[] = \Input::get('id');
 		}
 
-		$query = "SELECT * " .(count($this->arrSqlDetails) > 0 ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
+		$query = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 
 		$sqlWhere = '';
 
@@ -5614,7 +5614,7 @@ var Stylect = {
 				$arrFilterFields[] = $k;
 			}
 		}
-		if (count($arrFilterFields))
+		if (!empty($arrFilterFields))
 		{
 			foreach ($arrFilterFields as $field)
 			{
@@ -5691,7 +5691,7 @@ var Stylect = {
 			}
 		}
 
-		if (count($this->procedure))
+		if (!empty($this->procedure))
 		{
 			$arrProcedure = $this->procedure;
 

@@ -523,7 +523,7 @@ class ExtendedForm extends \Form
 
 		if ($doNotSubmit && $this->blnAllowSkipRequired)
 		{
-			if (count($this->arrWidgetsFailedValidation) && count(array_count_values($this->arrWidgetsFailedValidation)) == 1)
+			if (!empty($this->arrWidgetsFailedValidation) && count(array_count_values($this->arrWidgetsFailedValidation)) == 1)
 			{
 				$doNotSubmit = false;
 			}

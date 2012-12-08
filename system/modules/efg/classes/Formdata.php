@@ -62,7 +62,7 @@ class Formdata extends \Frontend
 			'upload', 'fileTree'
 		);
 
-		if (is_array($GLOBALS['EFG']['storable_fields']) && count($GLOBALS['EFG']['storable_fields']))
+		if (!empty($GLOBALS['EFG']['storable_fields']))
 		{
 			$this->arrFFstorable = array_unique(array_merge($this->arrFFstorable, $GLOBALS['EFG']['storable_fields']));
 		}
@@ -199,14 +199,14 @@ class Formdata extends \Frontend
 
 		$arrProcessed = array();
 
-		if (is_array($this->arrSearchableListingPages) && count($this->arrSearchableListingPages)>0)
+		if (!empty($this->arrSearchableListingPages))
 		{
 			$this->loadDataContainer('fd_feedback');
 
 			foreach ($this->arrSearchableListingPages as $pageId => $arrParams)
 			{
 
-				if (is_array($arrRoot) && count($arrRoot) > 0 && !in_array($pageId, $arrRoot))
+				if (!empty($arrRoot) && !in_array($pageId, $arrRoot))
 				{
 					continue;
 				}
@@ -304,7 +304,7 @@ class Formdata extends \Frontend
 								}
 							}
 						}
-						$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) .')' : '';
+						$strListWhere = (!empty($arrListWhere)) ? '(' . implode('', $arrListWhere) .')' : '';
 						$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
 					}
 
@@ -990,7 +990,7 @@ class Formdata extends \Frontend
 						$arrSel = deserialize($varValue, true);
 					}
 
-					if (count($arrSel))
+					if (!empty($arrSel))
 					{
 
 						// get options labels instead of values for mail / text
@@ -1074,7 +1074,7 @@ class Formdata extends \Frontend
 						$arrSel = deserialize($varValue, true);
 					}
 
-					if (count($arrSel))
+					if (!empty($arrSel))
 					{
 						// get options labels instead of values for mail / text
 						if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
@@ -1123,7 +1123,7 @@ class Formdata extends \Frontend
 						$arrSel = deserialize($varValue, true);
 					}
 
-					if (count($arrSel))
+					if (!empty($arrSel))
 					{
 						$strVal = $arrSel;
 					}
@@ -1735,7 +1735,7 @@ class Formdata extends \Frontend
 							}
 						}
 
-						if ( count($arrOptions) == 1 )
+						if (count($arrOptions) == 1)
 						{
 							$blnDoNotAddEmptyOption = true;
 						}
@@ -1900,7 +1900,7 @@ class Formdata extends \Frontend
 
 		$arrTags = preg_split("/(\{[^}]+\})/sim", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
 
-		if (is_array($arrTags) && count($arrTags)>0)
+		if (!empty($arrTags))
 		{
 			// Replace tags
 			foreach ($arrTags as $strTag)

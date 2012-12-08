@@ -129,7 +129,7 @@ class ModuleFormdata extends \Backend
 		$objConfig->write($tplConfig->parse());
 		$objConfig->close();
 
-		if (!$arrStoreForms || count($arrStoreForms) == 0)
+		if (empty($arrStoreForms))
 		{
 			return;
 		}
@@ -161,7 +161,7 @@ class ModuleFormdata extends \Backend
 		}
 
 		// dca/fd_FORMKEY.php
-		if ($this->objForm && count($this->objForm) > 0)
+		if ($this->objForm && !empty($this->objForm))
 		{
 			$arrFields = array();
 			$arrFieldNamesById = array();
@@ -211,7 +211,7 @@ class ModuleFormdata extends \Backend
 
 		// overall dca/fd_feedback.php
 		// Get all form fields of all storing forms
-		if (count($arrStoreForms) > 0)
+		if (!empty($arrStoreForms))
 		{
 			$arrAllFields = array();
 			$arrFieldNamesById = array();

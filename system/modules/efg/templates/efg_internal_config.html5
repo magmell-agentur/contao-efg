@@ -38,7 +38,7 @@ $GLOBALS['TL_CTE']['includes']['form'] = 'ExtendedForm';
  * -------------------------------------------------------------------------
  */
 
-<?php if ($this->arrStoreForms && count($this->arrStoreForms) > 0): ?>
+<?php if (!empty($this->arrStoreForms)): ?>
 array_insert($GLOBALS['BE_MOD'], 1, array('formdata' => array()));
 
 // this is used for the form independent "Feedback" module

@@ -125,7 +125,7 @@ class FormdataProcessor extends \Frontend
 		// Types of form fields with storable data
 		$arrFFstorable = $this->Formdata->arrFFstorable;
 
-		if (($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && count($arrSubmitted)>0)
+		if (($arrForm['storeFormdata'] || $arrForm['sendConfirmationMail'] || $arrForm['sendFormattedMail']) && !empty($arrSubmitted))
 		{
 			$timeNow = time();
 
@@ -136,11 +136,11 @@ class FormdataProcessor extends \Frontend
 
 			$arrBaseFields = array();
 			$arrDetailFields = array();
-			if (count($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields']))
+			if (!empty($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields']))
 			{
 				$arrBaseFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields'];
 			}
-			if (count($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']))
+			if (!empty($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields']))
 			{
 				$arrDetailFields = $GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['detailFields'];
 			}
@@ -167,7 +167,7 @@ class FormdataProcessor extends \Frontend
 
 					$this->import($callback[0]);
 					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm, $arrLabels);
-					if (is_array($arrResult) && count($arrResult)>0)
+					if (!empty($arrResult))
 					{
 						$arrSubmitted = $arrResult;
 						$arrToSave = $arrSubmitted;
@@ -178,7 +178,7 @@ class FormdataProcessor extends \Frontend
 		}
 
 		// Formdata storage
-		if ($arrForm['storeFormdata'] && count($arrSubmitted) > 0)
+		if ($arrForm['storeFormdata'] && !empty($arrSubmitted))
 		{
 			$blnStoreOptionsValue = ($arrForm['efgStoreValues'] == "1" ? true : false);
 
@@ -522,7 +522,7 @@ class FormdataProcessor extends \Frontend
 								$varTxt = array();
 								$varHtml = array();
 								if (is_string($varVal)) $varVal = array($varVal);
-								if (count($varVal))
+								if (!empty($varVal))
 								{
 									foreach ($varVal as $strVal)
 									{
@@ -533,7 +533,7 @@ class FormdataProcessor extends \Frontend
 										}
 									}
 								}
-								if (!count($varTxt) &&  $blnSkipEmpty)
+								if (empty($varTxt) &&  $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -686,7 +686,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			if (is_array($attachments) && count($attachments)>0)
+			if (!empty($attachments))
 			{
 				foreach ($attachments as $strFile => $varParams)
 				{
@@ -710,7 +710,7 @@ class FormdataProcessor extends \Frontend
 
 			// Send e-mail
 			$blnConfirmationSent = false;
-			if (count($arrRecipient)>0)
+			if (!empty($arrRecipient))
 			{
 				foreach ($arrRecipient as $recipient)
 				{
@@ -866,7 +866,7 @@ class FormdataProcessor extends \Frontend
 								$varTxt = array();
 								$varHtml = array();
 								if (is_string($varVal)) $varVal = array($varVal);
-								if (count($varVal))
+								if (!empty($varVal))
 								{
 									foreach ($varVal as $strVal)
 									{
@@ -877,7 +877,7 @@ class FormdataProcessor extends \Frontend
 										}
 									}
 								}
-								if (!count($varTxt) &&  $blnSkipEmpty)
+								if (empty($varTxt) &&  $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -1029,7 +1029,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			if (is_array($attachments) && count($attachments)>0)
+			if (!empty($attachments))
 			{
 				foreach ($attachments as $strFile => $varParams)
 				{
@@ -1052,7 +1052,7 @@ class FormdataProcessor extends \Frontend
 			}
 
 			// Send e-mail
-			if (count($arrRecipient)>0)
+			if (!empty($arrRecipient))
 			{
 				foreach ($arrRecipient as $recipient)
 				{
@@ -1096,7 +1096,7 @@ class FormdataProcessor extends \Frontend
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
 
 		// fix: after submission of normal single page form array $_SESSION['EFP']['FORMDATA'] is empty
-		if (is_null($arrSubmitted) || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')) )
+		if (null === $arrSubmitted || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')) )
 		{
 			$arrSubmitted = $_SESSION['FORM_DATA'];
 			$arrSubmitted['_formId_'] = $_SESSION['EFP']['FORMDATA'];
@@ -1108,7 +1108,7 @@ class FormdataProcessor extends \Frontend
 			$blnProcess = true;
 		}
 
- 		if ($arrSubmitted && count($arrSubmitted)>0 && isset($arrSubmitted['_formId_']) && $blnProcess)
+ 		if (!empty($arrSubmitted) && isset($arrSubmitted['_formId_']) && $blnProcess)
 		{
 			$blnSkipEmpty = false;
 
@@ -1123,7 +1123,7 @@ class FormdataProcessor extends \Frontend
 
 			preg_match('/<body[^>]*?>.*?<\/body>/si', $strContent, $arrMatch);
 
-			if (is_array($arrMatch) && count($arrMatch))
+			if (!empty($arrMatch))
 			{
 
 				for ($m=0; $m < count($arrMatch); $m++)

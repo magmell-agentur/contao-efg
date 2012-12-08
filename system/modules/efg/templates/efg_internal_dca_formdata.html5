@@ -505,7 +505,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 	case 'efgLookupRadio':
 	case 'efgLookupSelect':
 		$arrOpts = deserialize($varVals['efgLookupOptions']); ?>
-<?php if (count($arrOpts)>0): foreach ($arrOpts as $kOpt => $valOpt): ?>
+<?php if (!empty($arrOpts)): foreach ($arrOpts as $kOpt => $valOpt): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['efgLookupOptions']['<?php echo str_replace("'", "\'", $kOpt);?>'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($valOpt)); ?>';
 <?php endforeach; ?>
 <?php if($varVals['type'] == 'efgLookupCheckbox'): ?>

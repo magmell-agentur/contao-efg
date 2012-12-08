@@ -209,7 +209,7 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(count($arrGroups)>0)
+						if(!empty($arrGroups))
 						{
 							foreach($arrGroups as $group)
 							{
@@ -218,7 +218,7 @@ class ModuleFormdataListing extends \Module
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
-							if (count($arrGroupMembers)>0)
+							if (!empty($arrGroupMembers))
 							{
 								$arrAllowedOwnerIds = array_merge($arrAllowedOwnerIds, $arrGroupMembers);
 							}
@@ -268,7 +268,7 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(count($arrGroups)>0)
+						if(!empty($arrGroups))
 						{
 							foreach($arrGroups as $group)
 							{
@@ -277,7 +277,7 @@ class ModuleFormdataListing extends \Module
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
-							if (count($arrGroupMembers)>0)
+							if (!empty($arrGroupMembers))
 							{
 								$arrAllowedOwnerIds = array_merge($arrAllowedOwnerIds, $arrGroupMembers);
 							}
@@ -327,7 +327,7 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(count($arrGroups)>0)
+						if(!empty($arrGroups))
 						{
 							foreach($arrGroups as $group)
 							{
@@ -336,7 +336,7 @@ class ModuleFormdataListing extends \Module
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
-							if (count($arrGroupMembers)>0)
+							if (!empty($arrGroupMembers))
 							{
 								$arrAllowedOwnerIds = array_merge($arrAllowedOwnerIds, $arrGroupMembers);
 							}
@@ -385,7 +385,7 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(count($arrGroups)>0)
+						if(!empty($arrGroups))
 						{
 							foreach($arrGroups as $group)
 							{
@@ -394,7 +394,7 @@ class ModuleFormdataListing extends \Module
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
 													->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
-							if (count($arrGroupMembers)>0)
+							if (!empty($arrGroupMembers))
 							{
 								$arrAllowedOwnerIds = array_merge($arrAllowedOwnerIds, $arrGroupMembers);
 							}
@@ -666,7 +666,7 @@ class ModuleFormdataListing extends \Module
 						}
 					}
 				}
-				$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) .')' : '';
+				$strListWhere = (!empty($arrListWhere)) ? '(' . implode('', $arrListWhere) .')' : '';
 				$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
 			}
 			if (strlen($this->strFormKey))
@@ -746,7 +746,7 @@ class ModuleFormdataListing extends \Module
 		$varKeyword = '';
 		$strOptions = '';
 
-		if (count($this->arrAllowedOwnerIds)>0)
+		if (!empty($this->arrAllowedOwnerIds))
 		{
 			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "fd_member IN (" . implode(',', $this->arrAllowedOwnerIds) . ")";
 		}
@@ -763,7 +763,7 @@ class ModuleFormdataListing extends \Module
 			unset($arrSearchFields);
 		}
 
-		if (is_array($arrSearchFields) && count($arrSearchFields))
+		if (!empty($arrSearchFields))
 		{
 			if (!$blnExport)
 			{
@@ -802,7 +802,7 @@ class ModuleFormdataListing extends \Module
 								}
 
 								$arrMatches = $this->array_filter_like($this->{$prop}, \Input::get('for'));
-								if (count($arrMatches))
+								if (!empty($arrMatches))
 								{
 									$arrConds[] = $field . " IN(".implode(",", array_keys($arrMatches)).")";
 								}
@@ -817,7 +817,7 @@ class ModuleFormdataListing extends \Module
 							}
 						}
 
-						if (count($arrConds)>0)
+						if (!empty($arrConds))
 						{
 							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" OR ", $arrConds) . ')';
 							$varKeyword = array_fill(0, count($arrConds), '%' . \Input::get('for') . '%');
@@ -859,7 +859,7 @@ class ModuleFormdataListing extends \Module
 									}
 
 									$arrMatches = $this->array_filter_like($this->{$prop}, urldecode($for));
-									if (count($arrMatches))
+									if (!empty($arrMatches))
 									{
 										$arrConds[] = $field ." IN(" . implode(",", array_keys($arrMatches)) . ")";
 									}
@@ -877,7 +877,7 @@ class ModuleFormdataListing extends \Module
 							}
 						}
 
-						if (count($arrConds)>0)
+						if (!empty($arrConds))
 						{
 							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" AND ", $arrConds) . ')';
 							$varKeyword = $arrKeywords;
@@ -898,7 +898,7 @@ class ModuleFormdataListing extends \Module
 								$arrOptions[] = array('name' => $field, 'label' => ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field));
 							}
 						}
-						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+						elseif (is_array($this->arrDetailFields) && !empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 						{
 							$arrOptions[] = array('name' => $field, 'label' => htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]));
 						}
@@ -937,7 +937,7 @@ class ModuleFormdataListing extends \Module
 							}
 
 							$arrMatches = $this->array_filter_like($this->{$prop}, \Input::get('for'));
-							if (count($arrMatches))
+							if (!empty($arrMatches))
 							{
 								$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $field ." IN(" . implode(",", array_keys($arrMatches)) . ")";
 							}
@@ -965,7 +965,7 @@ class ModuleFormdataListing extends \Module
 								$strOptions .= '  <option value="' . $field . '"' . (($field == \Input::get('search')) ? ' selected="selected"' : '') . '>' . htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) . '</option>' . "\n";
 							}
 						}
-						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+						elseif (is_array($this->arrDetailFields) && !empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
 						{
 							$strOptions .= '  <option value="' . $field . '"' . (($field == \Input::get('search')) ? ' selected="selected"' : '') . '>' . ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field) . '</option>' . "\n";
 						}
@@ -1020,7 +1020,7 @@ class ModuleFormdataListing extends \Module
 					}
 				}
 			}
-			$strListWhere = (count($arrListWhere)>0) ? '(' . implode('', $arrListWhere) . ')' : '';
+			$strListWhere = (!empty($arrListWhere)) ? '(' . implode('', $arrListWhere) . ')' : '';
 			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
 		}
 		if (strlen($this->strFormKey))
@@ -1053,7 +1053,7 @@ class ModuleFormdataListing extends \Module
 		$strListFields = '';
 		$strListFields .= 'id,alias';
 
-		if (count($arrListFields)>0)
+		if (!empty($arrListFields))
 		{
 			foreach ($arrListFields as $field)
 			{
@@ -1070,7 +1070,7 @@ class ModuleFormdataListing extends \Module
 					$strListFields .= ',' . $field;
 				}
 
-				if (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
+				if (is_array($this->arrDetailFields) && !empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 				{
 					$strListFields .= ',(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id) AS `' . $field . '`';
 				}
@@ -1113,7 +1113,7 @@ class ModuleFormdataListing extends \Module
 			$arrSort = array();
 			$arrSortSigned = array('digit', 'date', 'datim', 'time');
 
-			if (count($arrListSort))
+			if (!empty($arrListSort))
 			{
 				foreach ($arrListSort as $strSort)
 				{
@@ -1144,7 +1144,7 @@ class ModuleFormdataListing extends \Module
 				}
 			}
 
-			if (count($arrSort)>0)
+			if (!empty($arrSort))
 			{
 				$strListSort = 'ORDER BY ' . implode(',', $arrSort);
 			}
@@ -1768,7 +1768,7 @@ class ModuleFormdataListing extends \Module
 						if ($useFormValues == 1)
 						{
 							// single value checkboxes don't have options
-							if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+							if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$strVal = strlen($row[$v]) ? key($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) : '';
 							}
@@ -1792,14 +1792,14 @@ class ModuleFormdataListing extends \Module
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") === false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+							if ((strpos($row[$v], "|") === false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
 							}
 							else
 							{
-								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 									$tmparr = split("\\|", $row[$v]);
@@ -2107,12 +2107,12 @@ class ModuleFormdataListing extends \Module
 
 		foreach($arrListFields as $field)
 		{
-			if ( in_array($field, $this->arrBaseFields) )
+			if (in_array($field, $this->arrBaseFields))
 			{
 				$strQuery .= $strSep . $field;
 				$strSep = ', ';
 			}
-			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+			if (!empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 			{
 				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				$strSep = ', ';
@@ -2509,12 +2509,12 @@ class ModuleFormdataListing extends \Module
 
 		foreach($arrListFields as $field)
 		{
-			if ( in_array($field, $this->arrBaseFields) )
+			if (in_array($field, $this->arrBaseFields))
 			{
 				$strQuery .= $strSep . $field;
 				$strSep = ', ';
 			}
-			if ( is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+			if (!empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 			{
 				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field .'`';
 				$strSep = ', ';
@@ -2714,7 +2714,7 @@ class ModuleFormdataListing extends \Module
 						if ($useFormValues == 1)
 						{
 							// single value checkboxes don't have options
-							if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+							if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$strVal = strlen($row[$v]) ? key($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) : '';
 							}
@@ -2738,14 +2738,14 @@ class ModuleFormdataListing extends \Module
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") == FALSE) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+							if ((strpos($row[$v], "|") == FALSE) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
 							}
 							else
 							{
-								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
+								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 									$tmparr = split("\\|", $row[$v]);
@@ -3024,7 +3024,7 @@ class ModuleFormdataListing extends \Module
 				$strQuery .= $strSep . $field;
 				$strSep = ', ';
 			}
-			if (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
+			if (!empty($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 			{
 				$strQuery .= $strSep .'(SELECT value FROM tl_formdata_details WHERE ff_name="' .$field. '" AND pid=f.id ) AS `' . $field . '`';
 				$strSep = ', ';
@@ -3455,7 +3455,7 @@ class ModuleFormdataListing extends \Module
 	{
 		$arrRet = array(-1 => "-");
 
-		if (!is_array($arrInput) || !count($arrInput))
+		if (!is_array($arrInput) || empty($arrInput))
 		{
 			return $arrRet;
 		}
