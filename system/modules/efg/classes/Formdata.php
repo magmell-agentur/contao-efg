@@ -718,7 +718,7 @@ class Formdata extends \Frontend
 		$strType = $arrField['type'];
 		$strVal = '';
 
-		if ( in_array($strType, $this->arrFFstorable) )
+		if (in_array($strType, $this->arrFFstorable))
 		{
 
 			switch ($strType)
@@ -759,14 +759,9 @@ class Formdata extends \Frontend
 						{
 							$strVal = (int) $strVal;
 						}
-						elseif (is_string($strVal) && strlen($strVal) )
+						elseif (is_string($strVal) && strlen($strVal))
 						{
 							$strFormat = $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format'];
-//							if (!empty($arrField['eval']['dateFormat']))
-//							{
-//								$strFormat = $arrField['eval']['dateFormat'];
-//							}
-
 							$objDate = new Date($strVal, $strFormat);
 							$strVal = $objDate->tstamp;
 						}
@@ -818,7 +813,7 @@ class Formdata extends \Frontend
 			$blnSkipEmpty = $arrField['efgMailSkipEmpty'];
 		}
 
-		if ( in_array($strType, $this->arrFFstorable) )
+		if (in_array($strType, $this->arrFFstorable))
 		{
 
 			switch ($strType)
@@ -921,7 +916,6 @@ class Formdata extends \Frontend
 					}
 					elseif (is_array($varSubmitted))
 					{
-						//$strVal = implode(', ', $varSubmitted);
 						$strVal = $varSubmitted;
 					}
 				break;
@@ -969,7 +963,7 @@ class Formdata extends \Frontend
 		$strType = $arrField['type'];
 		$strVal = '';
 
-		if ( in_array($strType, $this->arrFFstorable) )
+		if (in_array($strType, $this->arrFFstorable))
 		{
 
 			switch ($strType)
@@ -1113,7 +1107,6 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					//$arrSel = deserialize($varValue, true);
 					if (is_string($varValue) && strpos($varValue, '|') !== false)
 					{
 						$arrSel = explode('|', $varValue);
@@ -1784,9 +1777,9 @@ class Formdata extends \Frontend
 
 				$arrTempOptions = array();
 				// include blank option to input type select
-				if ( $strType == 'efgLookupSelect' )
+				if ($strType == 'efgLookupSelect')
 				{
-					if ( !$blnDoNotAddEmptyOption )
+					if (!$blnDoNotAddEmptyOption)
 					{
 						$arrTempOptions[] = array('value'=>'', 'label'=>'-');
 					}

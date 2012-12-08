@@ -279,7 +279,7 @@ class FormdataProcessor extends \Frontend
 				$strType = $arrField['type'];
 				$strVal = '';
 
-				if ( in_array($strType, $arrFFstorable) )
+				if (in_array($strType, $arrFFstorable))
 				{
 
 					if ($blnStoreOptionsValue && in_array($strType, array('checkbox', 'radio', 'select')))
@@ -320,7 +320,7 @@ class FormdataProcessor extends \Frontend
 						}
 					}
 
-					if ($arrSubmitted[$k] || ($strType == 'upload' && strlen($strVal)) )
+					if ($arrSubmitted[$k] || ($strType == 'upload' && strlen($strVal)))
 					{
 						// prepare data
 						$arrFieldSet = array(
@@ -513,9 +513,9 @@ class FormdataProcessor extends \Frontend
 							$strLabel = $arrTagParams['label'];
 						}
 
-						if (in_array($strType, $arrFFstorable) )
+						if (in_array($strType, $arrFFstorable))
 						{
-							if ( $strType == 'efgImageSelect' )
+							if ($strType == 'efgImageSelect')
 							{
 								$strVal = '';
 								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
@@ -699,11 +699,11 @@ class FormdataProcessor extends \Frontend
 			{
 				$confEmail->imageDir = $dirImages;
 			}
-			if ( $messageText != '' )
+			if ($messageText != '')
 			{
 				$confEmail->text = $messageText;
 			}
-			if ( $messageHtml != '' )
+			if ($messageHtml != '')
 			{
 				$confEmail->html = $messageHtml;
 			}
@@ -789,10 +789,10 @@ class FormdataProcessor extends \Frontend
 			$messageText = \String::decodeEntities($arrForm['formattedMailText']);
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
-			if ( $messageHtmlTmpl != '' )
+			if ($messageHtmlTmpl != '')
 			{
 				$fileTemplate = new \File($messageHtmlTmpl);
-				if ( $fileTemplate->mime == 'text/html' )
+				if ($fileTemplate->mime == 'text/html')
 				{
 					$messageHtml = $fileTemplate->getContent();
 				}
@@ -857,9 +857,9 @@ class FormdataProcessor extends \Frontend
 							$strLabel = $arrTagParams['label'];
 						}
 
-						if ( in_array($strType, $arrFFstorable) )
+						if (in_array($strType, $arrFFstorable))
 						{
-							if ( $strType == 'efgImageSelect' )
+							if ($strType == 'efgImageSelect')
 							{
 								$strVal = '';
 								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
@@ -887,7 +887,7 @@ class FormdataProcessor extends \Frontend
 							}
 							elseif ($strType=='upload')
 							{
-								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
+								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)))
 								{
 									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
 									{
@@ -1042,11 +1042,11 @@ class FormdataProcessor extends \Frontend
 			{
 				$infoEmail->imageDir = $dirImages;
 			}
-			if ( $messageText != '' )
+			if ($messageText != '')
 			{
 				$infoEmail->text = $messageText;
 			}
-			if ( $messageHtml != '' )
+			if ($messageHtml != '')
 			{
 				$infoEmail->html = $messageHtml;
 			}
@@ -1096,7 +1096,7 @@ class FormdataProcessor extends \Frontend
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
 
 		// fix: after submission of normal single page form array $_SESSION['EFP']['FORMDATA'] is empty
-		if (null === $arrSubmitted || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')) )
+		if (null === $arrSubmitted || (count($arrSubmitted) == 1 && array_keys($arrSubmitted) === array('_formId_')))
 		{
 			$arrSubmitted = $_SESSION['FORM_DATA'];
 			$arrSubmitted['_formId_'] = $_SESSION['EFP']['FORMDATA'];
