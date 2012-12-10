@@ -269,7 +269,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		// get all forms marked to store data
 		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
-										->execute("1");
+			->execute("1");
 		if (!$this->arrStoreForms)
 		{
 			while ($objForms->next())
@@ -410,7 +410,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		else
 		{
 			$objFFNames = \Database::getInstance()->prepare("SELECT DISTINCT ff.name FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
-											->execute("1");
+				->execute("1");
 			if ( $objFFNames->numRows)
 			{
 				$arrFFNames = $objFFNames->fetchEach('name');
@@ -587,8 +587,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		$objRow = \Database::getInstance()->prepare($sqlQuery)
-								 ->limit(1)
-								 ->execute($this->intId);
+			->limit(1)
+			->execute($this->intId);
 
 		if ($objRow->numRows < 1)
 		{
@@ -665,13 +665,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$row[$i] = strlen($value) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : '-';
 			}
 			elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupCheckbox'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'select'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fp_preSelectMenu'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgImageSelect'
-					|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fileTree')
-					&& $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupCheckbox'
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'select'
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fp_preSelectMenu'
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect'
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgImageSelect'
+				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fileTree')
+				&& $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
 				$row[$i] = strlen($value) ? str_replace('|', ', ', $value) : $value;
 			}
@@ -721,8 +721,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				else
 				{
 					$objKey = \Database::getInstance()->prepare("SELECT " . $chunks[1] . " FROM " . $chunks[0] . " WHERE id=?")
-											 ->limit(1)
-											 ->execute($row[$i]);
+						->limit(1)
+						->execute($row[$i]);
 					if ($objKey->numRows)
 					{
 						$row[$i] = $objKey->$chunks[1];
@@ -826,8 +826,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$this->set['tstamp'] = 0;
 
 			$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $this->strTable . " %s")
-											->set($this->set)
-											->execute();
+				->set($this->set)
+				->execute();
 
 			if ($objInsertStmt->affectedRows)
 			{
@@ -847,7 +847,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0]
 					);
 
-   					// default value
+					// default value
 					if (!empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
 					{
 						// default value in case of field type checkbox, select, radio
@@ -865,8 +865,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					$arrDetailSet['value'] = $strVal;
 
 					$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")
-											->set($arrDetailSet)
-											->execute();
+						->set($arrDetailSet)
+						->execute();
 				}
 
 				// Save new record in the session
@@ -930,8 +930,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($this->strTable == 'tl_undo')
 		{
 			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
-							->limit(1)
-							->execute($this->intId);
+				->limit(1)
+				->execute($this->intId);
 
 			$this->redirect($this->getReferer());
 		}
@@ -964,8 +964,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			foreach ($fields as $k=>$v)
 			{
 				$objSave = \Database::getInstance()->prepare("SELECT * FROM " . $table . " WHERE id=?")
-										->limit(1)
-										->execute($v);
+					->limit(1)
+					->execute($v);
 
 				if ($objSave->numRows)
 				{
@@ -985,7 +985,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$this->import('BackendUser', 'User');
 
 		$objUndoStmt = \Database::getInstance()->prepare("INSERT INTO tl_undo (pid, tstamp, fromTable, query, affectedRows, data) VALUES (?, ?, ?, ?, ?, ?)")
-									  ->execute($this->User->id, time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
+			->execute($this->User->id, time(), $this->strTable, 'DELETE FROM '.$this->strTable.' WHERE id='.$this->intId, $affected, serialize($data));
 
 		// Delete the records
 		if ($objUndoStmt->affectedRows)
@@ -1009,8 +1009,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				foreach ($fields as $k=>$v)
 				{
 					\Database::getInstance()->prepare("DELETE FROM " . $table . " WHERE id=?")
-								   ->limit(1)
-								   ->execute($v);
+						->limit(1)
+						->execute($v);
 				}
 			}
 
@@ -1078,7 +1078,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$cctable[$v] = $GLOBALS['TL_DCA'][$v]['config']['ctable'];
 
 			$objDelete = \Database::getInstance()->prepare("SELECT id FROM " . $v . " WHERE pid=?")
-										->execute($id);
+				->execute($id);
 
 			if (!$GLOBALS['TL_DCA'][$v]['config']['doNotDeleteRecords'] && strlen($v) && $objDelete->numRows)
 			{
@@ -1102,8 +1102,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	public function undo()
 	{
 		$objRecords = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-									 ->limit(1)
-								 	 ->execute($this->intId);
+			->limit(1)
+			->execute($this->intId);
 
 		// Check whether there is a record
 		if ($objRecords->numRows < 1)
@@ -1133,8 +1133,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				}
 
 				$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $table . " %s")
-												->set($restore)
-												->execute();
+					->set($restore)
+					->execute();
 
 				// Do not delete record from tl_undo if there is an error
 				if ($objInsertStmt->affectedRows < 1)
@@ -1150,8 +1150,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$this->log('Undone '. $query, 'DC_Formdata undo()', TL_GENERAL);
 
 			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
-							->limit(1)
-							->execute($this->intId);
+				->limit(1)
+				->execute($this->intId);
 		}
 
 		$this->redirect($this->getReferer());
@@ -1200,8 +1200,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		$objRow = \Database::getInstance()->prepare($sqlQuery)
-								 ->limit(1)
-								 ->executeUncached($this->intId);
+			->limit(1)
+			->executeUncached($this->intId);
 
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
@@ -1282,7 +1282,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$return .= "\n\n" . '<fieldset' . ($key ? ' id="pal_'.$key.'"' : '') . ' class="' . $class . ($legend ? '' : ' nolegend') . '">' . $legend;
 
 				// Build rows of the current box
-				foreach ($v as $kk=>$vv)
+				foreach ($v as $kk => $vv)
 				{
 					if ($vv == '[EOF]')
 					{
@@ -1310,7 +1310,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					$this->strInputName = $vv;
 					$this->varValue = $objRow->$vv;
 
-					// Autofocus the first field
+					// Autofocus the first text field
 					if ($blnIsFirst && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] == 'text')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['autofocus'] = 'autofocus';
@@ -1361,7 +1361,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 					// field types radio, select, multi checkbox
 					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
-							|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
+						|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
@@ -1493,8 +1493,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								{
 									$vVal = trim($vVal);
 									$strK = false;
-	 								if (strlen($vVal) && $strK == false)
-	 								{
+									if (strlen($vVal) && $strK == false)
+									{
 
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
@@ -1523,7 +1523,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 											$arrNewValues[] = $strK;
 										}
 
-	 								}
+									}
 								}
 
 								$this->varValue = $arrNewValues;
@@ -1698,7 +1698,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
 					}
 
-					// Build the row and pass the current palette string (thanks to Tristan Lins)
+					// Build the row and pass the current palette string
 					$blnAjax ? $strAjax .= $this->row($this->strPalette) : $return .= $this->row($this->strPalette);
 				}
 
@@ -1719,8 +1719,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div class="tl_submit_container">
 <input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">
 <input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'"> '
-. (!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'"> ' : '')
-.'</div>
+			. (!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'"> ' : '')
+			.'</div>
 
 </div>
 </form>
@@ -1765,7 +1765,7 @@ window.addEvent(\'domready\', function() {
 
 			// Set the current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
 			\Database::getInstance()->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE " . implode(' AND ', $this->procedure))
-							->execute($arrValues);
+				->execute($arrValues);
 
 			// Redirect
 			if (isset($_POST['saveNclose']))
@@ -1926,8 +1926,8 @@ window.addEvent(\'domready\', function() {
 
 				// Get the field values
 				$objRow = \Database::getInstance()->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
-											->limit(1)
-											->executeUncached($this->intId);
+					->limit(1)
+					->executeUncached($this->intId);
 
 				// Store the active record
 				$this->objActiveRecord = $objRow;
@@ -2138,8 +2138,8 @@ window.addEvent(\'domready\', function() {
 								{
 									$vVal = trim($vVal);
 									$strK = false;
-	 								if (strlen($vVal) && $strK == false)
-	 								{
+									if (strlen($vVal) && $strK == false)
+									{
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
 										{
@@ -2167,7 +2167,7 @@ window.addEvent(\'domready\', function() {
 											$arrNewValues[] = $strK;
 										}
 
-	 								}
+									}
 								}
 
 								$this->varValue = $arrNewValues;
@@ -2383,7 +2383,7 @@ window.addEvent(\'domready\', function() {
 
 					// Set current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
 					\Database::getInstance()->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE id=?")
-								   ->execute(time(), $this->intId);
+						->execute(time(), $this->intId);
 				}
 			}
 
@@ -2526,7 +2526,7 @@ window.addEvent(\'domready\', function() {
 
 		$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField];
 
-		// table to write to tl_formdata (base fields) or tl_formdata_details (detail fields)
+		// table to write to: tl_formdata (base fields) or tl_formdata_details (detail fields)
 		$strTargetTable = $this->strTable;
 		$strTargetField = $this->strField;
 		$blnDetailField = false;
@@ -2612,12 +2612,27 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
+		// Convert fileTree IDs to file paths, if Contao's database-assisted file manager is used
+		if ($arrField['inputType'] == 'fileTree' && $arrField['isDatabaseAssisted'])
+		{
+			if (is_array($varValue) && !empty($varValue))
+			{
+				foreach ($varValue as $key => $intFileId)
+				{
+					$varValue[$key] = \FilesModel::findOneBy('id', $intFileId)->path;
+				}
+			}
+			elseif (is_numeric($varValue) && !empty($varValue))
+			{
+				$varValue = \FilesModel::findOneBy('id', $varValue)->path;
+			}
+		}
 
 		// Make sure unique fields are unique
 		if (strlen($varValue) && $arrField['eval']['unique'])
 		{
 			$objUnique = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $this->strField . "=? AND id!=?")
-										->execute($varValue, $this->intId);
+				->execute($varValue, $this->intId);
 
 			if ($objUnique->numRows)
 			{
@@ -2674,7 +2689,7 @@ window.addEvent(\'domready\', function() {
 			{
 				// if record does not exist insert an empty record
 				$objExist = \Database::getInstance()->prepare("SELECT id FROM tl_formdata_details WHERE pid=? AND ff_name=?")
-											->execute(array($this->intId, $strTargetField));
+					->execute(array($this->intId, $strTargetField));
 
 				if ($objExist->numRows == 0)
 				{
@@ -2687,15 +2702,15 @@ window.addEvent(\'domready\', function() {
 						'ff_name' => $strTargetField
 					);
 					$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $strTargetTable . " %s")
-										->set($arrSetInsert)
-										->execute();
+						->set($arrSetInsert)
+						->execute();
 				}
 
 				$sqlUpd = "UPDATE " . $strTargetTable . " SET value=? WHERE " . implode(' AND ', $arrProcedures);
 			}
 
 			$objUpdateStmt = \Database::getInstance()->prepare($sqlUpd)
-											->execute($arrValues);
+				->execute($arrValues);
 
 			if ($objUpdateStmt->affectedRows)
 			{
@@ -2734,8 +2749,8 @@ window.addEvent(\'domready\', function() {
 			$subpalettes = array();
 
 			$objFields = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
-										->limit(1)
-										->executeUncached($this->intId);
+				->limit(1)
+				->executeUncached($this->intId);
 
 			// Get selector values from DB
 			if ($objFields->numRows > 0)
@@ -3034,8 +3049,8 @@ window.addEvent(\'domready\', function() {
 				foreach ($result as $k=>$v)
 				{
 					$objField = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
-											   ->limit(1)
-											   ->execute($v['pid']);
+						->limit(1)
+						->execute($v['pid']);
 
 					$result[$k]['pid'] = $objField->$showFields[0];
 				}
@@ -3060,7 +3075,7 @@ window.addEvent(\'domready\', function() {
 				{
 					$return .= '
     <th class="tl_folder_tlist col_' . $f . (($f == $firstOrderBy) ? ' ordered_by' : '') . '">'.$GLOBALS['TL_DCA'][$this->strTable]['fields'][$f]['label'][0].'</th>';
-			}
+				}
 
 				$return .= '
     <th class="tl_folder_tlist tl_right_nowrap">&nbsp;</th>
@@ -3406,8 +3421,8 @@ window.addEvent(\'domready\', function() {
 				try
 				{
 					\Database::getInstance()->prepare("SELECT * ".(!empty($this->arrSqlDetails) ? ','.implode(', ', array_values($this->arrSqlDetails)) : '')." FROM " . $this->strTable . " f WHERE " . $sqlSearchField . " REGEXP ?")
-								   ->limit(1)
-								   ->execute(\Input::postRaw('tl_value'));
+						->limit(1)
+						->execute(\Input::postRaw('tl_value'));
 
 					$session['search'][$strSessionKey]['value'] = \Input::postRaw('tl_value');
 				}
@@ -3620,7 +3635,7 @@ window.addEvent(\'domready\', function() {
 			$sqlQuery = $sqlSelect . $sqlWhere;
 
 			$objTotal = \Database::getInstance()->prepare($sqlQuery)
-									   ->execute($this->values);
+				->execute($this->values);
 			$total = $objTotal->count;
 			$options_total = 0;
 			$blnIsMaxResultsPerPage = false;
@@ -3860,7 +3875,7 @@ window.addEvent(\'domready\', function() {
 			}
 
 			$objFields = \Database::getInstance()->prepare("SELECT DISTINCT(" . $sqlField . ") AS `". $field . "` FROM " . $this->strTable . " f ". ((is_array($arrProcedure) && strlen($arrProcedure[0])) ? ' WHERE ' . implode(' AND ', $arrProcedure) : ''))
-										->execute($arrValues);
+				->execute($arrValues);
 
 			// Begin select menu
 			$fields .= '
@@ -3994,8 +4009,8 @@ window.addEvent(\'domready\', function() {
 						$key = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['foreignKey'], 2);
 
 						$objParent = \Database::getInstance()->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
-													->limit(1)
-													->execute($vv);
+							->limit(1)
+							->execute($vv);
 
 						if ($objParent->numRows)
 						{
@@ -4027,8 +4042,8 @@ window.addEvent(\'domready\', function() {
 						}
 
 						$objShowFields = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM ". $this->ptable . " WHERE id=?")
-														->limit(1)
-														->execute($vv);
+							->limit(1)
+							->execute($vv);
 
 						if ($objShowFields->numRows)
 						{
@@ -4112,8 +4127,8 @@ window.addEvent(\'domready\', function() {
 			$key = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['foreignKey'], 2);
 
 			$objParent = \Database::getInstance()->prepare("SELECT " . $key[1] . " AS value FROM " . $key[0] . " WHERE id=?")
-										->limit(1)
-										->execute($value);
+				->limit(1)
+				->execute($value);
 
 			if ($objParent->numRows)
 			{
@@ -4329,11 +4344,11 @@ window.addEvent(\'domready\', function() {
 			$value = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='checkbox'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupCheckbox'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='select'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='conditionalselect'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupSelect'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='radio') )
+			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupCheckbox'
+			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='select'
+			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='conditionalselect'
+			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupSelect'
+			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='radio') )
 		{
 			$value = str_replace('|', ', ', $value);
 		}
@@ -4402,8 +4417,8 @@ window.addEvent(\'domready\', function() {
 		}
 
 		$objRow = \Database::getInstance()->prepare($sqlQuery)
-								->limit(1)
-								->execute($this->intId);
+			->limit(1)
+			->execute($this->intId);
 
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
@@ -4438,8 +4453,8 @@ window.addEvent(\'domready\', function() {
 		if ($intFormId == 0)
 		{
 			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
-					->limit(1)
-					->execute($arrSubmitted['form']);
+				->limit(1)
+				->execute($arrSubmitted['form']);
 		}
 
 		if ($objForm->numRows < 1)
@@ -4528,8 +4543,8 @@ window.addEvent(\'domready\', function() {
 			if (!is_bool(strpos($strRecipient, "{{user::email}}")) && $arrSubmitted['fd_member'] > 0)
 			{
 				$objUser = \Database::getInstance()->prepare("SELECT `email` FROM `tl_member` WHERE id=?")
-									->limit(1)
-									->execute($arrSubmitted['fd_member']);
+					->limit(1)
+					->execute($arrSubmitted['fd_member']);
 
 				$arrRecipient = array_map("str_replace", array_fill(0, count($arrRecipient), "{{user::email}}"), array_fill(0, count($arrRecipient), $objUser->email), $arrRecipient);
 				$strRecipient = implode(', ', $arrRecipient);
@@ -4566,26 +4581,26 @@ window.addEvent(\'domready\', function() {
 		$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 		// Replace tags in messageText, messageHtml ...
- 		$tags = array();
- 		// preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
- 		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
+		$tags = array();
+		// preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
+		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
- 		// Replace tags of type {{form::<form field name>}}
+		// Replace tags of type {{form::<form field name>}}
 		// .. {{form::uploadfieldname?attachment=true}}
 		// .. {{form::fieldname?label=Label for this field: }}
- 		foreach ($tags[0] as $tag)
- 		{
+		foreach ($tags[0] as $tag)
+		{
 			//$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
 			$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 			switch (strtolower($elements[0]))
- 			{
- 				// Form
- 				case 'form':
- 					$strKey = $elements[1];
+			{
+				// Form
+				case 'form':
+					$strKey = $elements[1];
 					$arrKey = explode('?', $strKey);
 					$strKey = $arrKey[0];
 
- 					$arrTagParams = null;
+					$arrTagParams = null;
 					if (isset($arrKey[1]) && strlen($arrKey[1]))
 					{
 						$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
@@ -4639,10 +4654,10 @@ window.addEvent(\'domready\', function() {
 
 							$subject = str_replace($tag, $strLabel . $varText, $subject);
 							$messageText = str_replace($tag, $strLabel . $varText, $messageText);
-		 					$messageHtml = str_replace($tag, $strLabel . $varHtml, $messageHtml);
+							$messageHtml = str_replace($tag, $strLabel . $varHtml, $messageHtml);
 
-		 					unset($varText);
-		 					unset($varHtml);
+							unset($varText);
+							unset($varHtml);
 						}
 						elseif ($strType=='upload')
 						{
@@ -4681,7 +4696,7 @@ window.addEvent(\'domready\', function() {
 							}
 							$subject = str_replace($tag, $strLabel . $strVal, $subject);
 							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
-		 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 
 						}
 						else
@@ -4702,9 +4717,9 @@ window.addEvent(\'domready\', function() {
 								$strVal = nl2br($strVal);
 								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 							}
-		 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 
-		 				}
+						}
 					}
 
 					// replace insert tags in subject
@@ -4719,7 +4734,7 @@ window.addEvent(\'domready\', function() {
 						$sender = str_replace($tag, $strVal, $sender);
 					}
 
- 				break;
+					break;
 			}
 		}
 
@@ -4862,8 +4877,8 @@ window.addEvent(\'domready\', function() {
 				{
 					$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => time());
 					$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
-									->set($arrUpd)
-									->execute($this->intId);
+						->set($arrUpd)
+						->execute($this->intId);
 				}
 
 			}
@@ -4926,14 +4941,14 @@ window.addEvent(\'domready\', function() {
 
 		if (!empty($attachments))
 		{
-  	$return .= '
+			$return .= '
   <tr class="row_3">
     <td class="col_0" style="vertical-align:top">' . $GLOBALS['TL_LANG']['tl_formdata']['attachments'] . '</td>
     <td class="col_1">' . implode(',<br> ', $attachments) . '</td>
   </tr>';
 		}
 
-  $return .= '
+		$return .= '
 </table>
 
 <h3>' . $GLOBALS['TL_LANG']['tl_formdata']['mail_body_plaintext'][0] . '</h3>
@@ -4943,19 +4958,19 @@ window.addEvent(\'domready\', function() {
 
 		if (strlen($messageHtml))
 		{
-	$return .= '
+			$return .= '
 <h3>' . $GLOBALS['TL_LANG']['tl_formdata']['mail_body_html'][0] . '</h3>
 <div class="preview_html">
 ' . preg_replace(array('/.*?<body.*?>/si','/<\/body>.*$/si'), array('', ''), $messageHtml) . '
 </div>';
 		}
 
-$return .= '
+		$return .= '
 </div>';
 
 		if (!$blnSend)
 		{
-	$return .= '
+			$return .= '
 <div class="tl_formbody_submit">
 
 <div class="tl_submit_container">
@@ -4965,7 +4980,7 @@ $return .= '
 </div>';
 		}
 
-$return .= '
+		$return .= '
 </form>';
 
 		return $return;
@@ -5072,8 +5087,8 @@ $return .= '
 				$strAliasField = (strlen($this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
 
 				$objForm = \Database::getInstance()->prepare("SELECT id FROM tl_form WHERE `title`=?")
-									->limit(1)
-									->execute($strFormTitle);
+					->limit(1)
+					->execute($strFormTitle);
 				if ($objForm->numRows == 1)
 				{
 					$intFormId = intval($objForm->id);
@@ -5231,8 +5246,8 @@ $return .= '
 							try
 							{
 								$objNewFormdataDetails = \Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")
-																		->set($arrDetailSet)
-																		->execute();
+									->set($arrDetailSet)
+									->execute();
 							}
 							catch(Exception $ee)
 							{
@@ -5426,7 +5441,7 @@ var Stylect = {
 </div>
 
 <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_formdata']['import'][1].'</h2>'
-.\Message::generate().'
+			.\Message::generate().'
 <form action="'.ampersand(\Environment::get('request'), true).'" id="tl_formdata_import" class="tl_form" method="post">
 <div class="tl_formbody_edit tl_formdata_import">
 	<input type="hidden" name="FORM_SUBMIT" value="tl_formdata_import">
@@ -5773,8 +5788,8 @@ var Stylect = {
 				foreach ($result as $k=>$v)
 				{
 					$objField = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
-											   ->limit(1)
-											   ->execute($v['pid']);
+						->limit(1)
+						->execute($v['pid']);
 					$result[$k]['pid'] = $objField->$showFields[0];
 				}
 
@@ -5929,12 +5944,12 @@ var Stylect = {
 						}
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'radio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'conditionalselect'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'conditionalselect'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
@@ -6169,7 +6184,7 @@ var Stylect = {
 		{
 			$members = array();
 			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
-								->execute();
+				->execute();
 			$members[] = '-';
 			if ($objMembers->numRows)
 			{
@@ -6196,7 +6211,7 @@ var Stylect = {
 
 			// Get all users
 			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
-								->execute();
+				->execute();
 			$users[] = '-';
 			if ($objUsers->numRows)
 			{
@@ -6223,7 +6238,7 @@ var Stylect = {
 
 			// Get all member groups
 			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
-								->execute();
+				->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
 			{
@@ -6250,7 +6265,7 @@ var Stylect = {
 
 			// Get all user groups
 			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
-								->execute();
+				->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
 			{
