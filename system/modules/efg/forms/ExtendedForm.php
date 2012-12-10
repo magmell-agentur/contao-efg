@@ -80,7 +80,7 @@ class ExtendedForm extends \Form
 		switch ($strKey)
 		{
 			case 'objEditRecord':
-				if ($varValue instanceof Database_Result)
+				if ($varValue instanceof \Database\Result)
 				{
 					$this->objEditRecord = $varValue;
 				}
@@ -122,7 +122,7 @@ class ExtendedForm extends \Form
 
 		// Check multipage
 		$objPaginators = \Database::getInstance()->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
-									->execute($this->id, 'efgFormPaginator');
+			->execute($this->id, 'efgFormPaginator');
 		if ($objPaginators->numRows)
 		{
 			$this->blnMultipage = true;
@@ -248,7 +248,7 @@ class ExtendedForm extends \Form
 						continue;
 					}
 					elseif ($this->intActivePage > 1 && $this->intActivePage < $this->intTotalPages
-							&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting']))
+						&& ($intFieldSorting <= (int) $this->arrPaginators[($this->intActivePage - 2)]['sorting'] || $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting']))
 					{
 						continue;
 					}
@@ -547,7 +547,7 @@ class ExtendedForm extends \Form
 				}
 				// if posted 'back'
 				elseif ($strMode == 'back' && $this->intActivePage <= $this->intTotalPages
-						&& (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x'])))
+					&& (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x'])))
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] - 1);
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
@@ -589,8 +589,8 @@ class ExtendedForm extends \Form
 		if ($this->method == 'GET')
 		{
 			$objNextPage = \Database::getInstance()->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-										  ->limit(1)
-										  ->execute($this->jumpTo);
+				->limit(1)
+				->execute($this->jumpTo);
 
 			if ($objNextPage->numRows)
 			{
@@ -612,7 +612,7 @@ class ExtendedForm extends \Form
 		{
 			$this->Template->fields .= '
 <script'.((!$blnIsHtml5) ? ' type="text/javascript"' : '') .'>'
-. $this->getDateString() . '
+				. $this->getDateString() . '
 </script>';
 		}
 
@@ -657,21 +657,21 @@ if(typeof(window.addEvent)=="function"){
 if(typeof(window.addEvent)=="function"){
 window.addEvent("domready",function(){'
 			. 'Locale.define("en-US","Date",{'
-				. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
-				. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
-				. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
-				. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
+			. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
+			. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
+			. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
+			. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
 			. '});'
 			. 'Locale.define("en-US","DatePicker",{'
-				. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
-				. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
-				. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
-				. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
-				. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
-				. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
+			. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
+			. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
+			. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
+			. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
+			. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
+			. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
 			. '});'
-		. '});'
-		.'}';
+			. '});'
+			.'}';
 	}
 
 }

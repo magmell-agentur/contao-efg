@@ -216,7 +216,7 @@ class ModuleFormdataListing extends \Module
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
-													->execute();
+								->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (!empty($arrGroupMembers))
 							{
@@ -275,7 +275,7 @@ class ModuleFormdataListing extends \Module
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
-													->execute();
+								->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (!empty($arrGroupMembers))
 							{
@@ -334,7 +334,7 @@ class ModuleFormdataListing extends \Module
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
-													->execute();
+								->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (!empty($arrGroupMembers))
 							{
@@ -392,7 +392,7 @@ class ModuleFormdataListing extends \Module
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
 							$objGroupMembers = \Database::getInstance()->prepare("SELECT DISTINCT id FROM tl_member WHERE " . implode(" OR ", $arrGroupsWhere))
-													->execute();
+								->execute();
 							$arrGroupMembers = $objGroupMembers->fetchEach('id');
 							if (!empty($arrGroupMembers))
 							{
@@ -432,7 +432,7 @@ class ModuleFormdataListing extends \Module
 
 			$strField = implode('.', $arrParams);
 			$objDownload = \Database::getInstance()->prepare("SELECT fd.fd_member, fd.fd_user, fdd.value FROM tl_formdata fd, tl_formdata_details fdd WHERE (fd.id=fdd.pid) AND fd.id=? AND fdd.ff_name=?")
-										->execute($intFdId,  $strField);
+				->execute($intFdId,  $strField);
 			if ($objDownload->numRows)
 			{
 				$arrDownload = $objDownload->fetchAssoc();
@@ -486,8 +486,8 @@ class ModuleFormdataListing extends \Module
 
 		// get names of detail fields
 		$objFF = \Database::getInstance()->prepare("SELECT ff.name, ff.label, ff.type, ff.rgxp FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
-											->execute("1");
-		if ( $objFF->numRows)
+			->execute("1");
+		if ($objFF->numRows)
 		{
 			$this->arrFF = array();
 			$this->arrFFNames = array();
@@ -680,7 +680,7 @@ class ModuleFormdataListing extends \Module
 			$strQuery .=  $strWhere;
 
 			$objCheck = \Database::getInstance()->prepare($strQuery)
-							->execute(\Input::get($this->strDetailKey), \Input::get($this->strDetailKey));
+				->execute(\Input::get($this->strDetailKey), \Input::get($this->strDetailKey));
 
 			if ($objCheck->numRows == 1)
 			{
@@ -1783,11 +1783,11 @@ class ModuleFormdataListing extends \Module
 						}
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'radio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
@@ -1983,7 +1983,7 @@ class ModuleFormdataListing extends \Module
 		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 
 			$varOwner = $objOwner->fetchAssoc();
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
@@ -2006,7 +2006,7 @@ class ModuleFormdataListing extends \Module
 		elseif (strlen($this->efg_fe_edit_access) )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedEditOwnerIds))
 			{
@@ -2027,7 +2027,7 @@ class ModuleFormdataListing extends \Module
 		elseif (strlen($this->efg_fe_delete_access) )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
 			{
@@ -2048,7 +2048,7 @@ class ModuleFormdataListing extends \Module
 		elseif (strlen($this->efg_fe_export_access) )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedExportOwnerIds))
 			{
@@ -2124,8 +2124,8 @@ class ModuleFormdataListing extends \Module
 		$strQuery .= $strWhere;
 
 		$objRecord = \Database::getInstance()->prepare($strQuery)
-									->limit(1)
-									->execute($this->intRecordId);
+			->limit(1)
+			->execute($this->intRecordId);
 
 		if ($objRecord->numRows < 1)
 		{
@@ -2375,8 +2375,8 @@ class ModuleFormdataListing extends \Module
 			if (intval($objRecord->fd_user) > 0)
 			{
 				$objUser = \Database::getInstance()->prepare("SELECT email FROM tl_user WHERE id=?")
-											->limit(1)
-											->execute($objRecord->fd_user);
+					->limit(1)
+					->execute($objRecord->fd_user);
 				if ($objUser->numRows)
 				{
 					$arrNotifies[] = $objUser->email;
@@ -2385,8 +2385,8 @@ class ModuleFormdataListing extends \Module
 			if (intval($objRecord->fd_member) > 0)
 			{
 				$objMember = \Database::getInstance()->prepare("SELECT email FROM tl_member WHERE id=?")
-											->limit(1)
-											->execute($objRecord->fd_member);
+					->limit(1)
+					->execute($objRecord->fd_member);
 				if ($objMember->numRows)
 				{
 					$arrNotifies[] = $objMember->email;
@@ -2446,7 +2446,7 @@ class ModuleFormdataListing extends \Module
 		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 
 			$varOwner = $objOwner->fetchAssoc();
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
@@ -2470,7 +2470,7 @@ class ModuleFormdataListing extends \Module
 		elseif (strlen($this->efg_fe_export_access) )
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+				->execute($this->intRecordId);
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedExportOwnerIds))
 			{
@@ -2526,8 +2526,8 @@ class ModuleFormdataListing extends \Module
 		$strQuery .= $strWhere;
 
 		$objRecords = \Database::getInstance()->prepare($strQuery)
-									->limit(1)
-									->execute($this->intRecordId);
+			->limit(1)
+			->execute($this->intRecordId);
 
 		if ($objRecords->numRows < 1)
 		{
@@ -2729,11 +2729,11 @@ class ModuleFormdataListing extends \Module
 						}
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'radio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
-							|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
+						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
@@ -2892,6 +2892,7 @@ class ModuleFormdataListing extends \Module
 	 */
 	protected function editSingleRecord()
 	{
+
 		/**
 		 * Prepare URL
 		 */
@@ -2915,7 +2916,7 @@ class ModuleFormdataListing extends \Module
 
 		$strVarConnector = $blnQuery ? '&amp;' : '?';
 		// check record
-		if ($this->intRecordId === null || intval($this->intRecordId)<1)
+		if ($this->intRecordId === null || intval($this->intRecordId) < 1)
 		{
 			unset($_GET[$this->strDetailKey]);
 			unset($_GET['act']);
@@ -2926,7 +2927,7 @@ class ModuleFormdataListing extends \Module
 
 		// Check Owner and Alias
 		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+			->execute($this->intRecordId);
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check access
@@ -2979,17 +2980,19 @@ class ModuleFormdataListing extends \Module
 
 		// get the form
 		$objCheckRecord = \Database::getInstance()->prepare("SELECT form FROM tl_formdata WHERE id=?")
-								->limit(1)
-								->execute($this->intRecordId);
+			->limit(1)
+			->execute($this->intRecordId);
+
 		if ($objCheckRecord->numRows == 1)
 		{
 			$strForm = $objCheckRecord->form;
 		}
+
 		if (strlen($strForm))
 		{
 			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
-							->limit(1)
-							->execute($strForm);
+				->limit(1)
+				->execute($strForm);
 			if ($objForm->numRows == 1)
 			{
 				$intFormId = $objForm->id;
@@ -2998,8 +3001,8 @@ class ModuleFormdataListing extends \Module
 
 		// get ContentElement holding the form
 		$objFormElement = \Database::getInstance()->prepare("SELECT * FROM tl_content WHERE form=?")
-				->limit(1)
-				->execute($intFormId);
+			->limit(1)
+			->execute($intFormId);
 
 		if ($objFormElement->numRows<1)
 		{
@@ -3037,8 +3040,8 @@ class ModuleFormdataListing extends \Module
 		$strQuery .= $strWhere;
 
 		$objRecord = \Database::getInstance()->prepare($strQuery)
-									->limit(1)
-									->execute($this->intRecordId);
+			->limit(1)
+			->execute($this->intRecordId);
 		if ($objRecord->numRows < 1)
 		{
 			return;
@@ -3049,7 +3052,9 @@ class ModuleFormdataListing extends \Module
 		{
 			$this->Template->editform = $this->generateEditForm($objFormElement, $objRecord);
 		}
+
 	}
+
 
 	protected function deleteSingleRecord()
 	{
@@ -3094,7 +3099,7 @@ class ModuleFormdataListing extends \Module
 
 		// Check Owner and Alias
 		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
-							->execute($this->intRecordId);
+			->execute($this->intRecordId);
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check list access
@@ -3153,9 +3158,9 @@ class ModuleFormdataListing extends \Module
 	 * Generate frontend editing form
 	 * @return string
 	 */
-	// public function generateEditForm($objFormElement, $arrRecord)
 	public function generateEditForm($objFormElement, $objRecord)
 	{
+
 		if (TL_MODE == 'BE')
 		{
 			return '';
@@ -3216,13 +3221,13 @@ class ModuleFormdataListing extends \Module
 			$value = $this->parseDate($objPage->datimFormat, $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='checkbox'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupCheckbox'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='select'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='conditionalselect'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupSelect'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='radio'
-				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='fileTree')
-			)
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupCheckbox'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='select'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='conditionalselect'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupSelect'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='radio'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='fileTree')
+		)
 		{
 			$value = str_replace('|', ', ', $value);
 		}
@@ -3292,7 +3297,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$members = array();
 			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
-								->execute();
+				->execute();
 			$members[] = '-';
 			if ($objMembers->numRows)
 			{
@@ -3316,7 +3321,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$users = array();
 			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
-								->execute();
+				->execute();
 			$users[] = '-';
 			if ($objUsers->numRows)
 			{
@@ -3340,7 +3345,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
-								->execute();
+				->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
 			{
@@ -3364,7 +3369,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
-								->execute();
+				->execute();
 			$groups[] = '-';
 			if ($objGroups->numRows)
 			{
