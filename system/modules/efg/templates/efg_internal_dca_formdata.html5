@@ -439,6 +439,7 @@ endforeach; ?>),
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", \String::decodeEntities($varVals['label'])) : $strField); ?>', '<?php echo '[' . $strField .'] ' .str_replace("'", "\'", \String::decodeEntities($varVals['label'])); ?>');
 <?php if (($varVals['type']=='upload' && $varVals['storeFile']) || $varVals['type']=='efgImageSelect'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = 'fileTree';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['isDatabaseAssisted'] = <?php echo ($GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted']) ? 'true' : 'false'; ?>;
 <?php elseif ($varVals['type'] == 'fp_preSelectMenu'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = 'select';
 <?php elseif ($varVals['type'] == 'countryselect'): ?>
