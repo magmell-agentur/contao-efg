@@ -119,21 +119,21 @@ class Formdata extends \Frontend
 
 		// get field used to build alias
 		$objForm = \Database::getInstance()->prepare("SELECT id, efgAliasField FROM tl_form WHERE title=?")
-					->limit(1)
-					->execute($strFormTitle);
+			->limit(1)
+			->execute($strFormTitle);
 		if ($objForm->numRows)
 		{
-			 if (strlen($objForm->efgAliasField))
-			 {
-			 	$strAliasField = $objForm->efgAliasField;
-			 }
+			if (strlen($objForm->efgAliasField))
+			{
+				$strAliasField = $objForm->efgAliasField;
+			}
 		}
 
 		if ($strAliasField == '')
 		{
 			$objFormField = \Database::getInstance()->prepare("SELECT ff.name FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND f.title=? AND ff.type=? AND ff.rgxp NOT IN ('email','date','datim','time') ORDER BY sorting")
-							->limit(1)
-							->execute($strFormTitle, 'text');
+				->limit(1)
+				->execute($strFormTitle, 'text');
 
 			if ($objFormField->numRows)
 			{
@@ -154,7 +154,7 @@ class Formdata extends \Frontend
 		}
 
 		$objAlias = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE alias=? AND id != ?")
-								   ->executeUncached($varValue, $intRecId);
+			->executeUncached($varValue, $intRecId);
 
 		// Check whether the alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
@@ -312,7 +312,7 @@ class Formdata extends \Frontend
 
 					// add details pages to the indexer
 					$objData = \Database::getInstance()->prepare($strQuery)
-							->execute($strForm);
+						->execute($strForm);
 
 					while ($objData->next())
 					{
@@ -339,7 +339,7 @@ class Formdata extends \Frontend
 		{
 			// get all forms marked to store data
 			$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
-											->execute("1");
+				->execute("1");
 
 			while ($objForms->next())
 			{
@@ -366,7 +366,7 @@ class Formdata extends \Frontend
 		{
 			// get all pages containig listing formdata
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=?")
-									->execute("module", "formdatalisting");
+				->execute("module", "formdatalisting");
 			while ($objListingPages->next())
 			{
 				$this->arrListingPages[$objListingPages->id] = $objListingPages->alias;
@@ -386,7 +386,7 @@ class Formdata extends \Frontend
 		{
 			// get all pages containig listing formdata with details page
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
-									->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
+				->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
 			while ($objListingPages->next())
 			{
 				$strFormdataDetailsKey = 'details';
@@ -413,13 +413,13 @@ class Formdata extends \Frontend
 		if($intId > 0)
 		{
 			$objFormdata = \Database::getInstance()->prepare("SELECT * FROM tl_formdata WHERE id=?")
-										->executeUncached($intId);
+				->executeUncached($intId);
 			if ($objFormdata->numRows == 1)
 			{
 				$varReturn['fd_base'] = $objFormdata->fetchAssoc();
 
 				$objFormdataDetails = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=?")
-										->execute($intId);
+					->execute($intId);
 				if ($objFormdataDetails->numRows)
 				{
 					$arrTemp = $objFormdataDetails->fetchAllAssoc();
@@ -453,7 +453,7 @@ class Formdata extends \Frontend
 		if ($intId > 0)
 		{
 			$objFormFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
-											->execute($intId);
+				->execute($intId);
 
 			while ($objFormFields->next())
 			{
@@ -468,7 +468,6 @@ class Formdata extends \Frontend
 			}
 
 			return $varReturn;
-
 		}
 		else
 		{
@@ -540,7 +539,7 @@ class Formdata extends \Frontend
 							$strVal = implode('|', $strVal);
 						}
 					}
-				break;
+					break;
 				case 'efgLookupRadio':
 				case 'radio':
 					$strVal = $varSubmitted;
@@ -560,7 +559,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -611,7 +610,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgImageSelect':
 					$strVal = '';
 					if (is_array($varSubmitted))
@@ -622,14 +621,17 @@ class Formdata extends \Frontend
 					{
 						$strVal = $varSubmitted;
 					}
-				break;
+					break;
 				case 'upload':
 					$strVal = '';
+
 					if (strlen($varFile['name']))
 					{
-						if ($arrField['storeFile'] == "1")
+						if ($arrField['storeFile'] == '1')
 						{
-							if ($arrField['useHomeDir'] == "1")
+							$strUploadFolder = $arrField['uploadFolder'];
+
+							if ($arrField['useHomeDir'] == '1')
 							{
 								// Overwrite upload folder with user home directory
 								if (FE_USER_LOGGED_IN)
@@ -637,19 +639,54 @@ class Formdata extends \Frontend
 									$this->import('FrontendUser', 'User');
 									if ($this->User->assignDir && $this->User->homeDir && is_dir(TL_ROOT . '/' . $this->User->homeDir))
 									{
-										$arrField['uploadFolder'] = $this->User->homeDir;
+										$strUploadFolder = $this->User->homeDir;
 									}
 								}
 							}
-							$strVal = $arrField['uploadFolder'] . '/' . $varFile['name'];
+
+							// As of Contao 3 upload folder is ID of tl_files record,
+							// EFG stores the path instead
+							if (version_compare(VERSION, '3.0', '>=') && $arrField['isDatabaseAssisted'])
+							{
+								if (isset($varFile['id']))
+								{
+									$objFile = \FilesModel::findOneBy('id', $varFile['id']);
+
+									if ($objFile !== null)
+									{
+										$strVal = $objFile->path;
+									}
+								}
+								elseif (isset($varFile['pid']))
+								{
+									$objFolder = \FilesModel::findOneBy('id', $varFile['pid']);
+
+									if ($objFolder !== null)
+									{
+										$strVal = $objFolder->path . '/' . $varFile['name'];
+									}
+								}
+								else
+								{
+									$objFolder = \FilesModel::findOneBy('id', $strUploadFolder);
+
+									if ($objFolder !== null)
+									{
+										$strVal = $objFolder->path . '/' . $varFile['name'];
+									}
+								}
+							}
+							else
+							{
+								$strVal = $strUploadFolder . '/' . $varFile['name'];
+							}
 						}
 						else
 						{
 							$strVal = $varFile['name'];
 						}
 					}
-
-				break;
+					break;
 
 				case 'text':
 				case 'calendar':
@@ -669,7 +706,7 @@ class Formdata extends \Frontend
 					{
 						$strVal = $varSubmitted;
 					}
-				break;
+					break;
 
 				default:
 					$strVal = $varSubmitted;
@@ -747,7 +784,7 @@ class Formdata extends \Frontend
 					{
 						$strVal = $varValue;
 					}
-				break;
+					break;
 				case 'text':
 				case 'calendar':
 				case 'xdependentcalendarfields':
@@ -766,7 +803,7 @@ class Formdata extends \Frontend
 							$strVal = $objDate->tstamp;
 						}
 					}
-				break;
+					break;
 
 				case 'hidden':
 				case 'textarea':
@@ -774,7 +811,7 @@ class Formdata extends \Frontend
 				case 'password':
 				default:
 					$strVal = $varValue;
-				break;
+					break;
 
 			}
 
@@ -851,7 +888,7 @@ class Formdata extends \Frontend
 					{
 						$strVal = (is_array($varSubmitted) ? implode(', ', $varSubmitted) : $varSubmitted);
 					}
-				break;
+					break;
 				case 'efgLookupRadio':
 				case 'radio':
 					$strVal = (is_array($varSubmitted) ? $varSubmitted[0] : $varSubmitted);
@@ -863,7 +900,7 @@ class Formdata extends \Frontend
 							$strVal = $mxVal['label'];
 						}
 					}
-				break;
+					break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -907,7 +944,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgImageSelect':
 					$strVal = '';
 					if (is_string($varSubmitted) && strlen($varSubmitted))
@@ -918,21 +955,21 @@ class Formdata extends \Frontend
 					{
 						$strVal = $varSubmitted;
 					}
-				break;
+					break;
 				case 'upload':
 					$strVal = '';
 					if (strlen($varFile['name']))
 					{
 						$strVal = $varFile['name'];
 					}
-				break;
+					break;
 				case 'password':
 				case 'hidden':
 				case 'text':
 				case 'textarea':
 				default:
 					$strVal = $varSubmitted;
-				break;
+					break;
 			}
 
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
@@ -1019,7 +1056,7 @@ class Formdata extends \Frontend
 							$strVal = implode(', ', $arrSel);
 						}
 					}
-				break;
+					break;
 				case 'efgLookupRadio':
 				case 'radio':
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
@@ -1048,7 +1085,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -1102,7 +1139,7 @@ class Formdata extends \Frontend
 							$strVal = implode(', ', $arrSel);
 						}
 					}
-				break;
+					break;
 				case 'efgImageSelect':
 					$strVal = '';
 					$arrSel = array();
@@ -1120,21 +1157,21 @@ class Formdata extends \Frontend
 					{
 						$strVal = $arrSel;
 					}
-				break;
+					break;
 				case 'upload':
 					$strVal = '';
 					if (strlen($varFile['name']))
 					{
 						$strVal = $varFile['name'];
 					}
-				break;
+					break;
 				case 'password':
 				case 'hidden':
 				case 'text':
 				case 'textarea':
 				default:
 					$strVal = $varValue;
-				break;
+					break;
 			}
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
 
@@ -1207,7 +1244,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgLookupRadio':
 				case 'radio':
 					if ($arrField['options'])
@@ -1243,7 +1280,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -1282,7 +1319,7 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-				break;
+					break;
 				case 'efgImageSelect':
 				case 'fileTree':
 					if (is_string($varVal) && strpos($varVal, '|') !== false)
@@ -1293,7 +1330,7 @@ class Formdata extends \Frontend
 					{
 						$varVal = deserialize($varValue);
 					}
-				break;
+					break;
 				case 'upload':
 					$varVal = '';
 					if (strlen($varValue))
@@ -1308,7 +1345,7 @@ class Formdata extends \Frontend
 						}
 						$varVal = $strVal;
 					}
-				break;
+					break;
 
 				case 'text':
 				case 'calendar':
@@ -1342,11 +1379,11 @@ class Formdata extends \Frontend
 					{
 						$varVal = $varValue;
 					}
-				break;
+					break;
 
 				default:
 					$varVal = $varValue;
-				break;
+					break;
 
 			}
 
@@ -1440,7 +1477,7 @@ class Formdata extends \Frontend
 					if (strlen($strLookupWhere) || strlen($arrLookupOptions['lookup_sort']))
 					{
 						$objDetailFields = \Database::getInstance()->prepare("SELECT DISTINCT(ff.`name`) FROM tl_form f, tl_form_field ff WHERE f.storeFormdata=? AND (f.id=ff.pid) AND ff.`type` IN ('".implode("','", $this->arrFFstorable)."')")
-														->execute('1');
+							->execute('1');
 						if ($objDetailFields->numRows)
 						{
 							$arrDetailFields = $objDetailFields->fetchEach('name');
@@ -1792,7 +1829,7 @@ class Formdata extends \Frontend
 				}
 				$arrOptions = $arrTempOptions;
 
-			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
+				break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
 			// countryselectmenu
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
@@ -1802,7 +1839,7 @@ class Formdata extends \Frontend
 					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
 				}
 				$arrOptions = $arrTempOptions;
-			break;
+				break;
 
 			default:
 				if ($arrField['options'])
@@ -1832,7 +1869,7 @@ class Formdata extends \Frontend
 						}
 					}
 				}
-			break;
+				break;
 		} // end switch $arrField['type']
 
 		return $arrOptions;
@@ -1924,7 +1961,7 @@ class Formdata extends \Frontend
 				}
 			}
 
-  			$strBuffer = $strReturn;
+			$strBuffer = $strReturn;
 		}
 
 		return $blnEval;

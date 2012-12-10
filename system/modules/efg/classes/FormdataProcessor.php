@@ -66,7 +66,7 @@ class FormdataProcessor extends \Frontend
 		if ($intListingId)
 		{
 			$objListing = \Database::getInstance()->prepare("SELECT * FROM tl_module WHERE id=?")
-								->execute($intListingId);
+				->execute($intListingId);
 			if ($objListing->numRows)
 			{
 				$arrListing = $objListing->fetchAssoc();
@@ -109,7 +109,7 @@ class FormdataProcessor extends \Frontend
 				$blnFEedit = true;
 
 				$objCheck = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE id=? OR alias=?")
-								->execute(\Input::get($this->strFormdataDetailsKey), \Input::get($this->strFormdataDetailsKey));
+					->execute(\Input::get($this->strFormdataDetailsKey), \Input::get($this->strFormdataDetailsKey));
 
 				if ($objCheck->numRows == 1)
 				{
@@ -153,7 +153,7 @@ class FormdataProcessor extends \Frontend
 				{
 					continue;
 				}
-				elseif ( in_array($k, $arrHookFields) || in_array($k, array_keys($arrFormFields)) || in_array($k, array('FORM_SUBMIT','MAX_FILE_SIZE')) )
+				elseif (in_array($k, $arrHookFields) || in_array($k, array_keys($arrFormFields)) || in_array($k, array('FORM_SUBMIT','MAX_FILE_SIZE')))
 				{
 					$arrToSave[$k] = $varVal;
 				}
@@ -164,7 +164,6 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($GLOBALS['TL_HOOKS']['processEfgFormData'] as $key => $callback)
 				{
-
 					$this->import($callback[0]);
 					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm, $arrLabels);
 					if (!empty($arrResult))
@@ -191,23 +190,6 @@ class FormdataProcessor extends \Frontend
 			}
 
 			// Prepare record tl_formdata
-			if ($arrFormFields['name'])
-			{
-				$strUserName = $arrSubmitted['name'];
-			}
-			if ($arrFormFields['email'])
-			{
-				$strUserEmail = $arrSubmitted['email'];
-			}
-			if ($arrFormFields['confirmationMailRecipientField'])
-			{
-				$strUserEmail = $arrSubmitted[$arrForm['confirmationMailRecipientField']];
-			}
-			if ($arrFormFields['message'])
-			{
-				$strUserMessage = $arrSubmitted['message'];
-			}
-
 			$arrSet = array
 			(
 				'form' => $arrForm['title'],
@@ -256,8 +238,7 @@ class FormdataProcessor extends \Frontend
 			{
 				$intNewId = $intOldId;
 				\Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")->set($arrSet)->execute($intOldId);
- 				\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
-								->execute($intOldId);
+				\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")->execute($intOldId);
 			}
 			else
 			{
@@ -268,8 +249,8 @@ class FormdataProcessor extends \Frontend
 				if (in_array('comments', $this->Config->getActiveModules()))
 				{
 					\Database::getInstance()->prepare("UPDATE tl_comments %s WHERE `source` = 'tl_formdata' AND parent=?")
-								->set(array('parent' => $intNewId))
-								->execute($intOldId);
+						->set(array('parent' => $intNewId))
+						->execute($intOldId);
 				}
 			}
 
@@ -300,6 +281,20 @@ class FormdataProcessor extends \Frontend
 					{
 						$arrField['rgxp'] = 'date';
 						$arrField['dateFormat'] = $arrField['xdateformat'];
+					}
+					// set isDatabaseAssisted for field type upload
+					elseif ($arrField['type'] == 'upload')
+					{
+						$arrField['isDatabaseAssisted'] = false;
+						if (version_compare(VERSION, '3.0', '>='))
+						{
+							$this->loadDataContainer('tl_files');
+
+							if ($GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
+							{
+								$arrField['isDatabaseAssisted'] = true;
+							}
+						}
 					}
 
 					$strVal = $this->Formdata->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
@@ -335,9 +330,9 @@ class FormdataProcessor extends \Frontend
 						);
 
 						$objNewFormdataDetails = \Database::getInstance()
-								->prepare("INSERT INTO tl_formdata_details %s")
-								->set($arrFieldSet)
-								->execute();
+							->prepare("INSERT INTO tl_formdata_details %s")
+							->set($arrFieldSet)
+							->execute();
 
 					}
 
@@ -351,10 +346,10 @@ class FormdataProcessor extends \Frontend
 				{
 					if ($intNewId > 0 && intval($intOldId)>0 && intval($intNewId) != intval($intOldId))
 					{
-	 					\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
-	 							->execute($intOldId);
-	 					\Database::getInstance()->prepare("DELETE FROM tl_formdata WHERE id=?")
-	 							->execute($intOldId);
+						\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
+							->execute($intOldId);
+						\Database::getInstance()->prepare("DELETE FROM tl_formdata WHERE id=?")
+							->execute($intOldId);
 					}
 				}
 				$strRedirectTo = preg_replace('/\?.*$/', '', \Environment::get('request'));
@@ -366,8 +361,8 @@ class FormdataProcessor extends \Frontend
 			{
 				$arrUpd = array('alias' => $strAlias);
 				\Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
-								->set($arrUpd)
-								->execute($intNewId);
+					->set($arrUpd)
+					->execute($intNewId);
 			}
 		} // end form data storage
 
@@ -476,34 +471,34 @@ class FormdataProcessor extends \Frontend
 			$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
-	 		$tags = array();
+			$tags = array();
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
-	 		// Replace tags of type {{form::<form field name>}}
+			// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
-	 		foreach ($tags[0] as $tag)
-	 		{
+			foreach ($tags[0] as $tag)
+			{
 				$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 
 				switch (strtolower($elements[0]))
-	 			{
- 					// Form
- 					case 'form':
+				{
+					// Form
+					case 'form':
 						$strKey = $elements[1];
 						$arrKey = explode('?', $strKey);
 						$strKey = $arrKey[0];
 
- 						$arrTagParams = null;
+						$arrTagParams = null;
 						if (isset($arrKey[1]) && strlen($arrKey[1]))
 						{
 							$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 						}
 
- 						$arrField = $arrFormFields[$strKey];
- 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
+						$arrField = $arrFormFields[$strKey];
+						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
 
- 						$strType = $arrField['type'];
+						$strType = $arrField['type'];
 
 						$strLabel = '';
 						$strVal = '';
@@ -539,7 +534,7 @@ class FormdataProcessor extends \Frontend
 								}
 
 								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
-			 					$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
+								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType=='upload')
 							{
@@ -564,7 +559,7 @@ class FormdataProcessor extends \Frontend
 									$strLabel = '';
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
-			 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
 							else
 							{
@@ -581,8 +576,8 @@ class FormdataProcessor extends \Frontend
 									$strVal = nl2br($strVal);
 									$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 								}
-			 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
-			 				}
+								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+							}
 						}
 
 						// replace insert tags in subject
@@ -597,7 +592,7 @@ class FormdataProcessor extends \Frontend
 							$sender = str_replace($tag, $strVal, $sender);
 						}
 
- 					break;
+						break;
 				}
 			} // foreach tags
 
@@ -736,8 +731,8 @@ class FormdataProcessor extends \Frontend
 			{
 				$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => $timeNow);
 				$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
-								->set($arrUpd)
-								->execute($intNewId);
+					->set($arrUpd)
+					->execute($intNewId);
 			}
 
 		} // End confirmation mail
@@ -821,33 +816,33 @@ class FormdataProcessor extends \Frontend
 			$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
 
 			// Replace tags in messageText, messageHtml ...
-	 		$tags = array();
+			$tags = array();
 			preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
-	 		// Replace tags of type {{form::<form field name>}}
+			// Replace tags of type {{form::<form field name>}}
 			// .. {{form::uploadfieldname?attachment=true}}
 			// .. {{form::fieldname?label=Label for this field: }}
-	 		foreach ($tags[0] as $tag)
-	 		{
-	 			$elements = explode('::', trim(str_replace(array('__BRCL__', '__BRCR__'), array('', ''), $tag)));
-	 			switch (strtolower($elements[0]))
-	 			{
- 					// Form
- 					case 'form':
+			foreach ($tags[0] as $tag)
+			{
+				$elements = explode('::', trim(str_replace(array('__BRCL__', '__BRCR__'), array('', ''), $tag)));
+				switch (strtolower($elements[0]))
+				{
+					// Form
+					case 'form':
 						$strKey = $elements[1];
 						$arrKey = explode('?', $strKey);
 						$strKey = $arrKey[0];
 
- 						$arrTagParams = null;
+						$arrTagParams = null;
 						if (isset($arrKey[1]) && strlen($arrKey[1]))
 						{
 							$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
 						}
 
- 						$arrField = $arrFormFields[$strKey];
- 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
+						$arrField = $arrFormFields[$strKey];
+						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
 
- 						$strType = $arrField['type'];
+						$strType = $arrField['type'];
 
 						$strLabel = '';
 						$strVal = '';
@@ -883,7 +878,7 @@ class FormdataProcessor extends \Frontend
 								}
 
 								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
-			 					$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
+								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType=='upload')
 							{
@@ -907,7 +902,7 @@ class FormdataProcessor extends \Frontend
 									$strLabel = '';
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
-			 					$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
 							else
 							{
@@ -940,7 +935,7 @@ class FormdataProcessor extends \Frontend
 							$sender = str_replace($tag, $strVal, $sender);
 						}
 
- 					break;
+						break;
 				}
 			}
 
@@ -1092,7 +1087,6 @@ class FormdataProcessor extends \Frontend
 	 */
 	public function processConfirmationContent($strContent)
 	{
-
 		$arrSubmitted = $_SESSION['EFP']['FORMDATA'];
 
 		// fix: after submission of normal single page form array $_SESSION['EFP']['FORMDATA'] is empty
@@ -1108,7 +1102,7 @@ class FormdataProcessor extends \Frontend
 			$blnProcess = true;
 		}
 
- 		if (!empty($arrSubmitted) && isset($arrSubmitted['_formId_']) && $blnProcess)
+		if (!empty($arrSubmitted) && isset($arrSubmitted['_formId_']) && $blnProcess)
 		{
 			$blnSkipEmpty = false;
 
@@ -1184,7 +1178,7 @@ class FormdataProcessor extends \Frontend
 								}
 
 								$strTemp = str_replace($tag, $strLabel . $strVal, $strTemp);
-							break;
+								break;
 						}
 					}
 
