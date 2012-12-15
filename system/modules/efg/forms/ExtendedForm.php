@@ -328,6 +328,7 @@ class ExtendedForm extends \Form
 					// frontend editing
 					if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 					{
+
 						if (is_array($objWidget->options))
 						{
 							$arrData['options'] = $objWidget->options;
@@ -353,7 +354,6 @@ class ExtendedForm extends \Form
 
 						// prepare value
 						$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
-
 						$objWidget->value = $varFieldValue;
 					}
 					else
