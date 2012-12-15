@@ -889,7 +889,7 @@ class ModuleFormdataListing extends \Module
 					{
 						if (in_array($field, $this->arrBaseFields))
 						{
-							if ( strlen($this->strFormKey) && $field == 'form')
+							if (strlen($this->strFormKey) && $field == 'form')
 							{
 								continue;
 							}
@@ -912,7 +912,7 @@ class ModuleFormdataListing extends \Module
 
 				case 'dropdown':
 				default:
-					if ( strlen(\Input::get('search')) && strlen(\Input::get('for')) )
+					if (strlen(\Input::get('search')) && strlen(\Input::get('for')) )
 					{
 						$varKeyword = '%' . \Input::get('for') . '%';
 
@@ -956,7 +956,7 @@ class ModuleFormdataListing extends \Module
 					{
 						if (in_array($field, $this->arrBaseFields))
 						{
-							if ( strlen($this->strFormKey) && $field == 'form')
+							if (strlen($this->strFormKey) && $field == 'form')
 							{
 								continue;
 							}
@@ -1380,7 +1380,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$blnEditAllowed = true;
 				}
-				elseif (strlen($this->efg_fe_edit_access) )
+				elseif (strlen($this->efg_fe_edit_access))
 				{
 					if (in_array(intval($arrRows[$i]['fd_member']), $this->arrAllowedEditOwnerIds))
 					{
@@ -1416,7 +1416,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$blnExportAllowed = true;
 				}
-				elseif (strlen($this->efg_fe_export_access) )
+				elseif (strlen($this->efg_fe_export_access))
 				{
 					if (in_array(intval($arrRows[$i]['fd_member']), $this->arrAllowedExportOwnerIds))
 					{
@@ -1548,7 +1548,7 @@ class ModuleFormdataListing extends \Module
 						elseif (is_string($value) && strlen($value) && is_file(TL_ROOT . '/' . $value))
 						{
 							$objFile = new \File($value);
-							if (!in_array($objFile->extension, $allowedDownload) )
+							if (!in_array($objFile->extension, $allowedDownload))
 							{
 								$arrTd[$class][count($arrTd[$class])-1]['content'] = '&nbsp;';
 								$arrListItems[$i][$k]['content'] = '&nbsp;';
@@ -1600,7 +1600,7 @@ class ModuleFormdataListing extends \Module
 								if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
 									$objFile = new \File($strFile);
 
-									if (!in_array($objFile->extension, $allowedDownload) )
+									if (!in_array($objFile->extension, $allowedDownload))
 									{
 										unset($arrListItems[$i][$k]['raw'][$kF]);
 										continue;
@@ -1611,7 +1611,7 @@ class ModuleFormdataListing extends \Module
 
 										$arrTemp[$keyTemp]['src'] = $this->urlEncode($strFile);
 
-										if ( substr($objFile->mime, 0, 6) == 'image/' )
+										if (substr($objFile->mime, 0, 6) == 'image/')
 										{
 											$arrTemp[$keyTemp]['display'] = 'image';
 										}
@@ -1699,10 +1699,6 @@ class ModuleFormdataListing extends \Module
 
 		else
 		{
-
-			$arrEditAllowed = array();
-			$arrDeleteAllowed = array();
-			$arrExportAllowed = array();
 
 			// Process result and format values
 			foreach ($arrRows as $row)
@@ -1955,7 +1951,6 @@ class ModuleFormdataListing extends \Module
 		 */
 		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
-		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
 		$blnQuery = false;
 		foreach (preg_split('/&(amp;)?/', urldecode($_SERVER['QUERY_STRING'])) as $fragment)
@@ -1970,8 +1965,6 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$strVarConnector = $blnQuery ? '&amp;' : '?';
-
 		// check record
 		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
 		{
@@ -1980,7 +1973,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// check access
-		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
@@ -2003,7 +1996,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnEditAllowed = true;
 		}
-		elseif (strlen($this->efg_fe_edit_access) )
+		elseif (strlen($this->efg_fe_edit_access))
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
@@ -2024,7 +2017,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnDeleteAllowed = true;
 		}
-		elseif (strlen($this->efg_fe_delete_access) )
+		elseif (strlen($this->efg_fe_delete_access))
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
@@ -2045,7 +2038,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnExportAllowed = true;
 		}
-		elseif (strlen($this->efg_fe_export_access) )
+		elseif (strlen($this->efg_fe_export_access))
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
@@ -2226,7 +2219,7 @@ class ModuleFormdataListing extends \Module
 				}
 
 				// single file
-				elseif (!is_array($arrFields[$class]['raw']) && strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']) )
+				elseif (!is_array($arrFields[$class]['raw']) && strlen($arrFields[$class]['raw']) && is_file(TL_ROOT . '/' . $arrFields[$class]['raw']))
 				{
 					$objFile = new \File($arrFields[$class]['content']);
 
@@ -2283,7 +2276,7 @@ class ModuleFormdataListing extends \Module
 						if (strlen($strFile) && is_file(TL_ROOT . '/' . $strFile)) {
 							$objFile = new \File($strFile);
 
-							if (!in_array($objFile->extension, $allowedDownload) )
+							if (!in_array($objFile->extension, $allowedDownload))
 							{
 								unset($arrFields[$class]['raw'][$kF]);
 								continue;
@@ -2294,7 +2287,7 @@ class ModuleFormdataListing extends \Module
 
 								$arrTemp[$keyTemp]['src'] = $this->urlEncode($strFile);
 
-								if ( substr($objFile->mime, 0, 6) == 'image/' )
+								if (substr($objFile->mime, 0, 6) == 'image/')
 								{
 									$arrTemp[$keyTemp]['display'] = 'image';
 								}
@@ -2374,20 +2367,18 @@ class ModuleFormdataListing extends \Module
 		{
 			if (intval($objRecord->fd_user) > 0)
 			{
-				$objUser = \Database::getInstance()->prepare("SELECT email FROM tl_user WHERE id=?")
-					->limit(1)
-					->execute($objRecord->fd_user);
-				if ($objUser->numRows)
+				$objUser = \UserModel::findByPk($objRecord->fd_user);
+
+				if ($objUser !== null && !empty($objUser->email))
 				{
 					$arrNotifies[] = $objUser->email;
 				}
 			}
 			if (intval($objRecord->fd_member) > 0)
 			{
-				$objMember = \Database::getInstance()->prepare("SELECT email FROM tl_member WHERE id=?")
-					->limit(1)
-					->execute($objRecord->fd_member);
-				if ($objMember->numRows)
+				$objMember = \MemberModel::findByPk($objRecord->fd_member);
+
+				if ($objMember !== null && !empty($objMember->email))
 				{
 					$arrNotifies[] = $objMember->email;
 				}
@@ -2419,7 +2410,6 @@ class ModuleFormdataListing extends \Module
 		 */
 		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
-		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
 
 		$blnQuery = false;
 		foreach (preg_split('/&(amp;)?/', urldecode($_SERVER['QUERY_STRING'])) as $fragment)
@@ -2434,16 +2424,14 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$strVarConnector = $blnQuery ? '&amp;' : '?';
-
 		// check record
-		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
+		if (null === $this->intRecordId || intval($this->intRecordId) < 1)
 		{
 			return;
 		}
 
 		// check access
-		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
@@ -2467,10 +2455,11 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnExportAllowed = true;
 		}
-		elseif (strlen($this->efg_fe_export_access) )
+		elseif (strlen($this->efg_fe_export_access))
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
 				->execute($this->intRecordId);
+
 			$varOwner = $objOwner->fetchAssoc();
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedExportOwnerIds))
 			{
@@ -2593,9 +2582,7 @@ class ModuleFormdataListing extends \Module
 			// Process result and format values
 			foreach ($result as $row)
 			{
-
 				$intRowCounter++;
-
 				$args = array();
 
 				if ($intRowCounter == 0)
@@ -2625,11 +2612,11 @@ class ModuleFormdataListing extends \Module
 						{
 							$strName = $v;
 						}
-						elseif ( strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]) )
+						elseif (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0]))
 						{
 							$strName = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['label'][0];
 						}
-						elseif ( strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]) )
+						elseif (strlen($GLOBALS['TL_LANG']['tl_formdata'][$v][0]))
 						{
 							$strName = $GLOBALS['TL_LANG']['tl_formdata'][$v][0];
 						}
@@ -2687,7 +2674,7 @@ class ModuleFormdataListing extends \Module
 				foreach ($showFields as $k=>$v)
 				{
 
-					if (in_array($v, $ignoreFields) )
+					if (in_array($v, $ignoreFields))
 					{
 						continue;
 					}
@@ -2699,15 +2686,15 @@ class ModuleFormdataListing extends \Module
 
 					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
@@ -2810,15 +2797,15 @@ class ModuleFormdataListing extends \Module
 						{
 							$strVal = $this->arrMembers[intval($row[$v])];
 						}
-						if ($v == 'fd_user')
+						elseif ($v == 'fd_user')
 						{
 							$strVal = $this->arrUsers[intval($row[$v])];
 						}
-						if ($v == 'fd_member_group')
+						elseif ($v == 'fd_member_group')
 						{
 							$strVal = $this->arrMemberGroups[intval($row[$v])];
 						}
-						if ($v == 'fd_user_group')
+						elseif ($v == 'fd_user_group')
 						{
 							$strVal = $this->arrUserGroups[intval($row[$v])];
 						}
@@ -2898,8 +2885,6 @@ class ModuleFormdataListing extends \Module
 		 */
 		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
-		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
-
 		$blnQuery = false;
 
 		foreach (preg_split('/&(amp;)?/', $_SERVER['QUERY_STRING']) as $fragment)
@@ -2914,7 +2899,6 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$strVarConnector = $blnQuery ? '&amp;' : '?';
 		// check record
 		if ($this->intRecordId === null || intval($this->intRecordId) < 1)
 		{
@@ -2928,10 +2912,11 @@ class ModuleFormdataListing extends \Module
 		// Check Owner and Alias
 		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
 			->execute($this->intRecordId);
+
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check access
-		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
@@ -2950,7 +2935,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnEditAllowed = true;
 		}
-		elseif (!empty($this->efg_fe_edit_access) )
+		elseif (!empty($this->efg_fe_edit_access))
 		{
 			if (in_array(intval($varOwner['fd_member']), $this->arrAllowedEditOwnerIds))
 			{
@@ -2988,23 +2973,19 @@ class ModuleFormdataListing extends \Module
 			$strForm = $objCheckRecord->form;
 		}
 
+		// get ContentElement holding the form
 		if (strlen($strForm))
 		{
-			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
-				->limit(1)
-				->execute($strForm);
-			if ($objForm->numRows == 1)
+
+			$objForm = \FormModel::findOneBy('title', $strForm);
+
+			if ($objForm !== null)
 			{
-				$intFormId = $objForm->id;
+				$objFormElement = \ContentModel::findOneBy('form', $objForm->id);
 			}
 		}
 
-		// get ContentElement holding the form
-		$objFormElement = \Database::getInstance()->prepare("SELECT * FROM tl_content WHERE form=?")
-			->limit(1)
-			->execute($intFormId);
-
-		if ($objFormElement->numRows<1)
+		if ($objFormElement === null)
 		{
 			$this->log("Could not find a ContentElement containing the form \"".$strForm."\"", 'ModuleFormdataListing editSingleRecord()', 'ERROR');
 
@@ -3048,7 +3029,7 @@ class ModuleFormdataListing extends \Module
 		}
 		$_SESSION['EFP']['LISTING_MOD']['id'] = $intListingId;
 
-		if ($objFormElement->numRows == 1)
+		if ($objFormElement !== null)
 		{
 			$this->Template->editform = $this->generateEditForm($objFormElement, $objRecord);
 		}
@@ -3058,19 +3039,15 @@ class ModuleFormdataListing extends \Module
 
 	protected function deleteSingleRecord()
 	{
-
 		$intDeleteId = 0;
 
 		$this->import('FrontendUser', 'Member');
-
 
 		/**
 		 * Prepare URL
 		 */
 		$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrlParams = '';
-		$strUrlSuffix = $GLOBALS['TL_CONFIG']['urlSuffix'];
-
 		$blnQuery = false;
 
 		foreach (preg_split('/&(amp;)?/', $_SERVER['QUERY_STRING']) as $fragment)
@@ -3085,8 +3062,6 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$strVarConnector = $blnQuery ? '&amp;' : '?';
-
 		// check record
 		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
 		{
@@ -3100,10 +3075,11 @@ class ModuleFormdataListing extends \Module
 		// Check Owner and Alias
 		$objOwner = \Database::getInstance()->prepare("SELECT fd_member,alias FROM tl_formdata WHERE id=?")
 			->execute($this->intRecordId);
+
 		$varOwner = $objOwner->fetchAssoc();
 
 		// check list access
-		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public' )
+		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
@@ -3116,14 +3092,14 @@ class ModuleFormdataListing extends \Module
 		$blnDeleteAllowed = false;
 		if ($this->efg_fe_delete_access == 'none')
 		{
-			$blnEditAllowed = false;
+			$blnDeleteAllowed = false;
 		}
 		elseif($this->efg_fe_delete_access == 'public')
 		{
 			$blnDeleteAllowed = true;
 			$intDeleteId = intval($this->intRecordId);
 		}
-		elseif (strlen($this->efg_fe_delete_access) )
+		elseif (strlen($this->efg_fe_delete_access))
 		{
 			if (intval($varOwner['fd_member'])>0 && in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
 			{
@@ -3166,7 +3142,6 @@ class ModuleFormdataListing extends \Module
 			return '';
 		}
 
-		$strClass = $this->findContentElement($objFormElement->type);
 		$objFormElement->typePrefix = 'ce_';
 
 		$this->EditForm = new ExtendedForm($objFormElement);
@@ -3261,7 +3236,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// E-mail addresses
-		if ($value && ($rgxp == 'email' || strpos($this->arrFF[$k]['name'], 'mail') !== false || strpos($k, 'mail') !== false ) )
+		if ($value && ($rgxp == 'email' || strpos($this->arrFF[$k]['name'], 'mail') !== false || strpos($k, 'mail') !== false ))
 		{
 			$value = \String::encodeEmail($value);
 			$value = '<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;' . $value . '">' . $value . '</a>';
@@ -3295,6 +3270,7 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrMembers)
 		{
+// TODO: use MemberModel ???
 			$members = array();
 			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
 				->execute();
@@ -3319,6 +3295,7 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrUsers)
 		{
+// TODO: use UserModel ???
 			$users = array();
 			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
 				->execute();
@@ -3343,6 +3320,7 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrMemberGroups)
 		{
+// TODO: use MemberGroupModel ???
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
 				->execute();
@@ -3367,6 +3345,7 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrUserGroups)
 		{
+// TODO: use UserGroupModel ???
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
 				->execute();
