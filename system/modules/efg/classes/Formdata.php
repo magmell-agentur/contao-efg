@@ -255,12 +255,12 @@ class Formdata extends \Frontend
 						// Determine domain
 						if (intval($pageId)>0)
 						{
-							$domain = \Environment::base();
+							$domain = \Environment::get('base');
 							$objParent = $this->getPageDetails($pageId);
 
 							if (strlen($objParent->domain))
 							{
-								$domain = (\Environment::ssl() ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
+								$domain = (\Environment::get('ssl') ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
 							}
 						}
 						$arrProcessed[$pageId] = $domain . $this->generateFrontendUrl($objParent->row(), '/'.$strFormdataDetailsKey.'/%s');

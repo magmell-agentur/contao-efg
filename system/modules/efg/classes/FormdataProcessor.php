@@ -523,7 +523,7 @@ class FormdataProcessor extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = \Environment::base() . $strVal;
+											$varTxt[] = \Environment::get('base') . $strVal;
 											$varHtml[] = '<img src="' . $strVal . '" />';
 										}
 									}
@@ -867,7 +867,7 @@ class FormdataProcessor extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = \Environment::base() . $strVal;
+											$varTxt[] = \Environment::get('base') . $strVal;
 											$varHtml[] = '<img src="' . $strVal . '" />';
 										}
 									}
