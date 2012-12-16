@@ -221,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailAttachments'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true),
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'multiple' => true, 'mandatory'=>true),
 	'sql'                     => "blob NULL"
 );
 
@@ -240,7 +240,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailAttachments'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
-	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>true),
+	'eval'                    => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>true, 'multiple' => true, 'mandatory'=>true),
 	'sql'                     => "blob NULL"
 );
 
