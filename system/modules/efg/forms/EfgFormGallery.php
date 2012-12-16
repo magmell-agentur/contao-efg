@@ -459,23 +459,23 @@ class EfgFormGallery extends \ContentElement
 			++$rowcount;
 		}
 
-/*
-		$strTemplate = 'gallery_default';
+		/*
+				$strTemplate = 'gallery_default';
 
-		// Use a custom template
-		if (TL_MODE == 'FE' && $this->galleryTpl != '')
-		{
-			$strTemplate = $this->galleryTpl;
-		}
+				// Use a custom template
+				if (TL_MODE == 'FE' && $this->galleryTpl != '')
+				{
+					$strTemplate = $this->galleryTpl;
+				}
 
-		$objTemplate = new \FrontendTemplate($strTemplate);
-		$objTemplate->setData($this->arrData);
+				$objTemplate = new \FrontendTemplate($strTemplate);
+				$objTemplate->setData($this->arrData);
 
-		$objTemplate->body = $body;
-		$objTemplate->headline = $this->headline; // see #1603
+				$objTemplate->body = $body;
+				$objTemplate->headline = $this->headline; // see #1603
 
-		$this->Template->images = $objTemplate->parse();
-*/
+				$this->Template->images = $objTemplate->parse();
+		*/
 		$this->Template->multiple = ($this->efgImageMultiple) ? true : false;
 		$this->Template->body = $body;
 		$this->Template->images = $images;

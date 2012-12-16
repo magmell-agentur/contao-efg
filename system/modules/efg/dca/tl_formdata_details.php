@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		),
 		'pid' => array
 		(
-		//	'foreignKey'              => 'tl_formdata.alias',
+			//	'foreignKey'              => 'tl_formdata.alias',
 			'sql'                     => "int(10) unsigned NOT NULL default '0'",
 			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
 		),
@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		(
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
- 		'value' => array
+		'value' => array
 		(
 			'label'                   => array('Value', 'Wert des tl_formdata_details-Datensatzes'),
 			'inputType'               => 'text',

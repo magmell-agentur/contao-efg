@@ -434,7 +434,7 @@ class tl_formdata extends \Backend
 
 		while ($objDetails->next())
 		{
-			 $strRet .=  '<div class="fd_row"><div class="fd_label">' .$objDetails->ff_name . ':&nbsp;</div><div class="fd_value">' . $objDetails->value . '&nbsp;</div></div>';
+			$strRet .=  '<div class="fd_row"><div class="fd_label">' .$objDetails->ff_name . ':&nbsp;</div><div class="fd_value">' . $objDetails->value . '&nbsp;</div></div>';
 		}
 
 		$strRet .= '</div></div>';
@@ -454,7 +454,7 @@ class tl_formdata extends \Backend
 
 		// Get all forms
 		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=? ORDER BY title ASC")
-							->execute("1");
+			->execute("1");
 		$forms[] = '-';
 		if ($objForms->numRows)
 		{
@@ -479,7 +479,7 @@ class tl_formdata extends \Backend
 
 		// Get all members
 		$objItems = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS fullname FROM tl_member ORDER BY fullname ASC")
-							->execute("1");
+			->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
 		{
@@ -504,7 +504,7 @@ class tl_formdata extends \Backend
 
 		// Get all users
 		$objItems = \Database::getInstance()->prepare("SELECT id, name FROM tl_user ORDER BY name ASC")
-							->execute("1");
+			->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
 		{
@@ -528,7 +528,7 @@ class tl_formdata extends \Backend
 
 		// Get all member groups
 		$objItems = \Database::getInstance()->prepare("SELECT id,`name` FROM tl_member_group ORDER BY `name` ASC")
-							->execute("1");
+			->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
 		{
@@ -552,7 +552,7 @@ class tl_formdata extends \Backend
 
 		// Get all user groups
 		$objItems = \Database::getInstance()->prepare("SELECT id,`name` FROM tl_user_group ORDER BY `name` ASC")
-							->execute("1");
+			->execute("1");
 		//$items[0] = '-';
 		if ($objItems->numRows)
 		{

@@ -91,8 +91,8 @@ class ModuleFormdata extends \Backend
 		$this->intFormId = $dc->id;
 
 		$this->objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
-						->execute($this->intFormId)
-						->fetchAssoc();
+			->execute($this->intFormId)
+			->fetchAssoc();
 		$this->updateConfig();
 	}
 
@@ -167,7 +167,7 @@ class ModuleFormdata extends \Backend
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
 			$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
-								->execute($this->objForm['id']);
+				->execute($this->objForm['id']);
 			if ($objFields->numRows)
 			{
 				while ($objFields->next())
@@ -216,7 +216,7 @@ class ModuleFormdata extends \Backend
 			$arrAllFields = array();
 			$arrFieldNamesById = array();
 			$objAllFields = \Database::getInstance()->prepare("SELECT ff.* FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
-								->execute("1");
+				->execute("1");
 			if ($objAllFields->numRows)
 			{
 				while ($objAllFields->next())

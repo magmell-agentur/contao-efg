@@ -92,25 +92,25 @@ class EfgFormPaginator extends \Widget
 			if ($this->efgBackImageSubmit && is_file(TL_ROOT . '/' . $this->efgBackSingleSRC))
 			{
 				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
-								($this->formActivePage ? ' name="FORM_BACK"' : ''),
-								$this->efgBackSingleSRC,
-								$this->strId,
-								(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-								specialchars($this->efgBackSlabel),
-								specialchars($this->efgBackSlabel),
-								specialchars('submit_back'),
-								$this->getAttributes(),
-								$this->strTagEnding);
+					($this->formActivePage ? ' name="FORM_BACK"' : ''),
+					$this->efgBackSingleSRC,
+					$this->strId,
+					(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+					specialchars($this->efgBackSlabel),
+					specialchars($this->efgBackSlabel),
+					specialchars('submit_back'),
+					$this->getAttributes(),
+					$this->strTagEnding);
 			}
 			else
 			{
 				$return .= sprintf('<input type="submit"%s id="ctrl_%s_back" class="submit back%s" value="%s"%s%s',
-							($this->formActivePage ? ' name="FORM_BACK"' : ''),
-							$this->strId,
-							(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-							specialchars($this->efgBackSlabel),
-							$this->getAttributes(),
-							$this->strTagEnding);
+					($this->formActivePage ? ' name="FORM_BACK"' : ''),
+					$this->strId,
+					(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+					specialchars($this->efgBackSlabel),
+					$this->getAttributes(),
+					$this->strTagEnding);
 			}
 		}
 
@@ -118,25 +118,25 @@ class EfgFormPaginator extends \Widget
 		if ($this->imageSubmit && is_file(TL_ROOT . '/' . $this->singleSRC))
 		{
 			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
-							($this->formActivePage ? ' name="FORM_NEXT"' : ''),
-							$this->singleSRC,
-							$this->strId,
-							(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-							specialchars($this->slabel),
-							specialchars($this->slabel),
-							specialchars('submit_next'),
-							$this->getAttributes(),
-							$this->strTagEnding);
+				($this->formActivePage ? ' name="FORM_NEXT"' : ''),
+				$this->singleSRC,
+				$this->strId,
+				(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+				specialchars($this->slabel),
+				specialchars($this->slabel),
+				specialchars('submit_next'),
+				$this->getAttributes(),
+				$this->strTagEnding);
 		}
 		else
 		{
 			$return .= sprintf('<input type="submit"%s id="ctrl_%s" class="submit next%s" value="%s"%s%s',
-							($this->formActivePage ? ' name="FORM_NEXT"' : ''),
-							$this->strId,
-							(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-							specialchars($this->slabel),
-							$this->getAttributes(),
-							$this->strTagEnding);
+				($this->formActivePage ? ' name="FORM_NEXT"' : ''),
+				$this->strId,
+				(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+				specialchars($this->slabel),
+				$this->getAttributes(),
+				$this->strTagEnding);
 		}
 
 		return $return;

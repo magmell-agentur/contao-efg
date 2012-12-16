@@ -109,19 +109,19 @@ class EfgFormLookupRadio extends \Widget
 		foreach ($this->arrOptions as $i => $arrOption)
 		{
 			$strOptions .= sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
-									$this->strName,
-									$this->strId.'_'.$i,
-									$arrOption['value'],
-									((is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']) ? ' checked="checked"' : ''),
-									$this->strTagEnding,
-									$this->strId.'_'.$i,
-									$arrOption['label']);
+				$this->strName,
+				$this->strId.'_'.$i,
+				$arrOption['value'],
+				((is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']) ? ' checked="checked"' : ''),
+				$this->strTagEnding,
+				$this->strId.'_'.$i,
+				$arrOption['label']);
 		}
 
-        return sprintf('<div id="ctrl_%s" class="radio_container%s">%s</div>',
-						$this->strId,
-						(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-						$strOptions) . $this->addSubmit();
+		return sprintf('<div id="ctrl_%s" class="radio_container%s">%s</div>',
+			$this->strId,
+			(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+			$strOptions) . $this->addSubmit();
 	}
 
 }

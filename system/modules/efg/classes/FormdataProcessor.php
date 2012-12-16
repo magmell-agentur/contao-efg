@@ -1128,14 +1128,12 @@ class FormdataProcessor extends \Frontend
 
 					// Replace tags
 					$tags = array();
-					// preg_match_all('/{{[^{}]+}}/i', $strContent, $tags);
 					preg_match_all('/__BRCL__.*?__BRCR__/si', $strTemp, $tags);
 
 					// Replace tags of type {{form::<form field name>}}
 					// .. {{form::fieldname?label=Label for this field: }}
 					foreach ($tags[0] as $tag)
 					{
-						// $elements = explode('::', trim(str_replace(array('{{', '}}'), array('', ''), $tag)));
 						$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
 						switch (strtolower($elements[0]))
 						{
@@ -1152,7 +1150,6 @@ class FormdataProcessor extends \Frontend
 								}
 
 								$arrField = $arrFormFields[$strKey];
-								$strType = $arrField['type'];
 
 								$strLabel = '';
 								$strVal = '';

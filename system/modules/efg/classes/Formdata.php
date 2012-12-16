@@ -1071,7 +1071,7 @@ class Formdata extends \Frontend
 							{
 								if (isset($varOpts[$strVal]))
 								{
-									$strVal = $varOpts[$vSel];
+									$strVal = $varOpts[$strVal];
 									break;
 								}
 							}
@@ -1110,7 +1110,7 @@ class Formdata extends \Frontend
 						// get options labels instead of values for mail / text
 						if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
 						{
-							foreach ( $arrSel as $kSel => $vSel)
+							foreach ($arrSel as $kSel => $vSel)
 							{
 								foreach ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options'] as $strOptsKey => $varOpts)
 								{
@@ -1185,8 +1185,8 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare database value from tl_formdata / tl_formdata_details for widget
-	 * @param mixed stored value
-	 * @param array form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
+	 * @param mixed Stored value
+	 * @param array Form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
 	 * @return mixed
 	 */
 	public function prepareDbValForWidget($varValue='', $arrField=false, $varFile=false)
@@ -1330,6 +1330,25 @@ class Formdata extends \Frontend
 					{
 						$varVal = deserialize($varValue);
 					}
+
+					if ($strType == 'fileTree' && version_compare(VERSION, '3.0', '>=') && $arrField['isDatabaseAssisted'])
+					{
+						if (!empty($varVal))
+						{
+							if (is_array($varVal))
+							{
+								foreach ($varVal as $key => $strFile)
+								{
+									$varVal[$key] = \FilesModel::findOneBy('path', $strFile)->id;
+								}
+							}
+							elseif (is_string($varVal))
+							{
+								$varVal = \FilesModel::findOneBy('path', $varVal)->id;
+							}
+						}
+					}
+
 					break;
 				case 'upload':
 					$varVal = '';
@@ -1415,11 +1434,11 @@ class Formdata extends \Frontend
 		{
 			$strType = 'efgLookupSelect';
 		}
-		if ($arrField['inputType'] == 'efgLookupCheckbox')
+		elseif ($arrField['inputType'] == 'efgLookupCheckbox')
 		{
 			$strType = 'efgLookupCheckbox';
 		}
-		if ($arrField['inputType'] == 'efgLookupRadio')
+		elseif ($arrField['inputType'] == 'efgLookupRadio')
 		{
 			$strType = 'efgLookupRadio';
 		}
@@ -1773,7 +1792,7 @@ class Formdata extends \Frontend
 						// include blank option to input type select
 						if ( $strType == 'efgLookupSelect' )
 						{
-							if ( !$blnDoNotAddEmptyOption )
+							if (!$blnDoNotAddEmptyOption)
 							{
 								array_unshift($arrOptions, array('value'=>'', 'label'=>'-'));
 							}
@@ -1849,9 +1868,10 @@ class Formdata extends \Frontend
 				else
 				{
 					$strClass = $GLOBALS['TL_FFL'][$arrField['type']];
-					if ($this->classFileExists($strClass))
+					if (class_exists($strClass))
 					{
 						$objWidget = new $strClass($arrField);
+
 						if ($objWidget instanceof FormSelectMenu || $objWidget instanceof FormCheckbox || $objWidget instanceof FormRadioButton)
 						{
 
@@ -1872,8 +1892,43 @@ class Formdata extends \Frontend
 				break;
 		} // end switch $arrField['type']
 
+		// Decode 'special chars', encoded by \Input::encodeSpecialChars (for example labels of checkbox options containing '(')
+		$arrOptions = $this->decodeSpecialChars($arrOptions);
+
 		return $arrOptions;
 
+	}
+
+
+	/**
+	 * Decode special characters
+	 *
+	 * @param mixed $varValue A string or array
+	 *
+	 * @return mixed The decoded string or array
+	 */
+	protected function decodeSpecialChars($varValue)
+	{
+		if ($varValue === null || $varValue == '')
+		{
+			return $varValue;
+		}
+
+		// Recursively clean arrays
+		if (is_array($varValue))
+		{
+			foreach ($varValue as $k=>$v)
+			{
+				$varValue[$k] = $this->decodeSpecialChars($v);
+			}
+
+			return $varValue;
+		}
+
+		$arrSearch = array('&#35;', '&#60;', '&#62;', '&#40;', '&#41;', '&#92;', '&#61;');
+		$arrReplace = array('#', '<', '>', '(', ')', '\\', '=');
+
+		return str_replace($arrSearch, $arrReplace, $varValue);
 	}
 
 	/**

@@ -175,36 +175,36 @@ class EfgFormLookupCheckbox extends \Widget
 			$checked = '';
 			if ((is_array($this->varValue) && in_array($arrOption['value'] , $this->varValue) || $this->varValue == $arrOption['value']))
 			{
-			  $checked = ' checked="checked"';
+				$checked = ' checked="checked"';
 			}
 
 			$strOptions .= sprintf('<span><input type="checkbox" name="%s" id="opt_%s" class="checkbox" value="%s"%s%s <label for="opt_%s">%s</label></span>',
-									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
-									$this->strId.'_'.$i,
-									$arrOption['value'],
-									$checked,
-									$this->strTagEnding,
-									$this->strId.'_'.$i,
-									$arrOption['label']);
+				$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
+				$this->strId.'_'.$i,
+				$arrOption['value'],
+				$checked,
+				$this->strTagEnding,
+				$this->strId.'_'.$i,
+				$arrOption['label']);
 
 			// render as checked radio if used as lookup on tl_calendar_events and only one event available
 			if ($strLookupTable == 'tl_calendar_events' && $blnSingleEvent)
 			{
 				$strOptions =  sprintf('<span><input type="radio" name="%s" id="opt_%s" class="radio" value="%s"%s%s <label for="opt_%s">%s</label></span>',
-									$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
-									$this->strId.'_'.$i,
-									$arrOption['value'],
-									$checked,
-									$this->strTagEnding,
-									$this->strId.'_'.$i,
-									$arrOption['label']);
+					$this->strName . ((count($this->arrOptions) > 1) ? '[]' : ''),
+					$this->strId.'_'.$i,
+					$arrOption['value'],
+					$checked,
+					$this->strTagEnding,
+					$this->strId.'_'.$i,
+					$arrOption['label']);
 			}
 		}
 
-        return sprintf('<div id="ctrl_%s" class="checkbox_container%s">%s</div>',
-						$this->strId,
-						(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-						$strOptions) . $this->addSubmit();
+		return sprintf('<div id="ctrl_%s" class="checkbox_container%s">%s</div>',
+			$this->strId,
+			(strlen($this->strClass) ? ' ' . $this->strClass : ''),
+			$strOptions) . $this->addSubmit();
 	}
 
 }
