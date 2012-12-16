@@ -1184,11 +1184,7 @@ class FormdataProcessor extends \Frontend
 					// Eval the code
 					if ($blnEval)
 					{
-						ob_start();
-						$blnCheck = eval("?>" . $strTemp);
-						$strCheck = ob_get_contents();
-						$strTemp = $strCheck;
-						ob_end_clean();
+						$strTemp = $this->Formdata->evalConditionTags($strTemp);
 					}
 
 					$strContent = str_replace($arrMatch[$m], $strTemp, $strContent);
