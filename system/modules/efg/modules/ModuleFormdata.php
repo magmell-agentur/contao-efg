@@ -148,12 +148,10 @@ class ModuleFormdata extends \Backend
 					include($strFile);
 				}
 
-				$tplMod = 'tplMod_' . $strModLang;
 				$tplMod = $this->newTemplate('efg_internal_modules');
 				$tplMod->arrForm = $this->objForm;
 				$tplMod->arrStoreForms = $arrStoreForms;
 
-				$objMod = 'objMod_' . $strModLang;
 				$objMod = new \File('system/modules/efg/languages/'.$strModLang.'/modules.php');
 				$objMod->write($tplMod->parse());
 				$objMod->close();
@@ -188,7 +186,6 @@ class ModuleFormdata extends \Backend
 			}
 
 			$strFormKey = (isset($this->objForm['formID']) && strlen($this->objForm['formID'])) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
-			$tplDca = 'tplDca_' . $strFormKey;
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
 			$tplDca->arrForm = $this->objForm;
@@ -203,7 +200,6 @@ class ModuleFormdata extends \Backend
 			}
 			$tplDca->blnBackendMail = $blnBackendMail;
 
-			$objDca = 'objDca_' . $strFormKey;
 			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
@@ -237,14 +233,13 @@ class ModuleFormdata extends \Backend
 			}
 
 			$strFormKey = 'feedback';
-			$tplDca = 'tplDca_' . $strFormKey;
+
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->objForm['title']);
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrAllFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
 
-			$objDca = 'objDca_' . $strFormKey;
 			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
