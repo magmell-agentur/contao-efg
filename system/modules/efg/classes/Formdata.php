@@ -624,7 +624,7 @@ class Formdata extends \Frontend
 					break;
 				case 'upload':
 					$strVal = '';
-
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					if (strlen($varFile['name']))
 					{
 						if ($arrField['storeFile'] == '1')
@@ -807,6 +807,7 @@ class Formdata extends \Frontend
 
 				case 'hidden':
 				case 'textarea':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 				case 'upload':
 				case 'password':
 				default:
@@ -946,6 +947,7 @@ class Formdata extends \Frontend
 					}
 					break;
 				case 'efgImageSelect':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
 					if (is_string($varSubmitted) && strlen($varSubmitted))
 					{
@@ -957,6 +959,7 @@ class Formdata extends \Frontend
 					}
 					break;
 				case 'upload':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
 					if (strlen($varFile['name']))
 					{
@@ -1141,6 +1144,7 @@ class Formdata extends \Frontend
 					}
 					break;
 				case 'efgImageSelect':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
 					$arrSel = array();
 
@@ -1159,6 +1163,7 @@ class Formdata extends \Frontend
 					}
 					break;
 				case 'upload':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
 					if (strlen($varFile['name']))
 					{
@@ -1186,7 +1191,8 @@ class Formdata extends \Frontend
 	/**
 	 * Prepare database value from tl_formdata / tl_formdata_details for widget
 	 * @param mixed Stored value
-	 * @param array Form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
+	 * @param array|boolean Form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
+	 * @param mixed File
 	 * @return mixed
 	 */
 	public function prepareDbValForWidget($varValue='', $arrField=false, $varFile=false)
@@ -1206,7 +1212,6 @@ class Formdata extends \Frontend
 
 		if (in_array($strType, $this->arrFFstorable))
 		{
-
 			switch ($strType)
 			{
 				case 'efgLookupCheckbox':
@@ -1322,6 +1327,7 @@ class Formdata extends \Frontend
 					break;
 				case 'efgImageSelect':
 				case 'fileTree':
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					if (is_string($varVal) && strpos($varVal, '|') !== false)
 					{
 						$varVal = explode('|', $varVal);
@@ -1339,16 +1345,21 @@ class Formdata extends \Frontend
 							{
 								foreach ($varVal as $key => $strFile)
 								{
-									$varVal[$key] = \FilesModel::findOneBy('path', $strFile)->id;
+									if (!is_numeric($strFile))
+									{
+										$varVal[$key] = \FilesModel::findOneBy('path', $strFile)->id;
+									}
 								}
 							}
 							elseif (is_string($varVal))
 							{
-								$varVal = \FilesModel::findOneBy('path', $varVal)->id;
+								if (!is_numeric($varVal))
+								{
+									$varVal = \FilesModel::findOneBy('path', $varVal)->id;
+								}
 							}
 						}
 					}
-
 					break;
 				case 'upload':
 					$varVal = '';
@@ -1365,7 +1376,6 @@ class Formdata extends \Frontend
 						$varVal = $strVal;
 					}
 					break;
-
 				case 'text':
 				case 'calendar':
 				case 'xdependentcalendarfields':
@@ -1376,7 +1386,6 @@ class Formdata extends \Frontend
 					{
 						if ($varVal)
 						{
-
 							if ($arrField['rgxp'] == 'date')
 							{
 								// $varVal = date((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);

@@ -2976,7 +2976,6 @@ class ModuleFormdataListing extends \Module
 		// get ContentElement holding the form
 		if (strlen($strForm))
 		{
-
 			$objForm = \FormModel::findOneBy('title', $strForm);
 
 			if ($objForm !== null)

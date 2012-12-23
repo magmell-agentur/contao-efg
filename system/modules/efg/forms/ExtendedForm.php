@@ -134,10 +134,13 @@ class ExtendedForm extends \Form
 			}
 		}
 
-
 		// use core class Form if this is not a multi page form and not frontend edit form
 		if ((!$this->blnMultipage && !$this->blnEditform) || $this->method == 'GET' || TL_MODE == 'BE')
 		{
+			// unset files in session to avoid wrong validation and submission of file uploads
+			// .. files may be stored in session after frontend editing or submission of multipage form
+			$_SESSION['FILES'] = array();
+
 			$this->strTemplate = 'form';
 			return parent::compile();
 		}
@@ -258,20 +261,6 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				// unset session values if no FORM_SUBMIT or form page has not been completed
-				// (to avoid wrong validation against session values and to avoid usage of values of other forms)
-				// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
-				if ($strMode != 'reload' && strlen($objFields->name))
-				{
-					if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
-					{
-						if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
-						{
-							unset($_SESSION['FORM_DATA'][$objFields->name]);
-						}
-					}
-				}
-
 				$strClass = $GLOBALS['TL_FFL'][$objFields->type];
 
 				// Continue if the class is not defined
@@ -317,6 +306,26 @@ class ExtendedForm extends \Form
 					$this->arrWidgetsFailedValidation[$objFields->name] = 0;
 				}
 
+				// unset session values if no FORM_SUBMIT or form page has not been completed
+				// (to avoid wrong validation against session values and to avoid usage of values of other forms)
+				// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
+				if ($strMode != 'reload' && strlen($objFields->name))
+				{
+					if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
+					{
+						if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
+						{
+							unset($_SESSION['FORM_DATA'][$objFields->name]);
+						}
+
+						if ($objWidget instanceof \uploadable)
+						{
+							unset($_SESSION['FILES'][$objFields->name]);
+						}
+
+					}
+				}
+
 				// always populate from existing session data if configured
 				if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
 				{
@@ -352,6 +361,11 @@ class ExtendedForm extends \Form
 							$arrData['dateFormat'] = $arrData['xdateformat'];
 						}
 
+						if ($objWidget instanceof \uploadable)
+						{
+							unset($_SESSION['FILES'][$objFields->name]);
+						}
+
 						// prepare value
 						$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
 						$objWidget->value = $varFieldValue;
@@ -372,7 +386,6 @@ class ExtendedForm extends \Form
 						}
 					}
 				}
-
 
 				// HOOK: load form field callback
 				if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
@@ -486,12 +499,13 @@ class ExtendedForm extends \Form
 				{
 					$hasUpload = true;
 
-					if ($this->blnMultipage)
+					if ($this->blnMultipage || $this->blnEditform)
 					{
 						// save file info in session in frontend edit mode
-						if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name]) ))
+						if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name])))
 						{
 							$objFile = new \File($arrEditRecord[$objFields->name]);
+
 							if ($objFile->size)
 							{
 								$_SESSION['FILES'][$objFields->name] = array(
@@ -512,7 +526,9 @@ class ExtendedForm extends \Form
 							++$row;
 							continue;
 						}
+
 					}
+
 				}
 
 				$this->Template->fields .= $objWidget->parse();
@@ -605,7 +621,6 @@ class ExtendedForm extends \Form
 			$this->Template->fields .= '
 <script>' . $this->getBackButtonJavascriptString() . '
 </script>';
-
 		}
 
 		if ($blnAddDateJS)

@@ -426,7 +426,6 @@ class EfgFormGallery extends \ContentElement
 					// Add column width and class
 					$objCell->colWidth = $colwidth . '%';
 					$objCell->class = 'col_'.$j . $class_td;
-//TODO: use file ID or file path as option value? store ID or path in tl_formdata_details ?
 					$objCell->optId = 'opt_' . $this->widget->id . '_' . ($i + $j);
 					$objCell->optName = $this->widget->name;
 					$objCell->srcFile = $images[($i + $j)]['singleSRC'];
@@ -441,12 +440,10 @@ class EfgFormGallery extends \ContentElement
 							$this->widget->value = array($this->widget->value);
 						}
 
-						// $blnChecked = (is_array($this->widget->value) && in_array($objCell->srcFile, $this->widget->value));
 						$blnChecked = (is_array($this->widget->value) && (in_array($objCell->srcFile, $this->widget->value) || in_array($objCell->srcFileId, $this->widget->value)));
 					}
 					else
 					{
-						// $blnChecked = ($this->widget->value == $objCell->srcFile);
 						$blnChecked = ($this->widget->value == $objCell->srcFile || $this->widget->value == $objCell->srcFileId);
 					}
 					$objCell->checked = ($blnChecked ? ' checked="checked"' : '');

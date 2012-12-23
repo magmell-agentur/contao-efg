@@ -51,7 +51,7 @@ class FormdataProcessor extends \Frontend
 
 		$arrFormFields = array();
 
-// NOTE: maybe use form alias instead in upcoming release
+// TODO: maybe use form alias instead in upcoming release
 		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
 
 		$this->import('Formdata');
@@ -131,6 +131,7 @@ class FormdataProcessor extends \Frontend
 
 			$this->loadDataContainer($this->strFdDcaKey);
 			$this->loadDataContainer('tl_formdata_details');
+			$this->loadDataContainer('tl_files');
 
 			$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
@@ -657,23 +658,22 @@ class FormdataProcessor extends \Frontend
 			// check if we want custom attachments...
 			if ($arrForm['addConfirmationMailAttachments'])
 			{
-				// check if we have custom attachments...
 				if($arrForm['confirmationMailAttachments'])
 				{
 					$arrCustomAttachments = deserialize($arrForm['confirmationMailAttachments'], true);
-					if(is_array($arrCustomAttachments))
+
+					if (is_array($arrCustomAttachments))
 					{
-						foreach ($arrCustomAttachments as $strFile)
+						foreach ($arrCustomAttachments as $intFileId)
 						{
-							if(is_file($strFile))
+							$objModel = \FilesModel::findOneBy('id', $intFileId);
+
+							if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path) && is_readable(TL_ROOT . '/' . $objModel->path))
 							{
-								if(is_readable($strFile))
+								$objFile = new \File($objModel->path);
+								if ($objFile->size)
 								{
-									$objFile = new \File($strFile);
-									if ($objFile->size)
-									{
-										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
-									}
+									$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
 								}
 							}
 						}
@@ -1000,23 +1000,22 @@ class FormdataProcessor extends \Frontend
 			// check if we want custom attachments...
 			if ($arrForm['addFormattedMailAttachments'])
 			{
-				// check if we have custom attachments...
-				if($arrForm['formattedMailAttachments'])
+				if ($arrForm['formattedMailAttachments'])
 				{
 					$arrCustomAttachments = deserialize($arrForm['formattedMailAttachments'], true);
-					if(is_array($arrCustomAttachments))
+
+					if (is_array($arrCustomAttachments))
 					{
-						foreach ($arrCustomAttachments as $strFile)
+						foreach ($arrCustomAttachments as $intFileId)
 						{
-							if(is_file($strFile))
+							$objModel = \FilesModel::findOneBy('id', $intFileId);
+
+							if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path) && is_readable(TL_ROOT . '/' . $objModel->path))
 							{
-								if(is_readable($strFile))
+								$objFile = new \File($objModel->path);
+								if ($objFile->size)
 								{
-									$objFile = new \File($strFile);
-									if ($objFile->size)
-									{
-										$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
-									}
+									$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
 								}
 							}
 						}
