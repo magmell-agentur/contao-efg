@@ -27,7 +27,7 @@ ClassLoader::addClasses(array
 (
 	// Classes
 	'Efg\Formdata'                => 'system/modules/efg/classes/Formdata.php',
-	'Efg\FormdataBackend'         => 'system/modules/efg/modules/FormdataBackend.php',
+	'Efg\FormdataBackend'         => 'system/modules/efg/classes/FormdataBackend.php',
 	'Efg\FormdataComments'        => 'system/modules/efg/classes/FormdataComments.php',
 	'Efg\FormdataProcessor'       => 'system/modules/efg/classes/FormdataProcessor.php',
 
