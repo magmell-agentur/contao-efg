@@ -264,7 +264,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['edit'],
 				'href'                => 'act=edit',
-				'button_callback'     => array('ModuleFormdata', 'callbackEditButton'),
+				'button_callback'     => array('FormdataBackend', 'callbackEditButton'),
 				'icon'                => 'edit.gif'
 			),
 			'delete' => array

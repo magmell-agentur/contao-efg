@@ -16,7 +16,7 @@
  * Table tl_form
  */
 
-$GLOBALS['TL_DCA']['tl_form']['config']['onsubmit_callback'][] = array('ModuleFormdata', 'createFormdataDca');
+$GLOBALS['TL_DCA']['tl_form']['config']['onsubmit_callback'][] = array('FormdataBackend', 'createFormdataDca');
 
 // fields
 $GLOBALS['TL_DCA']['tl_form']['fields']['storeFormdata'] = array

@@ -43,7 +43,7 @@ ClassLoader::addClasses(array
 	'Efg\ExtendedForm'            => 'system/modules/efg/forms/ExtendedForm.php',
 
 	// Modules
-	'Efg\ModuleFormdata'          => 'system/modules/efg/modules/ModuleFormdata.php',
+	'Efg\FormdataBackend'         => 'system/modules/efg/modules/FormdataBackend.php',
 	'Efg\ModuleFormdataListing'   => 'system/modules/efg/modules/ModuleFormdataListing.php',
 
 	// Widgets
