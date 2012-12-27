@@ -27,6 +27,7 @@ ClassLoader::addClasses(array
 (
 	// Classes
 	'Efg\Formdata'                => 'system/modules/efg/classes/Formdata.php',
+	'Efg\FormdataBackend'         => 'system/modules/efg/modules/FormdataBackend.php',
 	'Efg\FormdataComments'        => 'system/modules/efg/classes/FormdataComments.php',
 	'Efg\FormdataProcessor'       => 'system/modules/efg/classes/FormdataProcessor.php',
 
@@ -43,7 +44,6 @@ ClassLoader::addClasses(array
 	'Efg\ExtendedForm'            => 'system/modules/efg/forms/ExtendedForm.php',
 
 	// Modules
-	'Efg\FormdataBackend'         => 'system/modules/efg/modules/FormdataBackend.php',
 	'Efg\ModuleFormdataListing'   => 'system/modules/efg/modules/ModuleFormdataListing.php',
 
 	// Widgets
