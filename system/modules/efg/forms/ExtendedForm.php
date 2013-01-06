@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -22,7 +22,7 @@ namespace Efg;
  * Class ExtendedForm
  *
  * Provide methods to handle front end forms (multi page and formdata frontend editing)
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -85,6 +85,7 @@ class ExtendedForm extends \Form
 					$this->objEditRecord = $varValue;
 				}
 				break;
+
 			default:
 				return parent::__set($strKey, $varValue);
 				break;
@@ -138,7 +139,7 @@ class ExtendedForm extends \Form
 		if ((!$this->blnMultipage && !$this->blnEditform) || $this->method == 'GET' || TL_MODE == 'BE')
 		{
 			// unset files in session to avoid wrong validation and submission of file uploads
-			// .. files may be stored in session after frontend editing or submission of multipage form
+			// .. files may be stored in session after frontend editing or submission of multi page form
 			$_SESSION['FILES'] = array();
 
 			$this->strTemplate = 'form';
@@ -367,7 +368,7 @@ class ExtendedForm extends \Form
 						}
 
 						// prepare value
-						$varFieldValue = $this->Formdata->prepareDbValForWidget($arrEditRecord[$objFields->name], $arrData);
+						$varFieldValue = $this->Formdata->prepareDatabaseValueForWidget($arrEditRecord[$objFields->name], $arrData);
 						$objWidget->value = $varFieldValue;
 					}
 					else
@@ -626,8 +627,8 @@ class ExtendedForm extends \Form
 		if ($blnAddDateJS)
 		{
 			$this->Template->fields .= '
-<script'.((!$blnIsHtml5) ? ' type="text/javascript"' : '') .'>'
-				. $this->getDateString() . '
+<script' . ((!$blnIsHtml5) ? ' type="text/javascript"' : '') . '>'
+		. $this->getDateString() . '
 </script>';
 		}
 
@@ -671,22 +672,22 @@ if(typeof(window.addEvent)=="function"){
 		return '
 if(typeof(window.addEvent)=="function"){
 window.addEvent("domready",function(){'
-			. 'Locale.define("en-US","Date",{'
-			. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
-			. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
-			. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
-			. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
-			. '});'
-			. 'Locale.define("en-US","DatePicker",{'
-			. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
-			. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
-			. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
-			. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
-			. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
-			. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
-			. '});'
-			. '});'
-			.'}';
+		. 'Locale.define("en-US","Date",{'
+		. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
+		. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
+		. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
+		. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
+		. '});'
+		. 'Locale.define("en-US","DatePicker",{'
+		. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
+		. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
+		. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
+		. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
+		. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
+		. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
+		. '});'
+		. '});'
+		.'}';
 	}
 
 }

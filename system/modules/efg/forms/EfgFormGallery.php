@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -23,7 +23,7 @@ namespace Efg;
  * based on ContentGallery by Leo Feyer
  *
  * Renders gallery with radio buttons or checkboxess
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */

@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -23,7 +23,7 @@ namespace Efg;
  * modified version of DC_Table by Leo Feyer
  *
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -142,7 +142,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	 * Items in tl_form, all forms marked to store data in tl_formdata
 	 * @param array
 	 */
-	protected $arrStoreForms;
+	protected $arrStoringForms;
 
 	protected $arrFormsDcaKey = null;
 
@@ -270,7 +270,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// get all forms marked to store data
 		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
 			->execute("1");
-		if (!$this->arrStoreForms)
+		if (!$this->arrStoringForms)
 		{
 			while ($objForms->next())
 			{
@@ -282,7 +282,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					$varKey = str_replace('-', '_', standardize($objForms->title));
 				}
-				$this->arrStoreForms[$varKey] = $objForms->row();
+				$this->arrStoringForms[$varKey] = $objForms->row();
 				$this->arrFormsDcaKey[$varKey] = $objForms->title;
 			}
 		}
@@ -373,7 +373,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					$this->strFormKey = \Input::get('do');
 					$this->strFormFilterKey = 'form';
-					$this->strFormFilterValue = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+					$this->strFormFilterValue = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 					$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 
 					// add sql where condition 'form'=TITLE_OF_FORM
@@ -613,6 +613,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Show all allowed fields
 		foreach ($fields as $i)
 		{
+
 			if (!in_array($i, $allowedFields)
 				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'password'
 				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['doNotShow']
@@ -630,7 +631,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$value = deserialize($row[$i]);
 			$class = (($count++ % 2) == 0) ? ' class="tl_bg"' : '';
 
-			// ignore display of empty detail fields if this is overall "feedback"
+			// Ignore empty detail fields if this is overall "feedback"
 			if (empty($this->strFormKey) && in_array($i, $this->arrDetailFields) && empty($value))
 			{
 				continue;
@@ -667,18 +668,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox'
 				&& !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
-				$row[$i] = strlen($value) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : '-';
-			}
-			elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupCheckbox'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'select'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fp_preSelectMenu'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgLookupSelect'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'efgImageSelect'
-				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'fileTree')
-				&& $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
-			{
-				$row[$i] = strlen($value) ? str_replace('|', ', ', $value) : $value;
+				if (in_array($i, $this->arrDetailFields))
+				{
+					$row[$i] = strlen($value) ? $value : '-';
+				}
+				else
+				{
+					$row[$i] = strlen($value) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : '-';
+				}
 			}
 			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'textarea'
 				&& ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['allowHtml']
@@ -689,11 +686,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			elseif (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['reference']))
 			{
 				$row[$i] = isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['reference'][$row[$i]]) ? ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['reference'][$row[$i]])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['reference'][$row[$i]][0] : $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['reference'][$row[$i]]) : $row[$i];
-			}
-			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['isAssociative']
-				|| array_is_assoc($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options']))
-			{
-				$row[$i] = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options'][$row[$i]];
 			}
 
 			if (in_array($i, $this->arrBaseFields) || in_array($i, $this->arrOwnerFields))
@@ -738,7 +730,16 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				}
 			}
 
-			// check multiline value
+			// Handle multiple value fields (CSV or pipe separated)
+			if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
+			{
+				$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['csv'] : '|';
+
+				$row[$i] = str_replace($strSep, ', ', $row[$i]);
+			}
+
+
+			// Check multiline value
 			if (!is_bool(strpos($row[$i], "\n")))
 			{
 				$strVal = $row[$i];
@@ -793,7 +794,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (isset($this->strFormKey) && strlen($this->strFormKey))
 		{
-			$set['form'] = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+			$set['form'] = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 			$set['date'] = time();
 			$set['ip'] = \Environment::get('ip');
 
@@ -849,10 +850,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						'pid' => $insertID,
 						'tstamp' => time(),
 						'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['ff_id'],
-						'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['inputType'],
-						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0] ,
-						'ff_name' => $strDetailField,
-						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['label'][0]
+						'ff_name' => $strDetailField
 					);
 
 					// default value
@@ -1334,8 +1332,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
 					}
 
+// TODO: !? support eval csv in Formdata::prepare... methods ?
+// TODO: !? support eval csv in DC_Formdata::show / showAll ?
+// TODO: !? support eval csv in ModuleFormdataListing ?
 					// Convert CSV fields (see #2890)
-					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'] && isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv']))
+					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']
+						&& isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv']))
 					{
 						$this->varValue = trimsplit($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'], $this->varValue);
 					}
@@ -1360,15 +1362,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
 
-					// render inputType hidden as inputType text in Backend
-					if ($strInputType == 'hidden')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'text';
-					}
-
 					// field types radio, select, multi checkbox
 					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
-						|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
+						|| ($strInputType == 'checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
@@ -1380,7 +1376,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								}
 							}
 						}
-						elseif (!is_array($this->varValue))
+						//elseif (!is_array($this->varValue))
+						else
 						{
 
 							// foreignKey fields
@@ -1485,7 +1482,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								asort($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
 							} // foreignKey field
 
-							$arrValues = explode('|', $this->varValue);
+							// $arrValues = explode('|', $this->varValue);
+							if (!is_array($this->varValue))
+							{
+								$arrValues = explode('|', $this->varValue);
+							}
+							else
+							{
+								$arrValues = $this->varValue;
+							}
 
 							if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['efgStoreValues'])
 							{
@@ -1522,7 +1527,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 											}
 										}
 
-										// add saved option to avaliable options if not exists
+										// add saved option to available options if it does not exist
 										if ($strK === false)
 										{
 											$strK = preg_replace('/(.*?\[)(.*?)(\])/si', '$2', $vVal);
@@ -1539,32 +1544,47 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					elseif ($strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
+					elseif ($strInputType == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
 					{
-						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+						// Modify options to handle Contao 3 new validation in Widget::isValidOption()
+						if (in_array($this->strField, $this->arrDetailFields))
 						{
-							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-						}
-						else
-						{
-							$arrVals = array($this->varValue);
+							$strFirstOpt = array_pop($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
+
+							$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][1] = $strFirstOpt;
+							if (!empty($this->varValue))
+							{
+								$this->varValue = '1';
+							}
 						}
 
-						// tom, 2007-09-27, bugfix:
-						// .. not if value is empty or does not exist at all
-						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
-						if (strlen($arrVals[0]) && strlen($this->varValue))
-						{
-							$this->varValue = $arrVals[0];
-						}
-						else
-						{
-							$this->varValue = '';
-						}
-					} // field typ single checkbox
+
+//						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+//						{
+//
+//							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
+//						}
+//						else
+//						{
+//							$arrVals = array($this->varValue);
+//						}
+//
+//						// tom, 2007-09-27, bugfix:
+//						// .. not if value is empty or does not exist at all
+//						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
+//						if (strlen($arrVals[0]) && strlen($this->varValue))
+//						{
+//							$this->varValue = $arrVals[0];
+//						}
+//						else
+//						{
+//							$this->varValue = '';
+//						}
+
+					} // field type single checkbox
 
 					// field type efgLookupSelect
-					elseif ($strInputType=='efgLookupSelect')
+					elseif ($strInputType == 'efgLookupSelect')
 					{
 						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -1582,7 +1602,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -1622,7 +1642,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -1662,7 +1682,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -1685,7 +1705,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 					else
 					{
-						$this->varValue = $this->Formdata->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$this->varValue = $this->Formdata->prepareDatabaseValueForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 					}
 
 					$this->objActiveRecord->{$this->strField} = $this->varValue;
@@ -2552,15 +2572,17 @@ window.addEvent(\'domready\', function() {
 			$varValue = $objDate->tstamp;
 		}
 
-		// Convert checkbox, radio, select, conditionalselect to store the values instead of keys
-		if (($arrField['inputType']=='checkbox' && $arrField['eval']['multiple']) || $arrField['inputType']=='radio' || $arrField['inputType']=='select' || $arrField['inputType']=='conditionalselect')
+		if (!in_array($this->strField, $this->arrOwnerFields) && !in_array($this->strField, $this->arrBaseFields))
 		{
 
-			if (!in_array($this->strField, $this->arrOwnerFields))
+			// Convert checkbox, radio, select, conditionalselect to store the values instead of keys
+			if (($arrField['inputType'] == 'checkbox' && $arrField['eval']['multiple'])
+				|| in_array($arrField['inputType'], array('radio', 'select', 'conditionalselect')))
 			{
+
 				$arrOpts = $arrField['options'];
 
-				// OptGroups can not be saved
+				// OptGroups can not be saved so flatten grouped options array
 				$arrNewOpts = array();
 
 				foreach ($arrOpts as $strKey => $varOpt)
@@ -2584,7 +2606,7 @@ window.addEvent(\'domready\', function() {
 				if (is_array($arrSel) && !empty($arrSel))
 				{
 					$arrSel = array_flip($arrSel);
-					// use options value or options label
+					// use options value or options labels
 					if ($arrField['eval']['efgStoreValues'])
 					{
 						$arrVals = array_keys(array_intersect_key($arrOpts, $arrSel));
@@ -2594,49 +2616,80 @@ window.addEvent(\'domready\', function() {
 						$arrVals = array_values(array_intersect_key($arrOpts, $arrSel));
 					}
 				}
-				$varValue = (is_array($arrVals) && !empty($arrVals) ? implode('|', $arrVals) : '');
-			}
-		}
 
-		if ($arrField['inputType']=='checkbox' && !$arrField['eval']['multiple'])
-		{
-			if (is_array($arrField['options']))
-			{
-				$arrVals = ($arrField['eval']['efgStoreValues'] ? array_keys($arrField['options']) : array_values($arrField['options']));
-			}
-			else
-			{
-				$arrVals = array("1");
-			}
-
-			if (strlen($varValue))
-			{
-				$varValue =  $arrVals[0];
-			}
-			else
-			{
-				$varValue = '';
-			}
-		}
-
-		// Convert fileTree IDs to file paths, if Contao's database-assisted file manager is used
-		if ($arrField['inputType'] == 'fileTree' && $arrField['isDatabaseAssisted'])
-		{
-			if (is_array($varValue) && !empty($varValue))
-			{
-				foreach ($varValue as $key => $intFileId)
+				if (is_array($arrVals) && !$arrField['eval']['multiple'])
 				{
-					$varValue[$key] = \FilesModel::findOneBy('id', $intFileId)->path;
+					$varValue = $arrVals[0];
+				}
+				else
+				{
+					$varValue = (is_array($arrVals) && !empty($arrVals)) ? $arrVals : '';
 				}
 			}
-			elseif (is_numeric($varValue) && !empty($varValue))
+
+			if ($arrField['inputType'] == 'checkbox' && !$arrField['eval']['multiple'])
 			{
-				$varValue = \FilesModel::findOneBy('id', $varValue)->path;
+				if (is_array($arrField['options']))
+				{
+					$arrVals = ($arrField['eval']['efgStoreValues'] ? array_keys($arrField['options']) : array_values($arrField['options']));
+				}
+				else
+				{
+					$arrVals = array("1");
+				}
+
+				if (strlen($varValue))
+				{
+					$varValue = $arrVals[0];
+				}
+				else
+				{
+					$varValue = '';
+				}
 			}
+
+		}
+
+		// Convert fileTree IDs to file paths
+		if ($arrField['inputType'] == 'fileTree')
+		{
+			$varValue = deserialize($varValue);
+
+			if (is_array($varValue) && !empty($varValue))
+			{
+				foreach ($varValue as $key => $varFile)
+				{
+					if (is_numeric($varFile))
+					{
+						$objFile = \FilesModel::findOneBy('id', $varFile);
+
+						if ($objFile !== null)
+						{
+							$varValue[$key] = $objFile->path;
+						}
+					}
+				}
+
+				//$varValue = implode('|', array_values($varValue));
+				$varValue = array_values($varValue);
+			}
+			elseif (!empty($varValue))
+			{
+				if (is_numeric($varValue))
+				{
+					$objFile = \FilesModel::findOneBy('id', $varValue);
+
+					if ($objFile !== null)
+					{
+						$varValue = $objFile->path;
+					}
+				}
+			}
+
 		}
 
 		// Make sure unique fields are unique
-		if (strlen($varValue) && $arrField['eval']['unique'])
+		if (!is_array($varValue) && strlen($varValue) && $arrField['eval']['unique'])
 		{
 			$objUnique = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE " . $this->strField . "=? AND id!=?")
 				->execute($varValue, $this->intId);
@@ -2645,6 +2698,17 @@ window.addEvent(\'domready\', function() {
 			{
 				throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['unique'], (strlen($arrField['label'][0]) ? $arrField['label'][0] : $this->strField)));
 			}
+		}
+
+		if (is_array($varValue))
+		{
+			$varValue = serialize($varValue);
+		}
+
+		// Convert arrays (see #2890)
+		if ($arrField['eval']['multiple'] && isset($arrField['eval']['csv']))
+		{
+			$varValue = implode($arrField['eval']['csv'], deserialize($varValue, true));
 		}
 
 		// Trigger the save_callback
@@ -2660,12 +2724,6 @@ window.addEvent(\'domready\', function() {
 		// Save the value if there was no error
 		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
 		{
-			// If the field is a fallback field, empty all other columns
-			if ($arrField['eval']['fallback'] && $varValue != '')
-			{
-				\Database::getInstance()->execute("UPDATE " . $this->strTable . " SET " . $this->strField . "=''");
-			}
-
 			$arrValues = $this->values;
 			$arrProcedures = $this->procedure;
 
@@ -2703,8 +2761,6 @@ window.addEvent(\'domready\', function() {
 						'pid' => $this->intId,
 						'tstamp' => time(),
 						'ff_id' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['ff_id'],
-						'ff_type' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['inputType'],
-						'ff_label' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['label'][0] ,
 						'ff_name' => $strTargetField
 					);
 					$objInsertStmt = \Database::getInstance()->prepare("INSERT INTO " . $strTargetTable . " %s")
@@ -2955,7 +3011,6 @@ window.addEvent(\'domready\', function() {
 
 			foreach ($arrProcedure as $kProc => $vProc)
 			{
-				//$strProcField = substr($vProc, 0, strpos($vProc, '='));
 				$arrParts = preg_split('/[\s=><\!]/si', $vProc);
 				$strProcField = $arrParts[0];
 				if (in_array($strProcField, $this->arrDetailFields))
@@ -3111,6 +3166,12 @@ window.addEvent(\'domready\', function() {
 						$row[$v] = str_replace('|', ', ', $row[$v]);
 					}
 
+					if (in_array($v, $this->arrDetailFields) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
+					{
+						$strSep = isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv']) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+						$row[$v] = str_replace($strSep, ', ', $row[$v]);
+					}
+
 					if (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
 						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
@@ -3129,10 +3190,19 @@ window.addEvent(\'domready\', function() {
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
+						&& !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
-						$args[$k] = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
-						$rowFormatted[$v] = $args[$k];
+						if (in_array($v, $this->arrDetailFields))
+						{
+							$args[$k] = strlen($row[$v]) ? $row[$v] : '-';
+							$rowFormatted[$v] = $args[$k];
+						}
+						else
+						{
+							$args[$k] = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
+							$rowFormatted[$v] = $args[$k];
+						}
 					}
 					elseif (in_array($v, $this->arrBaseFields) && in_array($v , $this->arrOwnerFields))
 					{
@@ -3206,10 +3276,6 @@ window.addEvent(\'domready\', function() {
 				{
 					$label = trim(\String::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
 				}
-
-				// Remove empty brackets (), [], {}, <> and empty tags from the label
-				//$label = preg_replace('/\( *\) ?|\[ *\] ?|\{ *\} ?|< *> ?/i', '', $label);
-				//$label = preg_replace('/<[^>]+>\s*<\/[^>]+>/i', '', $label);
 
 				// Build the sorting groups
 				if ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] > 0)
@@ -4446,7 +4512,10 @@ window.addEvent(\'domready\', function() {
 			// try to get Form ID
 			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields'] as $strField)
 			{
-				if ($intFormId > 0) break;
+				if ($intFormId > 0)
+				{
+					break;
+				}
 				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
 				{
 					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']);
@@ -4523,7 +4592,7 @@ window.addEvent(\'domready\', function() {
 			{
 				if (!$blnStoreOptionsValues)
 				{
-					$arrRecipient = $this->Formdata->prepareDbValForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
+					$arrRecipient = $this->Formdata->prepareDatabaseValueForWidget($varRecipient, $arrFormFields[$recipientFieldName], false);
 					if (!empty($arrRecipient))
 					{
 						$varRecipient = implode(', ', $arrRecipient);
@@ -4563,7 +4632,7 @@ window.addEvent(\'domready\', function() {
 		$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 		$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
 		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
-
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 		if ($messageHtmlTmpl != '')
 		{
 			$fileTemplate = new \File($messageHtmlTmpl);
@@ -4640,15 +4709,20 @@ window.addEvent(\'domready\', function() {
 
 							if (strlen($arrSubmitted[$strKey]) || is_array($arrSubmitted[$strKey]))
 							{
-								$varVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								foreach ($varVal as $k => $strVal)
+								$varVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
+								if (!empty($varVal))
 								{
-									if (strlen($strVal))
+									foreach ($varVal as $k => $strVal)
 									{
-										$varText[] = \Environment::get('base') . $strVal;
-										$varHtml[] = '<img src="' . $strVal . '">';
+										if (strlen($strVal))
+										{
+											$varText[] = \Environment::get('base') . $strVal;
+											$varHtml[] = '<img src="' . $strVal . '">';
+										}
 									}
 								}
+
 								if (is_array($varText))
 								{
 									$varText = implode(', ', $varText);
@@ -4696,7 +4770,7 @@ window.addEvent(\'domready\', function() {
 							}
 							else
 							{
-								$strVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$strVal = $this->formatValue($strKey, $strVal);
 							}
 
@@ -4711,7 +4785,7 @@ window.addEvent(\'domready\', function() {
 						}
 						else
 						{
-							$strVal = $this->Formdata->prepareDbValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							$strVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
 							if (!strlen($strVal) && $blnSkipEmpty)
@@ -5031,29 +5105,14 @@ window.addEvent(\'domready\', function() {
 			$arrSessionData['import'][$this->strFormKey]['csv_has_header'] = ($_POST['csv_has_header'] == '1' ? '1' : '');
 			$this->Session->set('EFG', $arrSessionData);
 
-			if (!\Input::post('import_source') || \Input::post('import_source') == '')
+			if (intval(\Input::post('import_source')) == 0)
 			{
 				\Message::addError($GLOBALS['TL_LANG']['tl_formdata']['error_select_source']);
 				$this->reload();
 			}
 
-			$strCsvFile = \Input::post('import_source');
-
-			// As of Contao 3 fileTree uses ID of database assisted file manager instead of file paths
-			if (version_compare(VERSION, '3.0', '>=') && $GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
-			{
-				if (is_numeric($strCsvFile))
-				{
-					$objFile = \FilesModel::findOneBy('id', $strCsvFile);
-
-					if ($objFile !== null)
-					{
-						$strCsvFile = $objFile->path;
-					}
-				}
-			}
-
-			$objFile = new \File($strCsvFile);
+			$objFileModel = \FilesModel::findOneBy('id', \Input::post('import_source'));
+			$objFile = new \File($objFileModel->path);
 
 			if ($objFile->extension != 'csv')
 			{
@@ -5073,6 +5132,7 @@ window.addEvent(\'domready\', function() {
 					$strSeparator = '\t';
 					break;
 
+				case 'comma':
 				default:
 					$strSeparator = ',';
 					break;
@@ -5105,7 +5165,7 @@ window.addEvent(\'domready\', function() {
 				$timeNow = time();
 				$strFormTitle = $this->arrFormsDcaKey[substr($this->strFormKey, 3)];
 
-				$strAliasField = (strlen($this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoreForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
+				$strAliasField = (strlen($this->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
 
 				$objForm = \Database::getInstance()->prepare("SELECT id FROM tl_form WHERE `title`=?")
 					->limit(1)
@@ -5149,9 +5209,6 @@ window.addEvent(\'domready\', function() {
 						'ip' => \Environment::get('ip'),
 						'date' => $timeNow,
 						'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
-						// 'alias' => '',
-						// 'fd_member_group' => 0,
-						// 'fd_user_group' => 0
 					);
 
 					foreach ($arrMapFields as $strField => $intCol)
@@ -5172,12 +5229,15 @@ window.addEvent(\'domready\', function() {
 									case 'fd_user':
 										$array = 'arrUsers';
 										break;
+
 									case 'fd_member':
 										$array = 'arrMembers';
 										break;
+
 									case 'fd_user_group':
 										$array = 'arrUserGroups';
 										break;
+
 									case 'fd_member_group':
 										$array = 'arrMemberGroups';
 										break;
@@ -5227,9 +5287,8 @@ window.addEvent(\'domready\', function() {
 						{
 							// $arrField = array_merge($arrFormFields[$strField], $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField]);
 							$arrField = $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strField];
-							$arrField['type'] = $arrFormFields[$strField]['type'];
 
-							$varValue = $this->Formdata->prepareImportValForDb($arrRow[$intCol], $arrField);
+							$varValue = $this->Formdata->prepareImportValueForDatabase($arrRow[$intCol], $arrField);
 
 							// prepare details data
 							$arrDetailSet = array(
@@ -5237,8 +5296,6 @@ window.addEvent(\'domready\', function() {
 								'sorting' => $arrFormFields[$strField]['sorting'],
 								'tstamp' => $timeNow,
 								'ff_id' => $arrField['ff_id'],
-								'ff_type' => $arrField['inputType'],
-								'ff_label' => $arrField['label'][0],
 								'ff_name' => $strField,
 								'value' => $varValue
 							);
@@ -5775,8 +5832,8 @@ var Stylect = {
 		$strExpEncl = '';
 		$strExpSep = ';';
 
-		$useFormValues = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
-		$useFieldNames = $this->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
+		$useFormValues = $this->arrStoringForms[substr($this->strFormKey, 3)]['useFormValues'];
+		$useFieldNames = $this->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 		if ($strMode=='csv')
 		{

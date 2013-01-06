@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -22,7 +22,7 @@ namespace Efg;
  *
  * Provide methods to handle data stored in tables tl_formdata and tl_formdata_details.
  *
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -32,7 +32,7 @@ class Formdata extends \Frontend
 	 * Items in tl_form, all forms marked to store data in tl_formdata
 	 * @param array
 	 */
-	protected $arrStoreForms = null;
+	protected $arrStoringForms = null;
 
 	protected $arrFormsDcaKey = null;
 	protected $arrFormdataDetailsKey = null;
@@ -43,9 +43,16 @@ class Formdata extends \Frontend
 	 */
 	protected $arrFFstorable = array();
 
+	/**
+	 * Mapping of frontend form fields to backend widgets
+	 * @var array
+	 */
+	protected $arrMapTL_FFL = array();
+
 	protected $strFdDcaKey = null;
 
 	protected $arrListingPages = null;
+
 	protected $arrSearchableListingPages = null;
 
 	public function __construct()
@@ -53,7 +60,8 @@ class Formdata extends \Frontend
 		parent::__construct();
 
 		// Types of form fields with storable data
-		$this->arrFFstorable = array(
+		$this->arrFFstorable = array
+		(
 			'sessionText', 'sessionOption', 'sessionCalculator',
 			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
 			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
@@ -67,7 +75,29 @@ class Formdata extends \Frontend
 			$this->arrFFstorable = array_unique(array_merge($this->arrFFstorable, $GLOBALS['EFG']['storable_fields']));
 		}
 
-		$this->getStoreForms();
+		// Mapping of frontend form fields to backend widgets for not identical types
+		$this->arrMapTL_FFL = array
+		(
+			'hidden' => 'text',
+			'upload' => 'fileTree',
+			'efgImageSelect' => 'fileTree',
+			'sessionText' => 'text',
+			'sessionOption' => 'checkbox',
+			'sessionCalculator' => 'text',
+			'conditionalselect' => 'select',
+			'countryselect' => 'select',
+			'fp_preSelectMenu' => 'select',
+		);
+
+		if (!empty($GLOBALS['EFG']['BE_FFL']))
+		{
+			foreach ($GLOBALS['EFG']['BE_FFL'] as $strTL_FFL => $strBE_FFL)
+			{
+				$this->arrMapTL_FFL[$strTL_FFL] = $strBE_FFL;
+			}
+		}
+
+		$this->getStoringForms();
 
 	}
 
@@ -83,12 +113,19 @@ class Formdata extends \Frontend
 			case 'FdDcaKey':
 				return $this->strFdDcaKey;
 				break;
+
 			case 'arrFFstorable':
 				return $this->arrFFstorable;
 				break;
-			case 'arrStoreForms':
-				return $this->arrStoreForms;
+
+			case 'arrMapTL_FFL':
+				return $this->arrMapTL_FFL;
 				break;
+
+			case 'arrStoringForms':
+				return $this->arrStoringForms;
+				break;
+
 			case 'arrFormsDcaKey':
 				return $this->arrFormsDcaKey;
 				break;
@@ -139,13 +176,12 @@ class Formdata extends \Frontend
 			{
 				$strAliasField = $objFormField->name;
 			}
-
 		}
 
 		// Generate alias if there is none
-		if (is_null($varValue) || !strlen($varValue))
+		if (empty($varValue))
 		{
-			if (strlen($strAliasField))
+			if (!empty($strAliasField))
 			{
 				// get value from post
 				$autoAlias = true;
@@ -165,19 +201,12 @@ class Formdata extends \Frontend
 		// Add ID to alias
 		if ($objAlias->numRows && $autoAlias)
 		{
-			$varValue .= (strlen($varValue) ? '.' : '') . $intRecId;
+			$varValue .= (!empty($varValue) ? '.' : '') . $intRecId;
 		}
 
 		return $varValue;
 	}
 
-	/**
-	 * Get Listing Detail page ID from url
-	 * is used no longer, just for backwards compatibility (not actual formdata dca files)
-	 */
-	public function getDetailPageIdFromUrl($arrFragments) {
-		return $arrFragments;
-	}
 
 	/**
 	 * Add formdata details to the indexer
@@ -192,7 +221,7 @@ class Formdata extends \Frontend
 
 		if ($intRoot > 0)
 		{
-			$arrRoot = $this->getChildRecords($intRoot, 'tl_page', true);
+			$arrRoot = \Database::getInstance()->getChildRecords($intRoot, 'tl_page', true);
 		}
 
 		$this->getSearchableListingPages();
@@ -219,6 +248,7 @@ class Formdata extends \Frontend
 						continue;
 					}
 				}
+
 				// do not add if no listing details fields are defined
 				if (!strlen($arrParams['list_info']))
 				{
@@ -232,7 +262,6 @@ class Formdata extends \Frontend
 
 				if (!isset($arrProcessed[$pageId]))
 				{
-
 					$arrProcessed[$pageId] = false;
 
 					$strForm = '';
@@ -242,23 +271,23 @@ class Formdata extends \Frontend
 						$strForm = $this->arrFormsDcaKey[$strFormsKey];
 					}
 
-					$pageAlias = (strlen($arrParams['alias']) ? $arrParams['alias'] : null);
+					$pageAlias = (!empty($arrParams['alias']) ? $arrParams['alias'] : null);
 
-					if (strlen($strForm))
+					if (!empty($strForm))
 					{
 						$strFormdataDetailsKey = 'details';
-						if (strlen($arrParams['formdataDetailsKey']))
+						if (!empty($arrParams['formdataDetailsKey']))
 						{
 							$strFormdataDetailsKey = $arrParams['formdataDetailsKey'];
 						}
 
 						// Determine domain
-						if (intval($pageId)>0)
+						if (intval($pageId) > 0)
 						{
 							$domain = \Environment::get('base');
 							$objParent = $this->getPageDetails($pageId);
 
-							if (strlen($objParent->domain))
+							if (!empty($objParent->domain))
 							{
 								$domain = (\Environment::get('ssl') ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
 							}
@@ -277,7 +306,7 @@ class Formdata extends \Frontend
 					$strQuery = "SELECT id,alias FROM tl_formdata f";
 					$strWhere = " WHERE form=?";
 
-					if (strlen($arrParams['list_where']))
+					if (!empty($arrParams['list_where']))
 					{
 						$arrListWhere = array();
 						$arrListConds = preg_split('/(\sAND\s|\sOR\s)/si', $arrParams['list_where'], -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -316,7 +345,7 @@ class Formdata extends \Frontend
 
 					while ($objData->next())
 					{
-						$arrPages[] = sprintf($strUrl, ((strlen($objData->alias) && !$GLOBALS['TL_CONFIG']['disableAlias']) ? $objData->alias : $objData->id));
+						$arrPages[] = sprintf($strUrl, ((!empty($objData->alias) && !$GLOBALS['TL_CONFIG']['disableAlias']) ? $objData->alias : $objData->id));
 					}
 
 				}
@@ -329,13 +358,14 @@ class Formdata extends \Frontend
 
 	}
 
+
 	/**
 	 * Get all forms marked to store data in tl_formdata
 	 */
-	public function getStoreForms()
+	public function getStoringForms()
 	{
 
-		if (!$this->arrStoreForms)
+		if (!$this->arrStoringForms)
 		{
 			// get all forms marked to store data
 			$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
@@ -343,21 +373,22 @@ class Formdata extends \Frontend
 
 			while ($objForms->next())
 			{
-				if (strlen($objForms->formID)) {
+				if (!empty($objForms->formID)) {
 					$varKey = str_replace('-', '_', standardize($objForms->formID));
 				}
 				else
 				{
 					$varKey = str_replace('-', '_', standardize($objForms->title));
 				}
-				$this->arrStoreForms[$varKey] = $objForms->row();
+				$this->arrStoringForms[$varKey] = $objForms->row();
 				$this->arrFormsDcaKey[$varKey] = $objForms->title;
 			}
 		}
 	}
 
+
 	/**
-	 * Get all pages containig frontend module formdata listing
+	 * Get all pages containing frontend module formdata listing
 	 * @return array
 	 */
 	private function getListingPages()
@@ -376,6 +407,7 @@ class Formdata extends \Frontend
 		return $this->arrListingPages;
 	}
 
+
 	/**
 	 * Get all pages for search indexer
 	 * @return array
@@ -384,21 +416,32 @@ class Formdata extends \Frontend
 	{
 		if (!$this->arrSearchableListingPages)
 		{
-			// get all pages containig listing formdata with details page
+			// get all pages containing listing formdata with details page
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
 				->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
 			while ($objListingPages->next())
 			{
 				$strFormdataDetailsKey = 'details';
-				if (strlen($objListingPages->efg_DetailsKey)) {
+				if (!empty($objListingPages->efg_DetailsKey)) {
 					$strFormdataDetailsKey = $objListingPages->efg_DetailsKey;
 				}
-				$this->arrSearchableListingPages[$objListingPages->id] = array('formdataDetailsKey' => $strFormdataDetailsKey, 'alias' => $objListingPages->alias, 'protected' => $objListingPages->protected, 'list_formdata' => $objListingPages->list_formdata, 'list_where' => $objListingPages->list_where, 'list_fields' => $objListingPages->list_fields, 'list_info' => $objListingPages->list_info, 'efg_list_acces' => $objListingPages->efg_list_access);
+				$this->arrSearchableListingPages[$objListingPages->id] = array
+				(
+					'formdataDetailsKey' => $strFormdataDetailsKey,
+					'alias' => $objListingPages->alias,
+					'protected' => $objListingPages->protected,
+					'list_formdata' => $objListingPages->list_formdata,
+					'list_where' => $objListingPages->list_where,
+					'list_fields' => $objListingPages->list_fields,
+					'list_info' => $objListingPages->list_info,
+					'efg_list_access' => $objListingPages->efg_list_access
+				);
 			}
 		}
 
 		return $this->arrSearchableListingPages;
 	}
+
 
 	/**
 	 * Return record from tl_formdata as Array('fd_base' => base fields from tl_formdata, 'fd_details' => detail fields from tl_formdata_details)
@@ -410,7 +453,7 @@ class Formdata extends \Frontend
 
 		$varReturn = array();
 
-		if($intId > 0)
+		if ($intId > 0)
 		{
 			$objFormdata = \Database::getInstance()->prepare("SELECT * FROM tl_formdata WHERE id=?")
 				->executeUncached($intId);
@@ -440,6 +483,7 @@ class Formdata extends \Frontend
 		}
 	}
 
+
 	/**
 	 * Return form fields as associative array
 	 * @param integer ID of tl_form record
@@ -457,14 +501,29 @@ class Formdata extends \Frontend
 
 			while ($objFormFields->next())
 			{
-				if (strlen($objFormFields->name)) {
+				if (!empty($objFormFields->name)) {
 					$varKey = $objFormFields->name;
 				}
 				else
 				{
 					$varKey = $objFormFields->id;
 				}
-				$varReturn[$varKey] = $objFormFields->row();
+				$arrField = $objFormFields->row();
+
+				// Set type of frontend widget
+				$arrField['formfieldType'] = $arrField['type'];
+
+				// Set type of backend widget
+				if (isset($this->arrMapTL_FFL[$arrField['formfieldType']]))
+				{
+					$arrField['inputType'] = $this->arrMapTL_FFL[$arrField['formfieldType']];
+				}
+				else
+				{
+					$arrField['inputType'] = $arrField['type'];
+				}
+
+				$varReturn[$varKey] = $arrField;
 			}
 
 			return $varReturn;
@@ -477,20 +536,28 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare post value for tl_formdata / tl_formdata_details DB record
-	 * @param mixed post value
-	 * @param array form field properties
-	 * @param mixed file
+	 * @param mixed Post value
+	 * @param array Form field properties
+	 * @param mixed File
 	 * @return mixed
 	 */
-	public function preparePostValForDb($varSubmitted='', $arrField=false, $varFile=false)
+	public function preparePostValueForDatabase($varSubmitted='', $arrField=false, $varFile=false)
 	{
-
 		if (!is_array($arrField))
 		{
 			return false;
 		}
 
 		$strType = $arrField['type'];
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
+		{
+			$strType = $arrField['formfieldType'];
+		}
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
+		{
+			$strType = $arrField['inputType'];
+		}
+
 		$strVal = '';
 
 		if (in_array($strType, $this->arrFFstorable))
@@ -509,7 +576,7 @@ class Formdata extends \Frontend
 					{
 						$arrSel[] = $varSubmitted;
 					}
-					if (is_array($varSubmitted))
+					elseif (is_array($varSubmitted))
 					{
 						$arrSel = $varSubmitted;
 					}
@@ -518,8 +585,7 @@ class Formdata extends \Frontend
 					{
 						if (in_array($mxVal['value'], $arrSel))
 						{
-							//$strVal .= $strSep . $arrOptions[$o]['label'];
-							if ($strType=='checkbox' && $arrField['eval']['efgStoreValues'])
+							if ($strType == 'checkbox' && $arrField['eval']['efgStoreValues'])
 							{
 								$strVal .= $strSep . $arrOptions[$o]['value'];
 							}
@@ -540,6 +606,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgLookupRadio':
 				case 'radio':
 					$strVal = $varSubmitted;
@@ -548,8 +615,7 @@ class Formdata extends \Frontend
 					{
 						if ($mxVal['value'] == $varSubmitted)
 						{
-							//$strVal = $arrOptions[$o]['label'];
-							if ($strType=='radio' && $arrField['eval']['efgStoreValues'])
+							if ($strType == 'radio' && $arrField['eval']['efgStoreValues'])
 							{
 								$strVal = $arrOptions[$o]['value'];
 							}
@@ -560,6 +626,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -577,8 +644,7 @@ class Formdata extends \Frontend
 						{
 							if (in_array($mxVal['value'], $varSubmitted))
 							{
-								//$strVal .= $strSep . $arrOptions[$o]['label'];
-								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
+								if ($arrField['eval']['efgStoreValues'] && in_array($strType, array('select', 'conditionalselect', 'countryselect', 'fp_preSelectMenu')))
 								{
 									$strVal .= $strSep . $arrOptions[$o]['value'];
 								}
@@ -598,8 +664,7 @@ class Formdata extends \Frontend
 						{
 							if ($mxVal['value'] == $varSubmitted)
 							{
-								//$strVal = $arrOptions[$o]['label'];
-								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
+								if ($arrField['eval']['efgStoreValues'] && in_array($strType, array('select', 'conditionalselect', 'countryselect', 'fp_preSelectMenu')))
 								{
 									$strVal = $arrOptions[$o]['value'];
 								}
@@ -611,6 +676,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgImageSelect':
 					$strVal = '';
 					if (is_array($varSubmitted))
@@ -622,67 +688,44 @@ class Formdata extends \Frontend
 						$strVal = $varSubmitted;
 					}
 					break;
+
 				case 'upload':
 					$strVal = '';
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
-					if (strlen($varFile['name']))
-					{
-						if ($arrField['storeFile'] == '1')
-						{
-							$strUploadFolder = $arrField['uploadFolder'];
 
-							if ($arrField['useHomeDir'] == '1')
+					if (!empty($varFile['name']))
+					{
+						if ($arrField['storeFile'])
+						{
+							$intUploadFolder = $arrField['uploadFolder'];
+
+							if ($arrField['useHomeDir'])
 							{
 								// Overwrite upload folder with user home directory
 								if (FE_USER_LOGGED_IN)
 								{
 									$this->import('FrontendUser', 'User');
-									if ($this->User->assignDir && $this->User->homeDir && is_dir(TL_ROOT . '/' . $this->User->homeDir))
+									if ($this->User->assignDir && $this->User->homeDir)
 									{
-										$strUploadFolder = $this->User->homeDir;
+										$intUploadFolder = $this->User->homeDir;
 									}
 								}
 							}
 
-							// As of Contao 3 upload folder is ID of tl_files record,
-							// EFG stores the path instead
-							if (version_compare(VERSION, '3.0', '>=') && $arrField['isDatabaseAssisted'])
+							$objUploadFolder = \FilesModel::findByPk($intUploadFolder);
+
+							// The upload folder could not be found
+							if ($objUploadFolder === null)
 							{
-								if (isset($varFile['id']))
-								{
-									$objFile = \FilesModel::findOneBy('id', $varFile['id']);
-
-									if ($objFile !== null)
-									{
-										$strVal = $objFile->path;
-									}
-								}
-								elseif (isset($varFile['pid']))
-								{
-									$objFolder = \FilesModel::findOneBy('id', $varFile['pid']);
-
-									if ($objFolder !== null)
-									{
-										$strVal = $objFolder->path . '/' . $varFile['name'];
-									}
-								}
-								else
-								{
-									$objFolder = \FilesModel::findOneBy('id', $strUploadFolder);
-
-									if ($objFolder !== null)
-									{
-										$strVal = $objFolder->path . '/' . $varFile['name'];
-									}
-								}
+								$this->log('Invalid upload folder ID ' . $intUploadFolder . ', file "'.$varFile['name'].'" could not been saved in file manager', __CLASS__.'::'.__FUNCTION__.'()', 'ERROR');
 							}
 							else
 							{
-								$strVal = $strUploadFolder . '/' . $varFile['name'];
+								$strVal = $objUploadFolder->path . '/' . $varFile['name'];
 							}
 						}
 						else
 						{
+							// TODO: change field type (backend inputType) to text ?
 							$strVal = $varFile['name'];
 						}
 					}
@@ -699,7 +742,7 @@ class Formdata extends \Frontend
 						{
 							$strFormat = $arrField['dateFormat'];
 						}
-						$objDate = new Date($strVal, $strFormat);
+						$objDate = new \Date($strVal, $strFormat);
 						$strVal = $objDate->tstamp;
 					}
 					else
@@ -711,12 +754,11 @@ class Formdata extends \Frontend
 				default:
 					$strVal = $varSubmitted;
 					break;
-
 			}
 
 			if (is_array($strVal))
 			{
-				foreach ($strVal as $k=>$value)
+				foreach ($strVal as $k => $value)
 				{
 					$strVal[$k] = \String::decodeEntities($value);
 				}
@@ -732,7 +774,6 @@ class Formdata extends \Frontend
 		} // if in_array arrFFstorable
 		else
 		{
-			//return (is_array($varSubmitted) ? implode('|', $varSubmitted) : $varSubmitted);
 			return (is_array($varSubmitted) ? serialize($varSubmitted) : $varSubmitted);
 		}
 
@@ -741,11 +782,11 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare value from CSV for tl_formdata / tl_formdata_details DB record
-	 * @param string field value from csv file
-	 * @param array form field properties
+	 * @param string Field value from csv file
+	 * @param array Form field properties
 	 * @return mixed
 	 */
-	public function prepareImportValForDb($varValue='', $arrField=false)
+	public function prepareImportValueForDatabase($varValue='', $arrField=false)
 	{
 		if (!is_array($arrField))
 		{
@@ -753,11 +794,19 @@ class Formdata extends \Frontend
 		}
 
 		$strType = $arrField['type'];
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
+		{
+			$strType = $arrField['formfieldType'];
+		}
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
+		{
+			$strType = $arrField['inputType'];
+		}
+
 		$strVal = '';
 
 		if (in_array($strType, $this->arrFFstorable))
 		{
-
 			switch ($strType)
 			{
 				case 'efgLookupCheckbox':
@@ -770,21 +819,21 @@ class Formdata extends \Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
-					$strVal = '';
 					if ($arrField['eval']['multiple'])
 					{
 						$arrSel = array();
 						if (strlen($varValue))
 						{
-							$arrSel = trimsplit(",\n", $varValue);
+							$arrSel = trimsplit('[,|]', $varValue);
 						}
-						$strVal = implode('|', $arrSel);
+						$strVal = $arrSel;
 					}
 					else
 					{
 						$strVal = $varValue;
 					}
 					break;
+
 				case 'text':
 				case 'calendar':
 				case 'xdependentcalendarfields':
@@ -792,7 +841,7 @@ class Formdata extends \Frontend
 					// Convert date formats into timestamps
 					if (in_array($arrField['eval']['rgxp'], array('date', 'time', 'datim')))
 					{
-						if (is_numeric($strVal))
+						if (is_numeric($strVal) && strlen($strVal) == 10)
 						{
 							$strVal = (int) $strVal;
 						}
@@ -805,38 +854,103 @@ class Formdata extends \Frontend
 					}
 					break;
 
+				case 'fileTree':
+				case 'upload':
+				case 'efgImageSelect':
+					$strVal = '';
+					if ($arrField['eval']['multiple'])
+					{
+						$arrSel = array();
+						if (strlen($varValue))
+						{
+							$arrVal = trimsplit('[,|]', $varValue);
+							if (!empty($arrVal))
+							{
+								foreach ($arrVal as $kVal => $mxVal)
+								{
+									if (is_numeric($mxVal))
+									{
+										$objFile = \FilesModel::findOneBy('id', $mxVal);
+
+										if ($objFile->path)
+										{
+											$arrSel[] = $objFile->path;
+										}
+									}
+									else
+									{
+										$arrSel[] = $mxVal;
+									}
+								}
+							}
+						}
+						$strVal = $arrSel;
+					}
+					else
+					{
+						if (is_numeric($varValue))
+						{
+							$objFile = \FilesModel::findOneBy('id', $varValue);
+
+							if ($objFile->path)
+							{
+								$strVal = $objFile->path;
+							}
+						}
+						else
+						{
+							$strVal = $varValue;
+						}
+					}
+					break;
+
 				case 'hidden':
 				case 'textarea':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
-				case 'upload':
 				case 'password':
 				default:
 					$strVal = $varValue;
 					break;
-
 			}
 
-			return (is_array($strVal) || is_object($strVal)) ? serialize($strVal) : \String::decodeEntities($strVal);
+			$varValue = $strVal;
 
 		} // if in_array arrFFstorable
+
+		if (is_array($varValue))
+		{
+			if ($arrField['eval']['multiple'] && isset($arrField['eval']['csv']))
+			{
+				$varValue = implode($arrField['eval']['csv'], $varValue);
+			}
+			else
+			{
+				$varValue = serialize($varValue);
+			}
+		}
+		elseif (is_object($varValue))
+		{
+			$varValue = serialize($varValue);
+		}
 		else
 		{
-			return (is_array($strVal) || is_object($strVal)) ? serialize($varValue) : \String::decodeEntities($varValue);
+			$varValue = \String::decodeEntities($varValue);
 		}
+
+		return $varValue;
 
 	}
 
 
 
 	/**
-	 * Prepare post value for Mail / Text
-	 * @param mixed post value
-	 * @param array form field properties
-	 * @param mixed file
-	 * @param boolean skip empty values (do not return label of selected option if its value is empty)
+	 * Prepare post value for mail / text
+	 * @param mixed Post value
+	 * @param array Form field properties
+	 * @param mixed File
+	 * @param boolean Skip empty values (do not return label of selected option if its value is empty)
 	 * @return mixed
 	 */
-	public function preparePostValForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmpty=false)
+	public function preparePostValueForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmpty=false)
 	{
 		if (!is_array($arrField))
 		{
@@ -844,6 +958,15 @@ class Formdata extends \Frontend
 		}
 
 		$strType = $arrField['type'];
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
+		{
+			$strType = $arrField['formfieldType'];
+		}
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
+		{
+			$strType = $arrField['inputType'];
+		}
+
 		$strVal = '';
 
 		if (isset($arrField['efgMailSkipEmpty']))
@@ -853,7 +976,6 @@ class Formdata extends \Frontend
 
 		if (in_array($strType, $this->arrFFstorable))
 		{
-
 			switch ($strType)
 			{
 				case 'efgLookupCheckbox':
@@ -867,10 +989,11 @@ class Formdata extends \Frontend
 					{
 						$arrSel[] = $varSubmitted;
 					}
-					if (is_array($varSubmitted))
+					elseif (is_array($varSubmitted))
 					{
 						$arrSel = $varSubmitted;
 					}
+
 					foreach ($arrOptions as $o => $mxVal)
 					{
 						if ($blnSkipEmpty && !strlen($mxVal['value']))
@@ -887,12 +1010,13 @@ class Formdata extends \Frontend
 
 					if ($strVal == '')
 					{
-						$strVal = (is_array($varSubmitted) ? implode(', ', $varSubmitted) : $varSubmitted);
+						$strVal = (is_array($varSubmitted)) ? implode(', ', $varSubmitted) : $varSubmitted;
 					}
 					break;
+
 				case 'efgLookupRadio':
 				case 'radio':
-					$strVal = (is_array($varSubmitted) ? $varSubmitted[0] : $varSubmitted);
+					$strVal = (is_array($varSubmitted)) ? $varSubmitted[0] : $varSubmitted;
 					$arrOptions = $this->prepareDcaOptions($arrField);
 					foreach ($arrOptions as $o => $mxVal)
 					{
@@ -902,6 +1026,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -930,7 +1055,7 @@ class Formdata extends \Frontend
 					}
 
 					// select single
-					if (is_string($varSubmitted))
+					elseif (is_string($varSubmitted))
 					{
 						foreach ($arrOptions as $o => $mxVal)
 						{
@@ -946,8 +1071,8 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgImageSelect':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
 					if (is_string($varSubmitted) && strlen($varSubmitted))
 					{
@@ -958,14 +1083,15 @@ class Formdata extends \Frontend
 						$strVal = $varSubmitted;
 					}
 					break;
+
 				case 'upload':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
-					if (strlen($varFile['name']))
+					if (!empty($varFile['name']))
 					{
 						$strVal = $varFile['name'];
 					}
 					break;
+
 				case 'password':
 				case 'hidden':
 				case 'text':
@@ -987,12 +1113,12 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare database value for Mail / Text
-	 * @param mixed database value
-	 * @param array form field properties
-	 * @param mixed file
+	 * @param mixed Database value
+	 * @param array Form field properties
+	 * @param mixed File
 	 * @return mixed
 	 */
-	public function prepareDbValForMail($varValue='', $arrField=false, $varFile=false)
+	public function prepareDatabaseValueForMail($varValue='', $arrField=false, $varFile=false)
 	{
 
 		if (!is_array($arrField))
@@ -1001,11 +1127,19 @@ class Formdata extends \Frontend
 		}
 
 		$strType = $arrField['type'];
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
+		{
+			$strType = $arrField['formfieldType'];
+		}
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
+		{
+			$strType = $arrField['inputType'];
+		}
+
 		$strVal = '';
 
 		if (in_array($strType, $this->arrFFstorable))
 		{
-
 			switch ($strType)
 			{
 				case 'efgLookupCheckbox':
@@ -1060,6 +1194,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgLookupRadio':
 				case 'radio':
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
@@ -1089,6 +1224,7 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -1143,8 +1279,9 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgImageSelect':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
+				case 'fileTree':
 					$strVal = '';
 					$arrSel = array();
 
@@ -1162,14 +1299,15 @@ class Formdata extends \Frontend
 						$strVal = $arrSel;
 					}
 					break;
+
 				case 'upload':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					$strVal = '';
-					if (strlen($varFile['name']))
+					if (!empty($varFile['name']))
 					{
 						$strVal = $varFile['name'];
 					}
 					break;
+
 				case 'password':
 				case 'hidden':
 				case 'text':
@@ -1195,7 +1333,7 @@ class Formdata extends \Frontend
 	 * @param mixed File
 	 * @return mixed
 	 */
-	public function prepareDbValForWidget($varValue='', $arrField=false, $varFile=false)
+	public function prepareDatabaseValueForWidget($varValue='', $arrField=false, $varFile=false)
 	{
 		if (!is_array($arrField))
 		{
@@ -1203,7 +1341,11 @@ class Formdata extends \Frontend
 		}
 
 		$strType = $arrField['type'];
-		if (TL_MODE == 'BE' && isset($arrField['inputType']))
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
+		{
+			$strType = $arrField['formfieldType'];
+		}
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
 		{
 			$strType = $arrField['inputType'];
 		}
@@ -1216,76 +1358,8 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
-					if ($arrField['options'])
-					{
-						$arrOptions = deserialize($arrField['options']);
-					}
-					else
-					{
-						$arrOptions = $this->prepareDcaOptions($arrField);
-					}
-
-					if (is_string($varVal))
-					{
-						$varVal = explode('|', $varVal);
-					}
-
-					if (is_array($arrOptions))
-					{
-						$arrTempOptions = array();
-						foreach ($arrOptions as $sK => $mxVal)
-						{
-							$arrTempOptions[$mxVal['value']] = $mxVal['label'];
-						}
-					}
-
-					if (is_array($varVal))
-					{
-						foreach ($varVal as $k => $v) {
-							$sNewVal = array_search($v, $arrTempOptions);
-							if ($sNewVal)
-							{
-								$varVal[$k] = $sNewVal;
-							}
-						}
-					}
-					break;
 				case 'efgLookupRadio':
 				case 'radio':
-					if ($arrField['options'])
-					{
-						$arrOptions = deserialize($arrField['options']);
-					}
-					else
-					{
-						$arrOptions = $this->prepareDcaOptions($arrField);
-					}
-
-					if (is_string($varVal))
-					{
-						$varVal = explode('|', $varVal);
-					}
-
-					if (is_array($arrOptions))
-					{
-						$arrTempOptions = array();
-						foreach ($arrOptions as $sK => $mxVal)
-						{
-							$arrTempOptions[$mxVal['value']] = $mxVal['label'];
-						}
-					}
-
-					if (is_array($varVal))
-					{
-						foreach ($varVal as $k => $v) {
-							$sNewVal = array_search($v, $arrTempOptions);
-							if ($sNewVal)
-							{
-								$varVal[$k] = $sNewVal;
-							}
-						}
-					}
-					break;
 				case 'efgLookupSelect':
 				case 'conditionalselect':
 				case 'countryselect':
@@ -1325,35 +1399,44 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'efgImageSelect':
 				case 'fileTree':
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 					if (is_string($varVal) && strpos($varVal, '|') !== false)
 					{
 						$varVal = explode('|', $varVal);
+					}
+					elseif (is_array($varVal))
+					{
+						$varVal = array_filter($varVal);
 					}
 					elseif (strlen($varVal))
 					{
 						$varVal = deserialize($varValue);
 					}
 
-					if ($strType == 'fileTree' && version_compare(VERSION, '3.0', '>=') && $arrField['isDatabaseAssisted'])
+					if (!empty($varVal))
 					{
-						if (!empty($varVal))
+						if (is_array($varVal))
 						{
-							if (is_array($varVal))
+							foreach ($varVal as $key => $strFile)
 							{
-								foreach ($varVal as $key => $strFile)
+								if (!is_numeric($strFile))
 								{
-									if (!is_numeric($strFile))
+									$objFile = \FilesModel::findOneBy('path', $strFile);
+									if ($objFile !== null)
 									{
 										$varVal[$key] = \FilesModel::findOneBy('path', $strFile)->id;
 									}
 								}
 							}
-							elseif (is_string($varVal))
+						}
+						elseif (is_string($varVal))
+						{
+							if (!is_numeric($varVal))
 							{
-								if (!is_numeric($varVal))
+								$objFile = \FilesModel::findOneBy('path', $varVal);
+								if ($objFile !== null)
 								{
 									$varVal = \FilesModel::findOneBy('path', $varVal)->id;
 								}
@@ -1361,11 +1444,12 @@ class Formdata extends \Frontend
 						}
 					}
 					break;
+
 				case 'upload':
 					$varVal = '';
 					if (strlen($varValue))
 					{
-						if ($arrField['storeFile'] == "1")
+						if ($arrField['storeFile'])
 						{
 							$strVal = $varValue;
 						}
@@ -1376,12 +1460,13 @@ class Formdata extends \Frontend
 						$varVal = $strVal;
 					}
 					break;
+
 				case 'text':
 				case 'calendar':
 				case 'xdependentcalendarfields':
 					// NOTE: different array structure in Backend (set by dca) and Frontend (set from tl_form_field)
 					// .. in Frontend: one-dimensional array like $arrField['rgxp'], $arrField['dateFormat']
-					// .. in Backend: multidemsional array like $arrField['eval']['rgxp']
+					// .. in Backend: multidimensional array like $arrField['eval']['rgxp']
 					if ($arrField['rgxp'] && in_array($arrField['rgxp'], array('date', 'datim', 'time')))
 					{
 						if ($varVal)
@@ -1412,7 +1497,6 @@ class Formdata extends \Frontend
 				default:
 					$varVal = $varValue;
 					break;
-
 			}
 
 			return $varVal;
@@ -1427,36 +1511,31 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare dca options array
-	 * @param array form field
+	 * @param array Form field properties
 	 * @return array DCA options
 	 */
 	public function prepareDcaOptions($arrField=false)
 	{
 
-		if (!$arrField)
+		if (!is_array($arrField))
 		{
 			return false;
 		}
 
 		$strType = $arrField['type'];
-		if ($arrField['inputType'] == 'efgLookupSelect')
+		if (TL_MODE == 'FE' && !empty($arrField['formfieldType']))
 		{
-			$strType = 'efgLookupSelect';
+			$strType = $arrField['formfieldType'];
 		}
-		elseif ($arrField['inputType'] == 'efgLookupCheckbox')
+		elseif (TL_MODE == 'BE' && !empty($arrField['inputType']))
 		{
-			$strType = 'efgLookupCheckbox';
-		}
-		elseif ($arrField['inputType'] == 'efgLookupRadio')
-		{
-			$strType = 'efgLookupRadio';
+			$strType = $arrField['inputType'];
 		}
 
 		$arrOptions = array();
 
 		switch ($strType)
 		{
-
 			case 'efgLookupCheckbox':
 			case 'efgLookupRadio':
 			case 'efgLookupSelect':
@@ -1467,7 +1546,7 @@ class Formdata extends \Frontend
 				$strLookupValField = (strlen($arrLookupOptions['lookup_val_field'])) ? $arrLookupOptions['lookup_val_field'] : null;
 
 				$strLookupWhere = \String::decodeEntities($arrLookupOptions['lookup_where']);
-				if (strlen($strLookupWhere))
+				if (!empty($strLookupWhere))
 				{
 					$strLookupWhere = $this->replaceInsertTags($strLookupWhere);
 				}
@@ -1478,9 +1557,9 @@ class Formdata extends \Frontend
 				$sqlLookupValField = (strlen($strLookupValField)) ? substr($strLookupValField, strpos($strLookupValField, '.')+1) : null;
 
 				$sqlLookupIdField = 'id';
-				$sqlLookupWhere = (strlen($strLookupWhere) ? " WHERE " . $strLookupWhere : "");
+				$sqlLookupWhere = (!empty($strLookupWhere) ? " WHERE " . $strLookupWhere : "");
 				$sqlLookupOrder = $arrLookupField[0] . '.' . $arrLookupField[1];
-				if (strlen($arrLookupOptions['lookup_sort']))
+				if (!empty($arrLookupOptions['lookup_sort']))
 				{
 					$sqlLookupOrder = $arrLookupOptions['lookup_sort'];
 				}
@@ -1490,11 +1569,6 @@ class Formdata extends \Frontend
 				// handle lookup formdata
 				if (substr($sqlLookupTable, 0, 3) == 'fd_')
 				{
-					// load formdata specific dca
-					//if (!isset($GLOBALS['TL_DCA']['tl_formdata'])) {
-					//$this->loadDataContainer($sqlLookupTable);
-					//}
-
 					$strFormKey = $this->arrFormsDcaKey[substr($sqlLookupTable, 3)];
 
 					$sqlLookupTable = 'tl_formdata f, tl_formdata_details fd';
@@ -1502,7 +1576,7 @@ class Formdata extends \Frontend
 					$sqlLookupWhere = " WHERE (f.id=fd.pid AND f.form='".$strFormKey."' AND ff_name='".$arrLookupField[1]."')";
 
 					$arrDetailFields = array();
-					if (strlen($strLookupWhere) || strlen($arrLookupOptions['lookup_sort']))
+					if (!empty($strLookupWhere) || !empty($arrLookupOptions['lookup_sort']))
 					{
 						$objDetailFields = \Database::getInstance()->prepare("SELECT DISTINCT(ff.`name`) FROM tl_form f, tl_form_field ff WHERE f.storeFormdata=? AND (f.id=ff.pid) AND ff.`type` IN ('".implode("','", $this->arrFFstorable)."')")
 							->execute('1');
@@ -1512,7 +1586,7 @@ class Formdata extends \Frontend
 						}
 					}
 
-					if (strlen($strLookupWhere))
+					if (!empty($strLookupWhere))
 					{
 						// special treatment for fields in tl_formdata_details
 						$arrPattern = array();
@@ -1526,7 +1600,7 @@ class Formdata extends \Frontend
 					}
 					$sqlLookupField = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\') ) AS `'. $arrLookupField[1] .'`';
 
-					if (strlen($arrLookupOptions['lookup_sort']))
+					if (!empty($arrLookupOptions['lookup_sort']))
 					{
 						// special treatment for fields in tl_formdata_details
 						$arrPattern = array();
@@ -1548,26 +1622,24 @@ class Formdata extends \Frontend
 				// handle lookup calendar events
 				if ($sqlLookupTable == 'tl_calendar_events')
 				{
-
-					//$sqlLookupOrder = 'startTime ASC';
 					$sqlLookupOrder = '';
 
 					// handle order (max. 2 fields)
 					// .. default startTime ASC
 					$arrSortKeys = array(array('field'=>'startTime', 'order'=>'ASC'),array('field'=>'startTime', 'order'=>'ASC'));
-					if (strlen($arrLookupOptions['lookup_sort']))
+					if (!empty($arrLookupOptions['lookup_sort']))
 					{
 						$sqlLookupOrder = $arrLookupOptions['lookup_sort'];
 						$arrSortOn = trimsplit(',', $arrLookupOptions['lookup_sort']);
 						$arrSortKeys = array();
 						foreach ($arrSortOn as $strSort)
 						{
-							$arrSortPar = explode(' ', $strSort);
-							$arrSortKeys[] = array('field'=>$arrSortPar[0], 'order'=> (strtoupper($arrSortPar[1])=='DESC'? 'DESC' : 'ASC'));
+							$arrSortParam = explode(' ', $strSort);
+							$arrSortKeys[] = array('field'=>$arrSortParam[0], 'order'=> (strtoupper($arrSortParam[1])=='DESC'? 'DESC' : 'ASC'));
 						}
 					}
 
-					$sqlLookupWhere = (strlen($strLookupWhere) ? "(" . $strLookupWhere . ")" : "");
+					$sqlLookupWhere = (!empty($strLookupWhere) ? "(" . $strLookupWhere . ")" : "");
 
 					$strReferer = $this->getReferer();
 
@@ -1576,11 +1648,11 @@ class Formdata extends \Frontend
 					{
 						if (is_numeric(\Input::get('events')))
 						{
-							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=" . intval(\Input::get('events')) . " ";
+							$sqlLookupWhere .= (!empty($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.id=" . intval(\Input::get('events')) . " ";
 						}
 						elseif (is_string(\Input::get('events')))
 						{
-							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='" . \Input::get('events') . "' ";
+							$sqlLookupWhere .= (!empty($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='" . \Input::get('events') . "' ";
 						}
 					}
 					// if linked from event reader page
@@ -1602,12 +1674,12 @@ class Formdata extends \Frontend
 						elseif (is_string($strEvents))
 						{
 							$strEvents = str_replace('.html', '', $strEvents);
-							$sqlLookupWhere .= (strlen($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$strEvents."' ";
+							$sqlLookupWhere .= (!empty($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$strEvents."' ";
 						}
 
 					}
 
-					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (strlen($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
+					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (!empty($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
 
 					$objEvents = \Database::getInstance()->prepare($sqlLookup)->execute();
 
@@ -1620,9 +1692,9 @@ class Formdata extends \Frontend
 							$intDate = $arrEvent['startDate'];
 
 							$intStart = time();
-							$intEnd = time() + 60*60*24*178 ; // max. 1/2 Jahr
+							$intEnd = time() + 60*60*24*178 ; // max. half year
 
-							$span = Calendar::calculateSpan($arrEvent['startTime'], $arrEvent['endTime']);
+							$span = \Calendar::calculateSpan($arrEvent['startTime'], $arrEvent['endTime']);
 
 							$strTime = '';
 							$strTime .= date($GLOBALS['TL_CONFIG']['dateFormat'], $arrEvent['startDate']);
@@ -1653,7 +1725,7 @@ class Formdata extends \Frontend
 							if ($sqlLookupValField)
 							{
 								//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
-								if (count($arrSortKeys)>=2)
+								if (count($arrSortKeys) >= 2)
 								{
 									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
 								}
@@ -1665,7 +1737,7 @@ class Formdata extends \Frontend
 							else
 							{
 								//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
-								if (count($arrSortKeys)>=2)
+								if (count($arrSortKeys) >= 2)
 								{
 									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
 								}
@@ -1682,7 +1754,7 @@ class Formdata extends \Frontend
 								$arrRepeat = deserialize($arrEvent['repeatEach']);
 								$blnSummer = date('I', $arrEvent['startTime']);
 
-								$intEnd = time() + 60*60*24*178; // max. 1/2 Jahr
+								$intEnd = time() + 60*60*24*178; // max. 1/2 Year
 
 								while ($arrEvent['endTime'] < $intEnd)
 								{
@@ -1707,7 +1779,6 @@ class Formdata extends \Frontend
 
 									if ($arrEvent['startTime'] >= $intStart || $arrEvent['endTime'] <= $intEnd)
 									{
-
 										$strTime = '';
 										$strTime .= date($GLOBALS['TL_CONFIG']['dateFormat'], $arrEvent['startTime']);
 
@@ -1731,7 +1802,7 @@ class Formdata extends \Frontend
 										if ($sqlLookupValField)
 										{
 											//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
-											if (count($arrSortKeys)>=2)
+											if (count($arrSortKeys) >= 2)
 											{
 												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
 											}
@@ -1743,7 +1814,7 @@ class Formdata extends \Frontend
 										else
 										{
 											//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
-											if (count($arrSortKeys)>=2)
+											if (count($arrSortKeys) >= 2)
 											{
 												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
 											}
@@ -1763,7 +1834,7 @@ class Formdata extends \Frontend
 						// sort events
 						foreach ($arrEvents as $k => $arr)
 						{
-							if ($arrSortKeys[1]['order']=='DESC')
+							if ($arrSortKeys[1]['order'] == 'DESC')
 							{
 								krsort($arrEvents[$k]);
 							}
@@ -1772,7 +1843,7 @@ class Formdata extends \Frontend
 								ksort($arrEvents[$k]);
 							}
 						}
-						if ($arrSortKeys[0]['order']=='DESC')
+						if ($arrSortKeys[0]['order'] == 'DESC')
 						{
 							krsort($arrEvents);
 						}
@@ -1799,7 +1870,7 @@ class Formdata extends \Frontend
 						}
 
 						// include blank option to input type select
-						if ( $strType == 'efgLookupSelect' )
+						if ($strType == 'efgLookupSelect')
 						{
 							if (!$blnDoNotAddEmptyOption)
 							{
@@ -1815,9 +1886,9 @@ class Formdata extends \Frontend
 
 				else // normal lookup table or formdata lookup table
 				{
-					$sqlLookup = "SELECT " . $sqlLookupIdField . (strlen($sqlLookupField) ? ', ' : '') . $sqlLookupField . ( strlen($sqlLookupValField) ? ', ' : '') . $sqlLookupValField . " FROM " . $sqlLookupTable . $sqlLookupWhere . (strlen($sqlLookupOrder)>1 ? " ORDER BY " . $sqlLookupOrder : "");
+					$sqlLookup = "SELECT " . $sqlLookupIdField . (!empty($sqlLookupField) ? ', ' : '') . $sqlLookupField . (!empty($sqlLookupValField) ? ', ' : '') . $sqlLookupValField . " FROM " . $sqlLookupTable . $sqlLookupWhere . (!empty($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder : "");
 
-					if (strlen($sqlLookupTable))
+					if (!empty($sqlLookupTable))
 					{
 						$objOptions = \Database::getInstance()->prepare($sqlLookup)->execute();
 					}
@@ -1858,11 +1929,12 @@ class Formdata extends \Frontend
 				$arrOptions = $arrTempOptions;
 
 				break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
+
 			// countryselectmenu
 			case 'countryselect':
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
-				foreach($arrCountries as $strKey => $strVal)
+				foreach ($arrCountries as $strKey => $strVal)
 				{
 					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
 				}
@@ -1881,7 +1953,7 @@ class Formdata extends \Frontend
 					{
 						$objWidget = new $strClass($arrField);
 
-						if ($objWidget instanceof FormSelectMenu || $objWidget instanceof FormCheckbox || $objWidget instanceof FormRadioButton)
+						if ($objWidget instanceof \FormSelectMenu || $objWidget instanceof \FormCheckbox || $objWidget instanceof \FormRadioButton)
 						{
 
 							// HOOK: load form field callback
@@ -1899,7 +1971,7 @@ class Formdata extends \Frontend
 					}
 				}
 				break;
-		} // end switch $arrField['type']
+		} // end switch $strType
 
 		// Decode 'special chars', encoded by \Input::encodeSpecialChars (for example labels of checkbox options containing '(')
 		$arrOptions = $this->decodeSpecialChars($arrOptions);
@@ -1940,6 +2012,7 @@ class Formdata extends \Frontend
 		return str_replace($arrSearch, $arrReplace, $varValue);
 	}
 
+
 	/**
 	 * Parse Insert tag params
 	 * @param string Insert tag
@@ -1976,6 +2049,7 @@ class Formdata extends \Frontend
 		return $arrReturn;
 
 	}
+
 
 	/**
 	 * Replace 'condition tags': {if ...}, {elseif ...}, {else} and  {endif}
@@ -2030,6 +2104,7 @@ class Formdata extends \Frontend
 
 		return $blnEval;
 	}
+
 
 	public function evalConditionTags($strBuffer, $arrSubmitted = null, $arrFiles = null, $arrForm = null)
 	{

@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -20,7 +20,7 @@ namespace Efg;
 /**
  * Class FormdataProcessor
  *
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -38,7 +38,7 @@ class FormdataProcessor extends \Frontend
 	 * @param array $arrSubmitted Submitted data
 	 * @param array|bool $arrForm Form configuration
 	 * @param array|bool $arrFiles Files uploaded
-	 * @param array|bool $arrLabels    Form field labels
+	 * @param array|bool $arrLabels Form field labels
 	 * @return void
 	 */
 	public function processSubmittedData($arrSubmitted, $arrForm=false, $arrFiles=false, $arrLabels=false) {
@@ -51,19 +51,16 @@ class FormdataProcessor extends \Frontend
 
 		$arrFormFields = array();
 
+		$this->import('FrontendUser', 'Member');
 // TODO: maybe use form alias instead in upcoming release
 		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
 
 		$this->import('Formdata');
 		$this->Formdata->FdDcaKey = $this->strFdDcaKey;
 
-		$this->import('FrontendUser', 'Member');
-
-		$dirImages = '';
-
 		// get params of related listing formdata
 		$intListingId = intval($_SESSION['EFP']['LISTING_MOD']['id']);
-		if ($intListingId)
+		if ($intListingId > 0)
 		{
 			$objListing = \Database::getInstance()->prepare("SELECT * FROM tl_module WHERE id=?")
 				->execute($intListingId);
@@ -77,7 +74,7 @@ class FormdataProcessor extends \Frontend
 			}
 		}
 
-		if (strlen($arrListing['efg_DetailsKey']))
+		if (!empty($arrListing['efg_DetailsKey']))
 		{
 			$this->strFormdataDetailsKey = $arrListing['efg_DetailsKey'];
 		}
@@ -88,7 +85,6 @@ class FormdataProcessor extends \Frontend
 
 		$strUrl = preg_replace('/\?.*$/', '', \Environment::get('request'));
 		$strUrlParams = '';
-
 		$blnQuery = false;
 		foreach (preg_split('/&(amp;)?/', $_SERVER['QUERY_STRING']) as $fragment)
 		{
@@ -180,7 +176,7 @@ class FormdataProcessor extends \Frontend
 		// Formdata storage
 		if ($arrForm['storeFormdata'] && !empty($arrSubmitted))
 		{
-			$blnStoreOptionsValue = ($arrForm['efgStoreValues'] == "1" ? true : false);
+			$blnStoreOptionsValue = ($arrForm['efgStoreValues']) ? true : false;
 
 			// if frontend editing, get old record
 			if ($intOldId > 0)
@@ -197,7 +193,7 @@ class FormdataProcessor extends \Frontend
 				'tstamp' => $timeNow,
 				'date' => $timeNow,
 				'ip' => \System::anonymizeIp(\Environment::get('ip')),
-				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] == '1' ? '1' : '' ),
+				'published' => ($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default'] ? '1' : '' ),
 				'fd_member' => intval($this->Member->id),
 				'fd_member_group' => intval($this->Member->groups[0]),
 				'fd_user' => intval($this->User->id),
@@ -226,8 +222,8 @@ class FormdataProcessor extends \Frontend
 				$arrSet['fd_user'] = $arrOldFormdata['fd_user'];
 				$arrSet['fd_user_group'] = $arrOldFormdata['fd_user_group'];
 
-				// set published to value of old record, if NO default value is defined
-				if ( !isset($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default']) )
+				// set published to value of old record, if no default value is defined
+				if (!isset($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default']))
 				{
 					$arrSet['published'] = $arrOldFormdata['published'];
 				}
@@ -258,7 +254,9 @@ class FormdataProcessor extends \Frontend
 			// store details data
 			foreach ($arrFormFields as $k => $arrField)
 			{
-				$strType = $arrField['type'];
+
+				//$strType = $arrField['type'];
+				$strType = $arrField['formfieldType'];
 				$strVal = '';
 
 				if (in_array($strType, $arrFFstorable))
@@ -270,7 +268,7 @@ class FormdataProcessor extends \Frontend
 					}
 
 					// set rgxp 'date' for field type 'calendar' if not set
-					if ($arrField['type'] == 'calendar')
+					if ($strType == 'calendar')
 					{
 						if (!isset($arrField['rgxp']))
 						{
@@ -278,27 +276,27 @@ class FormdataProcessor extends \Frontend
 						}
 					}
 					// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
-					elseif ($arrField['type'] == 'xdependentcalendarfields')
+					elseif ($strType == 'xdependentcalendarfields')
 					{
 						$arrField['rgxp'] = 'date';
 						$arrField['dateFormat'] = $arrField['xdateformat'];
 					}
-					// set isDatabaseAssisted for field type upload
-					elseif ($arrField['type'] == 'upload')
-					{
-						$arrField['isDatabaseAssisted'] = false;
-						if (version_compare(VERSION, '3.0', '>='))
-						{
-							$this->loadDataContainer('tl_files');
+//					// set isDatabaseAssisted for field type upload
+//					elseif ($strType == 'upload')
+//					{
+//						$arrField['isDatabaseAssisted'] = false;
+//						if (version_compare(VERSION, '3.0', '>='))
+//						{
+//							$this->loadDataContainer('tl_files');
+//
+//							if ($GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
+//							{
+//								$arrField['isDatabaseAssisted'] = true;
+//							}
+//						}
+//					}
 
-							if ($GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
-							{
-								$arrField['isDatabaseAssisted'] = true;
-							}
-						}
-					}
-
-					$strVal = $this->Formdata->preparePostValForDb($arrSubmitted[$k], $arrField, $arrFiles[$k]);
+					$strVal = $this->Formdata->preparePostValueForDatabase($arrSubmitted[$k], $arrField, $arrFiles[$k]);
 
 					// special treatment for type upload
 					// if frontend editing and no new upload, keep old file
@@ -324,8 +322,6 @@ class FormdataProcessor extends \Frontend
 							'sorting' => $arrField['sorting'],
 							'tstamp' => $timeNow,
 							'ff_id' => $arrField['id'],
-							'ff_type' => $strType,
-							'ff_label' => $arrField['label'],
 							'ff_name' => $arrField['name'],
 							'value' => $strVal
 						);
@@ -373,11 +369,12 @@ class FormdataProcessor extends \Frontend
 
 		foreach ($arrFormFields as $k => $arrField)
 		{
-			$strType = $arrField['type'];
+			//$strType = $arrField['type'];
+			$strType = $arrField['formfieldType'];
 			$strVal = '';
 			if (in_array($strType, $arrFFstorable))
 			{
-				$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$k], $arrField, $arrFiles[$k], $blnSkipEmpty);
+				$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$k], $arrField, $arrFiles[$k], $blnSkipEmpty);
 			}
 
 			$_SESSION['EFP']['FORMDATA'][$k] = $strVal;
@@ -407,10 +404,10 @@ class FormdataProcessor extends \Frontend
 			$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			$sender = $arrForm['confirmationMailSender'];
-			if (strlen($sender))
+			if (!empty($sender))
 			{
 				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-				if (strpos($sender, '<')>0)
+				if (strpos($sender, '<') > 0)
 				{
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
 					$sender = $parts[2];
@@ -429,7 +426,7 @@ class FormdataProcessor extends \Frontend
 				$arrRecipient = trimsplit(',', $varRecipient);
 			}
 
-			if (strlen($arrForm['confirmationMailRecipient']))
+			if (!empty($arrForm['confirmationMailRecipient']))
 			{
 				$varRecipient = $arrForm['confirmationMailRecipient'];
 				$arrRecipient = array_merge($arrRecipient, trimsplit(',', $varRecipient));
@@ -438,6 +435,7 @@ class FormdataProcessor extends \Frontend
 
 			$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 			$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 			if ($messageHtmlTmpl != '')
 			{
@@ -499,7 +497,8 @@ class FormdataProcessor extends \Frontend
 						$arrField = $arrFormFields[$strKey];
 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
 
-						$strType = $arrField['type'];
+						//$strType = $arrField['type'];
+						$strType = $arrField['formfieldType'];
 
 						$strLabel = '';
 						$strVal = '';
@@ -514,10 +513,13 @@ class FormdataProcessor extends \Frontend
 							if ($strType == 'efgImageSelect')
 							{
 								$strVal = '';
-								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$varTxt = array();
 								$varHtml = array();
-								if (is_string($varVal)) $varVal = array($varVal);
+								if (is_string($varVal))
+								{
+									$varVal = array($varVal);
+								}
 								if (!empty($varVal))
 								{
 									foreach ($varVal as $strVal)
@@ -529,7 +531,7 @@ class FormdataProcessor extends \Frontend
 										}
 									}
 								}
-								if (empty($varTxt) &&  $blnSkipEmpty)
+								if (empty($varTxt) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -537,15 +539,15 @@ class FormdataProcessor extends \Frontend
 								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
 								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
-							elseif ($strType=='upload')
+							elseif ($strType == 'upload')
 							{
-								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
+								if ($arrTagParams && (array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true))
 								{
-									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
+									if (!empty($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
 									{
 										if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
 										{
-											$attachments[$arrFiles[$strKey]['tmp_name']] = array('name'=>$arrFiles[$strKey]['name'], 'file'=>$arrFiles[$strKey]['tmp_name'], 'mime'=>$arrFiles[$strKey]['type']);
+											$attachments[$arrFiles[$strKey]['tmp_name']] = array('name' => $arrFiles[$strKey]['name'], 'file' => $arrFiles[$strKey]['tmp_name'], 'mime' => $arrFiles[$strKey]['type']);
 										}
 
 									}
@@ -553,7 +555,7 @@ class FormdataProcessor extends \Frontend
 								}
 								else
 								{
-									$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+									$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
@@ -564,7 +566,7 @@ class FormdataProcessor extends \Frontend
 							}
 							else
 							{
-								$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
@@ -582,13 +584,13 @@ class FormdataProcessor extends \Frontend
 						}
 
 						// replace insert tags in subject
-						if (strlen($subject))
+						if (!empty($subject))
 						{
 							$subject = str_replace($tag, $strVal, $subject);
 						}
 
 						// replace insert tags in sender
-						if (strlen($sender))
+						if (!empty($sender))
 						{
 							$sender = str_replace($tag, $strVal, $sender);
 						}
@@ -598,7 +600,7 @@ class FormdataProcessor extends \Frontend
 			} // foreach tags
 
 			// Replace standard insert tags
-			if (strlen($messageText))
+			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
 				$messageText = $this->replaceInsertTags($messageText);
@@ -609,7 +611,7 @@ class FormdataProcessor extends \Frontend
 				$messageText = strip_tags($messageText);
 			}
 
-			if (strlen($messageHtml))
+			if (!empty($messageHtml))
 			{
 				$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
 				$messageHtml = $this->replaceInsertTags($messageHtml);
@@ -619,7 +621,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 			// replace insert tags in subject
-			if (strlen($subject))
+			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
@@ -629,25 +631,25 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 			// replace insert tags in sender
-			if (strlen($sender))
+			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 				$sender = $this->replaceInsertTags($sender);
 			}
 
 			// replace insert tags in replyto
-			if (strlen($arrForm['confirmationMailReplyto']))
+			if (!empty($arrForm['confirmationMailReplyto']))
 			{
 				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto']);
 			}
 
 			$confEmail = new \Email();
 			$confEmail->from = $sender;
-			if (strlen($senderName))
+			if (!empty($senderName))
 			{
 				$confEmail->fromName = $senderName;
 			}
-			if (strlen($replyTo))
+			if (!empty($replyTo))
 			{
 				$confEmail->replyTo($replyTo);
 			}
@@ -690,15 +692,15 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			if ($dirImages != '')
+			if (!empty($dirImages))
 			{
 				$confEmail->imageDir = $dirImages;
 			}
-			if ($messageText != '')
+			if (!empty($messageText))
 			{
 				$confEmail->text = $messageText;
 			}
-			if ($messageHtml != '')
+			if (!empty($messageHtml))
 			{
 				$confEmail->html = $messageHtml;
 			}
@@ -709,16 +711,16 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $recipient)
 				{
-					if(strlen($recipient))
+					if (!empty($recipient))
 					{
 						$recipient = $this->replaceInsertTags($recipient);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
-						if (strpos($recipient, '<')>0)
+						if (strpos($recipient, '<') > 0)
 						{
 							preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
 							$recipientName = trim($parts[1]);
-							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+							$recipient = (!empty($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
 						}
 					}
 
@@ -727,7 +729,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			if ($blnConfirmationSent && isset($intNewId) && intval($intNewId)>0)
+			if ($blnConfirmationSent && isset($intNewId) && intval($intNewId) > 0)
 			{
 				$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => $timeNow);
 				$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
@@ -759,9 +761,10 @@ class FormdataProcessor extends \Frontend
 
 			// Set the admin e-mail as "from" address
 			$sender = $GLOBALS['TL_ADMIN_EMAIL'];
-			if(strlen($sender)){
+			if (!empty($sender))
+			{
 				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-				if (strpos($sender, '<')>0)
+				if (strpos($sender, '<') > 0)
 				{
 					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
 					$sender = $parts[2];
@@ -782,6 +785,7 @@ class FormdataProcessor extends \Frontend
 
 			$subject = \String::decodeEntities($arrForm['formattedMailSubject']);
 			$messageText = \String::decodeEntities($arrForm['formattedMailText']);
+// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
 			if ($messageHtmlTmpl != '')
@@ -794,19 +798,19 @@ class FormdataProcessor extends \Frontend
 			}
 
 			// prepare insert tags to handle separate from 'condition tags'
-			if (strlen($messageText))
+			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
 			}
-			if (strlen($messageHtml))
+			if (!empty($messageHtml))
 			{
 				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 			}
-			if (strlen($subject))
+			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
 			}
-			if (strlen($sender))
+			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
@@ -842,12 +846,13 @@ class FormdataProcessor extends \Frontend
 						$arrField = $arrFormFields[$strKey];
 						$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
 
-						$strType = $arrField['type'];
+						//$strType = $arrField['type'];
+						$strType = $arrField['formfieldType'];
 
 						$strLabel = '';
 						$strVal = '';
 
-						if ($arrTagParams && strlen($arrTagParams['label']))
+						if ($arrTagParams && !empty($arrTagParams['label']))
 						{
 							$strLabel = $arrTagParams['label'];
 						}
@@ -857,10 +862,13 @@ class FormdataProcessor extends \Frontend
 							if ($strType == 'efgImageSelect')
 							{
 								$strVal = '';
-								$varVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$varTxt = array();
 								$varHtml = array();
-								if (is_string($varVal)) $varVal = array($varVal);
+								if (is_string($varVal))
+								{
+									$varVal = array($varVal);
+								}
 								if (!empty($varVal))
 								{
 									foreach ($varVal as $strVal)
@@ -872,7 +880,7 @@ class FormdataProcessor extends \Frontend
 										}
 									}
 								}
-								if (empty($varTxt) &&  $blnSkipEmpty)
+								if (empty($varTxt) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -880,22 +888,22 @@ class FormdataProcessor extends \Frontend
 								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
 								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
-							elseif ($strType=='upload')
+							elseif ($strType == 'upload')
 							{
-								if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)))
+								if ($arrTagParams && (array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true))
 								{
-									if (strlen($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
+									if (!empty($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
 									{
 										if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
 										{
-											$attachments[$arrFiles[$strKey]['tmp_name']] = array('name'=>$arrFiles[$strKey]['name'], 'file'=>$arrFiles[$strKey]['tmp_name'], 'mime'=>$arrFiles[$strKey]['type']);
+											$attachments[$arrFiles[$strKey]['tmp_name']] = array('name' => $arrFiles[$strKey]['name'], 'file' => $arrFiles[$strKey]['tmp_name'], 'mime' => $arrFiles[$strKey]['type']);
 										}
 									}
 									$strVal = '';
 								}
 								else
 								{
-									$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+									$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
@@ -906,14 +914,14 @@ class FormdataProcessor extends \Frontend
 							}
 							else
 							{
-								$strVal = $this->Formdata->preparePostValForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
-								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
+								if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
 									$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 									$strVal = nl2br($strVal);
@@ -924,13 +932,13 @@ class FormdataProcessor extends \Frontend
 						}
 
 						// replace insert tags in subject
-						if (strlen($subject))
+						if (!empty($subject))
 						{
 							$subject = str_replace($tag, $strVal, $subject);
 						}
 
 						// replace insert tags in sender
-						if (strlen($sender))
+						if (!empty($sender))
 						{
 							$sender = str_replace($tag, $strVal, $sender);
 						}
@@ -940,7 +948,7 @@ class FormdataProcessor extends \Frontend
 			}
 
 			// Replace standard insert tags
-			if (strlen($messageText))
+			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
 				$messageText = $this->replaceInsertTags($messageText);
@@ -950,7 +958,7 @@ class FormdataProcessor extends \Frontend
 				}
 				$messageText = strip_tags($messageText);
 			}
-			if (strlen($messageHtml))
+			if (!empty($messageHtml))
 			{
 				$messageHtml =  preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
 				$messageHtml = $this->replaceInsertTags($messageHtml);
@@ -960,7 +968,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 			// replace insert tags in subject
-			if (strlen($subject))
+			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
 				$subject = $this->replaceInsertTags($subject);
@@ -970,7 +978,7 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 			// replace insert tags in sender
-			if (strlen($sender))
+			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
@@ -979,18 +987,18 @@ class FormdataProcessor extends \Frontend
 
 			$infoEmail = new \Email();
 			$infoEmail->from = $sender;
-			if (strlen($senderName))
+			if (!empty($senderName))
 			{
 				$infoEmail->fromName = $senderName;
 			}
 			$infoEmail->subject = $subject;
 
 			// Get "reply to" address, if form contains field named 'email'
-			if (isset($arrSubmitted['email']) && strlen($arrSubmitted['email']) && !is_bool(strpos($arrSubmitted['email'], '@')))
+			if (isset($arrSubmitted['email']) && !empty($arrSubmitted['email']) && !is_bool(strpos($arrSubmitted['email'], '@')))
 			{
 				$replyTo = $arrSubmitted['email'];
 				// add name
-				if (isset($arrSubmitted['name']) && strlen($arrSubmitted['name']))
+				if (isset($arrSubmitted['name']) && !empty($arrSubmitted['name']))
 				{
 					$replyTo = '"'. $arrSubmitted['name'] .'" <' . $arrSubmitted['email'] . '>';
 				}
@@ -1032,15 +1040,15 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			if ($dirImages != '')
+			if (!empty($dirImages))
 			{
 				$infoEmail->imageDir = $dirImages;
 			}
-			if ($messageText != '')
+			if (!empty($messageText))
 			{
 				$infoEmail->text = $messageText;
 			}
-			if ($messageHtml != '')
+			if (!empty($messageHtml))
 			{
 				$infoEmail->html = $messageHtml;
 			}
@@ -1050,16 +1058,16 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $recipient)
 				{
-					if (strlen($recipient))
+					if (!empty($recipient))
 					{
 						$recipient = $this->replaceInsertTags($recipient);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
-						if (strpos($recipient, '<')>0)
+						if (strpos($recipient, '<') > 0)
 						{
 							preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
 							$recipientName = trim($parts[1]);
-							$recipient = (strlen($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
+							$recipient = (!empty($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
 						}
 					}
 
@@ -1072,9 +1080,9 @@ class FormdataProcessor extends \Frontend
 		// redirect after frontend editing
 		if ($blnFEedit)
 		{
-			if (strlen($strRedirectTo))
+			if (!empty($strRedirectTo))
 			{
-				$strRed = preg_replace(array('/\/' . $this->strFormdataDetailsKey . '\/' . \Input::get($this->strFormdataDetailsKey) . '/i', '/' . $this->strFormdataDetailsKey . '=' . \Input::get($this->strFormdataDetailsKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
+				$strRed = preg_replace(array('/\/' . $this->strFormdataDetailsKey . '\/' . \Input::get($this->strFormdataDetailsKey) . '/i', '/' . $this->strFormdataDetailsKey . '=' . \Input::get($this->strFormdataDetailsKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (!empty($strUrlParams) ? '?'.$strUrlParams : '');
 				$this->redirect($strRed);
 			}
 		}

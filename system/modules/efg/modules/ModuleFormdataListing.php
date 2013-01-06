@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -21,7 +21,7 @@ namespace Efg;
  * Class ModuleFormdataListing
  *
  * based on ModuleListing by Leo Feyer
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -70,7 +70,7 @@ class ModuleFormdataListing extends \Module
 	 * Items in tl_form, all forms marked to store data in tl_formdata
 	 * @param array
 	 */
-	protected $arrStoreForms;
+	protected $arrStoringForms;
 
 	/**
 	 * Base fields in table tl_formdata
@@ -520,7 +520,7 @@ class ModuleFormdataListing extends \Module
 				$this->strFormKey = (substr($this->list_formdata, 0 , 3) == 'fd_' ? $this->list_formdata : 'fd_' . $this->list_formdata);
 				$this->strDcaKey = (substr($this->list_formdata, 0, 3) == 'fd_' ? $this->list_formdata : 'fd_'.$this->list_formdata);
 				$this->strFormFilterKey = 'form';
-				$this->strFormFilterValue = $this->arrStoreForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+				$this->strFormFilterValue = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 				$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 			}
 		}
@@ -547,8 +547,8 @@ class ModuleFormdataListing extends \Module
 			$arrHookData = array();
 			$arrHookDataColumns = array();
 
-			$useFormValues = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
-			$useFieldNames = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
+			$useFormValues = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFormValues'];
+			$useFieldNames = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 			$this->blnExportUTF8Decode = true;
 			if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
@@ -1966,7 +1966,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// check record
-		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
+		if (intval($this->intRecordId) < 1)
 		{
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
@@ -2196,7 +2196,6 @@ class ModuleFormdataListing extends \Module
 			(
 				'label' => (strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $value,
-				// 'raw' => deserialize(\String::decodeEntities($v))
 				'raw' => $v
 			);
 
@@ -2204,11 +2203,9 @@ class ModuleFormdataListing extends \Module
 				'name' => $k,
 				'label'=>(strlen($label = $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($label) : htmlspecialchars($this->arrFF[$k]['label'])),
 				'content' => $value,
-				//'raw' => deserialize(\String::decodeEntities($v)),
 				'raw' => $v,
 				'class' => str_replace('row_', 'field_', $class)
 			);
-
 
 			if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 			{
@@ -2234,7 +2231,7 @@ class ModuleFormdataListing extends \Module
 						$arrFields[$class]['src'] = $this->urlEncode($arrFields[$class]['content']);
 						$arrItem[$k]['type'] = 'file';
 						$arrItem[$k]['src'] = $this->urlEncode($arrFields[$class]['content']);
-						if ( substr($objFile->mime, 0, 6) == 'image/' )
+						if (substr($objFile->mime, 0, 6) == 'image/' )
 						{
 							$arrFields[$class]['display'] = 'image';
 							$arrItem[$k]['display'] = 'image';
@@ -2532,8 +2529,8 @@ class ModuleFormdataListing extends \Module
 		$strExpEncl = '"';
 		$strExpSep = '';
 
-		$useFormValues = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFormValues'];
-		$useFieldNames = $this->Formdata->arrStoreForms[substr($this->strFormKey, 3)]['useFieldNames'];
+		$useFormValues = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFormValues'];
+		$useFieldNames = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 		$blnCustomXlsExport = false;
 		$arrHookData = array();
@@ -2696,7 +2693,8 @@ class ModuleFormdataListing extends \Module
 					{
 						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
+					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
+						&& !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
 						if ($useFormValues == 1)
 						{
@@ -2725,7 +2723,7 @@ class ModuleFormdataListing extends \Module
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") == FALSE) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
+							if ((strpos($row[$v], "|") == false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
@@ -3157,6 +3155,8 @@ class ModuleFormdataListing extends \Module
 	 */
 	public function formatValue($k, $value)
 	{
+		global $objPage;
+
 		$value = deserialize($value);
 
 		$rgxp = '';
@@ -3168,8 +3168,6 @@ class ModuleFormdataListing extends \Module
 		{
 			$rgxp = $this->arrFF[$k]['rgxp'];
 		}
-
-		global $objPage;
 
 		// Array
 		if (is_array($value))
@@ -3194,13 +3192,13 @@ class ModuleFormdataListing extends \Module
 		{
 			$value = $this->parseDate($objPage->datimFormat, $value);
 		}
-		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='checkbox'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupCheckbox'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='select'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='conditionalselect'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='efgLookupSelect'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='radio'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType']=='fileTree')
+		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'checkbox'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupCheckbox'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'select'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'conditionalselect'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupSelect'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'radio'
+			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 		)
 		{
 			$value = str_replace('|', ', ', $value);
@@ -3269,18 +3267,15 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrMembers)
 		{
-// TODO: use MemberModel ???
 			$members = array();
-			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
+			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name FROM tl_member ORDER BY name ASC")
 				->execute();
 			$members[] = '-';
 			if ($objMembers->numRows)
 			{
 				while ($objMembers->next())
 				{
-					$k = $objMembers->id;
-					$v = $objMembers->name;
-					$members[$k] = $v;
+					$members[$objMembers->id] = $objMembers->name;
 				}
 			}
 			$this->arrMembers = $members;
@@ -3294,18 +3289,15 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrUsers)
 		{
-// TODO: use UserModel ???
 			$users = array();
-			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
+			$objUsers = \Database::getInstance()->prepare("SELECT id,name FROM tl_user ORDER BY name ASC")
 				->execute();
 			$users[] = '-';
 			if ($objUsers->numRows)
 			{
 				while ($objUsers->next())
 				{
-					$k = $objUsers->id;
-					$v = $objUsers->name;
-					$users[$k] = $v;
+					$users[$objUsers->id] = $objUsers->name;
 				}
 			}
 			$this->arrUsers = $users;
@@ -3319,7 +3311,6 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrMemberGroups)
 		{
-// TODO: use MemberGroupModel ???
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
 				->execute();
@@ -3328,9 +3319,7 @@ class ModuleFormdataListing extends \Module
 			{
 				while ($objGroups->next())
 				{
-					$k = $objGroups->id;
-					$v = $objGroups->name;
-					$groups[$k] = $v;
+					$groups[$objGroups->id] = $objGroups->name;
 				}
 			}
 			$this->arrMemberGroups = $groups;
@@ -3344,7 +3333,6 @@ class ModuleFormdataListing extends \Module
 	{
 		if (!$this->arrUserGroups)
 		{
-// TODO: use UserGroupModel ???
 			$groups = array();
 			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
 				->execute();
@@ -3353,9 +3341,7 @@ class ModuleFormdataListing extends \Module
 			{
 				while ($objGroups->next())
 				{
-					$k = $objGroups->id;
-					$v = $objGroups->name;
-					$groups[$k] = $v;
+					$groups[$objGroups->id] = $objGroups->name;
 				}
 			}
 			$this->arrUserGroups = $groups;

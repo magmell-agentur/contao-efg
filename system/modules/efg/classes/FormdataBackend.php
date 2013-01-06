@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -20,7 +20,7 @@ namespace Efg;
 /**
  * Class FormdataBackend
  *
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -39,14 +39,13 @@ class FormdataBackend extends \Backend
 	 */
 	protected $arrData = array();
 
-	protected $arrStoreForms = null;
-
-	protected $arrFormsDcaKey = null;
-
 	protected $objForm;
 
 	// Types of form fields with storable data
 	protected $arrFFstorable = array();
+
+	// Mapping of frontend form fields to backend widgets
+	protected $arrMapTL_FFL = array();
 
 	public function __construct()
 	{
@@ -57,22 +56,25 @@ class FormdataBackend extends \Backend
 
 		// Types of form fields with storable data
 		$this->arrFFstorable = $this->Formdata->arrFFstorable;
+
+		// Mapping of frontend form fields to backend widgets
+		$this->arrMapTL_FFL = $this->Formdata->arrMapTL_FFL;
 	}
 
 	public function generate()
 	{
 		if (\Input::get('do') && \Input::get('do') != "feedback")
 		{
-			if ($this->Formdata->arrStoreForms[\Input::get('do')])
+			if ($this->Formdata->arrStoringForms[\Input::get('do')])
 			{
 				$session = $this->Session->getData();
-				$session['filter']['tl_feedback']['form'] = $this->Formdata->arrStoreForms[\Input::get('do')]['title'];
+				$session['filter']['tl_feedback']['form'] = $this->Formdata->arrStoringForms[\Input::get('do')]['title'];
 
 				$this->Session->setData($session);
 			}
 		}
 
-		if (\Input::get('act') == "")
+		if (\Input::get('act') == '')
 		{
 			return $this->objDc->showAll();
 		}
@@ -118,21 +120,34 @@ class FormdataBackend extends \Backend
 	 */
 	private function updateConfig()
 	{
-		$arrStoreForms = $this->Formdata->arrStoreForms;
+		$arrStoringForms = $this->Formdata->arrStoringForms;
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
 		$tplConfig->arrForm = $this->objForm;
-		$tplConfig->arrStoreForms = $arrStoreForms;
+		$tplConfig->arrStoringForms = $arrStoringForms;
 
 		$objConfig = new \File('system/modules/efg/config/config.php');
 		$objConfig->write($tplConfig->parse());
 		$objConfig->close();
 
-		if (empty($arrStoreForms))
+		if (empty($arrStoringForms))
 		{
 			return;
 		}
+
+//		// Check for Contao 3 database assisted file manager
+//		$blnDatabaseAssistedFileManager = false;
+//		if (version_compare(VERSION, '3.0', '>='))
+//		{
+//			$this->loadDataContainer('tl_files');
+//
+//			if (isset($GLOBALS['TL_DCA']['tl_files']) && $GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
+//			{
+//				$blnDatabaseAssistedFileManager = true;
+//			}
+//
+//		}
 
 		// languages/modules.php
 		$arrModLangs = scan(TL_ROOT . '/system/modules/efg/languages');
@@ -150,7 +165,7 @@ class FormdataBackend extends \Backend
 
 				$tplMod = $this->newTemplate('efg_internal_modules');
 				$tplMod->arrForm = $this->objForm;
-				$tplMod->arrStoreForms = $arrStoreForms;
+				$tplMod->arrStoringForms = $arrStoringForms;
 
 				$objMod = new \File('system/modules/efg/languages/'.$strModLang.'/modules.php');
 				$objMod->write($tplMod->parse());
@@ -159,40 +174,42 @@ class FormdataBackend extends \Backend
 		}
 
 		// dca/fd_FORMKEY.php
-		if ($this->objForm && !empty($this->objForm))
+		if (!empty($this->objForm))
 		{
 			$arrFields = array();
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
-			$objFields = \Database::getInstance()->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
-				->execute($this->objForm['id']);
-			if ($objFields->numRows)
+			$arrFormFields = $this->Formdata->getFormFieldsAsArray($this->objForm['id']);
+
+			if (!empty($arrFormFields))
 			{
-				while ($objFields->next())
+				foreach ($arrFormFields as $strFieldKey => $arrField)
 				{
-					$arrField = $objFields->row();
-					$strFieldKey = (strlen($arrField['name'])) ? $arrField['name'] : $arrField['id'];
-					if (in_array($arrField['type'], $this->arrFFstorable))
+					// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
+					if (!in_array($arrField['type'], $this->arrFFstorable)
+						|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
 					{
-						// ignore some special fields like checkbox CC, fields of type password ...
-						if (($arrField['type'] == 'checkbox' && $strFieldKey == 'cc') || $arrField['type'] == 'password')
-						{
-							continue;
-						}
-						$arrFields[$strFieldKey] = $arrField;
-						$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+						continue;
 					}
+
+					$arrFields[$strFieldKey] = $arrField;
+					$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 				}
 			}
 
 			$strFormKey = (isset($this->objForm['formID']) && strlen($this->objForm['formID'])) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
+
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
 			$tplDca->arrForm = $this->objForm;
-			$tplDca->arrStoreForms = $arrStoreForms;
+			$tplDca->arrStoringForms = $arrStoringForms;
 			$tplDca->arrFields = $arrFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
 
+//			// Contao 3 database assisted file manager
+//			$tplDca->blnDatabaseAssistedFileManager = $blnDatabaseAssistedFileManager;
+
+			// Enable backend confirmation mail
 			$blnBackendMail = false;
 			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']))
 			{
@@ -207,38 +224,44 @@ class FormdataBackend extends \Backend
 
 		// overall dca/fd_feedback.php
 		// Get all form fields of all storing forms
-		if (!empty($arrStoreForms))
+		if (!empty($arrStoringForms))
 		{
 			$arrAllFields = array();
 			$arrFieldNamesById = array();
-			$objAllFields = \Database::getInstance()->prepare("SELECT ff.* FROM tl_form_field ff, tl_form f WHERE ff.pid=f.id AND f.storeFormdata=? ORDER BY ff.pid ASC, ff.sorting ASC")
-				->execute("1");
-			if ($objAllFields->numRows)
+
+			foreach ($arrStoringForms as $strFormKey => $arrForm)
 			{
-				while ($objAllFields->next())
+				// Get all form fields of this form
+				$arrFormFields = $this->Formdata->getFormFieldsAsArray($arrForm['id']);
+
+				if (!empty($arrFormFields))
 				{
-					$arrField = $objAllFields->row();
-					$strFieldKey = (strlen($arrField['name']) ? $arrField['name'] : $arrField['id']);
-					if (in_array($arrField['type'], $this->arrFFstorable))
+					foreach ($arrFormFields as $strFieldKey => $arrField)
 					{
-						// ignore some special fields like checkbox CC, fields of type password ...
-						if (($arrField['type'] == 'checkbox' && $strFieldKey == 'cc') || $arrField['type'] == 'password')
+						// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
+						if (!in_array($arrField['type'], $this->arrFFstorable)
+							|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
 						{
 							continue;
 						}
+
 						$arrAllFields[$strFieldKey] = $arrField;
 						$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 					}
 				}
+
 			}
 
 			$strFormKey = 'feedback';
 
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->objForm['title']);
-			$tplDca->arrStoreForms = $arrStoreForms;
+			$tplDca->arrStoringForms = $arrStoringForms;
 			$tplDca->arrFields = $arrAllFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
+
+//			// Contao 3 database assisted file manager
+//			$tplDca->blnDatabaseAssistedFileManager = $blnDatabaseAssistedFileManager;
 
 			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());

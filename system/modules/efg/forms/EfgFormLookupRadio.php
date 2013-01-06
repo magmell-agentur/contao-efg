@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -22,7 +22,7 @@ namespace Efg;
  *
  * Form field "radio (DB)".
  * based on FormRadio by Leo Feyer
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -60,7 +60,6 @@ class EfgFormLookupRadio extends \Widget
 			case 'efgLookupOptions':
 				$this->import('Formdata');
 				$this->arrConfiguration['efgLookupOptions'] = $varValue;
-
 				$arrOptions = $this->Formdata->prepareDcaOptions($this->arrConfiguration);
 				$this->arrOptions = $arrOptions;
 				break;
@@ -91,6 +90,7 @@ class EfgFormLookupRadio extends \Widget
 			case 'options':
 				return $this->arrOptions;
 				break;
+
 			default:
 				return parent::__get($strKey);
 				break;

@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -21,7 +21,7 @@ namespace Efg;
  * Class EfgLookupOptionWizard
  *
  * Provide methods to handle form field lookup option
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
@@ -70,9 +70,11 @@ class EfgLookupOptionWizard extends \Widget
 			case 'value':
 				$this->varValue = deserialize($varValue);
 				break;
+
 			case 'mandatory':
 				$this->arrConfiguration['mandatory'] = $varValue ? true : false;
 				break;
+
 			default:
 				parent::__set($strKey, $varValue);
 				break;
@@ -171,11 +173,7 @@ class EfgLookupOptionWizard extends \Widget
 		// Make sure there is at least an empty array
 		if (!is_array($this->varValue) || !$this->varValue['lookup_field'])
 		{
-			$this->varValue = array (
-				array (
-					''
-				)
-			);
+			$this->varValue = array(array(''));
 		}
 
 		$strSelectedTable = '';
@@ -183,6 +181,8 @@ class EfgLookupOptionWizard extends \Widget
 		{
 			$strSelectedTable = substr($this->varValue['lookup_field'], 0, strpos($this->varValue['lookup_field'], '.'));
 		}
+
+		$return = '';
 
 		// Begin table
 

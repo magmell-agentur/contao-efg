@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -44,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		'sorting' => array
 		(
 			'mode'                    => 4,
-			'fields'                  => array('ff_name','ff_label','value'),
+//			'fields'                  => array('ff_name','ff_label','value'),
 			'panelLayout'             => 'search,filter',
 			'headerFields'            => array('form', 'date', 'ip', 'be_notes'),
 			'child_record_callback'   => array('tl_formdata_details', 'listFormdata')
@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'pid,id,ff_name,ff_label,ff_type,value'
+		'default'                     => 'pid,id,ff_name,value'
 	),
 
 	// Fields
@@ -108,17 +108,9 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
-		'ff_type' => array
-		(
-			'sql'                     => "varchar(32) NOT NULL default ''"
-		),
 		'ff_name' => array
 		(
 			'sql'                     => "varchar(64) NOT NULL default ''"
-		),
-		'ff_label' => array
-		(
-			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'value' => array
 		(

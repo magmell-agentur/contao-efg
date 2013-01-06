@@ -3,12 +3,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -429,7 +429,7 @@ class tl_formdata extends \Backend
 
 		$strRet .= '<div class="mark_links">';
 		// Details from table tl_formdata_details
-		$strSql = "SELECT ff_type,ff_name,ff_label,value FROM tl_formdata_details WHERE pid=? ORDER BY sorting ASC";
+		$strSql = "SELECT ff_name,value FROM tl_formdata_details WHERE pid=? ORDER BY sorting ASC";
 		$objDetails = \Database::getInstance()->prepare($strSql)->execute($arrRow['id']);
 
 		while ($objDetails->next())

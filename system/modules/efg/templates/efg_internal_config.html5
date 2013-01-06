@@ -4,12 +4,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 <?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
@@ -38,7 +38,7 @@ $GLOBALS['TL_CTE']['includes']['form'] = 'ExtendedForm';
  * -------------------------------------------------------------------------
  */
 
-<?php if (!empty($this->arrStoreForms)): ?>
+<?php if (!empty($this->arrStoringForms)): ?>
 array_insert($GLOBALS['BE_MOD'], 1, array('formdata' => array()));
 
 // this is used for the form independent "Feedback" module
@@ -50,7 +50,7 @@ $GLOBALS['BE_MOD']['formdata']['feedback'] = array
 	);
 
 // following are used for the form dependent modules
-<?php foreach($this->arrStoreForms as $strKey=>$arrVals): ?>
+<?php foreach($this->arrStoringForms as $strKey=>$arrVals): ?>
 $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
 	(
 		'tables'     => array('tl_formdata', 'tl_formdata_details'),

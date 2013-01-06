@@ -4,12 +4,12 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * @package   Efg
  * @author    Thomas Kuhn <mail@th-kuhn.de>
  * @license   http://www.gnu.org/licenses/lgpl-3.0.html LGPL
- * @copyright Thomas Kuhn 2007-2012
+ * @copyright Thomas Kuhn 2007-2013
  */
 
 
@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['MOD']['feedback'] = array('<?php echo str_replace("'", "\'"
 
 $GLOBALS['TL_LANG']['MOD']['formdatalisting'] = array('<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdatalisting'][0])); ?>', '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdatalisting'][1])); ?>');
 
-<?php foreach($this->arrStoreForms as $strKey=>$arrVals): ?>
+<?php foreach($this->arrStoringForms as $strKey=>$arrVals): ?>
 $GLOBALS['TL_LANG']['MOD']['fd_<?php echo $strKey; ?>'] = array('<?php echo str_replace("'", "\'", \String::decodeEntities($arrVals['title'])); ?>', '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdata_from'])); ?> "<?php echo str_replace("'", "\'", \String::decodeEntities($arrVals['title'])); ?>".');
 <?php endforeach; ?>
 
