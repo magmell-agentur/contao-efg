@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['mail'],
 				'href'                => 'act=mail',
-				'icon'                => 'system/modules/efg/public/mail.gif'
+				'icon'                => 'system/modules/efg/assets/mail.gif'
 			)
 		)
 	),

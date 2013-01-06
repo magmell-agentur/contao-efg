@@ -31,7 +31,7 @@ $GLOBALS['TL_LANG']['efg_list_searchtype']['multiplefields'] = array('Multiple s
 
 $GLOBALS['TL_LANG']['tl_module']['efg_list_search'] = array('Searchable fields', 'Please select the fields that you want to be searchable in the front end.');
 $GLOBALS['TL_LANG']['tl_module']['efg_list_info'] = array('Details page fields', 'Please select the fields you want to show on the details page. Select none to disable the details page feature.');
-$GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'] = array('Icons folder', 'Give in the directory containing your icons. If left blank the icons in folder "system/modules/efg/public/" will be used.');
+$GLOBALS['TL_LANG']['tl_module']['efg_iconfolder'] = array('Icons folder', 'Give in the directory containing your icons. If left blank the icons in folder "system/modules/efg/assets/" will be used.');
 $GLOBALS['TL_LANG']['tl_module']['efg_fe_keep_id'] = array('Keep record ID on frontend editing', 'When editing in frontend normally a new record is created and therefore a new ID, then the old one is deleted. Choose this option if you rely on an unchanged record ID.');
 $GLOBALS['TL_LANG']['tl_module']['efg_fe_no_formatted_mail'] = array('Do not send via e-mail (formatted text or html) on frontend editing', 'Choose this option if you want to deactivate the delivery by e-mail (formatted Text / HTML) when editing in frontend.');
 $GLOBALS['TL_LANG']['tl_module']['efg_fe_no_confirmation_mail'] = array('Do not send confirmation via e-mail on frontend editing', 'Choose this option if you want to deactivate the confirmation by e-mail when editing in frontend.');

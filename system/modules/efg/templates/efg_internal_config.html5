@@ -21,7 +21,7 @@
 */
 if (TL_MODE == 'BE')
 {
-	$GLOBALS['TL_CSS'][] = 'system/modules/efg/public/w50_fix.css';
+	$GLOBALS['TL_CSS'][] = 'system/modules/efg/assets/w50_fix.css';
 }
 
 
@@ -45,8 +45,8 @@ array_insert($GLOBALS['BE_MOD'], 1, array('formdata' => array()));
 $GLOBALS['BE_MOD']['formdata']['feedback'] = array
 	(
 		'tables'     => array('tl_formdata', 'tl_formdata_details'),
-		'icon'       => 'system/modules/efg/public/formdata_all.gif',
-		'stylesheet' => 'system/modules/efg/public/style.css'
+		'icon'       => 'system/modules/efg/assets/formdata_all.gif',
+		'stylesheet' => 'system/modules/efg/assets/style.css'
 	);
 
 // following are used for the form dependent modules
@@ -55,8 +55,8 @@ $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
 	(
 		'tables'     => array('tl_formdata', 'tl_formdata_details'),
 		'import'     => array('FormdataBackend', 'importCsv'),
-		'icon'       => 'system/modules/efg/public/formdata.gif',
-		'stylesheet' => 'system/modules/efg/public/style.css'
+		'icon'       => 'system/modules/efg/assets/formdata.gif',
+		'stylesheet' => 'system/modules/efg/assets/style.css'
 	);
 <?php endforeach; ?>
 <?php endif; ?>
