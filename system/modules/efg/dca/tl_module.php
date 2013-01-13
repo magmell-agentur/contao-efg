@@ -318,17 +318,11 @@ class tl_ext_module extends \Backend
 			$this->arrFormdataTables['fd_feedback'] = $GLOBALS['TL_LANG']['MOD']['feedback'][0];
 
 			// all forms marked to store data
-			$objForms = \Database::getInstance()->prepare("SELECT f.id,f.title,f.formID,ff.type,ff.name,ff.label FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND storeFormdata=? ORDER BY title")
+			$objForms = \Database::getInstance()->prepare("SELECT f.id,f.title,f.alias,f.formID,ff.type,ff.name,ff.label FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND storeFormdata=? ORDER BY title")
 				->execute("1");
 			while ($objForms->next())
 			{
-				if (strlen($objForms->formID)) {
-					$varKey = 'fd_' . $objForms->formID;
-				}
-				else
-				{
-					$varKey = 'fd_' . str_replace('-', '_', standardize($objForms->title));
-				}
+				$varKey = 'fd_' . (!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title));
 				$this->arrFormdataTables[$varKey] = $objForms->title;
 				$this->arrFormdataFields['fd_feedback'][$objForms->name] = $objForms->label;
 				$this->arrFormdataFields[$varKey][$objForms->name] = $objForms->label;

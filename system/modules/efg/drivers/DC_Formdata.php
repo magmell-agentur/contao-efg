@@ -115,7 +115,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	protected $arrModule = array();
 
 	/**
-	 * Related form, like fd_frm_contact
+	 * Related form key, like 'fd_frm_contact'
 	 * @param string
 	 */
 	protected $strFormKey;
@@ -137,14 +137,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	 * @param string
 	 */
 	protected $sqlFormFilter;
-
-	/**
-	 * Items in tl_form, all forms marked to store data in tl_formdata
-	 * @param array
-	 */
-	protected $arrStoringForms;
-
-	protected $arrFormsDcaKey = null;
 
 	/**
 	 * Base fields in table tl_formdata
@@ -267,30 +259,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 		}
 
-		// get all forms marked to store data
-		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames,efgAliasField FROM tl_form WHERE storeFormdata=?")
-			->execute("1");
-		if (!$this->arrStoringForms)
-		{
-			while ($objForms->next())
-			{
-				if (strlen($objForms->formID))
-				{
-					$varKey = $objForms->formID;
-				}
-				else
-				{
-					$varKey = str_replace('-', '_', standardize($objForms->title));
-				}
-				$this->arrStoringForms[$varKey] = $objForms->row();
-				$this->arrFormsDcaKey[$varKey] = $objForms->title;
-			}
-		}
-
 		// all field names of table tl_formdata
 		foreach (\Database::getInstance()->listFields('tl_formdata') as $arrField)
 		{
-
 			if ($arrField['type'] != 'index')
 			{
 				$this->arrBaseFields[] = $arrField['name'];
@@ -373,7 +344,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					$this->strFormKey = \Input::get('do');
 					$this->strFormFilterKey = 'form';
-					$this->strFormFilterValue = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+					$this->strFormFilterValue = $this->Formdata->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 					$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 
 					// add sql where condition 'form'=TITLE_OF_FORM
@@ -794,7 +765,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (isset($this->strFormKey) && strlen($this->strFormKey))
 		{
-			$set['form'] = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+			$set['form'] = $this->Formdata->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 			$set['date'] = time();
 			$set['ip'] = \Environment::get('ip');
 
@@ -5163,9 +5134,9 @@ window.addEvent(\'domready\', function() {
 				$resFile = $objFile->handle;
 
 				$timeNow = time();
-				$strFormTitle = $this->arrFormsDcaKey[substr($this->strFormKey, 3)];
+				$strFormTitle = $this->Formdata->arrFormsDcaKey[substr($this->strFormKey, 3)];
 
-				$strAliasField = (strlen($this->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
+				$strAliasField = (strlen($this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
 
 				$objForm = \Database::getInstance()->prepare("SELECT id FROM tl_form WHERE `title`=?")
 					->limit(1)
@@ -5832,8 +5803,8 @@ var Stylect = {
 		$strExpEncl = '';
 		$strExpSep = ';';
 
-		$useFormValues = $this->arrStoringForms[substr($this->strFormKey, 3)]['useFormValues'];
-		$useFieldNames = $this->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
+		$useFormValues = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFormValues'];
+		$useFieldNames = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 		if ($strMode=='csv')
 		{

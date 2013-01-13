@@ -52,10 +52,9 @@ class FormdataProcessor extends \Frontend
 		$arrFormFields = array();
 
 		$this->import('FrontendUser', 'Member');
-// TODO: maybe use form alias instead in upcoming release
-		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
-
 		$this->import('Formdata');
+
+		$this->strFdDcaKey = 'fd_' . (!empty($arrForm['alias']) ? $arrForm['alias'] : str_replace('-', '_', standardize($arrForm['title'])) );
 		$this->Formdata->FdDcaKey = $this->strFdDcaKey;
 
 		// get params of related listing formdata
@@ -281,6 +280,7 @@ class FormdataProcessor extends \Frontend
 						$arrField['rgxp'] = 'date';
 						$arrField['dateFormat'] = $arrField['xdateformat'];
 					}
+// TODO: check/cleanup
 //					// set isDatabaseAssisted for field type upload
 //					elseif ($strType == 'upload')
 //					{

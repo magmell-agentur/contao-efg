@@ -39,7 +39,7 @@ class FormdataBackend extends \Backend
 	 */
 	protected $arrData = array();
 
-	protected $objForm;
+	protected $arrForm = null;
 
 	// Types of form fields with storable data
 	protected $arrFFstorable = array();
@@ -63,7 +63,7 @@ class FormdataBackend extends \Backend
 
 	public function generate()
 	{
-		if (\Input::get('do') && \Input::get('do') != "feedback")
+		if (\Input::get('do') && \Input::get('do') != 'feedback')
 		{
 			if ($this->Formdata->arrStoringForms[\Input::get('do')])
 			{
@@ -91,8 +91,7 @@ class FormdataBackend extends \Backend
 	public function createFormdataDca(\DataContainer $dc)
 	{
 		$this->intFormId = $dc->id;
-
-		$this->objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
+		$this->arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
 			->execute($this->intFormId)
 			->fetchAssoc();
 		$this->updateConfig();
@@ -124,7 +123,7 @@ class FormdataBackend extends \Backend
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
-		$tplConfig->arrForm = $this->objForm;
+		$tplConfig->arrForm = $this->arrForm;
 		$tplConfig->arrStoringForms = $arrStoringForms;
 
 		$objConfig = new \File('system/modules/efg/config/config.php');
@@ -135,19 +134,6 @@ class FormdataBackend extends \Backend
 		{
 			return;
 		}
-
-//		// Check for Contao 3 database assisted file manager
-//		$blnDatabaseAssistedFileManager = false;
-//		if (version_compare(VERSION, '3.0', '>='))
-//		{
-//			$this->loadDataContainer('tl_files');
-//
-//			if (isset($GLOBALS['TL_DCA']['tl_files']) && $GLOBALS['TL_DCA']['tl_files']['config']['databaseAssisted'])
-//			{
-//				$blnDatabaseAssistedFileManager = true;
-//			}
-//
-//		}
 
 		// languages/modules.php
 		$arrModLangs = scan(TL_ROOT . '/system/modules/efg/languages');
@@ -164,7 +150,7 @@ class FormdataBackend extends \Backend
 				}
 
 				$tplMod = $this->newTemplate('efg_internal_modules');
-				$tplMod->arrForm = $this->objForm;
+				$tplMod->arrForm = $this->arrForm;
 				$tplMod->arrStoringForms = $arrStoringForms;
 
 				$objMod = new \File('system/modules/efg/languages/'.$strModLang.'/modules.php');
@@ -174,12 +160,12 @@ class FormdataBackend extends \Backend
 		}
 
 		// dca/fd_FORMKEY.php
-		if (!empty($this->objForm))
+		if ($this->arrForm !== null)
 		{
 			$arrFields = array();
 			$arrFieldNamesById = array();
 			// Get all form fields of this form
-			$arrFormFields = $this->Formdata->getFormFieldsAsArray($this->objForm['id']);
+			$arrFormFields = $this->Formdata->getFormFieldsAsArray($this->arrForm['id']);
 
 			if (!empty($arrFormFields))
 			{
@@ -197,21 +183,18 @@ class FormdataBackend extends \Backend
 				}
 			}
 
-			$strFormKey = (isset($this->objForm['formID']) && strlen($this->objForm['formID'])) ? $this->objForm['formID'] : str_replace('-', '_', standardize($this->objForm['title']));
+			$strFormKey = (!empty($this->arrForm['alias'])) ? $this->arrForm['alias'] : str_replace('-', '_', standardize($this->objForm['title']));
 
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
-			$tplDca->arrForm = $this->objForm;
+			$tplDca->arrForm = $this->arrForm;
 			$tplDca->arrStoringForms = $arrStoringForms;
 			$tplDca->arrFields = $arrFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
 
-//			// Contao 3 database assisted file manager
-//			$tplDca->blnDatabaseAssistedFileManager = $blnDatabaseAssistedFileManager;
-
 			// Enable backend confirmation mail
 			$blnBackendMail = false;
-			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']))
+			if ($this->arrForm['sendConfirmationMail'] || strlen($this->arrForm['confirmationMailText']))
 			{
 				$blnBackendMail = true;
 			}
@@ -255,19 +238,17 @@ class FormdataBackend extends \Backend
 			$strFormKey = 'feedback';
 
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
-			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->objForm['title']);
+			$tplDca->arrForm = array('key' => 'feedback', 'title'=> $this->arrForm['title']);
 			$tplDca->arrStoringForms = $arrStoringForms;
 			$tplDca->arrFields = $arrAllFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
-
-//			// Contao 3 database assisted file manager
-//			$tplDca->blnDatabaseAssistedFileManager = $blnDatabaseAssistedFileManager;
 
 			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
 			$objDca->write($tplDca->parse());
 			$objDca->close();
 
 		}
+
 	}
 
 	/**

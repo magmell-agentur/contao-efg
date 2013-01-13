@@ -145,7 +145,7 @@ class Formdata extends \Frontend
 		$autoAlias = false;
 		$strAliasField = '';
 
-		if (is_null($strFormTitle))
+		if ($strFormTitle === null)
 		{
 			return '';
 		}
@@ -158,6 +158,7 @@ class Formdata extends \Frontend
 		$objForm = \Database::getInstance()->prepare("SELECT id, efgAliasField FROM tl_form WHERE title=?")
 			->limit(1)
 			->execute($strFormTitle);
+
 		if ($objForm->numRows)
 		{
 			if (strlen($objForm->efgAliasField))
@@ -241,7 +242,7 @@ class Formdata extends \Frontend
 				}
 
 				// do not add if list condition contains insert tags
-				if (strlen($arrParams['list_where']))
+				if (!empty($arrParams['list_where']))
 				{
 					if (strpos($arrParams['list_where'], '{{') !== false)
 					{
@@ -250,12 +251,12 @@ class Formdata extends \Frontend
 				}
 
 				// do not add if no listing details fields are defined
-				if (!strlen($arrParams['list_info']))
+				if (empty($arrParams['list_info']))
 				{
 					continue;
 				}
 
-				if (!strlen($arrParams['list_formdata']))
+				if (empty($arrParams['list_formdata']))
 				{
 					continue;
 				}
@@ -368,20 +369,14 @@ class Formdata extends \Frontend
 		if (!$this->arrStoringForms)
 		{
 			// get all forms marked to store data
-			$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
+			$objForms = \Database::getInstance()->prepare("SELECT id,title,alias,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
 				->execute("1");
 
 			while ($objForms->next())
 			{
-				if (!empty($objForms->formID)) {
-					$varKey = str_replace('-', '_', standardize($objForms->formID));
-				}
-				else
-				{
-					$varKey = str_replace('-', '_', standardize($objForms->title));
-				}
-				$this->arrStoringForms[$varKey] = $objForms->row();
-				$this->arrFormsDcaKey[$varKey] = $objForms->title;
+				$strFormKey = (!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title));
+				$this->arrStoringForms[$strFormKey] = $objForms->row();
+				$this->arrFormsDcaKey[$strFormKey] = $objForms->title;
 			}
 		}
 	}
@@ -398,6 +393,7 @@ class Formdata extends \Frontend
 			// get all pages containig listing formdata
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=?")
 				->execute("module", "formdatalisting");
+
 			while ($objListingPages->next())
 			{
 				$this->arrListingPages[$objListingPages->id] = $objListingPages->alias;
@@ -419,10 +415,12 @@ class Formdata extends \Frontend
 			// get all pages containing listing formdata with details page
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
 				->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
+
 			while ($objListingPages->next())
 			{
 				$strFormdataDetailsKey = 'details';
-				if (!empty($objListingPages->efg_DetailsKey)) {
+				if (!empty($objListingPages->efg_DetailsKey))
+				{
 					$strFormdataDetailsKey = $objListingPages->efg_DetailsKey;
 				}
 				$this->arrSearchableListingPages[$objListingPages->id] = array
@@ -450,7 +448,6 @@ class Formdata extends \Frontend
 	 */
 	public function getFormdataAsArray($intId=0)
 	{
-
 		$varReturn = array();
 
 		if ($intId > 0)
@@ -491,7 +488,6 @@ class Formdata extends \Frontend
 	 */
 	public function getFormfieldsAsArray($intId=0)
 	{
-
 		$varReturn = array();
 
 		if ($intId > 0)
@@ -501,13 +497,7 @@ class Formdata extends \Frontend
 
 			while ($objFormFields->next())
 			{
-				if (!empty($objFormFields->name)) {
-					$varKey = $objFormFields->name;
-				}
-				else
-				{
-					$varKey = $objFormFields->id;
-				}
+				$varKey = (!empty($objFormFields->name)) ? $objFormFields->name : $objFormFields->id;
 				$arrField = $objFormFields->row();
 
 				// Set type of frontend widget

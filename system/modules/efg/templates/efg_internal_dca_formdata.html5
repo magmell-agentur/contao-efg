@@ -209,7 +209,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			/*
-			'label_callback'          => array('tl_fd_<?php echo str_replace('-', '_', $this->strFormKey); ?>','getRowLabel')
+			'label_callback'          => array('tl_fd_<?php echo str_replace(array('-','.'), array('_', '_'), $this->strFormKey); ?>','getRowLabel')
 			*/
 <?php endif; ?>
 <?php if ($this->arrForm['key'] == 'feedback'): ?>
@@ -591,7 +591,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_clas
 <?php endforeach; ?>
 
 /**
- * Class tl_fd_<?php echo $this->strFormKey . PHP_EOL; ?>
+ * Class tl_fd_<?php echo str_replace(array('-','.'), array('_','_'), $this->strFormKey) . PHP_EOL; ?>
  *
  * Provide miscellaneous methods that are used by the data configuration array.
  *
@@ -599,7 +599,7 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['ff_clas
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    Efg
  */
-class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this->strFormKey) : 'feedback'); ?> extends \Backend
+class tl_fd_<?php echo (strlen($this->strFormKey)) ? str_replace(array('-','.'), array('_','_'), $this->strFormKey) : 'feedback'; ?> extends \Backend
 {
 
 	/**

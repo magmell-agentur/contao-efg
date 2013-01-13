@@ -384,7 +384,7 @@ class tl_formdata extends \Backend
 
 	/**
 	 * Autogenerate an alias if it has not been set yet
-	 * alias is created from formdata content related to first form field of type text not using rgxp=email
+	 * alias is created from formdata content related to first form field of type text not using rgxp=email/date/datim/time
 	 * @param mixed
 	 * @param object
 	 * @return string
