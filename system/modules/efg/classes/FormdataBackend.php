@@ -121,6 +121,20 @@ class FormdataBackend extends \Backend
 	{
 		$arrStoringForms = $this->Formdata->arrStoringForms;
 
+		// Remove unused dca files
+		$arrFiles = scan(TL_ROOT . '/system/modules/efg/dca', true);
+		foreach ($arrFiles as $strFile)
+		{
+			if (substr($strFile, 0, 3) == 'fd_' && $strFile != 'fd_feedback.php')
+			{
+				if (!in_array(str_replace('.php', '', substr($strFile, 3)) , array_keys($arrStoringForms)))
+				{
+					$objFile = new \File('system/modules/efg/dca/' . $strFile);
+					$objFile->delete();
+				}
+			}
+		}
+
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
 		$tplConfig->arrForm = $this->arrForm;
@@ -141,6 +155,15 @@ class FormdataBackend extends \Backend
 
 		foreach ($arrModLangs as $strModLang)
 		{
+
+			// Remove cached language files
+			if (is_file(TL_ROOT . '/system/cache/language/' . $strModLang .'/modules.php'))
+			{
+				$objFile = new \File('system/cache/language/' . $strModLang . '/modules.php');
+				$objFile->delete();
+			}
+
+
 			if (array_key_exists($strModLang, $arrLanguages))
 			{
 				$strFile = sprintf('%s/system/modules/%s/languages/%s/%s.php', TL_ROOT, 'efg', $strModLang, 'tl_efg_modules');
@@ -248,6 +271,7 @@ class FormdataBackend extends \Backend
 			$objDca->close();
 
 		}
+
 
 	}
 
