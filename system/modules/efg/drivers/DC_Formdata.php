@@ -1301,7 +1301,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 // TODO: !? support eval csv in Formdata::prepare... methods ?
 // TODO: !? support eval csv in DC_Formdata::show / showAll ?
 // TODO: !? support eval csv in ModuleFormdataListing ?
-					// Convert CSV fields (see #2890)
+					// Convert CSV fields
 					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']
 						&& isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv']))
 					{
@@ -1990,17 +1990,20 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
 					}
 
+					// Convert CSV fields
+					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']
+						&& isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv']))
+					{
+						$this->varValue = trimsplit($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'], $this->varValue);
+					}
+
 					// prepare values of special fields like radio, select and checkbox
 					$strInputType = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'];
 
-					// render inputType hidden as inputType text in Backend
-					if ($strInputType == 'hidden')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'text';
-					}
 
 					// field types radio, select, multi checkbox
-					elseif ($strInputType=='radio' || $strInputType=='select' || $strInputType=='conditionalselect' || ($strInputType=='checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']))
+					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
+						|| ($strInputType == 'checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
@@ -2012,13 +2015,14 @@ window.addEvent(\'domready\', function() {
 								}
 							}
 						}
-						elseif (!is_array($this->varValue))
+						// elseif (!is_array($this->varValue))
+						else
 						{
 							// foreignKey fields
 							if ($strInputType == 'select' && strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']))
 							{
 								// include blank Option
-								$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][0] = "-";
+								$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['includeBlankOption'] = true;
 
 								$arrKey = explode('.', $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
 								$strForeignTable = $arrKey[0];
@@ -2048,7 +2052,7 @@ window.addEvent(\'domready\', function() {
 									$sqlForeignFd = "SELECT f.id," . $strForeignSqlField . " FROM tl_formdata f, tl_formdata_details fd ";
 									$sqlForeignFd .= "WHERE (f.id=fd.pid) AND f." . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterKey'] . "='" . $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['formFilterValue'] . "' AND fd.ff_name='" . $strForeignField . "'";
 
-									if (strlen($strForeignKeyCond))
+									if (!empty($strForeignKeyCond))
 									{
 										$arrForeignKeyCond = preg_split('/([\s!=><]+)/', $strForeignKeyCond, -1, PREG_SPLIT_DELIM_CAPTURE);
 										$strForeignCondField = $arrForeignKeyCond[0];
@@ -2057,7 +2061,7 @@ window.addEvent(\'domready\', function() {
 										{
 											$sqlForeignFd .= ' AND f.' . $strForeignCondField . implode('', $arrForeignKeyCond);
 										}
-										elseif (in_array($strForeignCondField, $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['detailFields']))
+										if (in_array($strForeignCondField, $GLOBALS['TL_DCA'][$strForeignTable]['tl_formdata']['detailFields']))
 										{
 											$sqlForeignFd .= ' AND (SELECT value FROM tl_formdata_details WHERE ff_name="' .$strForeignCondField. '" AND pid=f.id ) ' . implode('', $arrForeignKeyCond);
 										}
@@ -2076,7 +2080,7 @@ window.addEvent(\'domready\', function() {
 										{
 											foreach ($arrForeignRecords as $arrForeignRecord)
 											{
-												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] . ' [~' . $arrForeignRecord['id'] . '~]';
+												$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][$arrForeignRecord['id']] = $arrForeignRecord[$strForeignField] .  ' [~' . $arrForeignRecord['id'] . '~]';
 											}
 										}
 										unset($arrForeignRecords);
@@ -2114,9 +2118,17 @@ window.addEvent(\'domready\', function() {
 								}
 								// sort options on label
 								asort($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-							}
+							} // foreignKey field
 
-							$arrValues = explode('|', $this->varValue);
+							// $arrValues = explode('|', $this->varValue);
+							if (!is_array($this->varValue))
+							{
+								$arrValues = explode('|', $this->varValue);
+							}
+							else
+							{
+								$arrValues = $this->varValue;
+							}
 
 							if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['efgStoreValues'])
 							{
@@ -2133,6 +2145,7 @@ window.addEvent(\'domready\', function() {
 									$strK = false;
 									if (strlen($vVal) && $strK == false)
 									{
+
 										// handle grouped options
 										foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] as $strOptsKey => $varOpts)
 										{
@@ -2152,7 +2165,7 @@ window.addEvent(\'domready\', function() {
 											}
 										}
 
-										// add saved option to avaliable options if not exists
+										// add saved option to available options if it does not exist
 										if ($strK === false)
 										{
 											$strK = preg_replace('/(.*?\[)(.*?)(\])/si', '$2', $vVal);
@@ -2165,37 +2178,51 @@ window.addEvent(\'domready\', function() {
 
 								$this->varValue = $arrNewValues;
 							}
-
 						}
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					elseif ($strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
+					elseif ($strInputType == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
 					{
-						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+						// Modify options to handle Contao 3 new validation in Widget::isValidOption()
+						if (in_array($this->strField, $this->arrDetailFields))
 						{
-							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-						}
-						else
-						{
-							$arrVals = array($this->varValue);
+							$strFirstOpt = array_pop($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
+
+							$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][1] = $strFirstOpt;
+							if (!empty($this->varValue))
+							{
+								$this->varValue = '1';
+							}
 						}
 
-						// tom, 2007-09-27, bugfix:
-						// .. not if value is empty or does not exist at all
-						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
-						if (strlen($arrVals[0]) && strlen($this->varValue))
-						{
-							$this->varValue = $arrVals[0];
-						}
-						else
-						{
-							$this->varValue = "";
-						}
-					} // field typ single checkbox
+
+//						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+//						{
+//
+//							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
+//						}
+//						else
+//						{
+//							$arrVals = array($this->varValue);
+//						}
+//
+//						// tom, 2007-09-27, bugfix:
+//						// .. not if value is empty or does not exist at all
+//						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
+//						if (strlen($arrVals[0]) && strlen($this->varValue))
+//						{
+//							$this->varValue = $arrVals[0];
+//						}
+//						else
+//						{
+//							$this->varValue = '';
+//						}
+
+					} // field type single checkbox
 
 					// field type efgLookupSelect
-					elseif ($strInputType=='efgLookupSelect')
+					elseif ($strInputType == 'efgLookupSelect')
 					{
 						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -2213,7 +2240,7 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -2228,6 +2255,9 @@ window.addEvent(\'domready\', function() {
 								}
 							}
 						}
+
+						// render type efgLookupSelect as SelectMenu
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 
 					} // field type efgLookupSelect
 
@@ -2250,7 +2280,7 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -2265,6 +2295,9 @@ window.addEvent(\'domready\', function() {
 								}
 							}
 						}
+
+						// render type efgLookupCheckbox as CheckboxMenu
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 
 					} // field type efgLookupCheckbox
 
@@ -2287,7 +2320,7 @@ window.addEvent(\'domready\', function() {
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $arrNewOptions;
 
 						// prepare varValue
-						if (strlen($this->varValue))
+						if (!empty($this->varValue))
 						{
 							if (!is_array($this->varValue))
 							{
@@ -2303,56 +2336,67 @@ window.addEvent(\'domready\', function() {
 							}
 						}
 
+						// render type efgLookupRadio as RadioMenu
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
+
 					} // field type efgLookupRadio
 
+					else
+					{
+						$this->varValue = $this->Formdata->prepareDatabaseValueForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+					}
+
+					$this->objActiveRecord->{$this->strField} = $this->varValue;
 
 					// Call load_callback
 					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback']))
 					{
 						foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['load_callback'] as $callback)
 						{
-							$this->import($callback[0]);
-							$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
+							if (is_array($callback))
+							{
+								$this->import($callback[0]);
+								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
+							}
 						}
+
+						$this->objActiveRecord->{$this->strField} = $this->varValue;
 					}
 
-					// Re-set the current value
-					$this->objActiveRecord->{$this->strField} = $this->varValue;
-
-					// input type efgLookupCheckbox: modify DCA to render as CheckboxMenu
-					if ($strInputType=='efgLookupCheckbox')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
-					}
-					// input type efgLookupRadio: modify DCA to render as RadioMenu
-					elseif ($strInputType=='efgLookupRadio')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
-					}
-					// input type efgLookupSelect: modify DCA to render as SelectMenu
-					elseif ($strInputType=='efgLookupSelect')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
-					}
+//					// input type efgLookupCheckbox: modify DCA to render as CheckboxMenu
+//					if ($strInputType=='efgLookupCheckbox')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
+//					}
+//					// input type efgLookupRadio: modify DCA to render as RadioMenu
+//					elseif ($strInputType=='efgLookupRadio')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
+//					}
+//					// input type efgLookupSelect: modify DCA to render as SelectMenu
+//					elseif ($strInputType=='efgLookupSelect')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
+//					}
 
 					// Build the current row
 					$blnAjax ? $strAjax .= $this->row() : $return .= $this->row();
 
-					// input type efgLookupCheckbox: reset DCA inputType
-					if ($strInputType=='efgLookupCheckbox')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupCheckbox';
-					}
-					// input type efgLookupRadio: reset DCA inputType
-					elseif ($strInputType=='efgLookupRadio')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupRadio';
-					}
-					// input type efgLookupSelect: reset DCA inputType
-					elseif ($strInputType=='efgLookupSelect')
-					{
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupSelect';
-					}
+//					// input type efgLookupCheckbox: reset DCA inputType
+//					if ($strInputType=='efgLookupCheckbox')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupCheckbox';
+//					}
+//					// input type efgLookupRadio: reset DCA inputType
+//					elseif ($strInputType=='efgLookupRadio')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupRadio';
+//					}
+//					// input type efgLookupSelect: reset DCA inputType
+//					elseif ($strInputType=='efgLookupSelect')
+//					{
+//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupSelect';
+//					}
 
 				}
 
