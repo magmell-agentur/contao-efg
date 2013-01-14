@@ -77,7 +77,6 @@ class EfgFormPaginator extends \Widget
 	 */
 	public function generate()
 	{
-
 		global $objPage;
 
 		if ($objPage->outputFormat == 'html5')
@@ -89,11 +88,13 @@ class EfgFormPaginator extends \Widget
 
 		if ($this->efgAddBackButton && (($this->formTotalPages > 1 && $this->formActivePage > 1) || TL_MODE == 'BE'))
 		{
-			if ($this->efgBackImageSubmit && is_file(TL_ROOT . '/' . $this->efgBackSingleSRC))
+			if ($this->efgBackImageSubmit && $this->efgBackSingleSRC > 0)
 			{
+				$objFileModel = \FilesModel::findOneBy('id', $this->efgBackSingleSRC);
+
 				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
 					($this->formActivePage ? ' name="FORM_BACK"' : ''),
-					$this->efgBackSingleSRC,
+					$objFileModel->path,
 					$this->strId,
 					(strlen($this->strClass) ? ' ' . $this->strClass : ''),
 					specialchars($this->efgBackSlabel),
@@ -115,11 +116,13 @@ class EfgFormPaginator extends \Widget
 		}
 
 
-		if ($this->imageSubmit && is_file(TL_ROOT . '/' . $this->singleSRC))
+		if ($this->imageSubmit && $this->singleSRC > 0)
 		{
+			$objFileModel = \FilesModel::findOneBy('id', $this->singleSRC);
+
 			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
 				($this->formActivePage ? ' name="FORM_NEXT"' : ''),
-				$this->singleSRC,
+				$objFileModel->path,
 				$this->strId,
 				(strlen($this->strClass) ? ' ' . $this->strClass : ''),
 				specialchars($this->slabel),
