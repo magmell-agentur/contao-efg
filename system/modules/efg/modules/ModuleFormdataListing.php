@@ -67,12 +67,6 @@ class ModuleFormdataListing extends \Module
 	protected $sqlFormFilter;
 
 	/**
-	 * Items in tl_form, all forms marked to store data in tl_formdata
-	 * @param array
-	 */
-	protected $arrStoringForms;
-
-	/**
 	 * Base fields in table tl_formdata
 	 * @param mixed
 	 */
@@ -502,7 +496,6 @@ class ModuleFormdataListing extends \Module
 
 		$this->strFormKey = '';
 		$this->strDcaKey = 'tl_formdata';
-
 		$this->strFormFilterKey = '';
 		$this->strFormFilterValue = '';
 
@@ -517,10 +510,10 @@ class ModuleFormdataListing extends \Module
 			}
 			else
 			{
-				$this->strFormKey = (substr($this->list_formdata, 0 , 3) == 'fd_' ? $this->list_formdata : 'fd_' . $this->list_formdata);
-				$this->strDcaKey = (substr($this->list_formdata, 0, 3) == 'fd_' ? $this->list_formdata : 'fd_'.$this->list_formdata);
+				$this->strFormKey = (substr($this->list_formdata, 0, 3) == 'fd_') ? $this->list_formdata : 'fd_' . $this->list_formdata;
+				$this->strDcaKey = (substr($this->list_formdata, 0, 3) == 'fd_') ? $this->list_formdata : 'fd_'.$this->list_formdata;
 				$this->strFormFilterKey = 'form';
-				$this->strFormFilterValue = $this->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+				$this->strFormFilterValue = $this->Formdata->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 				$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 			}
 		}
@@ -587,7 +580,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->editable = true;
 				}
-				elseif ( ($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id) > 0 )
 				{
 					$this->Template->editable = true;
 				}
@@ -600,7 +593,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->deletable = true;
 				}
-				elseif ( ($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id) > 0 )
 				{
 					$this->Template->deletable = true;
 				}
@@ -613,7 +606,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->exportable = true;
 				}
-				elseif ( ($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id) > 0 )
 				{
 					$this->Template->exportable = true;
 				}
@@ -716,20 +709,17 @@ class ModuleFormdataListing extends \Module
 				$this->editSingleRecord();
 				return;
 			}
-
 			elseif (\Input::get('act') == 'delete' && intval($this->intRecordId) > 0)
 			{
 				$this->deleteSingleRecord();
 				return;
 			}
-
 			elseif (\Input::get('act') == 'export' && intval($this->intRecordId) > 0)
 			{
 				$this->exportSingleRecord($strExportMode);
 				return;
 			}
-
-			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0)
+			elseif (intval($this->intRecordId) > 0)
 			{
 				$this->listSingleRecord();
 				return;
@@ -1025,7 +1015,7 @@ class ModuleFormdataListing extends \Module
 		}
 		if (strlen($this->strFormKey))
 		{
-			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE "). $this->strFormFilterKey . "='" . $this->strFormFilterValue . "'";
+			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $this->strFormFilterKey . "='" . $this->strFormFilterValue . "'";
 		}
 
 		// replace insert tags in where, e.g. {{user::id}}
@@ -1146,7 +1136,7 @@ class ModuleFormdataListing extends \Module
 
 			if (!empty($arrSort))
 			{
-				$strListSort = 'ORDER BY ' . implode(',', $arrSort);
+				$strListSort = ' ORDER BY ' . implode(',', $arrSort);
 			}
 			else
 			{
@@ -1275,7 +1265,7 @@ class ModuleFormdataListing extends \Module
 			{
 				header('Content-Type: appplication/csv; charset=' . ($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
 				header('Content-Transfer-Encoding: binary');
-				header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") .'.csv"');
+				header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") . '.csv"');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 				header('Pragma: public');
 				header('Expires: 0');
@@ -1330,7 +1320,7 @@ class ModuleFormdataListing extends \Module
 
 					$strExpSep = ";";
 				}
-				if ($strExportMode=='xls')
+				elseif ($strExportMode=='xls')
 				{
 					if (!$blnCustomXlsExport)
 					{
@@ -1671,7 +1661,7 @@ class ModuleFormdataListing extends \Module
 			/**
 			 * Pagination
 			 */
-			if (intval($per_page)>0)
+			if (intval($per_page) > 0)
 			{
 				$objPagination = new \Pagination($intTotalcount, $per_page);
 				$this->Template->pagination = $objPagination->generate("\n  ");
@@ -1684,7 +1674,7 @@ class ModuleFormdataListing extends \Module
 			$this->Template->per_page_label = specialchars($GLOBALS['TL_LANG']['MSC']['list_perPage']);
 			$this->Template->search_label = specialchars($GLOBALS['TL_LANG']['MSC']['search']);
 			$this->Template->per_page = \Input::get('per_page');
-			if (intval($this->perPage)>0)
+			if (intval($this->perPage) > 0)
 			{
 				$this->Template->list_perPage = $this->perPage;
 			}
@@ -1749,15 +1739,15 @@ class ModuleFormdataListing extends \Module
 
 					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'datim')
 					{
-						$strVal = ( $row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '' );
+						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
@@ -1798,7 +1788,7 @@ class ModuleFormdataListing extends \Module
 								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
-									$tmparr = split("\\|", $row[$v]);
+									$tmparr = explode('|', $row[$v]);
 									$fieldvalues = array();
 									foreach ($tmparr as $valuedesc)
 									{
@@ -1885,19 +1875,18 @@ class ModuleFormdataListing extends \Module
 						}
 					}
 
-					if ($strExportMode=='csv')
+					if ($strExportMode == 'csv')
 					{
 						$strVal = str_replace('"', '""', $strVal);
 						echo $strExpSep . $strExpEncl . $strVal . $strExpEncl;
 
 						$strExpSep = ";";
 					}
-
-					if ($strExportMode=='xls')
+					elseif ($strExportMode == 'xls')
 					{
 						if (!$blnCustomXlsExport)
 						{
-							$xls->setcell(array("sheetname" => $strXlsSheet,"row" => $intRowCounter, "col" => $intColCounter, "data" => $strVal, "vallign" => XLSXF_VALLIGN_TOP, "fontfamily" => XLSFONT_FAMILY_NORMAL));
+							$xls->setcell(array('sheetname' => $strXlsSheet, 'row' => $intRowCounter, 'col' => $intColCounter, 'data' => $strVal, 'vallign' => XLSXF_VALLIGN_TOP, 'fontfamily' => XLSFONT_FAMILY_NORMAL));
 						}
 						else
 						{
@@ -1909,7 +1898,7 @@ class ModuleFormdataListing extends \Module
 
 				$intRowCounter++;
 
-				if ($strExportMode=='csv')
+				if ($strExportMode == 'csv')
 				{
 					$strExpSep = '';
 					echo "\n";
@@ -1917,11 +1906,11 @@ class ModuleFormdataListing extends \Module
 
 			} // foreach ($result as $row)
 
-			if ($strExportMode=='xls')
+			if ($strExportMode == 'xls')
 			{
 				if (!$blnCustomXlsExport)
 				{
-					$xls->sendfile("export_" . $this->strFormKey . "_" . date("Ymd_His") . ".xls");
+					$xls->sendfile('export_' . $this->strFormKey . '_' . date("Ymd_His") . '.xls');
 					exit;
 				}
 				else
@@ -2488,8 +2477,6 @@ class ModuleFormdataListing extends \Module
 			$arrListFields = $arrTempFields;
 		}
 
-
-
 		$strQuery = "SELECT ";
 		$strWhere = '';
 
@@ -2536,7 +2523,7 @@ class ModuleFormdataListing extends \Module
 		$arrHookData = array();
 		$arrHookDataColumns = array();
 
-		if ($strExportMode=='xls')
+		if ($strExportMode == 'xls')
 		{
 			// check for HOOK efgExportXls
 			if (array_key_exists('efgExportXls', $GLOBALS['TL_HOOKS']) && is_array($GLOBALS['TL_HOOKS']['efgExportXls']))
@@ -2547,10 +2534,7 @@ class ModuleFormdataListing extends \Module
 			{
 				include(TL_ROOT.'/system/modules/efg/plugins/xls_export/xls_export.php');
 			}
-		}
 
-		if ($strExportMode=='xls')
-		{
 			if (!$blnCustomXlsExport)
 			{
 				$xls = new xlsexport();
@@ -2558,13 +2542,12 @@ class ModuleFormdataListing extends \Module
 				$strXlsSheet = "Export";
 				$xls->addworksheet($strXlsSheet);
 			}
-
 		}
 		else // defaults to csv
 		{
 			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
 			header('Content-Transfer-Encoding: binary');
-			header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") .'.csv"');
+			header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") . '.csv"');
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 			header('Pragma: public');
 			header('Expires: 0');
@@ -2626,20 +2609,20 @@ class ModuleFormdataListing extends \Module
 						{
 							$strName = \String::decodeEntities($strName);
 
-							if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
+							if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
 							{
 								$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
 							}
 						}
 
-						if ($strExportMode=='csv')
+						if ($strExportMode == 'csv')
 						{
 							$strName = str_replace('"', '""', $strName);
 							echo $strExpSep . $strExpEncl . str_replace('"', '""', $strName) . $strExpEncl;
 
 							$strExpSep = ";";
 						}
-						if ($strExportMode=='xls')
+						elseif ($strExportMode == 'xls')
 						{
 							if (!$blnCustomXlsExport)
 							{
@@ -2656,7 +2639,7 @@ class ModuleFormdataListing extends \Module
 
 					$intRowCounter++;
 
-					if ($strExportMode=='csv')
+					if ($strExportMode == 'csv')
 					{
 						echo "\n";
 					}
@@ -2733,7 +2716,7 @@ class ModuleFormdataListing extends \Module
 								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
-									$tmparr = split("\\|", $row[$v]);
+									$tmparr = explode('|', $row[$v]);
 									$fieldvalues = array();
 									foreach ($tmparr as $valuedesc)
 									{
@@ -2814,21 +2797,21 @@ class ModuleFormdataListing extends \Module
 						$strVal = \String::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
-						if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
+						if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
 						{
 							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
 						}
 					}
 
 
-					if ($strExportMode=='csv')
+					if ($strExportMode == 'csv')
 					{
 						$strVal = str_replace('"', '""', $strVal);
 						echo $strExpSep . $strExpEncl . $strVal . $strExpEncl;
 
 						$strExpSep = ";";
 					}
-					if ($strExportMode=='xls')
+					elseif ($strExportMode == 'xls')
 					{
 						if (!$blnCustomXlsExport)
 						{
@@ -2842,7 +2825,7 @@ class ModuleFormdataListing extends \Module
 
 				}
 
-				if ($strExportMode=='csv')
+				if ($strExportMode == 'csv')
 				{
 					$strExpSep = '';
 					echo "\n";
@@ -2852,11 +2835,11 @@ class ModuleFormdataListing extends \Module
 
 		} // if objRow->numRows
 
-		if ($strExportMode=='xls')
+		if ($strExportMode == 'xls')
 		{
 			if (!$blnCustomXlsExport)
 			{
-				$xls->sendfile("export_" . $this->strFormKey . "_" . date("Ymd") . ".xls");
+				$xls->sendfile('export_' . $this->strFormKey . '_' . date("Ymd") . '.xls');
 				exit;
 			}
 			else
@@ -3060,7 +3043,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// check record
-		if (is_null($this->intRecordId) || intval($this->intRecordId)<1)
+		if (is_null($this->intRecordId) || intval($this->intRecordId) < 1)
 		{
 			unset($_GET[$this->strDetailKey]);
 			unset($_GET['act']);
@@ -3091,14 +3074,14 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnDeleteAllowed = false;
 		}
-		elseif($this->efg_fe_delete_access == 'public')
+		elseif ($this->efg_fe_delete_access == 'public')
 		{
 			$blnDeleteAllowed = true;
 			$intDeleteId = intval($this->intRecordId);
 		}
 		elseif (strlen($this->efg_fe_delete_access))
 		{
-			if (intval($varOwner['fd_member'])>0 && in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
+			if (intval($varOwner['fd_member']) > 0 && in_array(intval($varOwner['fd_member']), $this->arrAllowedDeleteOwnerIds))
 			{
 				$blnDeleteAllowed = true;
 				$intDeleteId = intval($this->intRecordId);
@@ -3110,8 +3093,7 @@ class ModuleFormdataListing extends \Module
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
 		}
-
-		if ($blnDeleteAllowed)
+		else
 		{
 			\Database::getInstance()->prepare("DELETE FROM tl_formdata_details WHERE pid=?")
 				->execute(array($intDeleteId));

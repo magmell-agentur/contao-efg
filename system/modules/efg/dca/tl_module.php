@@ -16,7 +16,7 @@
  * Add palettes to tl_module
  */
 $GLOBALS['TL_DCA']['tl_module']['palettes']['formdatalisting'] = '{title_legend},name,headline,type;{config_legend},list_formdata,list_where,list_sort,perPage,list_fields,list_info;{efgSearch_legend},list_search,efg_list_searchtype;{protected_legend:hide},efg_list_access,efg_fe_edit_access,efg_fe_delete_access,efg_fe_export_access;{comments_legend:hide},efg_com_allow_comments;{template_legend:hide},list_layout,list_info_layout;{expert_legend:hide},efg_DetailsKey,efg_iconfolder,efg_fe_keep_id,efg_fe_no_formatted_mail,efg_fe_no_confirmation_mail,align,space,cssID';
-$GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_ext_module', 'onloadModuleType');
+$GLOBALS['TL_DCA']['tl_module']['fields']['type']['load_callback'][] = array('tl_module_efg', 'onloadModuleType');
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'efg_com_allow_comments';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['efg_com_allow_comments'] = 'com_moderate,com_bbcode,com_requireLogin,com_disableCaptcha,efg_com_per_page,com_order,com_template,efg_com_notify';
@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['list_formdata'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_module']['list_formdata'],
 	'exclude'                 => true,
 	'inputType'               => 'select',
-	'options_callback'        => array('tl_ext_module', 'getFormdataTables'),
+	'options_callback'        => array('tl_module_efg', 'getFormdataTables'),
 	'eval'                    => array('mandatory' => true, 'maxlength' => 64, 'includeBlankOption' => true, 'submitOnChange' => true, 'tl_class'=>'w50'),
 	'sql'                     => "varchar(64) NOT NULL default ''"
 );
@@ -266,14 +266,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
 
 
 /**
- * Class tl_ext_module
+ * Class tl_module_efg
  *
  * Provide miscellaneous methods that are used by the data configuration array.
  * @copyright  Thomas Kuhn 2007 - 2011
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
-class tl_ext_module extends \Backend
+class tl_module_efg extends \Backend
 {
 
 	private $arrFormdataTables = null;
@@ -289,19 +289,19 @@ class tl_ext_module extends \Backend
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['inputType'] = 'checkboxWizard';
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['eval']['mandatory'] = false;
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['options_callback'] = array('tl_ext_module', 'optionsListFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['load_callback'][] = array('tl_ext_module', 'onloadListFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['options_callback'] = array('tl_module_efg', 'optionsListFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['load_callback'][] = array('tl_module_efg', 'onloadListFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_fields']['save_callback'][] = array('tl_module_efg', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['inputType'] = 'checkboxWizard';
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['options_callback'] = array('tl_ext_module', 'optionsSearchFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['load_callback'][] = array('tl_ext_module', 'onloadSearchFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['options_callback'] = array('tl_module_efg', 'optionsSearchFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['load_callback'][] = array('tl_module_efg', 'onloadSearchFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_search']['save_callback'][] = array('tl_module_efg', 'onsaveFieldList');
 
 			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['inputType'] = 'checkboxWizard';
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['options_callback'] = array('tl_ext_module', 'optionsInfoFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['load_callback'][] = array('tl_ext_module', 'onloadInfoFields');
-			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['save_callback'][] = array('tl_ext_module', 'onsaveFieldList');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['options_callback'] = array('tl_module_efg', 'optionsInfoFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['load_callback'][] = array('tl_module_efg', 'onloadInfoFields');
+			$GLOBALS['TL_DCA']['tl_module']['fields']['list_info']['save_callback'][] = array('tl_module_efg', 'onsaveFieldList');
 		}
 		return $varValue;
 	}
@@ -312,27 +312,28 @@ class tl_ext_module extends \Backend
 	 */
 	public function getFormdataTables(DataContainer $dc)
 	{
-		if (is_null($this->arrFormdataTables) || is_null($this->arrFormdataFields))
+		if (null === $this->arrFormdataTables || null === $this->arrFormdataFields)
 		{
 			$this->arrFormdataTables = array();
 			$this->arrFormdataTables['fd_feedback'] = $GLOBALS['TL_LANG']['MOD']['feedback'][0];
 
 			// all forms marked to store data
-			$objForms = \Database::getInstance()->prepare("SELECT f.id,f.title,f.alias,f.formID,ff.type,ff.name,ff.label FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND storeFormdata=? ORDER BY title")
-				->execute("1");
-			while ($objForms->next())
+			$objFields = \Database::getInstance()->prepare("SELECT f.id,f.title,f.alias,f.formID,ff.type,ff.name,ff.label FROM tl_form f, tl_form_field ff WHERE (f.id=ff.pid) AND storeFormdata=? ORDER BY title")
+				->executeUncached('1');
+
+			while ($objFields->next())
 			{
-				$varKey = 'fd_' . (!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title));
-				$this->arrFormdataTables[$varKey] = $objForms->title;
-				$this->arrFormdataFields['fd_feedback'][$objForms->name] = $objForms->label;
-				$this->arrFormdataFields[$varKey][$objForms->name] = $objForms->label;
+				$arrField = $objFields->row();
+				$varKey = 'fd_' . (strlen($arrField['alias']) ? $arrField['alias'] : str_replace('-', '_', standardize($arrField['title'])));
+				$this->arrFormdataTables[$varKey] = $arrField['title'];
+				$this->arrFormdataFields['fd_feedback'][$arrField['name']] = $arrField['label'];
+				$this->arrFormdataFields[$varKey][$arrField['name']] = $arrField['label'];
 			}
 		}
-
-		$this->loadLanguageFile('tl_formdata');
+		$this->loadLanguageFile('tl_formdata', null, true);
 		if (strlen($dc->value))
 		{
-			$this->loadDataContainer($dc->value);
+			$this->loadDataContainer($dc->value, true);
 		}
 		return $this->arrFormdataTables;
 	}

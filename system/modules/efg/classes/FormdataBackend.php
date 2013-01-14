@@ -135,6 +135,17 @@ class FormdataBackend extends \Backend
 			}
 		}
 
+		// Remove cached dca files
+		$arrFiles = scan(TL_ROOT . '/system/cache/dca', true);
+		foreach ($arrFiles as $strFile)
+		{
+			if (substr($strFile, 0, 3) == 'fd_' || $strFile == 'tl_formdata.php')
+			{
+				$objFile = new \File('system/cache/dca/' . $strFile);
+				$objFile->delete();
+			}
+		}
+
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
 		$tplConfig->arrForm = $this->arrForm;
@@ -162,8 +173,13 @@ class FormdataBackend extends \Backend
 				$objFile = new \File('system/cache/language/' . $strModLang . '/modules.php');
 				$objFile->delete();
 			}
+			if (is_file(TL_ROOT . '/system/cache/language/' . $strModLang .'/tl_formdata.php'))
+			{
+				$objFile = new \File('system/cache/language/' . $strModLang . '/tl_formdata.php');
+				$objFile->delete();
+			}
 
-
+			// Create language files
 			if (array_key_exists($strModLang, $arrLanguages))
 			{
 				$strFile = sprintf('%s/system/modules/%s/languages/%s/%s.php', TL_ROOT, 'efg', $strModLang, 'tl_efg_modules');

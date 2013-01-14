@@ -157,11 +157,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	protected $arrDetailFields = null;
 
 	/**
-	 * Detail fields in table tl_formdata_details
-	 */
-	protected $arrDetailFieldsObj = null;
-
-	/**
 	 * Fields available for import field mapping
 	 */
 	protected $arrImportableFields = null;
@@ -344,7 +339,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					$this->strFormKey = \Input::get('do');
 					$this->strFormFilterKey = 'form';
-					$this->strFormFilterValue = $this->Formdata->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
+					$this->strFormFilterValue = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['title'];
 					$this->sqlFormFilter = ' AND ' . $this->strFormFilterKey . '=\'' . $this->strFormFilterValue . '\' ';
 
 					// add sql where condition 'form'=TITLE_OF_FORM
@@ -763,7 +758,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	public function create($set=array())
 	{
 
-		if (isset($this->strFormKey) && strlen($this->strFormKey))
+		if (!empty($this->strFormKey))
 		{
 			$set['form'] = $this->Formdata->arrStoringForms[str_replace('fd_', '', $this->strFormKey)]['title'];
 			$set['date'] = time();
@@ -3175,7 +3170,7 @@ window.addEvent(\'domready\', function() {
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
-					elseif (in_array($v, $this->arrBaseFields) && in_array($v , $this->arrOwnerFields))
+					elseif (in_array($v, $this->arrBaseFields) && in_array($v, $this->arrOwnerFields))
 					{
 						if ($v == 'fd_member')
 						{
@@ -3479,7 +3474,7 @@ window.addEvent(\'domready\', function() {
 		elseif ($session['search'][$strSessionKey]['value'] != '')
 		{
 			$sqlSearchField = $session['search'][$strSessionKey]['field'];
-			if (in_array($sqlSearchField, $this->arrDetailFields) )
+			if (in_array($sqlSearchField, $this->arrDetailFields))
 			{
 				$sqlSearchField = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' . $session['search'][$strSessionKey]['field'] .'\' AND pid=f.id)';
 			}
@@ -3909,11 +3904,11 @@ window.addEvent(\'domready\', function() {
 				$arrProcedure[] = "id IN(" . implode(',', array_map('intval', $this->root)) . ")";
 			}
 
-			if (in_array($field, $this->arrBaseFields) )
+			if (in_array($field, $this->arrBaseFields))
 			{
 				$sqlField = $field;
 			}
-			elseif (in_array($field, $this->arrDetailFields) )
+			elseif (in_array($field, $this->arrDetailFields))
 			{
 				$sqlField = "SELECT DISTINCT(value) FROM tl_formdata_details WHERE ff_name='" . $field . "' AND pid=f.id";
 			}
@@ -5616,6 +5611,7 @@ var Stylect = {
 			}
 			else
 			{
+// TODO: fix path
 				include(TL_ROOT.'/plugins/xls_export/xls_export.php');
 			}
 		}
