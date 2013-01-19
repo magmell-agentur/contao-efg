@@ -90,7 +90,7 @@ class EfgFormPaginator extends \Widget
 		{
 			if ($this->efgBackImageSubmit && $this->efgBackSingleSRC > 0)
 			{
-				$objFileModel = \FilesModel::findOneBy('id', $this->efgBackSingleSRC);
+				$objFileModel = \FilesModel::findByPk($this->efgBackSingleSRC);
 
 				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
 					($this->formActivePage ? ' name="FORM_BACK"' : ''),
@@ -118,7 +118,7 @@ class EfgFormPaginator extends \Widget
 
 		if ($this->imageSubmit && $this->singleSRC > 0)
 		{
-			$objFileModel = \FilesModel::findOneBy('id', $this->singleSRC);
+			$objFileModel = \FilesModel::findByPk($this->singleSRC);
 
 			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
 				($this->formActivePage ? ' name="FORM_NEXT"' : ''),

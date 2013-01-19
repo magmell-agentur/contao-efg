@@ -435,8 +435,16 @@ class FormdataProcessor extends \Frontend
 
 			$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 			$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 			$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
+
+			if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
+			{
+				$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
+				if ($objFileModel !== null)
+				{
+					$messageHtmlTmpl = $objFileModel->path;
+				}
+			}
 			if ($messageHtmlTmpl != '')
 			{
 				$fileTemplate = new \File($messageHtmlTmpl);
@@ -603,7 +611,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
-				$messageText = $this->replaceInsertTags($messageText);
+				$messageText = $this->replaceInsertTags($messageText, false);
 				if ($blnEvalMessageText)
 				{
 					$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
@@ -614,7 +622,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($messageHtml))
 			{
 				$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
-				$messageHtml = $this->replaceInsertTags($messageHtml);
+				$messageHtml = $this->replaceInsertTags($messageHtml, false);
 				if ($blnEvalMessageHtml)
 				{
 					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
@@ -624,7 +632,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
-				$subject = $this->replaceInsertTags($subject);
+				$subject = $this->replaceInsertTags($subject, false);
 				if ($blnEvalSubject)
 				{
 					$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
@@ -634,13 +642,13 @@ class FormdataProcessor extends \Frontend
 			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-				$sender = $this->replaceInsertTags($sender);
+				$sender = $this->replaceInsertTags($sender, false);
 			}
 
 			// replace insert tags in replyto
 			if (!empty($arrForm['confirmationMailReplyto']))
 			{
-				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto']);
+				$replyTo = $this->replaceInsertTags($arrForm['confirmationMailReplyto'], false);
 			}
 
 			$confEmail = new \Email();
@@ -668,11 +676,11 @@ class FormdataProcessor extends \Frontend
 					{
 						foreach ($arrCustomAttachments as $intFileId)
 						{
-							$objModel = \FilesModel::findOneBy('id', $intFileId);
+							$objFileModel = \FilesModel::findByPk($intFileId);
 
-							if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path) && is_readable(TL_ROOT . '/' . $objModel->path))
+							if ($objFileModel !== null && is_file(TL_ROOT . '/' . $objFileModel->path) && is_readable(TL_ROOT . '/' . $objFileModel->path))
 							{
-								$objFile = new \File($objModel->path);
+								$objFile = new \File($objFileModel->path);
 								if ($objFile->size)
 								{
 									$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
@@ -713,7 +721,7 @@ class FormdataProcessor extends \Frontend
 				{
 					if (!empty($recipient))
 					{
-						$recipient = $this->replaceInsertTags($recipient);
+						$recipient = $this->replaceInsertTags($recipient, false);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
 						if (strpos($recipient, '<') > 0)
@@ -785,9 +793,16 @@ class FormdataProcessor extends \Frontend
 
 			$subject = \String::decodeEntities($arrForm['formattedMailSubject']);
 			$messageText = \String::decodeEntities($arrForm['formattedMailText']);
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
 			$messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
+			if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
+			{
+				$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
+				if ($objFileModel !== null)
+				{
+					$messageHtmlTmpl = $objFileModel->path;
+				}
+			}
 			if ($messageHtmlTmpl != '')
 			{
 				$fileTemplate = new \File($messageHtmlTmpl);
@@ -951,7 +966,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
-				$messageText = $this->replaceInsertTags($messageText);
+				$messageText = $this->replaceInsertTags($messageText, false);
 				if ($blnEvalMessageText)
 				{
 					$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
@@ -961,7 +976,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($messageHtml))
 			{
 				$messageHtml =  preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
-				$messageHtml = $this->replaceInsertTags($messageHtml);
+				$messageHtml = $this->replaceInsertTags($messageHtml, false);
 				if ($blnEvalMessageHtml)
 				{
 					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
@@ -971,7 +986,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
-				$subject = $this->replaceInsertTags($subject);
+				$subject = $this->replaceInsertTags($subject, false);
 				if ($blnEvalSubject)
 				{
 					$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
@@ -981,8 +996,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-				// 2008-09-20 tom: Controller->replaceInsertTags seems not to work if string to parse contains insert tag only, so add space and trim result
-				$sender = trim($this->replaceInsertTags(" " . $sender . " "));
+				$sender = trim($this->replaceInsertTags($sender, false));
 			}
 
 			$infoEmail = new \Email();
@@ -1016,11 +1030,11 @@ class FormdataProcessor extends \Frontend
 					{
 						foreach ($arrCustomAttachments as $intFileId)
 						{
-							$objModel = \FilesModel::findOneBy('id', $intFileId);
+							$objFileModel = \FilesModel::findByPk($intFileId);
 
-							if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path) && is_readable(TL_ROOT . '/' . $objModel->path))
+							if ($objFileModel !== null && is_file(TL_ROOT . '/' . $objFileModel->path) && is_readable(TL_ROOT . '/' . $objFileModel->path))
 							{
-								$objFile = new \File($objModel->path);
+								$objFile = new \File($objFileModel->path);
 								if ($objFile->size)
 								{
 									$attachments[$objFile->value] = array('file' => TL_ROOT . '/' . $objFile->value, 'name' => $objFile->basename, 'mime' => $objFile->mime);
@@ -1060,7 +1074,7 @@ class FormdataProcessor extends \Frontend
 				{
 					if (!empty($recipient))
 					{
-						$recipient = $this->replaceInsertTags($recipient);
+						$recipient = $this->replaceInsertTags($recipient, false);
 						$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
 						$recipientName = '';
 						if (strpos($recipient, '<') > 0)

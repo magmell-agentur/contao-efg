@@ -669,7 +669,7 @@ class ModuleFormdataListing extends \Module
 
 			// replace insert tags in where, e.g. {{user::id}}
 			$strWhere = $this->replaceWhereTags($strWhere);
-			$strWhere = $this->replaceInsertTags($strWhere);
+			$strWhere = $this->replaceInsertTags($strWhere, false);
 			$strQuery .=  $strWhere;
 
 			$objCheck = \Database::getInstance()->prepare($strQuery)
@@ -1020,7 +1020,7 @@ class ModuleFormdataListing extends \Module
 
 		// replace insert tags in where, e.g. {{user::id}}
 		$strWhere = $this->replaceWhereTags($strWhere);
-		$strWhere = $this->replaceInsertTags($strWhere);
+		$strWhere = $this->replaceInsertTags($strWhere, false);
 
 		$strQuery .=  $strWhere;
 

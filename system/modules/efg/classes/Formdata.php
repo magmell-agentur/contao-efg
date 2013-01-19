@@ -860,11 +860,11 @@ class Formdata extends \Frontend
 								{
 									if (is_numeric($mxVal))
 									{
-										$objFile = \FilesModel::findOneBy('id', $mxVal);
+										$objFileModel = \FilesModel::findByPk($mxVal);
 
-										if ($objFile->path)
+										if ($objFileModel->path)
 										{
-											$arrSel[] = $objFile->path;
+											$arrSel[] = $objFileModel->path;
 										}
 									}
 									else
@@ -880,11 +880,11 @@ class Formdata extends \Frontend
 					{
 						if (is_numeric($varValue))
 						{
-							$objFile = \FilesModel::findOneBy('id', $varValue);
+							$objFileModel = \FilesModel::findByPk($varValue);
 
-							if ($objFile->path)
+							if ($objFileModel->path)
 							{
-								$strVal = $objFile->path;
+								$strVal = $objFileModel->path;
 							}
 						}
 						else
@@ -1413,10 +1413,10 @@ class Formdata extends \Frontend
 							{
 								if (!is_numeric($strFile))
 								{
-									$objFile = \FilesModel::findOneBy('path', $strFile);
-									if ($objFile !== null)
+									$objFileModel = \FilesModel::findOneBy('path', $strFile);
+									if ($objFileModel !== null)
 									{
-										$varVal[$key] = \FilesModel::findOneBy('path', $strFile)->id;
+										$varVal[$key] = $objFileModel->id;
 									}
 								}
 							}
@@ -1425,10 +1425,10 @@ class Formdata extends \Frontend
 						{
 							if (!is_numeric($varVal))
 							{
-								$objFile = \FilesModel::findOneBy('path', $varVal);
-								if ($objFile !== null)
+								$objFileModel = \FilesModel::findOneBy('path', $varVal);
+								if ($objFileModel !== null)
 								{
-									$varVal = \FilesModel::findOneBy('path', $varVal)->id;
+									$varVal = $objFileModel->id;
 								}
 							}
 						}
@@ -1538,7 +1538,7 @@ class Formdata extends \Frontend
 				$strLookupWhere = \String::decodeEntities($arrLookupOptions['lookup_where']);
 				if (!empty($strLookupWhere))
 				{
-					$strLookupWhere = $this->replaceInsertTags($strLookupWhere);
+					$strLookupWhere = $this->replaceInsertTags($strLookupWhere, false);
 				}
 
 				$arrLookupField = explode('.', $strLookupField);

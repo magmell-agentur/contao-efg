@@ -2671,11 +2671,11 @@ window.addEvent(\'domready\', function() {
 				{
 					if (is_numeric($varFile))
 					{
-						$objFile = \FilesModel::findOneBy('id', $varFile);
+						$objFileModel = \FilesModel::findByPk($varFile);
 
-						if ($objFile !== null)
+						if ($objFileModel !== null)
 						{
-							$varValue[$key] = $objFile->path;
+							$varValue[$key] = $objFileModel->path;
 						}
 					}
 				}
@@ -2687,11 +2687,11 @@ window.addEvent(\'domready\', function() {
 			{
 				if (is_numeric($varValue))
 				{
-					$objFile = \FilesModel::findOneBy('id', $varValue);
+					$objFileModel = \FilesModel::findByPk($varValue);
 
-					if ($objFile !== null)
+					if ($objFileModel !== null)
 					{
-						$varValue = $objFile->path;
+						$varValue = $objFileModel->path;
 					}
 				}
 			}
@@ -4506,7 +4506,6 @@ window.addEvent(\'domready\', function() {
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
-			//"'.$this->strTable.'.id='.$this->intId.'"'
 			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata mail()', TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
@@ -4642,7 +4641,15 @@ window.addEvent(\'domready\', function() {
 		$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 		$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
 		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
-// TODO: adopt to new database assisted file manager, which saves IDs instead of paths (EFG should store paths, fileTree needsIDs)
+
+		if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
+		{
+			$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
+			if ($objFileModel !== null)
+			{
+				$messageHtmlTmpl = $objFileModel->path;
+			}
+		}
 		if ($messageHtmlTmpl != '')
 		{
 			$fileTemplate = new \File($messageHtmlTmpl);
@@ -4670,7 +4677,6 @@ window.addEvent(\'domready\', function() {
 
 		// Replace tags in messageText, messageHtml ...
 		$tags = array();
-		// preg_match_all('/{{[^{}]+}}/i', $messageText . $messageHtml . $subject . $sender, $tags);
 		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
 
 		// Replace tags of type {{form::<form field name>}}
@@ -4836,7 +4842,7 @@ window.addEvent(\'domready\', function() {
 		if (strlen($subject))
 		{
 			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
-			$subject = $this->replaceInsertTags($subject);
+			$subject = $this->replaceInsertTags($subject, false);
 			if ($blnEvalSubject)
 			{
 				$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
@@ -4845,7 +4851,7 @@ window.addEvent(\'domready\', function() {
 		if (strlen($messageText))
 		{
 			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
-			$messageText = $this->replaceInsertTags($messageText);
+			$messageText = $this->replaceInsertTags($messageText, false);
 			if ($blnEvalMessageText)
 			{
 				$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
@@ -4854,7 +4860,7 @@ window.addEvent(\'domready\', function() {
 		if (strlen($messageHtml))
 		{
 			$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
-			$messageHtml = $this->replaceInsertTags($messageHtml);
+			$messageHtml = $this->replaceInsertTags($messageHtml, false);
 			if ($blnEvalMessageHtml)
 			{
 				$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
@@ -4864,7 +4870,7 @@ window.addEvent(\'domready\', function() {
 		// replace insert tags in sender
 		if (strlen($sender))
 		{
-			$sender = $this->replaceInsertTags($sender);
+			$sender = $this->replaceInsertTags($sender, false);
 		}
 
 		$confEmail = new \Email();
@@ -4887,11 +4893,11 @@ window.addEvent(\'domready\', function() {
 				{
 					foreach ($arrCustomAttachments as $intFileId)
 					{
-						$objModel = \FilesModel::findOneBy('id', $intFileId);
+						$objFileModel = \FilesModel::findByPk($intFileId);
 
-						if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path) && is_readable(TL_ROOT . '/' . $objModel->path))
+						if ($objFileModel !== null && is_file(TL_ROOT . '/' . $objFileModel->path) && is_readable(TL_ROOT . '/' . $objFileModel->path))
 						{
-							$objFile = new \File($objModel->path);
+							$objFile = new \File($objFileModel->path);
 							if ($objFile->size)
 							{
 								$attachments[] = $objFile->value;
@@ -5121,7 +5127,7 @@ window.addEvent(\'domready\', function() {
 				$this->reload();
 			}
 
-			$objFileModel = \FilesModel::findOneBy('id', \Input::post('import_source'));
+			$objFileModel = \FilesModel::findByPk(\Input::post('import_source'));
 			$objFile = new \File($objFileModel->path);
 
 			if ($objFile->extension != 'csv')
