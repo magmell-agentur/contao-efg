@@ -63,7 +63,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['efgAliasField'] = array
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'select',
-	'options_callback'        => array('tl_ext_form', 'getAliasFormFields'),
+	'options_callback'        => array('tl_form_efg', 'getAliasFormFields'),
 	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64),
 	'sql'                     => "varchar(64) NOT NULL default ''"
 );
@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailRecipientField'] = arra
 	'exclude'                 => true,
 	'filter'                  => false,
 	'inputType'               => 'select',
-	'options_callback'        => array('tl_ext_form', 'getEmailFormFields'),
+	'options_callback'        => array('tl_form_efg', 'getEmailFormFields'),
 	'eval'                    => array('chosen'=>true, 'mandatory'=>true, 'maxlength'=>64, 'tl_class'=>'w50'),
 	'sql'                     => "varchar(64) NOT NULL default ''"
 );
@@ -249,7 +249,6 @@ $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendFormattedMail
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'sendConfirmationMail';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'addConfirmationMailAttachments';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'addFormattedMailAttachments';
-
 $GLOBALS['TL_DCA']['tl_form']['palettes']['__selector__'][] = 'storeFormdata';
 $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] =  str_replace(array('storeValues', 'sendViaEmail'), array('storeValues;{efgStoreFormdata_legend:hide},storeFormdata', 'sendViaEmail;{efgSendFormattedMail_legend:hide},sendFormattedMail;{efgSendConfirmationMail_legend:hide},sendConfirmationMail'), $GLOBALS['TL_DCA']['tl_form']['palettes']['default'] );
 
@@ -272,14 +271,14 @@ array_insert($GLOBALS['TL_DCA']['tl_form']['subpalettes'], count($GLOBALS['TL_DC
 
 
 /**
- * Class tl_extform
+ * Class tl_form_efg
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
-class tl_ext_form extends \Backend
+class tl_form_efg extends \Backend
 {
 
 	/**
@@ -288,7 +287,6 @@ class tl_ext_form extends \Backend
 	 */
 	public function getEmailFormFields()
 	{
-
 		$fields = array();
 
 		// Get all form fields which can be used to define recipient of confirmation mail
@@ -316,7 +314,6 @@ class tl_ext_form extends \Backend
 	 */
 	public function getAliasFormFields()
 	{
-
 		$fields = array();
 
 		// Get all form fields which can be used to build auto alias

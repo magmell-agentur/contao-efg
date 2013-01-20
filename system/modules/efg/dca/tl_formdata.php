@@ -251,7 +251,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
  * Class tl_formdata
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */

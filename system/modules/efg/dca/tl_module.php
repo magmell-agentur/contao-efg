@@ -269,7 +269,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['efg_com_notify'] = array
  * Class tl_module_efg
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Thomas Kuhn 2007 - 2011
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
