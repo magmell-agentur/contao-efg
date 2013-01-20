@@ -304,9 +304,9 @@ class tl_formdata extends \Backend
 					if (file_exists($strFile))
 					{
 						$strName = $varFormKey;
-						include_once($strFile);
+						include_once $strFile;
 
-						// now replace standard dca tl_formdata by form-dependent dca
+						// Replace standard dca tl_formdata by form-dependent dca
 						if (is_array($GLOBALS['TL_DCA'][$strName]) && count($GLOBALS['TL_DCA'][$strName]) > 0)
 						{
 							$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
@@ -337,9 +337,9 @@ class tl_formdata extends \Backend
 				if (file_exists($strFile))
 				{
 					$strName = \Input::get('do');
-					include_once($strFile);
+					include_once $strFile;
 
-					// now replace standard dca tl_formdata by form-dependent dca
+					// Replace standard dca tl_formdata by form-dependent dca
 					if (is_array($GLOBALS['TL_DCA'][$strName]) && count($GLOBALS['TL_DCA'][$strName]) > 0)
 					{
 						$GLOBALS['TL_DCA']['tl_formdata'] = $GLOBALS['TL_DCA'][$strName];
