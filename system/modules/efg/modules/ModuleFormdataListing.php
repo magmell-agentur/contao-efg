@@ -100,6 +100,14 @@ class ModuleFormdataListing extends \Module
 	protected $arrAllowedDeleteOwnerIds = null;
 	protected $arrAllowedExportOwnerIds = null;
 
+	protected $arrMembers = null;
+
+	protected $arrUsers = null;
+
+	protected $arrMemberGroups = null;
+
+	protected $arrUserGroups = null;
+
 	protected $intRecordId = null;
 	protected $strDetailKey = 'details';
 
@@ -170,15 +178,15 @@ class ModuleFormdataListing extends \Module
 			$this->list_layout = 'list_default';
 		}
 
-		$this->arrOwnerFields = array('fd_member', 'fd_user','fd_member_group', 'fd_user_group');
-
-		$this->getMembers();
-		$this->getUsers();
-		$this->getMemberGroups();
-		$this->getUserGroups();
-
 		$this->import('FrontendUser', 'Member');
 		$this->import('Formdata');
+
+		$this->arrOwnerFields = array('fd_member', 'fd_user','fd_member_group', 'fd_user_group');
+
+		$this->arrMembers = $this->Formdata->arrMembers;
+		$this->arrMemberGroups = $this->Formdata->arrMemberGroups;
+		$this->arrUsers = $this->Formdata->arrUsers;
+		$this->arrUserGroups = $this->Formdata->arrUserGroups;
 
 		// check list access
 		if (strlen($this->efg_list_access))
@@ -187,7 +195,7 @@ class ModuleFormdataListing extends \Module
 			switch ($this->efg_list_access)
 			{
 				case 'member': // display own records only
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 					}
@@ -198,7 +206,7 @@ class ModuleFormdataListing extends \Module
 					break;
 
 				case 'groupmembers': // display records of group members
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
@@ -246,7 +254,7 @@ class ModuleFormdataListing extends \Module
 			switch($this->efg_fe_edit_access)
 			{
 				case 'member': // edit own records only
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 					}
@@ -257,7 +265,7 @@ class ModuleFormdataListing extends \Module
 					break;
 
 				case 'groupmembers': // edit records of group members
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
@@ -305,7 +313,7 @@ class ModuleFormdataListing extends \Module
 			switch($this->efg_fe_delete_access)
 			{
 				case 'member': // delete own records only
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 					}
@@ -316,7 +324,7 @@ class ModuleFormdataListing extends \Module
 					break;
 
 				case 'groupmembers': // delete records of group members
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
@@ -363,7 +371,7 @@ class ModuleFormdataListing extends \Module
 			switch($this->efg_fe_export_access)
 			{
 				case 'member': // export own records only
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 					}
@@ -374,7 +382,7 @@ class ModuleFormdataListing extends \Module
 					break;
 
 				case 'groupmembers': // export records of group members
-					if (intval($this->Member->id)>0)
+					if (intval($this->Member->id) > 0)
 					{
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
@@ -580,7 +588,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->editable = true;
 				}
-				elseif (($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id) > 0 )
+				elseif (($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->editable = true;
 				}
@@ -593,7 +601,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->deletable = true;
 				}
-				elseif (($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id) > 0 )
+				elseif (($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->deletable = true;
 				}
@@ -606,7 +614,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$this->Template->exportable = true;
 				}
-				elseif (($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id) > 0 )
+				elseif (($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->exportable = true;
 				}
@@ -1150,11 +1158,11 @@ class ModuleFormdataListing extends \Module
 		// Limit
 		if (!$blnExport)
 		{
-			if (intval(\Input::get('per_page'))>0)
+			if (intval(\Input::get('per_page')) > 0)
 			{
 				$objDataStmt->limit(\Input::get('per_page'), (($page - 1) * $per_page));
 			}
-			elseif (intval($this->perPage)>0)
+			elseif (intval($this->perPage) > 0)
 			{
 				$objDataStmt->limit($this->perPage, (($page - 1) * $per_page));
 			}
@@ -1559,7 +1567,7 @@ class ModuleFormdataListing extends \Module
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
 									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
-									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
+									$href .= ((strpos($href, '?') >= 1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 									$href = ampersand($href);
 
 									$arrTd[$class][count($arrTd[$class])-1]['display'] = 'download';
@@ -1610,7 +1618,7 @@ class ModuleFormdataListing extends \Module
 											$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
 											$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
-											$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
+											$href .= ((strpos($href, '?') >= 1) ? '&amp;' : '?') . 'download=' . $arrRows[$i]['id'] . '.' . $k;
 											$href = ampersand($href);
 
 											$arrTemp[$keyTemp]['display'] = 'download';
@@ -2230,7 +2238,7 @@ class ModuleFormdataListing extends \Module
 							$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
 							$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
-							$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
+							$href .= ((strpos($href, '?') >= 1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 							$href = ampersand($href);
 
 							$arrFields[$class]['display'] = 'download';
@@ -2282,7 +2290,7 @@ class ModuleFormdataListing extends \Module
 									$size = ' ('.number_format(($objFile->filesize/1024), 1, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']).' kB)';
 
 									$href = preg_replace('@(\?|&amp;)download=.*?(&amp;|$)@si', '', \Environment::get('request'));
-									$href .= ((strpos($href, '?')>=1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
+									$href .= ((strpos($href, '?') >= 1) ? '&amp;' : '?') . 'download=' . $this->intRecordId . '.' . $k;
 									$href = ampersand($href);
 
 									$arrTemp[$keyTemp]['display'] = 'download';
@@ -3242,93 +3250,6 @@ class ModuleFormdataListing extends \Module
 		return $value;
 	}
 
-	/**
-	 * get all members (FE)
-	 */
-	protected function getMembers()
-	{
-		if (!$this->arrMembers)
-		{
-			$members = array();
-			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name FROM tl_member ORDER BY name ASC")
-				->execute();
-			$members[] = '-';
-			if ($objMembers->numRows)
-			{
-				while ($objMembers->next())
-				{
-					$members[$objMembers->id] = $objMembers->name;
-				}
-			}
-			$this->arrMembers = $members;
-		}
-	}
-
-	/**
-	 * get all users (BE)
-	 */
-	protected function getUsers()
-	{
-		if (!$this->arrUsers)
-		{
-			$users = array();
-			$objUsers = \Database::getInstance()->prepare("SELECT id,name FROM tl_user ORDER BY name ASC")
-				->execute();
-			$users[] = '-';
-			if ($objUsers->numRows)
-			{
-				while ($objUsers->next())
-				{
-					$users[$objUsers->id] = $objUsers->name;
-				}
-			}
-			$this->arrUsers = $users;
-		}
-	}
-
-	/**
-	 * get all member groups (FE)
-	 */
-	protected function getMemberGroups()
-	{
-		if (!$this->arrMemberGroups)
-		{
-			$groups = array();
-			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_member_group ORDER BY name ASC")
-				->execute();
-			$groups[] = '-';
-			if ($objGroups->numRows)
-			{
-				while ($objGroups->next())
-				{
-					$groups[$objGroups->id] = $objGroups->name;
-				}
-			}
-			$this->arrMemberGroups = $groups;
-		}
-	}
-
-	/**
-	 * get all user groups (BE)
-	 */
-	protected function getUserGroups()
-	{
-		if (!$this->arrUserGroups)
-		{
-			$groups = array();
-			$objGroups = \Database::getInstance()->prepare("SELECT id,name FROM tl_user_group ORDER BY name ASC")
-				->execute();
-			$groups[] = '-';
-			if ($objGroups->numRows)
-			{
-				while ($objGroups->next())
-				{
-					$groups[$objGroups->id] = $objGroups->name;
-				}
-			}
-			$this->arrUserGroups = $groups;
-		}
-	}
 
 	/**
 	 * Convert encoding

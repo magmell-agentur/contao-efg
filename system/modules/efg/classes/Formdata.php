@@ -55,6 +55,14 @@ class Formdata extends \Frontend
 
 	protected $arrSearchableListingPages = null;
 
+	protected $arrMembers = null;
+
+	protected $arrUsers = null;
+
+	protected $arrMemberGroups = null;
+
+	protected $arrUserGroups = null;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -129,6 +137,23 @@ class Formdata extends \Frontend
 			case 'arrFormsDcaKey':
 				return $this->arrFormsDcaKey;
 				break;
+
+			case 'arrMembers':
+				return $this->getMembers();
+				break;
+
+			case 'arrUsers':
+				return $this->getUsers();
+				break;
+
+			case 'arrMemberGroups':
+				return $this->getMemberGroups();
+				break;
+
+			case 'arrUserGroups':
+				return $this->getUserGroups();
+				break;
+
 		}
 	}
 
@@ -523,6 +548,121 @@ class Formdata extends \Frontend
 			return false;
 		}
 	}
+
+
+	/**
+	 * get all members (FE)
+	 */
+	public function getMembers()
+	{
+		if ($this->arrMembers === null)
+		{
+			$members = array();
+			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
+				->execute();
+			$members[] = '-';
+			if ($objMembers->numRows)
+			{
+				while ($objMembers->next())
+				{
+					$k = $objMembers->id;
+					$v = $objMembers->name;
+					$members[$k] = $v;
+				}
+			}
+			$this->arrMembers = $members;
+		}
+
+		return $this->arrMembers;
+	}
+
+
+	/**
+	 * get all users (BE)
+	 */
+	public function getUsers()
+	{
+		if ($this->arrUsers === null)
+		{
+			$users = array();
+
+			// Get all users
+			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
+				->execute();
+			$users[] = '-';
+			if ($objUsers->numRows)
+			{
+				while ($objUsers->next())
+				{
+					$k = $objUsers->id;
+					$v = $objUsers->name;
+					$users[$k] = $v;
+				}
+			}
+			$this->arrUsers = $users;
+		}
+
+		return $this->arrUsers;
+	}
+
+
+	/**
+	 * get all member groups (FE)
+	 */
+	public function getMemberGroups()
+	{
+		if ($this->arrMemberGroups === null)
+		{
+			$groups = array();
+
+			// Get all member groups
+			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
+				->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrMemberGroups = $groups;
+		}
+
+		return $this->arrMemberGroups;
+	}
+
+
+	/**
+	 * get all user groups (BE)
+	 */
+	public function getUserGroups()
+	{
+		if ($this->arrUserGroups === null)
+		{
+			$groups = array();
+
+			// Get all user groups
+			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
+				->execute();
+			$groups[] = '-';
+			if ($objGroups->numRows)
+			{
+				while ($objGroups->next())
+				{
+					$k = $objGroups->id;
+					$v = $objGroups->name;
+					$groups[$k] = $v;
+				}
+			}
+			$this->arrUserGroups = $groups;
+		}
+
+		return $this->arrUserGroups;
+	}
+
 
 	/**
 	 * Prepare post value for tl_formdata / tl_formdata_details DB record

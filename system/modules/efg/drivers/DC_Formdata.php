@@ -266,10 +266,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		$this->arrOwnerFields = array('fd_member','fd_user','fd_member_group','fd_user_group');
 
-		$this->getMembers();
-		$this->getUsers();
-		$this->getMemberGroups();
-		$this->getUserGroups();
+		$this->arrMembers = $this->Formdata->arrMembers;
+		$this->arrMemberGroups = $this->Formdata->arrMemberGroups;
+		$this->arrUsers = $this->Formdata->arrUsers;
+		$this->arrUserGroups = $this->Formdata->arrUserGroups;
 
 		// Check whether the table is defined
 		if ($strTable == '' || !isset($GLOBALS['TL_DCA'][$strTable]))
@@ -444,6 +444,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			case 'arrFieldConfig':
 				return $this->arrFieldConfig;
 				break;
+
 		}
 
 		return parent::__get($strKey);
@@ -764,7 +765,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$set['date'] = time();
 			$set['ip'] = \Environment::get('ip');
 
-			if ($this->User && intval($this->User->id)>0)
+			if ($this->User && intval($this->User->id) > 0)
 			{
 				$set['fd_user'] = intval($this->User->id);
 			}
@@ -1523,30 +1524,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->varValue = '1';
 							}
 						}
-
-
-//						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
-//						{
-//
-//							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-//						}
-//						else
-//						{
-//							$arrVals = array($this->varValue);
-//						}
-//
-//						// tom, 2007-09-27, bugfix:
-//						// .. not if value is empty or does not exist at all
-//						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
-//						if (strlen($arrVals[0]) && strlen($this->varValue))
-//						{
-//							$this->varValue = $arrVals[0];
-//						}
-//						else
-//						{
-//							$this->varValue = '';
-//						}
-
 					} // field type single checkbox
 
 					// field type efgLookupSelect
@@ -2195,30 +2172,6 @@ window.addEvent(\'domready\', function() {
 								$this->varValue = '1';
 							}
 						}
-
-
-//						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
-//						{
-//
-//							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-//						}
-//						else
-//						{
-//							$arrVals = array($this->varValue);
-//						}
-//
-//						// tom, 2007-09-27, bugfix:
-//						// .. not if value is empty or does not exist at all
-//						// .. for example record is created by frontend form, checkbox was not checked, then no record in tl_formdata_details exists
-//						if (strlen($arrVals[0]) && strlen($this->varValue))
-//						{
-//							$this->varValue = $arrVals[0];
-//						}
-//						else
-//						{
-//							$this->varValue = '';
-//						}
-
 					} // field type single checkbox
 
 					// field type efgLookupSelect
@@ -4583,7 +4536,7 @@ window.addEvent(\'domready\', function() {
 		if (strlen($sender))
 		{
 			$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-			if (strpos($sender, '<')>0)
+			if (strpos($sender, '<') > 0)
 			{
 				preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
 				$sender = $parts[2];
@@ -4968,7 +4921,7 @@ window.addEvent(\'domready\', function() {
 
 				$url = \Environment::get('base') . preg_replace('/&(amp;)?(token|recipient)=[^&]*/', '', \Environment::get('request'));
 
-				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId)>0)
+				if ($blnConfirmationSent && isset($this->intId) && intval($this->intId) > 0)
 				{
 					$arrUpd = array('confirmationSent' => '1', 'confirmationDate' => time());
 					$res = \Database::getInstance()->prepare("UPDATE tl_formdata %s WHERE id=?")
@@ -6271,112 +6224,6 @@ var Stylect = {
 			}
 		}
 		return $strString;
-	}
-
-
-	/**
-	 * get all members (FE)
-	 */
-	protected function getMembers()
-	{
-		if (!$this->arrMembers)
-		{
-			$members = array();
-			$objMembers = \Database::getInstance()->prepare("SELECT id, CONCAT(firstname,' ',lastname) AS name,groups,login,username,locked,disable,start,stop FROM tl_member ORDER BY name ASC")
-				->execute();
-			$members[] = '-';
-			if ($objMembers->numRows)
-			{
-				while ($objMembers->next())
-				{
-					$k = $objMembers->id;
-					$v = $objMembers->name;
-					$members[$k] = $v;
-				}
-			}
-			$this->arrMembers = $members;
-		}
-	}
-
-
-	/**
-	 * get all users (BE)
-	 */
-	protected function getUsers()
-	{
-		if (!$this->arrUsers)
-		{
-			$users = array();
-
-			// Get all users
-			$objUsers = \Database::getInstance()->prepare("SELECT id,username,name,locked,disable,start,stop,admin,groups,modules,inherit,fop FROM tl_user ORDER BY name ASC")
-				->execute();
-			$users[] = '-';
-			if ($objUsers->numRows)
-			{
-				while ($objUsers->next())
-				{
-					$k = $objUsers->id;
-					$v = $objUsers->name;
-					$users[$k] = $v;
-				}
-			}
-			$this->arrUsers = $users;
-		}
-	}
-
-
-	/**
-	 * get all member groups (FE)
-	 */
-	protected function getMemberGroups()
-	{
-		if (!$this->arrMemberGroups)
-		{
-			$groups = array();
-
-			// Get all member groups
-			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_member_group ORDER BY `name` ASC")
-				->execute();
-			$groups[] = '-';
-			if ($objGroups->numRows)
-			{
-				while ($objGroups->next())
-				{
-					$k = $objGroups->id;
-					$v = $objGroups->name;
-					$groups[$k] = $v;
-				}
-			}
-			$this->arrMemberGroups = $groups;
-		}
-	}
-
-
-	/**
-	 * get all user groups (BE)
-	 */
-	protected function getUserGroups()
-	{
-		if (!$this->arrUserGroups)
-		{
-			$groups = array();
-
-			// Get all user groups
-			$objGroups = \Database::getInstance()->prepare("SELECT id, `name` FROM tl_user_group ORDER BY `name` ASC")
-				->execute();
-			$groups[] = '-';
-			if ($objGroups->numRows)
-			{
-				while ($objGroups->next())
-				{
-					$k = $objGroups->id;
-					$v = $objGroups->name;
-					$groups[$k] = $v;
-				}
-			}
-			$this->arrUserGroups = $groups;
-		}
 	}
 
 }
