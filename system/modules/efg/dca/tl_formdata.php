@@ -276,8 +276,13 @@ class tl_formdata extends \Backend
 		$strName = 'feedback';
 		$strFileName = 'tl_formdata';
 
-		// fix config for xdependentcalendarfields
-		$GLOBALS['BE_FFL']['xdependentcalendarfields'] = 'TextField';
+		// TODO: remove this fix if xdependentcalendarfield is available for Contao 3 and config is fixed
+		// Fix config for xdependentcalendarfields
+		// xdependentcalendarfields/config/config.php registers 'FormTextField', which is a front end widget)
+		if ($GLOBALS['BE_FFL']['xdependentcalendarfields'] == 'FormTextField')
+		{
+			$GLOBALS['BE_FFL']['xdependentcalendarfields'] = 'TextField';
+		}
 
 		if ($varFormKey != '' && is_string($varFormKey))
 		{
