@@ -846,7 +846,7 @@ class Formdata extends \Frontend
 							// The upload folder could not be found
 							if ($objUploadFolder === null)
 							{
-								$this->log('Invalid upload folder ID ' . $intUploadFolder . ', file "'.$varFile['name'].'" could not been saved in file manager', __CLASS__.'::'.__FUNCTION__.'()', 'ERROR');
+								$this->log('Invalid upload folder ID ' . $intUploadFolder . ', file "'.$varFile['name'].'" could not been saved in file manager', __METHOD__, 'ERROR');
 							}
 							else
 							{
@@ -2260,6 +2260,19 @@ class Formdata extends \Frontend
 		// Return the evaled code
 		return $strReturn;
 
+	}
+
+
+	public function getEmptyTagEnd()
+	{
+		if (TL_MODE == 'BE')
+		{
+			return ' />';
+		}
+
+		global $objPage;
+
+		return ($objPage->outputFormat == 'xhtml') ? ' />' : '>';
 	}
 
 }

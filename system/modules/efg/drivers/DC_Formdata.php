@@ -274,7 +274,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Check whether the table is defined
 		if ($strTable == '' || !isset($GLOBALS['TL_DCA'][$strTable]))
 		{
-			$this->log('Could not load the data container configuration for "' . $strTable . '"', 'DC_Formdata __construct()', TL_ERROR);
+			$this->log('Could not load the data container configuration for "' . $strTable . '"', __METHOD__, TL_ERROR);
 			trigger_error('Could not load the data container configuration', E_USER_ERROR);
 		}
 
@@ -710,9 +710,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			if (!is_bool(strpos($row[$i], "\n")))
 			{
 				$strVal = $row[$i];
-				$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+				$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 				$strVal = nl2br($strVal, false);
-				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+				$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 				$row[$i] = $strVal;
 				unset($strVal);
 			}
@@ -773,7 +773,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// Get all default values for the new entry
-		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
+		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k => $v)
 		{
 			if (isset($v['default']))
 			{
@@ -821,7 +821,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					);
 
 					// default value
-					if (!empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
+					if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
 					{
 						// default value in case of field type checkbox, select, radio
 						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strDetailField]['default']))
@@ -858,7 +858,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				}
 
 				// Add a log entry
-				$this->log('A new entry in table "'.$this->strTable.'" has been created (ID: '.$insertID.')', 'DC_Table create()', TL_GENERAL);
+				$this->log('A new entry in table "'.$this->strTable.'" has been created (ID: '.$insertID.')', __METHOD__, TL_GENERAL);
 				$this->redirect($this->switchToEdit($insertID).$s2e);
 			}
 		}
@@ -887,7 +887,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	{
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notDeletable'])
 		{
-			$this->log('Table "'.$this->strTable.'" is not deletable', 'DC_Table delete()', TL_ERROR);
+			$this->log('Table "'.$this->strTable.'" is not deletable', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -932,9 +932,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$affected = 0;
 
 		// Save each record of each table
-		foreach ($delete as $table=>$fields)
+		foreach ($delete as $table => $fields)
 		{
-			foreach ($fields as $k=>$v)
+			foreach ($fields as $k => $v)
 			{
 				$objSave = \Database::getInstance()->prepare("SELECT * FROM " . $table . " WHERE id=?")
 					->limit(1)
@@ -977,9 +977,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 
 			// Delete the records
-			foreach ($delete as $table=>$fields)
+			foreach ($delete as $table => $fields)
 			{
-				foreach ($fields as $k=>$v)
+				foreach ($fields as $k => $v)
 				{
 					\Database::getInstance()->prepare("DELETE FROM " . $table . " WHERE id=?")
 						->limit(1)
@@ -990,7 +990,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			// Add a log entry unless we are deleting from tl_log itself
 			if ($this->strTable != 'tl_log')
 			{
-				$this->log('DELETE FROM '.$this->strTable.' WHERE id='.$data[$this->strTable][0]['id'], 'DC_Table delete()', TL_GENERAL);
+				$this->log('DELETE FROM '.$this->strTable.' WHERE id='.$data[$this->strTable][0]['id'], __METHOD__, TL_GENERAL);
 			}
 		}
 
@@ -1008,7 +1008,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	{
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notDeletable'])
 		{
-			$this->log('Table "'.$this->strTable.'" is not deletable', 'DC_Formdata deleteAll()', TL_ERROR);
+			$this->log('Table "'.$this->strTable.'" is not deletable', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -1094,13 +1094,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// Restore the data
-		foreach ($data as $table=>$fields)
+		foreach ($data as $table => $fields)
 		{
 			foreach ($fields as $row)
 			{
 				$restore = array();
 
-				foreach ($row as $k=>$v)
+				foreach ($row as $k => $v)
 				{
 					$restore[$k] = $v;
 				}
@@ -1120,7 +1120,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Add log entry and delete record from tl_undo if there was no error
 		if (!$error)
 		{
-			$this->log('Undone '. $query, 'DC_Formdata undo()', TL_GENERAL);
+			$this->log('Undone '. $query, __METHOD__, TL_GENERAL);
 
 			\Database::getInstance()->prepare("DELETE FROM " . $this->strTable . " WHERE id=?")
 				->limit(1)
@@ -1149,7 +1149,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notEditable'])
 		{
-			$this->log('Table "' . $this->strTable . '" is not editable', 'DC_Formdata edit()', TL_ERROR);
+			$this->log('Table "' . $this->strTable . '" is not editable', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -1178,7 +1178,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
-			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata edit()', TL_ERROR);
+			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -1192,12 +1192,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (!empty($boxes))
 		{
-			foreach ($boxes as $k=>$v)
+			foreach ($boxes as $k => $v)
 			{
 				$eCount = 1;
 				$boxes[$k] = trimsplit(',', $v);
 
-				foreach ($boxes[$k] as $kk=>$vv)
+				foreach ($boxes[$k] as $kk => $vv)
 				{
 					if (preg_match('/^\[.*\]$/', $vv))
 					{
@@ -1228,7 +1228,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$blnIsFirst = true;
 
 			// Render boxes
-			foreach ($boxes as $k=>$v)
+			foreach ($boxes as $k => $v)
 			{
 				$strAjax = '';
 				$blnAjax = false;
@@ -1808,7 +1808,7 @@ window.addEvent(\'domready\', function() {
 	{
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notEditable'])
 		{
-			$this->log('Table "' . $this->strTable . '" is not editable', 'DC_Formdata editAll()', TL_ERROR);
+			$this->log('Table "' . $this->strTable . '" is not editable', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -2829,7 +2829,7 @@ window.addEvent(\'domready\', function() {
 			}
 			elseif (count($sValues) > 1)
 			{
-				foreach ($sValues as $k=>$v)
+				foreach ($sValues as $k => $v)
 				{
 					// Unset selectors that just trigger subpalettes (see #3738)
 					if (isset($GLOBALS['TL_DCA'][$this->strTable]['subpalettes'][$v]))
@@ -3121,7 +3121,7 @@ window.addEvent(\'domready\', function() {
 				$showFields = $GLOBALS['TL_DCA'][$table]['list']['label']['fields'];
 
 				// Label
-				foreach ($showFields as $k=>$v)
+				foreach ($showFields as $k => $v)
 				{
 					if (in_array($v, $this->arrDetailFields)
 						&& in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'], array('radio', 'efgLookupRadio', 'select', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox', 'efgImageSelect', 'fileTree')))
@@ -3220,9 +3220,9 @@ window.addEvent(\'domready\', function() {
 							if (!is_bool(strpos($row[$v], "\n")))
 							{
 								$strVal = $row[$v];
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+								$strVal = preg_replace('/(<\/|<)(h\d|p|div|secion|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 								$strVal = nl2br($strVal, false);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+								$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 								$row[$v] = $strVal;
 								unset($strVal);
 							}
@@ -3293,7 +3293,7 @@ window.addEvent(\'domready\', function() {
 				// Show columns
 				if ($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['showColumns'])
 				{
-					foreach ($args as $j=>$arg)
+					foreach ($args as $j => $arg)
 					{
 						$return .= '<td colspan="' . $colspan . '" class="tl_file_list col_' . $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['fields'][$j] . (($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['fields'][$j] == $firstOrderBy) ? ' ordered_by' : '') . '">' . (($arg != '') ? $arg : '-') . '</td>';
 					}
@@ -3527,7 +3527,7 @@ window.addEvent(\'domready\', function() {
 		$sortingFields = array();
 
 		// Get sorting fields
-		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
+		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k => $v)
 		{
 			if ($v['sorting'])
 			{
@@ -3758,7 +3758,7 @@ window.addEvent(\'domready\', function() {
 		$filter = ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4) ? $this->strTable.'_'.CURRENT_ID : (strlen($this->strFormKey)) ? $this->strFormKey : $this->strTable;
 
 		// Get the sorting fields
-		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k=>$v)
+		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $k => $v)
 		{
 			if ($v['filter'])
 			{
@@ -3928,7 +3928,7 @@ window.addEvent(\'domready\', function() {
 				{
 					($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'] == 6) ? rsort($options) : sort($options);
 
-					foreach ($options as $k=>$v)
+					foreach ($options as $k => $v)
 					{
 						if ($v == '')
 						{
@@ -3948,7 +3948,7 @@ window.addEvent(\'domready\', function() {
 				{
 					($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'] == 8) ? rsort($options) : sort($options);
 
-					foreach ($options as $k=>$v)
+					foreach ($options as $k => $v)
 					{
 						if ($v == '')
 						{
@@ -3974,7 +3974,7 @@ window.addEvent(\'domready\', function() {
 				{
 					($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'] == 10) ? rsort($options) : sort($options);
 
-					foreach ($options as $k=>$v)
+					foreach ($options as $k => $v)
 					{
 						if ($v == '')
 						{
@@ -4035,7 +4035,7 @@ window.addEvent(\'domready\', function() {
 				$blnDate = in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'], array(5, 6, 7, 8, 9, 10));
 
 				// Options
-				foreach ($options as $kk=>$vv)
+				foreach ($options as $kk => $vv)
 				{
 					$value = $blnDate ? $kk : $vv;
 
@@ -4380,12 +4380,8 @@ window.addEvent(\'domready\', function() {
 		{
 			$value = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 		}
-		elseif ($value && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='checkbox'
-			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupCheckbox'
-			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='select'
-			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='conditionalselect'
-			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='efgLookupSelect'
-			|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType']=='radio') )
+		elseif ($value && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType'],
+							array('checkbox', 'efgLookupCheckbox', 'select', 'conditionalselect', 'efgLookupSelect','radio')))
 		{
 			$value = str_replace('|', ', ', $value);
 		}
@@ -4443,7 +4439,6 @@ window.addEvent(\'domready\', function() {
 		$this->procedure[] = 'id=?';
 		$this->blnCreateNewVersion = false;
 
-
 		// Get current record
 		$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias;
 		$sqlWhere = " WHERE id=?";
@@ -4459,7 +4454,7 @@ window.addEvent(\'domready\', function() {
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
 		{
-			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', 'DC_Formdata mail()', TL_ERROR);
+			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
@@ -4467,46 +4462,40 @@ window.addEvent(\'domready\', function() {
 		$arrFiles = array();
 
 		// Form
+		$objForm = null;
 		$intFormId = 0;
 
 		if (!empty($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields']))
 		{
-			// try to get Form ID
+			// Try to get the form
 			foreach ($GLOBALS['TL_DCA'][$this->strTable]['tl_formdata']['detailFields'] as $strField)
 			{
-				if ($intFormId > 0)
+				if ($objForm !== null)
 				{
 					break;
 				}
-				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
+
+				if (!empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']))
 				{
-					$intFormId = intval($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id']);
-					$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
-						->limit(1)
-						->execute($intFormId);
+					$intFormId = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['f_id'];
+					$objForm = \FormModel::findByPk($intFormId);
 				}
 			}
 		}
 
-		if ($intFormId == 0)
+		if ($objForm == null)
 		{
-			$objForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE title=?")
-				->limit(1)
-				->execute($arrSubmitted['form']);
+			$objForm = \FormModel::findOneBy('title', $arrSubmitted['form']);
 		}
 
-		if ($objForm->numRows < 1)
+		if ($objForm == null)
 		{
-			$this->log('Could not load record "tl_form.id='.$intFormId.'" / "tl_form.title='.$arrSubmitted['form'].'"', 'DC_Formdata mail()', TL_ERROR);
+			$this->log('Could not load record "tl_form.id='.$intFormId.'" / "tl_form.title='.$arrSubmitted['form'].'"', __METHOD__, TL_ERROR);
 			$this->redirect('contao/main.php?act=error');
 		}
 
-		$arrForm = $objForm->fetchAssoc();
-
-		if (strlen($arrForm['id']))
-		{
-			$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
-		}
+		$arrForm = $objForm->row();
+		$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
 		// Types of form fields with storable data
 		$arrFFstorable = $this->Formdata->arrFFstorable;
@@ -4525,6 +4514,7 @@ window.addEvent(\'domready\', function() {
 		$arrRecipient = array();
 		$sender = '';
 		$senderName = '';
+		$replyTo = '';
 		$attachments = array();
 
 		$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
@@ -4533,7 +4523,7 @@ window.addEvent(\'domready\', function() {
 		$dirImages = '';
 
 		$sender = $arrForm['confirmationMailSender'];
-		if (strlen($sender))
+		if (!empty($sender))
 		{
 			$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
 			if (strpos($sender, '<') > 0)
@@ -4613,7 +4603,6 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// prepare insert tags to handle separate from 'condition tags'
-		$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
 		if (strlen($messageText))
 		{
 			$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
@@ -4622,8 +4611,15 @@ window.addEvent(\'domready\', function() {
 		{
 			$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 		}
+		if (strlen($subject))
+		{
+			$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
+		}
+		if (strlen($sender))
+		{
+			$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
+		}
 
-		// replace 'condition tags'
 		$blnEvalSubject = $this->Formdata->replaceConditionTags($subject);
 		$blnEvalMessageText = $this->Formdata->replaceConditionTags($messageText);
 		$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
@@ -4637,8 +4633,8 @@ window.addEvent(\'domready\', function() {
 		// .. {{form::fieldname?label=Label for this field: }}
 		foreach ($tags[0] as $tag)
 		{
-			//$elements = explode('::', preg_replace(array('/^{{/i', '/}}$/i'), array('',''), $tag));
 			$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
+
 			switch (strtolower($elements[0]))
 			{
 				// Form
@@ -4654,7 +4650,11 @@ window.addEvent(\'domready\', function() {
 					}
 
 					$arrField = $arrFormFields[$strKey];
-					$strType = $arrField['type'];
+					$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
+
+					//$strType = $arrField['type'];
+					$strType = $arrField['formfieldType'];
+
 					if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
 					{
 						$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
@@ -4673,43 +4673,33 @@ window.addEvent(\'domready\', function() {
 					{
 						if ($strType == 'efgImageSelect')
 						{
-							$varText = '';
-							$varHtml = '';
+							$varText = array();
+							$varHtml = array();
 
-							if (strlen($arrSubmitted[$strKey]) || is_array($arrSubmitted[$strKey]))
+							$varVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
+							if (is_string($varVal))
 							{
-								$varVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-
-								if (!empty($varVal))
+								$varVal = array($varVal);
+							}
+							if (!empty($varVal))
+							{
+								foreach ($varVal as $strVal)
 								{
-									foreach ($varVal as $k => $strVal)
+									if (strlen($strVal))
 									{
-										if (strlen($strVal))
-										{
-											$varText[] = \Environment::get('base') . $strVal;
-											$varHtml[] = '<img src="' . $strVal . '">';
-										}
+										$varText[] = \Environment::get('base') . $strVal;
+										$varHtml[] = '<img src="' . $strVal . '"' . $this->Formdata->getEmptyTagEnd();
 									}
 								}
-
-								if (is_array($varText))
-								{
-									$varText = implode(', ', $varText);
-									$varHtml = implode(', ', $varHtml);
-								}
 							}
-
-							if (!strlen($varText) && $blnSkipEmpty)
+							if (empty($varText) && $blnSkipEmpty)
 							{
 								$strLabel = '';
 							}
 
-							$subject = str_replace($tag, $strLabel . $varText, $subject);
-							$messageText = str_replace($tag, $strLabel . $varText, $messageText);
-							$messageHtml = str_replace($tag, $strLabel . $varHtml, $messageHtml);
-
-							unset($varText);
-							unset($varHtml);
+							$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
+							$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 						}
 						elseif ($strType=='upload')
 						{
@@ -4766,9 +4756,9 @@ window.addEvent(\'domready\', function() {
 
 							if (!is_bool(strpos($strVal, "\n")))
 							{
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+								$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 								$strVal = nl2br($strVal);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+								$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 							}
 							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 
@@ -5136,13 +5126,11 @@ window.addEvent(\'domready\', function() {
 
 				$strAliasField = (strlen($this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField']) ? $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['efgAliasField'] : '');
 
-				$objForm = \Database::getInstance()->prepare("SELECT id FROM tl_form WHERE `title`=?")
-					->limit(1)
-					->execute($strFormTitle);
-				if ($objForm->numRows == 1)
+				$objForm = \FormModel::findOneBy('title', $strFormTitle);
+
+				if ($objForm !== null)
 				{
-					$intFormId = intval($objForm->id);
-					$arrFormFields = $this->Formdata->getFormfieldsAsArray($intFormId);
+					$arrFormFields = $this->Formdata->getFormfieldsAsArray($objForm->id);
 				}
 
 				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
@@ -5335,7 +5323,7 @@ window.addEvent(\'domready\', function() {
 				$objFile->close();
 
 				// Add a log entry
-				$this->log('Imported file "'.$objFile->filename.'" into form data "'.$strFormTitle.'", created '.$intValid.' new records', 'DC_Formdata importFile()', TL_GENERAL);
+				$this->log('Imported file "'.$objFile->filename.'" into form data "'.$strFormTitle.'", created '.$intValid.' new records', __METHOD__, TL_GENERAL);
 
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 				$this->reload();
@@ -5615,7 +5603,7 @@ var Stylect = {
 			else
 			{
 // TODO: fix path
-				include(TL_ROOT.'/plugins/xls_export/xls_export.php');
+				include TL_ROOT.'/plugins/xls_export/xls_export.php';
 			}
 		}
 		elseif ($strMode!='csv')
@@ -5995,13 +5983,8 @@ var Stylect = {
 							$strVal = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
 						}
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'radio'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupRadio'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'select'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'conditionalselect'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupSelect'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
-						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
+					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'],
+								array('radio', 'efgLookupRasdio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
@@ -6013,7 +5996,7 @@ var Stylect = {
 								$arrOptions = array();
 								foreach ($GLOBALS['TL_DCA'][$table]['fields'][$v]['options'] as $o => $mxVal)
 								{
-									if ((!is_array($mxVal)))
+									if (!is_array($mxVal))
 									{
 										$arrOptions[$o] = $mxVal;
 									}
@@ -6026,7 +6009,6 @@ var Stylect = {
 									}
 								}
 
-								//$options = array_flip($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']);
 								$options = array_flip($arrOptions);
 								$strVal = $options[$row[$v]];
 							}

@@ -112,7 +112,7 @@ class FormdataProcessor extends \Frontend
 				}
 				else
 				{
-					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', 'FormdataProcessor processSubmittedData()', TL_GENERAL);
+					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', __METHOD__s, TL_GENERAL);
 				}
 			}
 		}
@@ -463,7 +463,6 @@ class FormdataProcessor extends \Frontend
 			{
 				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 			}
-
 			if (strlen($subject))
 			{
 				$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
@@ -508,6 +507,12 @@ class FormdataProcessor extends \Frontend
 						//$strType = $arrField['type'];
 						$strType = $arrField['formfieldType'];
 
+						if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
+						{
+							$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
+							$strType = $arrField['inputType'];
+						}
+
 						$strLabel = '';
 						$strVal = '';
 
@@ -522,7 +527,7 @@ class FormdataProcessor extends \Frontend
 							{
 								$strVal = '';
 								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								$varTxt = array();
+								$varText = array();
 								$varHtml = array();
 								if (is_string($varVal))
 								{
@@ -534,17 +539,17 @@ class FormdataProcessor extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = \Environment::get('base') . $strVal;
-											$varHtml[] = '<img src="' . $strVal . '" />';
+											$varText[] = \Environment::get('base') . $strVal;
+											$varHtml[] = '<img src="' . $strVal . '"' . $this->Formdata->getEmptyTagEnd();
 										}
 									}
 								}
-								if (empty($varTxt) && $blnSkipEmpty)
+								if (empty($varText) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
 
-								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
+								$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
 								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType == 'upload')
@@ -583,9 +588,9 @@ class FormdataProcessor extends \Frontend
 
 								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
-									$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+									$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 									$strVal = nl2br($strVal);
-									$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+									$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 								}
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
@@ -876,10 +881,11 @@ class FormdataProcessor extends \Frontend
 						{
 							if ($strType == 'efgImageSelect')
 							{
-								$strVal = '';
-								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								$varTxt = array();
+								$varText = array();
 								$varHtml = array();
+
+								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
 								if (is_string($varVal))
 								{
 									$varVal = array($varVal);
@@ -890,17 +896,17 @@ class FormdataProcessor extends \Frontend
 									{
 										if (strlen($strVal))
 										{
-											$varTxt[] = \Environment::get('base') . $strVal;
-											$varHtml[] = '<img src="' . $strVal . '" />';
+											$varText[] = \Environment::get('base') . $strVal;
+											$varHtml[] = '<img src="' . $strVal . '"' . $this->Formdata->getEmptyTagEnd();
 										}
 									}
 								}
-								if (empty($varTxt) && $blnSkipEmpty)
+								if (empty($varText) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
 
-								$messageText = str_replace($tag, $strLabel . implode(', ', $varTxt), $messageText);
+								$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
 								$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
 							}
 							elseif ($strType == 'upload')
@@ -938,9 +944,9 @@ class FormdataProcessor extends \Frontend
 
 								if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
-									$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
+									$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
 									$strVal = nl2br($strVal);
-									$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+									$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
 								}
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}

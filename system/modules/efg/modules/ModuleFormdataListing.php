@@ -689,7 +689,7 @@ class ModuleFormdataListing extends \Module
 			}
 			else
 			{
-				$this->log('Could not identify record by ID "' . \Input::get($this->strDetailKey) . '"', 'ModuleFormdataListing compile()', TL_GENERAL);
+				$this->log('Could not identify record by ID "' . \Input::get($this->strDetailKey) . '"', __METHOD__, TL_GENERAL);
 
 				$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 				$strUrlParams = '';
@@ -2975,7 +2975,7 @@ class ModuleFormdataListing extends \Module
 
 		if ($objFormElement === null)
 		{
-			$this->log("Could not find a ContentElement containing the form \"".$strForm."\"", 'ModuleFormdataListing editSingleRecord()', 'ERROR');
+			$this->log("Could not find a ContentElement containing the form \"".$strForm."\"", __METHOD__, 'ERROR');
 
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
 			$this->redirect($strRed);
