@@ -4728,7 +4728,7 @@ window.addEvent(\'domready\', function() {
 								$strVal = $this->formatValue($strKey, $strVal);
 							}
 
-							if (!strlen($strVal) && $blnSkipEmpty)
+							if (empty($strVal) && $blnSkipEmpty)
 							{
 								$strLabel = '';
 							}
@@ -4742,14 +4742,13 @@ window.addEvent(\'domready\', function() {
 							$strVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							$strVal = $this->formatValue($strKey, $strVal);
 
-							if (!strlen($strVal) && $blnSkipEmpty)
+							if (empty($strVal) && $blnSkipEmpty)
 							{
 								$strLabel = '';
 							}
-
 							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
-							if (!is_bool(strpos($strVal, "\n")))
+							if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
 							{
 								$strVal = $this->Formdata->formatMultilineValue($strVal);
 							}
@@ -4759,13 +4758,13 @@ window.addEvent(\'domready\', function() {
 					}
 
 					// replace insert tags in subject
-					if (strlen($subject))
+					if (!empty($subject))
 					{
 						$subject = str_replace($tag, $strVal, $subject);
 					}
 
 					// replace insert tags in sender
-					if (strlen($sender))
+					if (!empty($sender))
 					{
 						$sender = str_replace($tag, $strVal, $sender);
 					}
@@ -4775,15 +4774,6 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Replace standard insert tags and eval condition tags
-		if (strlen($subject))
-		{
-			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
-			$subject = $this->replaceInsertTags($subject, false);
-			if ($blnEvalSubject)
-			{
-				$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
-			}
-		}
 		if (strlen($messageText))
 		{
 			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
@@ -4803,22 +4793,33 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		// replace insert tags in sender
-		if (strlen($sender))
+		// replace insert tags in subject
+		if (!empty($subject))
 		{
+			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
+			$subject = $this->replaceInsertTags($subject, false);
+			if ($blnEvalSubject)
+			{
+				$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+			}
+		}
+
+		// replace insert tags in sender
+		if (!empty($sender))
+		{
+			$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 			$sender = $this->replaceInsertTags($sender, false);
 		}
 
 		$confEmail = new \Email();
 		$confEmail->from = $sender;
-		if (strlen($senderName))
+		if (!empty($senderName))
 		{
 			$confEmail->fromName = $senderName;
 		}
 		$confEmail->subject = $subject;
 
-		// Thanks to Torben Schwellnus
-		// check if we want custom attachments...
+		// Check if we want custom attachments... (Thanks to Torben Schwellnus)
 		if ($arrForm['addConfirmationMailAttachments'])
 		{
 			if ($arrForm['confirmationMailAttachments'])
@@ -4852,17 +4853,17 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		if ($dirImages != '')
+		if (!empty($dirImages))
 		{
 			$confEmail->imageDir = $dirImages;
 		}
-		if ($messageText != '')
+		if (!empty($messageText))
 		{
 			$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
 			$messageText = strip_tags($messageText);
 			$confEmail->text = $messageText;
 		}
-		if ($messageHtml != '')
+		if (!empty($messageHtml))
 		{
 			$confEmail->html = $messageHtml;
 		}

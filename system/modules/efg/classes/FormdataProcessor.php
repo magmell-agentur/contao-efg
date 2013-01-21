@@ -455,19 +455,19 @@ class FormdataProcessor extends \Frontend
 			}
 
 			// prepare insert tags to handle separate from 'condition tags'
-			if (strlen($messageText))
+			if (!empty($messageText))
 			{
 				$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
 			}
-			if (strlen($messageHtml))
+			if (!empty($messageHtml))
 			{
 				$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
 			}
-			if (strlen($subject))
+			if (!empty($subject))
 			{
 				$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
 			}
-			if (strlen($sender))
+			if (!empty($sender))
 			{
 				$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 			}
@@ -516,7 +516,7 @@ class FormdataProcessor extends \Frontend
 						$strLabel = '';
 						$strVal = '';
 
-						if ($arrTagParams && strlen($arrTagParams['label']))
+						if ($arrTagParams && !empty($arrTagParams['label']))
 						{
 							$strLabel = $arrTagParams['label'];
 						}
@@ -525,10 +525,11 @@ class FormdataProcessor extends \Frontend
 						{
 							if ($strType == 'efgImageSelect')
 							{
-								$strVal = '';
-								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								$varText = array();
 								$varHtml = array();
+
+								$varVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+
 								if (is_string($varVal))
 								{
 									$varVal = array($varVal);
@@ -570,23 +571,24 @@ class FormdataProcessor extends \Frontend
 								{
 									$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
-								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
+								if (empty($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
+								$subject = str_replace($tag, $strLabel . $strVal, $subject);
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
 							else
 							{
 								$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
+								if (empty($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 
-								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
+								if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
 									$strVal = $this->Formdata->formatMultilineValue($strVal);
 								}
@@ -621,7 +623,6 @@ class FormdataProcessor extends \Frontend
 				}
 				$messageText = strip_tags($messageText);
 			}
-
 			if (!empty($messageHtml))
 			{
 				$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
@@ -631,6 +632,7 @@ class FormdataProcessor extends \Frontend
 					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
+
 			// replace insert tags in subject
 			if (!empty($subject))
 			{
@@ -667,8 +669,7 @@ class FormdataProcessor extends \Frontend
 
 			$confEmail->subject = $subject;
 
-			// Thanks to Torben Schwellnus
-			// check if we want custom attachments...
+			// Check if we want custom attachments... (Thanks to Torben Schwellnus)
 			if ($arrForm['addConfirmationMailAttachments'])
 			{
 				if($arrForm['confirmationMailAttachments'])
@@ -709,6 +710,8 @@ class FormdataProcessor extends \Frontend
 			}
 			if (!empty($messageText))
 			{
+				$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
+				$messageText = strip_tags($messageText);
 				$confEmail->text = $messageText;
 			}
 			if (!empty($messageHtml))
@@ -766,6 +769,7 @@ class FormdataProcessor extends \Frontend
 			$arrRecipient = array();
 			$sender = '';
 			$senderName = '';
+			$replyTo = '';
 			$attachments = array();
 
 			$blnSkipEmpty = ($arrForm['formattedMailSkipEmpty']) ? true : false;
@@ -847,6 +851,7 @@ class FormdataProcessor extends \Frontend
 			foreach ($tags[0] as $tag)
 			{
 				$elements = explode('::', trim(str_replace(array('__BRCL__', '__BRCR__'), array('', ''), $tag)));
+
 				switch (strtolower($elements[0]))
 				{
 					// Form
@@ -866,6 +871,12 @@ class FormdataProcessor extends \Frontend
 
 						//$strType = $arrField['type'];
 						$strType = $arrField['formfieldType'];
+
+						if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
+						{
+							$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
+							$strType = $arrField['inputType'];
+						}
 
 						$strLabel = '';
 						$strVal = '';
@@ -924,17 +935,18 @@ class FormdataProcessor extends \Frontend
 								{
 									$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 								}
-								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
+								if (empty($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
+								$subject = str_replace($tag, $strLabel . $strVal, $subject);
 								$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
 							else
 							{
 								$strVal = $this->Formdata->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								if (!is_array($strVal) && !strlen($strVal) && $blnSkipEmpty)
+								if (empty($strVal) && $blnSkipEmpty)
 								{
 									$strLabel = '';
 								}
@@ -984,6 +996,7 @@ class FormdataProcessor extends \Frontend
 					$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
+
 			// replace insert tags in subject
 			if (!empty($subject))
 			{
@@ -994,6 +1007,7 @@ class FormdataProcessor extends \Frontend
 					$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
 				}
 			}
+
 			// replace insert tags in sender
 			if (!empty($sender))
 			{
@@ -1007,7 +1021,6 @@ class FormdataProcessor extends \Frontend
 			{
 				$infoEmail->fromName = $senderName;
 			}
-			$infoEmail->subject = $subject;
 
 			// Get "reply to" address, if form contains field named 'email'
 			if (isset($arrSubmitted['email']) && !empty($arrSubmitted['email']) && !is_bool(strpos($arrSubmitted['email'], '@')))
@@ -1021,7 +1034,9 @@ class FormdataProcessor extends \Frontend
 				$infoEmail->replyTo($replyTo);
 			}
 
-			// check if we want custom attachments...
+			$infoEmail->subject = $subject;
+
+			// Check if we want custom attachments... (Thanks to Torben Schwellnus)
 			if ($arrForm['addFormattedMailAttachments'])
 			{
 				if ($arrForm['formattedMailAttachments'])
@@ -1062,6 +1077,8 @@ class FormdataProcessor extends \Frontend
 			}
 			if (!empty($messageText))
 			{
+				$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
+				$messageText = strip_tags($messageText);
 				$infoEmail->text = $messageText;
 			}
 			if (!empty($messageHtml))
