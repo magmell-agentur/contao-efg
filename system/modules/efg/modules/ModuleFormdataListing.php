@@ -3237,14 +3237,8 @@ class ModuleFormdataListing extends \Module
 
 			if (!is_bool(strpos($value, "\n")))
 			{
-				$strVal = $value;
-				$strVal = preg_replace('/(<\/|<)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-				$strVal = nl2br($strVal);
-				$strVal = preg_replace('/(<\/)(h\d|p|div|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
-				$value = $strVal;
-				unset($strVal);
+				$value = $this->Formdata->formatMultilineValue($value);
 			}
-
 		}
 
 		return $value;

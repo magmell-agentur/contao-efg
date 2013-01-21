@@ -2236,6 +2236,26 @@ class Formdata extends \Frontend
 	}
 
 
+	/**
+	 * Handle multiline string
+	 * @param $strBuffer
+	 * @return string
+	 */
+	public function formatMultilineValue($strBuffer)
+	{
+		if (empty($strBuffer) || strpos($strBuffer, "\n") === false)
+		{
+			return $strBuffer;
+		}
+
+		$strBuffer = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strBuffer);
+		$strBuffer = nl2br($strBuffer, false);
+		$strBuffer = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strBuffer);
+
+		return $strBuffer;
+	}
+
+
 	public function evalConditionTags($strBuffer, $arrSubmitted = null, $arrFiles = null, $arrForm = null)
 	{
 		if (!strlen($strBuffer))

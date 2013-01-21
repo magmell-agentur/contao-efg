@@ -3219,12 +3219,7 @@ window.addEvent(\'domready\', function() {
 							// check multiline value
 							if (!is_bool(strpos($row[$v], "\n")))
 							{
-								$strVal = $row[$v];
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|secion|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-								$strVal = nl2br($strVal, false);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
-								$row[$v] = $strVal;
-								unset($strVal);
+								$row[$v] = $this->Formdata->formatMultilineValue($row[$v]);
 							}
 							$args[$k] = $row[$v];
 							$rowFormatted[$v] = $args[$k];
@@ -4756,9 +4751,7 @@ window.addEvent(\'domready\', function() {
 
 							if (!is_bool(strpos($strVal, "\n")))
 							{
-								$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-								$strVal = nl2br($strVal);
-								$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+								$strVal = $this->Formdata->formatMultilineValue($strVal);
 							}
 							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 

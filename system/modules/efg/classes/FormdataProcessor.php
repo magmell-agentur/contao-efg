@@ -588,9 +588,7 @@ class FormdataProcessor extends \Frontend
 
 								if (is_string($strVal) && strlen($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
-									$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-									$strVal = nl2br($strVal);
-									$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+									$strVal = $this->Formdata->formatMultilineValue($strVal);
 								}
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
@@ -944,9 +942,7 @@ class FormdataProcessor extends \Frontend
 
 								if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
 								{
-									$strVal = preg_replace('/(<\/|<)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4", $strVal);
-									$strVal = nl2br($strVal);
-									$strVal = preg_replace('/(<\/)(h\d|p|div|section|ul|ol|li|table|tbody|tr|td|th)([^>]*)(>)(\n)/si', "\\1\\2\\3\\4\n", $strVal);
+									$strVal = $this->Formdata->formatMultilineValue($strVal);
 								}
 								$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
 							}
