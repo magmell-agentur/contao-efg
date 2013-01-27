@@ -43,6 +43,8 @@ class Formdata extends \Frontend
 	 */
 	protected $arrFFstorable = array();
 
+	protected $arrBaseFields = null;
+
 	/**
 	 * Mapping of frontend form fields to backend widgets
 	 * @var array
@@ -80,7 +82,7 @@ class Formdata extends \Frontend
 
 		if (!empty($GLOBALS['EFG']['storable_fields']))
 		{
-			$this->arrFFstorable = array_unique(array_merge($this->arrFFstorable, $GLOBALS['EFG']['storable_fields']));
+			$this->arrFFstorable = array_filter(array_unique(array_merge($this->arrFFstorable, $GLOBALS['EFG']['storable_fields'])));
 		}
 
 		// Mapping of frontend form fields to backend widgets for not identical types
@@ -107,6 +109,8 @@ class Formdata extends \Frontend
 
 		$this->getStoringForms();
 
+		$this->arrBaseFields = array_filter(array_diff(\Database::getInstance()->getFieldNames('tl_formdata'), array('PRIMARY')));
+
 	}
 
 	/**
@@ -128,6 +132,10 @@ class Formdata extends \Frontend
 
 			case 'arrMapTL_FFL':
 				return $this->arrMapTL_FFL;
+				break;
+
+			case 'arrBaseFields':
+				return $this->arrBaseFields;
 				break;
 
 			case 'arrStoringForms':
@@ -179,7 +187,7 @@ class Formdata extends \Frontend
 			return '';
 		}
 
-		// get field used to build alias
+		// Get field used to build alias
 		$objForm = \Database::getInstance()->prepare("SELECT id, efgAliasField FROM tl_form WHERE title=?")
 			->limit(1)
 			->execute($strFormTitle);
@@ -209,7 +217,7 @@ class Formdata extends \Frontend
 		{
 			if (!empty($strAliasField))
 			{
-				// get value from post
+				// Get value from post
 				$autoAlias = true;
 				$varValue = standardize(\Input::post($strAliasField));
 			}
@@ -266,7 +274,7 @@ class Formdata extends \Frontend
 					continue;
 				}
 
-				// do not add if list condition contains insert tags
+				// Do not add if list condition contains insert tags
 				if (!empty($arrParams['list_where']))
 				{
 					if (strpos($arrParams['list_where'], '{{') !== false)
@@ -275,7 +283,7 @@ class Formdata extends \Frontend
 					}
 				}
 
-				// do not add if no listing details fields are defined
+				// Do not add if no listing details fields are defined
 				if (empty($arrParams['list_info']))
 				{
 					continue;
@@ -328,7 +336,7 @@ class Formdata extends \Frontend
 
 					$strUrl = $arrProcessed[$pageId];
 
-					// prepare conditions
+					// Prepare conditions
 					$strQuery = "SELECT id,alias FROM tl_formdata f";
 					$strWhere = " WHERE form=?";
 
@@ -365,7 +373,7 @@ class Formdata extends \Frontend
 
 					$strQuery .=  $strWhere;
 
-					// add details pages to the indexer
+					// Add details pages to the indexer
 					$objData = \Database::getInstance()->prepare($strQuery)
 						->execute($strForm);
 
@@ -376,7 +384,7 @@ class Formdata extends \Frontend
 
 				}
 
-			} // foreach arrSearchableListingPages
+			}
 
 		}
 
@@ -393,7 +401,7 @@ class Formdata extends \Frontend
 
 		if (!$this->arrStoringForms)
 		{
-			// get all forms marked to store data
+			// Get all forms marked to store data
 			$objForms = \Database::getInstance()->prepare("SELECT id,title,alias,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
 				->execute("1");
 
@@ -415,7 +423,7 @@ class Formdata extends \Frontend
 	{
 		if (!$this->arrListingPages)
 		{
-			// get all pages containig listing formdata
+			// Get all pages containing listing formdata
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=?")
 				->execute("module", "formdatalisting");
 
@@ -437,7 +445,7 @@ class Formdata extends \Frontend
 	{
 		if (!$this->arrSearchableListingPages)
 		{
-			// get all pages containing listing formdata with details page
+			// Get all pages containing listing formdata with details page
 			$objListingPages = \Database::getInstance()->prepare("SELECT tl_page.id,tl_page.alias,tl_page.protected,tl_module.list_formdata,tl_module.efg_DetailsKey,tl_module.list_where,tl_module.efg_list_access,tl_module.list_fields,tl_module.list_info FROM tl_page, tl_content, tl_article, tl_module WHERE (tl_page.id=tl_article.pid AND tl_article.id=tl_content.pid AND tl_content.module=tl_module.id) AND tl_content.type=? AND tl_module.type=? AND tl_module.list_info != '' AND tl_module.efg_list_access=? AND (tl_page.start=? OR tl_page.start<?) AND (tl_page.stop=? OR tl_page.stop>?) AND tl_page.published=?")
 				->execute("module", "formdatalisting", "public", '', time(), '', time(), 1);
 
@@ -901,7 +909,7 @@ class Formdata extends \Frontend
 
 			return $strVal;
 
-		} // if in_array arrFFstorable
+		}
 		else
 		{
 			return (is_array($varSubmitted) ? serialize($varSubmitted) : $varSubmitted);
@@ -1044,7 +1052,7 @@ class Formdata extends \Frontend
 
 			$varValue = $strVal;
 
-		} // if in_array arrFFstorable
+		}
 
 		if (is_array($varValue))
 		{
@@ -1080,7 +1088,7 @@ class Formdata extends \Frontend
 	 * @param boolean Skip empty values (do not return label of selected option if its value is empty)
 	 * @return mixed
 	 */
-	public function preparePostValueForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmpty=false)
+	public function preparePostValueForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmptyFields=false)
 	{
 		if (!is_array($arrField))
 		{
@@ -1101,7 +1109,7 @@ class Formdata extends \Frontend
 
 		if (isset($arrField['efgMailSkipEmpty']))
 		{
-			$blnSkipEmpty = $arrField['efgMailSkipEmpty'];
+			$blnSkipEmptyFields = $arrField['efgMailSkipEmpty'];
 		}
 
 		if (in_array($strType, $this->arrFFstorable))
@@ -1126,7 +1134,7 @@ class Formdata extends \Frontend
 
 					foreach ($arrOptions as $o => $mxVal)
 					{
-						if ($blnSkipEmpty && !strlen($mxVal['value']))
+						if ($blnSkipEmptyFields && !strlen($mxVal['value']))
 						{
 							continue;
 						}
@@ -1171,7 +1179,7 @@ class Formdata extends \Frontend
 					{
 						foreach ($arrOptions as $o => $mxVal)
 						{
-							if ($blnSkipEmpty && !strlen($mxVal['value']))
+							if ($blnSkipEmptyFields && !strlen($mxVal['value']))
 							{
 								continue;
 							}
@@ -1189,7 +1197,7 @@ class Formdata extends \Frontend
 					{
 						foreach ($arrOptions as $o => $mxVal)
 						{
-							if ($blnSkipEmpty && !strlen($mxVal['value']))
+							if ($blnSkipEmptyFields && !strlen($mxVal['value']))
 							{
 								continue;
 							}
@@ -1233,7 +1241,7 @@ class Formdata extends \Frontend
 
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
 
-		} // if in_array arrFFstorable
+		}
 		else
 		{
 			return (is_string($varSubmitted) && strlen($varSubmitted)) ? \String::decodeEntities($varSubmitted) : $varSubmitted;
@@ -1291,7 +1299,7 @@ class Formdata extends \Frontend
 					if (!empty($arrSel))
 					{
 
-						// get options labels instead of values for mail / text
+						// Get options labels instead of values for mail / text
 						if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
 						{
 							foreach ($arrSel as $kSel => $vSel)
@@ -1376,7 +1384,7 @@ class Formdata extends \Frontend
 
 					if (!empty($arrSel))
 					{
-						// get options labels instead of values for mail / text
+						// Get options labels instead of values for mail / text
 						if ($blnEfgStoreValues && is_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['options']))
 						{
 							foreach ($arrSel as $kSel => $vSel)
@@ -1448,7 +1456,7 @@ class Formdata extends \Frontend
 			}
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
 
-		} // if in_array arrFFstorable
+		}
 		else
 		{
 			return (is_string($varValue) && strlen($varValue)) ? \String::decodeEntities($varValue) : $varValue;
@@ -1603,17 +1611,14 @@ class Formdata extends \Frontend
 						{
 							if ($arrField['rgxp'] == 'date')
 							{
-								// $varVal = date((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
 								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'datim')
 							{
-								// $varVal = date($GLOBALS['TL_CONFIG']['datimFormat'], $varVal);
 								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'time')
 							{
-								// $varVal = date($GLOBALS['TL_CONFIG']['timeFormat'], $varVal);
 								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['timeFormat']), $varVal);
 							}
 						}
@@ -1631,7 +1636,7 @@ class Formdata extends \Frontend
 
 			return $varVal;
 
-		} // if in_array arrFFstorable
+		}
 		else
 		{
 			return $varVal;
@@ -1670,7 +1675,7 @@ class Formdata extends \Frontend
 			case 'efgLookupRadio':
 			case 'efgLookupSelect':
 
-				// get efgLookupOptions: array('lookup_field' => TABLENAME.FIELDNAME, 'lookup_val_field' => TABLENAME.FIELDNAME, 'lookup_where' => CONDITION, 'lookup_sort' => ORDER BY)
+				// Get efgLookupOptions: array('lookup_field' => TABLENAME.FIELDNAME, 'lookup_val_field' => TABLENAME.FIELDNAME, 'lookup_where' => CONDITION, 'lookup_sort' => ORDER BY)
 				$arrLookupOptions = deserialize($arrField['efgLookupOptions']);
 				$strLookupField = $arrLookupOptions['lookup_field'];
 				$strLookupValField = (strlen($arrLookupOptions['lookup_val_field'])) ? $arrLookupOptions['lookup_val_field'] : null;
@@ -1696,7 +1701,7 @@ class Formdata extends \Frontend
 
 				$arrOptions = array();
 
-				// handle lookup formdata
+				// Handle lookup formdata
 				if (substr($sqlLookupTable, 0, 3) == 'fd_')
 				{
 					$strFormKey = $this->arrFormsDcaKey[substr($sqlLookupTable, 3)];
@@ -1718,7 +1723,7 @@ class Formdata extends \Frontend
 
 					if (!empty($strLookupWhere))
 					{
-						// special treatment for fields in tl_formdata_details
+						// Special treatment for fields in tl_formdata_details
 						$arrPattern = array();
 						$arrReplace = array();
 						foreach($arrDetailFields as $strDetailField)
@@ -1732,7 +1737,7 @@ class Formdata extends \Frontend
 
 					if (!empty($arrLookupOptions['lookup_sort']))
 					{
-						// special treatment for fields in tl_formdata_details
+						// Special treatment for fields in tl_formdata_details
 						$arrPattern = array();
 						$arrReplace = array();
 						foreach($arrDetailFields as $strDetailField)
@@ -1747,14 +1752,14 @@ class Formdata extends \Frontend
 						$sqlLookupOrder = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\'))';
 					}
 
-				} // end lookup formdata
+				}
 
-				// handle lookup calendar events
+				// Handle lookup calendar events
 				if ($sqlLookupTable == 'tl_calendar_events')
 				{
 					$sqlLookupOrder = '';
 
-					// handle order (max. 2 fields)
+					// Handle order (max. 2 fields)
 					// .. default startTime ASC
 					$arrSortKeys = array(array('field'=>'startTime', 'order'=>'ASC'),array('field'=>'startTime', 'order'=>'ASC'));
 					if (!empty($arrLookupOptions['lookup_sort']))
@@ -1773,7 +1778,7 @@ class Formdata extends \Frontend
 
 					$strReferer = $this->getReferer();
 
-					// if form is placed on an events detail page, automatically add restriction to event(s)
+					// If form is placed on an events detail page, automatically add restriction to event(s)
 					if (strlen(\Input::get('events')))
 					{
 						if (is_numeric(\Input::get('events')))
@@ -1785,7 +1790,7 @@ class Formdata extends \Frontend
 							$sqlLookupWhere .= (!empty($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='" . \Input::get('events') . "' ";
 						}
 					}
-					// if linked from event reader page
+					// If linked from event reader page
 					if (strpos($strReferer, 'event-reader/events/') || strpos($strReferer, '&events=') )
 					{
 						if (strpos($strReferer, 'events/'))
@@ -1854,26 +1859,42 @@ class Formdata extends \Frontend
 
 							if ($sqlLookupValField)
 							{
-								//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								// $arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
 								if (count($arrSortKeys) >= 2)
 								{
-									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array
+									(
+										'value' => $arrEvent[$sqlLookupValField].'@'.$strTime,
+										'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '')
+									);
 								}
 								else
 								{
-									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array
+									(
+										'value' => $arrEvent[$sqlLookupValField].'@'.$strTime,
+										'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '')
+									);
 								}
 							}
 							else
 							{
-								//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+								// $arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
 								if (count($arrSortKeys) >= 2)
 								{
-									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array
+									(
+										'value' => $arrEvent[$sqlLookupValField].'@'.$strTime,
+										'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '')
+									);
 								}
 								else
 								{
-									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
+									$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array
+									(
+										'value' => $arrEvent[$sqlLookupValField].'@'.$strTime,
+										'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '')
+									);
 								}
 							}
 
@@ -1931,7 +1952,7 @@ class Formdata extends \Frontend
 
 										if ($sqlLookupValField)
 										{
-											//$arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											// $arrEvents[$arrEvent[$sqlLookupValField].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
 											if (count($arrSortKeys) >= 2)
 											{
 												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
@@ -1943,7 +1964,7 @@ class Formdata extends \Frontend
 										}
 										else
 										{
-											//$arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
+											// $arrEvents[$arrEvent['id'].'@'.$strTime] = $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : '');
 											if (count($arrSortKeys) >= 2)
 											{
 												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent[$arrSortKeys[1]['field']]][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
@@ -1955,13 +1976,13 @@ class Formdata extends \Frontend
 										}
 
 									}
-								} // while endTime < intEnd
+								}
 
-							} // if recurring
+							}
 
-						} // while
+						}
 
-						// sort events
+						// Sort events
 						foreach ($arrEvents as $k => $arr)
 						{
 							if ($arrSortKeys[1]['order'] == 'DESC')
@@ -1982,7 +2003,7 @@ class Formdata extends \Frontend
 							ksort($arrEvents);
 						}
 
-						// set options
+						// Set options
 						foreach ($arrEvents as $k1 => $arr1)
 						{
 							foreach ($arr1 as $k2 => $arr2)
@@ -1999,7 +2020,7 @@ class Formdata extends \Frontend
 							$blnDoNotAddEmptyOption = true;
 						}
 
-						// include blank option to input type select
+						// Include blank option
 						if ($strType == 'efgLookupSelect')
 						{
 							if (!$blnDoNotAddEmptyOption)
@@ -2008,13 +2029,14 @@ class Formdata extends \Frontend
 							}
 						}
 
-					} // if objEvents->numRows
+					}
 
 					return $arrOptions;
 
-				} // end handle calendar events
+				}
 
-				else // normal lookup table or formdata lookup table
+				// Normal lookup table or formdata lookup table
+				else
 				{
 					$sqlLookup = "SELECT " . $sqlLookupIdField . (!empty($sqlLookupField) ? ', ' : '') . $sqlLookupField . (!empty($sqlLookupValField) ? ', ' : '') . $sqlLookupValField . " FROM " . $sqlLookupTable . $sqlLookupWhere . (!empty($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder : "");
 
@@ -2038,11 +2060,10 @@ class Formdata extends \Frontend
 						}
 					}
 
-				} // end normal lookup table
-
+				}
 
 				$arrTempOptions = array();
-				// include blank option to input type select
+				// Include blank option
 				if ($strType == 'efgLookupSelect')
 				{
 					if (!$blnDoNotAddEmptyOption)
@@ -2058,7 +2079,7 @@ class Formdata extends \Frontend
 				}
 				$arrOptions = $arrTempOptions;
 
-				break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
+				break;
 
 			// countryselectmenu
 			case 'countryselect':
@@ -2069,6 +2090,7 @@ class Formdata extends \Frontend
 					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
 				}
 				$arrOptions = $arrTempOptions;
+
 				break;
 
 			default:
@@ -2101,13 +2123,325 @@ class Formdata extends \Frontend
 					}
 				}
 				break;
-		} // end switch $strType
+		}
 
 		// Decode 'special chars', encoded by \Input::encodeSpecialChars (for example labels of checkbox options containing '(')
 		$arrOptions = $this->decodeSpecialChars($arrOptions);
 
 		return $arrOptions;
 
+	}
+
+
+	public function prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields)
+	{
+
+		$subject = $objMailProperties->subject;
+		$arrRecipients = $objMailProperties->recipients;
+		$replyTo = $objMailProperties->replyTo;
+		$messageText = $objMailProperties->messageText;
+		$messageHtml= $objMailProperties->messageHtml;
+		$messageHtmlTmpl= $objMailProperties->messageHtmlTmpl;
+		$attachments= $objMailProperties->attachments;
+
+		$blnSkipEmptyFields = $objMailProperties->skipEmptyFields;
+
+		if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
+		{
+			$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
+			if ($objFileModel !== null)
+			{
+				$messageHtmlTmpl = $objFileModel->path;
+			}
+		}
+		if ($messageHtmlTmpl != '')
+		{
+			$fileTemplate = new \File($messageHtmlTmpl);
+			if ($fileTemplate->mime == 'text/html')
+			{
+				$messageHtml = $fileTemplate->getContent();
+			}
+		}
+
+		// Prepare insert tags to handle separate from 'condition tags'
+		if (!empty($messageText))
+		{
+			$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
+		}
+		if (!empty($messageHtml))
+		{
+			$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
+		}
+		if (!empty($subject))
+		{
+			$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
+		}
+		if (!empty($sender))
+		{
+			$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
+		}
+
+		$blnEvalSubject = $this->replaceConditionTags($subject);
+		$blnEvalMessageText = $this->replaceConditionTags($messageText);
+		$blnEvalMessageHtml = $this->replaceConditionTags($messageHtml);
+
+		// Replace tags in messageText, messageHtml ...
+		$tags = array();
+		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
+
+		// Replace tags of type {{form::<form field name>}}
+		// .. {{form::uploadfieldname?attachment=true}}
+		// .. {{form::fieldname?label=Label for this field: }}
+		foreach ($tags[0] as $tag)
+		{
+			$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('', ''), $tag));
+
+			switch (strtolower($elements[0]))
+			{
+				// Formdata field
+				case 'form':
+					$strKey = $elements[1];
+					list($strKey, $arrTagParams) = explode('?', $strKey);
+
+					if (!empty($arrTagParams))
+					{
+						$arrTagParams = $this->parseInsertTagParams($tag);
+					}
+
+					$arrField = $arrFormFields[$strKey];
+					$arrField['efgMailSkipEmpty'] = $blnSkipEmptyFields;
+
+					$strType = $arrField['formfieldType'];
+
+					if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
+					{
+						$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
+						$strType = $arrField['inputType'];
+					}
+
+					$strLabel = '';
+					$strVal = '';
+
+					if ($arrTagParams && !empty($arrTagParams['label']))
+					{
+						$strLabel = $arrTagParams['label'];
+					}
+
+					if (in_array($strType, $this->arrFFstorable))
+					{
+						if ($strType == 'efgImageSelect')
+						{
+							$varText = array();
+							$varHtml = array();
+
+							if (TL_MODE == 'BE')
+							{
+								$varVal = $this->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							}
+							else
+							{
+								$varVal = $this->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							}
+
+							if (is_string($varVal))
+							{
+								$varVal = array($varVal);
+							}
+							if (!empty($varVal))
+							{
+								foreach ($varVal as $strVal)
+								{
+									if (strlen($strVal))
+									{
+										$varText[] = \Environment::get('base') . $strVal;
+										$varHtml[] = '<img src="' . $strVal . '"' . $this->getEmptyTagEnd();
+									}
+								}
+							}
+							if (empty($varText) && $blnSkipEmptyFields)
+							{
+								$strLabel = '';
+							}
+
+							$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
+							$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml), $messageHtml);
+						}
+						elseif ($strType == 'upload')
+						{
+							$varText = array();
+							$varHtml = array();
+
+							if (TL_MODE == 'BE')
+							{
+								if (strlen($arrSubmitted[$strKey]))
+								{
+									if (!array_key_exists($strKey, $arrFiles))
+									{
+										$objFile = new \File($arrSubmitted[$strKey]);
+										if ($objFile->size)
+										{
+											$arrFiles[$strKey] = array
+											(
+												'tmp_name' => TL_ROOT .'/' . $objFile->path,
+												'file' => TL_ROOT . '/' . $objFile->path,
+												'name' => $objFile->basename,
+												'mime' => $objFile->mime
+											);
+										}
+									}
+								}
+							}
+
+							// Add file as attachment
+							if ($arrTagParams && $arrTagParams['attachment'])
+							{
+								if (!empty($arrFiles[$strKey]['tmp_name']) && is_file($arrFiles[$strKey]['tmp_name']))
+								{
+									if (!isset($attachments[$arrFiles[$strKey]['tmp_name']]))
+									{
+										$attachments[$arrFiles[$strKey]['tmp_name']] = array
+										(
+											'name' => $arrFiles[$strKey]['name'],
+											'file' => $arrFiles[$strKey]['tmp_name'],
+											'mime' => $arrFiles[$strKey]['type']
+										);
+									}
+								}
+								$varVal = array();
+							}
+							// File info
+							else
+							{
+								if (TL_MODE == 'BE')
+								{
+									$varVal = $this->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								}
+								else
+								{
+									$varVal = $this->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								}
+							}
+
+							if (is_string($varVal))
+							{
+								$varVal = array($varVal);
+							}
+							if (!empty($varVal))
+							{
+								foreach ($varVal as $strVal)
+								{
+									if (strlen($strVal))
+									{
+										$varText[] = basename($strVal);
+										$varHtml[] = basename($strVal);
+									}
+								}
+							}
+							if (empty($varText) && $blnSkipEmptyFields)
+							{
+								$strLabel = '';
+							}
+
+							$subject = str_replace($tag, $strLabel . implode(', ', $varText), $subject);
+							$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
+							$messageHtml = str_replace($tag, $strLabel . implode(', ', $varHtml), $messageHtml);
+						}
+						else
+						{
+							if (TL_MODE == 'BE')
+							{
+								$strVal = $this->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							}
+							else
+							{
+								$strVal = $this->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+							}
+
+							if (empty($strVal) && $blnSkipEmptyFields)
+							{
+								$strLabel = '';
+							}
+							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
+
+							if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
+							{
+								$strVal = $this->formatMultilineValue($strVal);
+							}
+							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
+						}
+					}
+
+					// Replace insert tags in subject
+					if (!empty($subject))
+					{
+						$subject = str_replace($tag, $strVal, $subject);
+					}
+
+					// Replace insert tags in sender
+					if (!empty($sender))
+					{
+						$sender = str_replace($tag, $strVal, $sender);
+					}
+
+					break;
+			}
+		}
+
+		// Replace standard insert tags and eval condition tags
+		if (!empty($messageText))
+		{
+			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
+			$messageText = $this->replaceInsertTags($messageText, false);
+			if ($blnEvalMessageText)
+			{
+				$messageText = $this->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
+			}
+			$messageText = strip_tags($messageText);
+			$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
+		}
+		if (!empty($messageHtml))
+		{
+			$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
+			$messageHtml = $this->replaceInsertTags($messageHtml, false);
+			if ($blnEvalMessageHtml)
+			{
+				$messageHtml = $this->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
+			}
+		}
+
+		// Replace insert tags in subject
+		if (!empty($subject))
+		{
+			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
+			$subject = $this->replaceInsertTags($subject, false);
+			if ($blnEvalSubject)
+			{
+				$subject = $this->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
+			}
+		}
+
+		// Replace insert tags in sender
+		if (!empty($sender))
+		{
+			$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
+			$sender = trim($this->replaceInsertTags($sender, false));
+		}
+
+		// Replace insert tags in replyTo
+		if (!empty($replyTo))
+		{
+			$replyTo = $this->replaceInsertTags($replyTo, false);
+		}
+
+		$objMailProperties->subject = $subject;
+		$objMailProperties->recipients = $arrRecipients;
+		$objMailProperties->replyTo = $replyTo;
+		$objMailProperties->messageText = $messageText;
+		$objMailProperties->messageHtmlTmpl = $messageHtmlTmpl;
+		$objMailProperties->messageHtml = $messageHtml;
+		$objMailProperties->attachments = $attachments;
+
+		return $objMailProperties;
 	}
 
 

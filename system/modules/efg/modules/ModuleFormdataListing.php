@@ -1693,7 +1693,7 @@ class ModuleFormdataListing extends \Module
 			//$this->Template->col_last = 'col_' . $j;
 			$this->Template->col_last = 'col_' . $intLastCol;
 
-		} // !$blnExport
+		}
 
 		else
 		{
@@ -1912,7 +1912,7 @@ class ModuleFormdataListing extends \Module
 					echo "\n";
 				}
 
-			} // foreach ($result as $row)
+			}
 
 			if ($strExportMode == 'xls')
 			{
@@ -1932,7 +1932,7 @@ class ModuleFormdataListing extends \Module
 			}
 			exit;
 
-		} // $blnExport
+		}
 
 	}
 
@@ -2050,7 +2050,9 @@ class ModuleFormdataListing extends \Module
 
 		// Fallback template
 		if (!strlen($this->list_info_layout))
+		{
 			$this->list_info_layout = 'info_default';
+		}
 
 		$this->Template = new \FrontendTemplate($this->list_info_layout);
 
@@ -2839,9 +2841,9 @@ class ModuleFormdataListing extends \Module
 					echo "\n";
 				}
 
-			} // foreach ($result as $row)
+			}
 
-		} // if objRow->numRows
+		}
 
 		if ($strExportMode == 'xls')
 		{

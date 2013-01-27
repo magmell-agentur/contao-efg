@@ -1447,7 +1447,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								}
 								// sort options on label
 								asort($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-							} // foreignKey field
+							}
 
 							// $arrValues = explode('|', $this->varValue);
 							if (!is_array($this->varValue))
@@ -1508,7 +1508,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->varValue = $arrNewValues;
 							}
 						}
-					} // field types radio, select, multi checkbox
+					}
 
 					// field type single checkbox
 					elseif ($strInputType == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
@@ -1524,18 +1524,18 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->varValue = '1';
 							}
 						}
-					} // field type single checkbox
+					}
 
 					// field type efgLookupSelect
 					elseif ($strInputType == 'efgLookupSelect')
 					{
 						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrNewOptions = array();
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
 						{
 							// prepare options array
-							$arrNewOptions = array();
 							foreach ($arrFieldOptions as $k => $v)
 							{
 								$arrNewOptions[$v['value']] = $v['label'];
@@ -1564,18 +1564,18 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// render type efgLookupSelect as SelectMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 
-					} // field type efgLookupSelect
+					}
 
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
 					{
 						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrNewOptions = array();
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
 						{
 							// prepare options array
-							$arrNewOptions = array();
 							foreach ($arrFieldOptions as $k => $v)
 							{
 								$arrNewOptions[$v['value']] = $v['label'];
@@ -1604,18 +1604,18 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// render type efgLookupCheckbox as CheckboxMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 
-					} // field type efgLookupCheckbox
+					}
 
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
 					{
 						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrNewOptions = array();
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
 						{
 							// prepare options array
-							$arrNewOptions = array();
 							foreach ($arrFieldOptions as $k => $v)
 							{
 								$arrNewOptions[$v['value']] = $v['label'];
@@ -1644,7 +1644,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// render type efgLookupRadio as RadioMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 
-					} // field type efgLookupRadio
+					}
 
 					else
 					{
@@ -2095,9 +2095,8 @@ window.addEvent(\'domready\', function() {
 								}
 								// sort options on label
 								asort($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
-							} // foreignKey field
+							}
 
-							// $arrValues = explode('|', $this->varValue);
 							if (!is_array($this->varValue))
 							{
 								$arrValues = explode('|', $this->varValue);
@@ -2156,7 +2155,7 @@ window.addEvent(\'domready\', function() {
 								$this->varValue = $arrNewValues;
 							}
 						}
-					} // field types radio, select, multi checkbox
+					}
 
 					// field type single checkbox
 					elseif ($strInputType == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
@@ -2172,7 +2171,7 @@ window.addEvent(\'domready\', function() {
 								$this->varValue = '1';
 							}
 						}
-					} // field type single checkbox
+					}
 
 					// field type efgLookupSelect
 					elseif ($strInputType == 'efgLookupSelect')
@@ -2212,7 +2211,7 @@ window.addEvent(\'domready\', function() {
 						// render type efgLookupSelect as SelectMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 
-					} // field type efgLookupSelect
+					}
 
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
@@ -2252,7 +2251,7 @@ window.addEvent(\'domready\', function() {
 						// render type efgLookupCheckbox as CheckboxMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 
-					} // field type efgLookupCheckbox
+					}
 
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
@@ -2292,7 +2291,7 @@ window.addEvent(\'domready\', function() {
 						// render type efgLookupRadio as RadioMenu
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
 
-					} // field type efgLookupRadio
+					}
 
 					else
 					{
@@ -3225,7 +3224,7 @@ window.addEvent(\'domready\', function() {
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
-				} // foreach ($showFields as $k=>$v)
+				}
 
 				// Shorten the label it if it is too long
 				$label = vsprintf((strlen($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['format']) ? $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['format'] : '%s'), $args);
@@ -4376,7 +4375,7 @@ window.addEvent(\'domready\', function() {
 			$value = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 		}
 		elseif ($value && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType'],
-							array('checkbox', 'efgLookupCheckbox', 'select', 'conditionalselect', 'efgLookupSelect','radio')))
+			array('checkbox', 'efgLookupCheckbox', 'select', 'conditionalselect', 'efgLookupSelect','radio')))
 		{
 			$value = str_replace('|', ', ', $value);
 		}
@@ -4492,8 +4491,17 @@ window.addEvent(\'domready\', function() {
 		$arrForm = $objForm->row();
 		$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
-		// Types of form fields with storable data
-		$arrFFstorable = $this->Formdata->arrFFstorable;
+		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $strKey => $arrField)
+		{
+			if (isset($arrFormFields[$strKey]))
+			{
+				$arrFormFields[$strKey] = array_merge($arrFormFields[$strKey], $arrField);
+			}
+			else
+			{
+				$arrFormFields[$strKey] = $arrField;
+			}
+		}
 
 		if (empty($arrForm['confirmationMailSubject']) || (empty($arrForm['confirmationMailText']) && empty($arrForm['confirmationMailTemplate'])))
 		{
@@ -4502,22 +4510,26 @@ window.addEvent(\'domready\', function() {
 
 		$this->loadDataContainer('tl_files');
 
-		$messageText = '';
-		$messageHtml = '';
-		$messageHtmlTmpl = '';
-		$strRecipient  = '';
-		$arrRecipient = array();
-		$sender = '';
-		$senderName = '';
-		$replyTo = '';
-		$attachments = array();
+		$objMailProperties = new \stdClass();
+		$objMailProperties->subject = '';
+		$objMailProperties->sender = '';
+		$objMailProperties->senderName = '';
+		$objMailProperties->replyTo = '';
+		$objMailProperties->recipients = array();
+		$objMailProperties->messageText = '';
+		$objMailProperties->messageHtmlTmpl = '';
+		$objMailProperties->messageHtml = '';
+		$objMailProperties->attachments = array();
+		$objMailProperties->skipEmptyFields = false;
 
-		$blnSkipEmpty = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
+		$objMailProperties->skipEmptyFields = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
+
 		$blnStoreOptionsValues = ($arrForm['efgStoreValues']) ? true : false;
 
-		$dirImages = '';
-
+		// Set the sender as given in form configuration
 		$sender = $arrForm['confirmationMailSender'];
+		$senderName = '';
+
 		if (!empty($sender))
 		{
 			$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
@@ -4528,10 +4540,19 @@ window.addEvent(\'domready\', function() {
 				$senderName = trim($parts[1]);
 			}
 		}
+		$objMailProperties->sender = $sender;
+		$objMailProperties->senderName = $senderName;
 
+		// Set the 'reply to' address, if given in form configuration
+		if (!empty($arrForm['confirmationMailReplyto']))
+		{
+			$objMailProperties->replyTo = $arrForm['confirmationMailReplyto'];
+		}
+
+		// Set recipient(s)
 		$recipientFieldName = $arrForm['confirmationMailRecipientField'];
 
-		if (strlen($recipientFieldName) && $arrSubmitted[$recipientFieldName])
+		if (!empty($recipientFieldName) && !empty($arrSubmitted[$recipientFieldName]))
 		{
 			$varRecipient = $arrSubmitted[$recipientFieldName];
 			// handle efg option 'save options of values' for field types radio, select, checkbox
@@ -4552,12 +4573,12 @@ window.addEvent(\'domready\', function() {
 
 		if (strlen($varRecipient) || strlen($arrForm['confirmationMailRecipient']))
 		{
-			$arrRecipient = array_unique(array_merge(trimsplit(',', $varRecipient), trimsplit(',', $arrForm['confirmationMailRecipient'])));
+			$arrRecipient = array_merge(trimsplit(',', $varRecipient), trimsplit(',', $arrForm['confirmationMailRecipient']));
 		}
 
 		if (\Input::get('recipient'))
 		{
-			$arrRecipient = array_unique(trimsplit(',', \Input::get('recipient')));
+			$arrRecipient = trimsplit(',', \Input::get('recipient'));
 		}
 
 		if (is_array($arrRecipient))
@@ -4574,298 +4595,75 @@ window.addEvent(\'domready\', function() {
 				$arrRecipient = array_map("str_replace", array_fill(0, count($arrRecipient), "{{user::email}}"), array_fill(0, count($arrRecipient), $objUser->email), $arrRecipient);
 				$strRecipient = implode(', ', $arrRecipient);
 			}
+			$arrRecipient = array_filter(array_unique($arrRecipient));
 		}
-
-		$subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
-		$messageText = \String::decodeEntities($arrForm['confirmationMailText']);
-		$messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
-
-		if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
-		{
-			$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
-			if ($objFileModel !== null)
-			{
-				$messageHtmlTmpl = $objFileModel->path;
-			}
-		}
-		if ($messageHtmlTmpl != '')
-		{
-			$fileTemplate = new \File($messageHtmlTmpl);
-			if ($fileTemplate->mime == 'text/html')
-			{
-				$messageHtml = $fileTemplate->getContent();
-			}
-		}
-
-		// prepare insert tags to handle separate from 'condition tags'
-		if (strlen($messageText))
-		{
-			$messageText = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageText);
-		}
-		if (strlen($messageHtml))
-		{
-			$messageHtml = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $messageHtml);
-		}
-		if (strlen($subject))
-		{
-			$subject = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $subject);
-		}
-		if (strlen($sender))
-		{
-			$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
-		}
-
-		$blnEvalSubject = $this->Formdata->replaceConditionTags($subject);
-		$blnEvalMessageText = $this->Formdata->replaceConditionTags($messageText);
-		$blnEvalMessageHtml = $this->Formdata->replaceConditionTags($messageHtml);
-
-		// Replace tags in messageText, messageHtml ...
-		$tags = array();
-		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
-
-		// Replace tags of type {{form::<form field name>}}
-		// .. {{form::uploadfieldname?attachment=true}}
-		// .. {{form::fieldname?label=Label for this field: }}
-		foreach ($tags[0] as $tag)
-		{
-			$elements = explode('::', preg_replace(array('/^__BRCL__/i', '/__BRCR__$/i'), array('',''), $tag));
-
-			switch (strtolower($elements[0]))
-			{
-				// Form
-				case 'form':
-					$strKey = $elements[1];
-					$arrKey = explode('?', $strKey);
-					$strKey = $arrKey[0];
-
-					$arrTagParams = null;
-					if (isset($arrKey[1]) && strlen($arrKey[1]))
-					{
-						$arrTagParams = $this->Formdata->parseInsertTagParams($tag);
-					}
-
-					$arrField = $arrFormFields[$strKey];
-					$arrField['efgMailSkipEmpty'] = $blnSkipEmpty;
-
-					//$strType = $arrField['type'];
-					$strType = $arrField['formfieldType'];
-
-					if (!isset($arrFormFields[$strKey]) && in_array($strKey, $this->arrBaseFields))
-					{
-						$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey];
-						$strType = $arrField['inputType'];
-					}
-
-					$strLabel = '';
-					$strVal = '';
-
-					if ($arrTagParams && strlen($arrTagParams['label']))
-					{
-						$strLabel = $arrTagParams['label'];
-					}
-
-					if (in_array($strType, $arrFFstorable))
-					{
-						if ($strType == 'efgImageSelect')
-						{
-							$varText = array();
-							$varHtml = array();
-
-							$varVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-
-							if (is_string($varVal))
-							{
-								$varVal = array($varVal);
-							}
-							if (!empty($varVal))
-							{
-								foreach ($varVal as $strVal)
-								{
-									if (strlen($strVal))
-									{
-										$varText[] = \Environment::get('base') . $strVal;
-										$varHtml[] = '<img src="' . $strVal . '"' . $this->Formdata->getEmptyTagEnd();
-									}
-								}
-							}
-							if (empty($varText) && $blnSkipEmpty)
-							{
-								$strLabel = '';
-							}
-
-							$messageText = str_replace($tag, $strLabel . implode(', ', $varText), $messageText);
-							$messageHtml = str_replace($tag, $strLabel . implode(' ', $varHtml) , $messageHtml);
-						}
-						elseif ($strType=='upload')
-						{
-
-							if (strlen($arrSubmitted[$strKey]))
-							{
-								if (!array_key_exists($strKey, $arrFiles))
-								{
-									$objFile = new \File($arrSubmitted[$strKey]);
-									if ($objFile->size)
-									{
-										$arrFiles[$strKey] = array('tmp_name' => $objFile->value, 'file'=>$objFile->value,  'name' => $objFile->basename, 'mime' => $objFile->mime);
-									}
-								}
-							}
-
-							if ($arrTagParams && ((array_key_exists('attachment', $arrTagParams) && $arrTagParams['attachment'] == true) || (array_key_exists('attachement', $arrTagParams) && $arrTagParams['attachement'] == true)) )
-							{
-								if (array_key_exists($strKey, $arrFiles) && strlen($arrFiles[$strKey]['name']))
-								{
-									if (empty($attachments) || !in_array($arrFiles[$strKey]['file'], $attachments))
-									{
-										$attachments[] = $arrFiles[$strKey]['file'];
-									}
-								}
-								$strVal = '';
-							}
-							else
-							{
-								$strVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-								$strVal = $this->formatValue($strKey, $strVal);
-							}
-
-							if (empty($strVal) && $blnSkipEmpty)
-							{
-								$strLabel = '';
-							}
-							$subject = str_replace($tag, $strLabel . $strVal, $subject);
-							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
-							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
-
-						}
-						else
-						{
-							$strVal = $this->Formdata->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
-							$strVal = $this->formatValue($strKey, $strVal);
-
-							if (empty($strVal) && $blnSkipEmpty)
-							{
-								$strLabel = '';
-							}
-							$messageText = str_replace($tag, $strLabel . $strVal, $messageText);
-
-							if (is_string($strVal) && !empty($strVal) && !is_bool(strpos($strVal, "\n")))
-							{
-								$strVal = $this->Formdata->formatMultilineValue($strVal);
-							}
-							$messageHtml = str_replace($tag, $strLabel . $strVal, $messageHtml);
-
-						}
-					}
-
-					// replace insert tags in subject
-					if (!empty($subject))
-					{
-						$subject = str_replace($tag, $strVal, $subject);
-					}
-
-					// replace insert tags in sender
-					if (!empty($sender))
-					{
-						$sender = str_replace($tag, $strVal, $sender);
-					}
-
-					break;
-			}
-		}
-
-		// Replace standard insert tags and eval condition tags
-		if (strlen($messageText))
-		{
-			$messageText = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageText);
-			$messageText = $this->replaceInsertTags($messageText, false);
-			if ($blnEvalMessageText)
-			{
-				$messageText = $this->Formdata->evalConditionTags($messageText, $arrSubmitted, $arrFiles, $arrForm);
-			}
-		}
-		if (strlen($messageHtml))
-		{
-			$messageHtml = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $messageHtml);
-			$messageHtml = $this->replaceInsertTags($messageHtml, false);
-			if ($blnEvalMessageHtml)
-			{
-				$messageHtml = $this->Formdata->evalConditionTags($messageHtml, $arrSubmitted, $arrFiles, $arrForm);
-			}
-		}
-
-		// replace insert tags in subject
-		if (!empty($subject))
-		{
-			$subject = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $subject);
-			$subject = $this->replaceInsertTags($subject, false);
-			if ($blnEvalSubject)
-			{
-				$subject = $this->Formdata->evalConditionTags($subject, $arrSubmitted, $arrFiles, $arrForm);
-			}
-		}
-
-		// replace insert tags in sender
-		if (!empty($sender))
-		{
-			$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
-			$sender = $this->replaceInsertTags($sender, false);
-		}
-
-		$confEmail = new \Email();
-		$confEmail->from = $sender;
-		if (!empty($senderName))
-		{
-			$confEmail->fromName = $senderName;
-		}
-		$confEmail->subject = $subject;
+		$objMailProperties->recipients = $arrRecipient;
 
 		// Check if we want custom attachments... (Thanks to Torben Schwellnus)
 		if ($arrForm['addConfirmationMailAttachments'])
 		{
-			if ($arrForm['confirmationMailAttachments'])
+			if($arrForm['confirmationMailAttachments'])
 			{
 				$arrCustomAttachments = deserialize($arrForm['confirmationMailAttachments'], true);
 
-				if (is_array($arrCustomAttachments))
+				if (!empty($arrCustomAttachments))
 				{
 					foreach ($arrCustomAttachments as $intFileId)
 					{
 						$objFileModel = \FilesModel::findByPk($intFileId);
 
-						if ($objFileModel !== null && is_file(TL_ROOT . '/' . $objFileModel->path) && is_readable(TL_ROOT . '/' . $objFileModel->path))
+						if ($objFileModel !== null)
 						{
 							$objFile = new \File($objFileModel->path);
 							if ($objFile->size)
 							{
-								$attachments[] = $objFile->value;
+								$attachments[TL_ROOT . '/' . $objFile->path] = array
+								(
+									'file' => TL_ROOT . '/' . $objFile->path,
+									'name' => $objFile->basename,
+									'mime' => $objFile->mime
+								);
 							}
 						}
 					}
 				}
 			}
 		}
+		$objMailProperties->attachments = $attachments;
 
-		if (!empty($attachments))
+		$objMailProperties->subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
+		$objMailProperties->messageText = \String::decodeEntities($arrForm['confirmationMailText']);
+		$objMailProperties->messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
+
+		// Replace Insert tags and conditional tags
+		$objMailProperties = $this->Formdata->prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields);
+
+		$objEmail = new \Email();
+		$objEmail->from = $objMailProperties->sender;
+
+		if (!empty($objMailProperties->senderName))
 		{
-			foreach ($attachments as $attachment)
+			$objEmail->fromName = $objMailProperties->senderName;
+		}
+		$objEmail->subject = $objMailProperties->subject;
+
+		if (!empty($objMailProperties->attachments))
+		{
+			foreach ($objMailProperties->attachments as $strFile => $varParams)
 			{
-				$confEmail->attachFile(TL_ROOT . '/' . $attachment);
+				$strContent = file_get_contents($varParams['file'], false);
+				$objEmail->attachFileFromString($strContent, $varParams['name'], $varParams['mime']);
 			}
 		}
 
-		if (!empty($dirImages))
+		if (!empty($objMailProperties->messageText))
 		{
-			$confEmail->imageDir = $dirImages;
+			$objEmail->text = $objMailProperties->messageText;
 		}
-		if (!empty($messageText))
+
+		if (!empty($objMailProperties->messageHtml))
 		{
-			$messageText = html_entity_decode($messageText, ENT_QUOTES, $GLOBALS['TL_CONFIG']['characterSet']);
-			$messageText = strip_tags($messageText);
-			$confEmail->text = $messageText;
-		}
-		if (!empty($messageHtml))
-		{
-			$confEmail->html = $messageHtml;
+			$objEmail->html = $objMailProperties->messageHtml;
 		}
 
 		// Send Mail
@@ -4879,10 +4677,10 @@ window.addEvent(\'domready\', function() {
 			if ($blnSend)
 			{
 				// Send e-mail
-				if (!empty($arrRecipient))
+				if (!empty($objMailProperties->recipients))
 				{
 					$arrSentTo = array();
-					foreach ($arrRecipient as $recipient)
+					foreach ($objMailProperties->recipients as $recipient)
 					{
 						if(strlen($recipient))
 						{
@@ -4896,7 +4694,7 @@ window.addEvent(\'domready\', function() {
 							}
 						}
 
-						$confEmail->sendTo($recipient);
+						$objEmail->sendTo($recipient);
 						$blnConfirmationSent = true;
 
 						\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_formdata']['mail_sent'], str_replace(array('<', '>'), array('[', ']'), $recipient)));
@@ -4958,21 +4756,27 @@ window.addEvent(\'domready\', function() {
 <table cellpadding="0" cellspacing="0" class="prev_header" summary="">
   <tr class="row_0">
     <td class="col_0">' . $GLOBALS['TL_LANG']['tl_formdata']['mail_sender'][0] . '</td>
-    <td class="col_1">' . $sender . '</td>
+    <td class="col_1">' . $objMailProperties->sender . '</td>
   </tr>
 
   <tr class="row_1">
     <td class="col_0"><label for="ctrl_formdata_recipient">' . $GLOBALS['TL_LANG']['tl_formdata']['mail_recipient'][0]. '</label></td>
-    <td class="col_1"><input name="recipient" type="ctrl_recipient" class="tl_text" value="' . $strRecipient . '" '.($blnSend ? 'disabled="disabled"' : '').'></td>
+    <td class="col_1"><input name="recipient" type="ctrl_recipient" class="tl_text" value="' . implode(',', $objMailProperties->recipients) . '" '.($blnSend ? 'disabled="disabled"' : '').'></td>
   </tr>
 
   <tr class="row_2">
     <td class="col_0">' . $GLOBALS['TL_LANG']['tl_formdata']['mail_subject'][0] . '</td>
-    <td class="col_1">' . $subject . '</td>
+    <td class="col_1">' . $objMailProperties->subject . '</td>
   </tr>';
 
-		if (!empty($attachments))
+		if (!empty($objMailProperties->attachments))
 		{
+			$attachments = array();
+			foreach ($objMailProperties->attachments as $strFile => $arr)
+			{
+				$attachments[] = str_replace(TL_ROOT.'/', '', $strFile);
+			}
+
 			$return .= '
   <tr class="row_3">
     <td class="col_0" style="vertical-align:top">' . $GLOBALS['TL_LANG']['tl_formdata']['attachments'] . '</td>
@@ -4985,15 +4789,15 @@ window.addEvent(\'domready\', function() {
 
 <h3>' . $GLOBALS['TL_LANG']['tl_formdata']['mail_body_plaintext'][0] . '</h3>
 <div class="preview_plaintext">
-' . nl2br($messageText) . '
+' . nl2br($objMailProperties->messageText) . '
 </div>';
 
-		if (strlen($messageHtml))
+		if (!empty($objMailProperties->messageHtml))
 		{
 			$return .= '
 <h3>' . $GLOBALS['TL_LANG']['tl_formdata']['mail_body_html'][0] . '</h3>
 <div class="preview_html">
-' . preg_replace(array('/.*?<body.*?>/si','/<\/body>.*$/si'), array('', ''), $messageHtml) . '
+' . preg_replace(array('/.*?<body.*?>/si','/<\/body>.*$/si'), array('', ''), $objMailProperties->messageHtml) . '
 </div>';
 		}
 
@@ -5125,6 +4929,18 @@ window.addEvent(\'domready\', function() {
 				if ($objForm !== null)
 				{
 					$arrFormFields = $this->Formdata->getFormfieldsAsArray($objForm->id);
+
+					foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $strKey => $arrField)
+					{
+						if (isset($arrFormFields[$strKey]))
+						{
+							$arrFormFields[$strKey] = array_merge($arrFormFields[$strKey], $arrField);
+						}
+						else
+						{
+							$arrFormFields[$strKey] = $arrField;
+						}
+					}
 				}
 
 				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
@@ -5305,7 +5121,7 @@ window.addEvent(\'domready\', function() {
 
 					$intTotal++;
 
-				} // while $arrRow
+				}
 
 				\Message::addConfirmation(sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_confirm'], $intValid));
 
@@ -5923,7 +5739,7 @@ var Stylect = {
 						echo "\n";
 					}
 
-				} // intRowCounter 0
+				}
 
 				$strExpSep = '';
 
@@ -5978,7 +5794,7 @@ var Stylect = {
 						}
 					}
 					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'],
-								array('radio', 'efgLookupRasdio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
+						array('radio', 'efgLookupRasdio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
@@ -6136,9 +5952,9 @@ var Stylect = {
 					echo "\n";
 				}
 
-			} // foreach ($result as $row)
+			}
 
-		} // if objRow->numRows
+		}
 
 		if ($strMode=='xls')
 		{
