@@ -5182,7 +5182,7 @@ window.addEvent(\'domready\', function() {
   <h3><label for="separator">'.$GLOBALS['TL_LANG']['MSC']['separator'][0].'</label></h3>
   <select name="separator" id="separator" class="tl_select" onfocus="Backend.getScrollOffset()">
     <option value="comma"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'comma' ? ' selected="selected"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
-    <option value="semicolon"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'semicolon' ? ' selected="selected"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
+    <option value="semicolon"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'semicolon' || !isset($arrSessionData['import'][$this->strFormKey]['separator']) ? ' selected="selected"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
     <option value="tabulator"'.($arrSessionData['import'][$this->strFormKey]['separator'] == 'tabulator' ? ' selected="selected"' : '').'>'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
   </select>'.(strlen($GLOBALS['TL_LANG']['MSC']['separator'][1]) ? '
   <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['MSC']['separator'][1].'</p>' : '').'
