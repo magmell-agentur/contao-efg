@@ -5405,15 +5405,10 @@ var Stylect = {
 
 		if ($strMode=='xls')
 		{
-			// check for HOOK efgExportXls
+			// Check for HOOK efgExportXls
 			if (array_key_exists('efgExportXls', $GLOBALS['TL_HOOKS']) && is_array($GLOBALS['TL_HOOKS']['efgExportXls']))
 			{
 				$blnCustomXlsExport = true;
-			}
-			else
-			{
-// TODO: fix path
-				include TL_ROOT.'/plugins/xls_export/xls_export.php';
 			}
 		}
 		elseif ($strMode!='csv')
@@ -5616,7 +5611,7 @@ var Stylect = {
 		{
 			if (!$blnCustomXlsExport)
 			{
-				$xls = new xlsexport();
+				$xls = new \xlsexport();
 				$strXlsSheet = "Export";
 				$xls->addworksheet($strXlsSheet);
 			}
@@ -5655,7 +5650,6 @@ var Stylect = {
 
 				$args = array();
 				$this->current[] = $row['id'];
-				//$showFields = $GLOBALS['TL_DCA'][$table]['list']['label']['fields'];
 
 				if ($intRowCounter == 0)
 				{
