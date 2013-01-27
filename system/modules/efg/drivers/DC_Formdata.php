@@ -5770,35 +5770,43 @@ var Stylect = {
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
 						&& !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
-						if ($useFormValues == 1)
+						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0)
 						{
-							// single value checkboxes don't have options
-							if ((is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) > 0))
+							if ($row[$v] != '')
 							{
-								$strVal = strlen($row[$v]) ? key($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) : '';
+								if (!$useFormValues)
+								{
+									$strVal = $row[$v];
+								}
+								else
+								{
+									$arrCbOpt = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'];
+									$arrCbOpt = array_flip($arrCbOpt);
+									$strVal = $arrCbOpt[$row[$v]];
+								}
 							}
 							else
 							{
-								$strVal = $row[$v];
+								$strVal = '';
 							}
 						}
 						else
 						{
-							$strVal = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
+							$strVal = ($row[$v] != '') ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
 						}
 					}
 					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'],
-						array('radio', 'efgLookupRasdio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
+						array('radio', 'efgLookupRadio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
 					{
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") == FALSE)
-								&& (is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) > 0))
+							if ((strpos($row[$v], '|') === false)
+								&& (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
 							{
 								// handle grouped options
 								$arrOptions = array();
-								foreach ($GLOBALS['TL_DCA'][$table]['fields'][$v]['options'] as $o => $mxVal)
+								foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'] as $o => $mxVal)
 								{
 									if (!is_array($mxVal))
 									{
@@ -5818,11 +5826,11 @@ var Stylect = {
 							}
 							else
 							{
-								if ((is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$table]['fields'][$v]['options']) > 0))
+								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
 								{
 									// handle grouped options
 									$arrOptions = array();
-									foreach ($GLOBALS['TL_DCA'][$table]['fields'][$v]['options'] as $o => $mxVal)
+									foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'] as $o => $mxVal)
 									{
 										if ((!is_array($mxVal)))
 										{
@@ -5862,20 +5870,25 @@ var Stylect = {
 					{
 						$row_v = deserialize($row[$v]);
 
+						if (!empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv']))
+						{
+							$row_v = explode($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'], $row[$v]);
+						}
+
 						if (is_array($row_v))
 						{
 							$args_k = array();
 
 							foreach ($row_v as $option)
 							{
-								$args_k[] = strlen($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$option]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$option] : $option;
+								$args_k[] = strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$option]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$option] : $option;
 							}
 
 							$args[$k] = implode(",\n", $args_k);
 						}
-						elseif (is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]))
+						elseif (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$row[$v]]))
 						{
-							$args[$k] = is_array($GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]][0] : $GLOBALS['TL_DCA'][$table]['fields'][$v]['reference'][$row[$v]];
+							$args[$k] = is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$row[$v]]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$row[$v]][0] : $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['reference'][$row[$v]];
 						}
 						else
 						{
