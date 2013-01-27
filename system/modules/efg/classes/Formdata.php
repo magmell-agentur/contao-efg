@@ -707,7 +707,7 @@ class Formdata extends \Frontend
 				case 'checkbox':
 					$strSep = '';
 					$strVal = '';
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 
 					$arrSel = array();
 					if (is_string($varSubmitted))
@@ -731,7 +731,7 @@ class Formdata extends \Frontend
 							{
 								$strVal .= $strSep . $arrOptions[$o]['label'];
 							}
-							$strSep = '|';
+							$strSep = (isset($arrField['eval']['csv'])) ? $arrField['eval']['csv'] : '|';
 						}
 					}
 
@@ -740,7 +740,7 @@ class Formdata extends \Frontend
 						$strVal = $varSubmitted;
 						if (is_array($strVal))
 						{
-							$strVal = implode('|', $strVal);
+							$strVal = implode((isset($arrField['eval']['csv']) ? $arrField['eval']['csv'] : '|'), $strVal);
 						}
 					}
 					break;
@@ -748,7 +748,7 @@ class Formdata extends \Frontend
 				case 'efgLookupRadio':
 				case 'radio':
 					$strVal = $varSubmitted;
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 					foreach ($arrOptions as $o => $mxVal)
 					{
 						if ($mxVal['value'] == $varSubmitted)
@@ -773,7 +773,7 @@ class Formdata extends \Frontend
 					$strSep = '';
 					$strVal = '';
 
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 
 					// select multiple
 					if (is_array($varSubmitted))
@@ -790,7 +790,7 @@ class Formdata extends \Frontend
 								{
 									$strVal .= $strSep . $arrOptions[$o]['label'];
 								}
-								$strSep = '|';
+								$strSep = (isset($arrField['eval']['csv'])) ? $arrField['eval']['csv'] : '|';
 							}
 						}
 					}
@@ -819,7 +819,7 @@ class Formdata extends \Frontend
 					$strVal = '';
 					if (is_array($varSubmitted))
 					{
-						$strVal = implode('|', $varSubmitted);
+						$strVal = implode((isset($arrField['eval']['csv']) ? $arrField['eval']['csv'] : '|'), $varSubmitted);
 					}
 					elseif (strlen($varSubmitted))
 					{
@@ -908,7 +908,6 @@ class Formdata extends \Frontend
 			}
 
 			return $strVal;
-
 		}
 		else
 		{
@@ -1120,7 +1119,7 @@ class Formdata extends \Frontend
 				case 'checkbox':
 					$strSep = '';
 					$strVal = '';
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 
 					$arrSel = array();
 					if (is_string($varSubmitted))
@@ -1155,7 +1154,7 @@ class Formdata extends \Frontend
 				case 'efgLookupRadio':
 				case 'radio':
 					$strVal = (is_array($varSubmitted)) ? $varSubmitted[0] : $varSubmitted;
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 					foreach ($arrOptions as $o => $mxVal)
 					{
 						if ($mxVal['value'] == $varSubmitted)
@@ -1172,7 +1171,7 @@ class Formdata extends \Frontend
 				case 'select':
 					$strSep = '';
 					$strVal = '';
-					$arrOptions = $this->prepareDcaOptions($arrField);
+					$arrOptions = $this->prepareWidgetOptions($arrField);
 
 					// select multiple
 					if (is_array($varSubmitted))
@@ -1287,9 +1286,12 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					if (is_string($varValue) && strpos($varValue, '|') !== false)
+					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
+							? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+
+					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
-						$arrSel = explode('|', $varValue);
+						$arrSel = explode($strSep, $varValue);
 					}
 					else
 					{
@@ -1373,9 +1375,12 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					if (is_string($varValue) && strpos($varValue, '|') !== false)
+					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
+						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+
+					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
-						$arrSel = explode('|', $varValue);
+						$arrSel = explode($strSep, $varValue);
 					}
 					else
 					{
@@ -1423,9 +1428,12 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					if (is_string($varValue) && strpos($varValue, '|') !== false)
+					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
+						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+
+					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
-						$arrSel = explode('|', $varValue);
+						$arrSel = explode($strSep, $varValue);
 					}
 					else
 					{
@@ -1503,18 +1511,20 @@ class Formdata extends \Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+					$strSep = (isset($arrField['eval']['csv'])) ? $arrField['eval']['csv'] : '|';
+
 					if ($arrField['options'])
 					{
 						$arrOptions = deserialize($arrField['options']);
 					}
 					else
 					{
-						$arrOptions = $this->prepareDcaOptions($arrField);
+						$arrOptions = $this->prepareWidgetOptions($arrField);
 					}
 
 					if (is_string($varVal))
 					{
-						$varVal = explode('|', $varVal);
+						$varVal = explode($strSep, $varVal);
 					}
 
 					if (is_array($arrOptions))
@@ -1540,9 +1550,11 @@ class Formdata extends \Frontend
 
 				case 'efgImageSelect':
 				case 'fileTree':
-					if (is_string($varVal) && strpos($varVal, '|') !== false)
+					$strSep = (isset($arrField['eval']['csv'])) ? $arrField['eval']['csv'] : '|';
+
+					if (is_string($varVal) && strpos($varVal, $strSep) !== false)
 					{
-						$varVal = explode('|', $varVal);
+						$varVal = explode($strSep, $varVal);
 					}
 					elseif (is_array($varVal))
 					{
@@ -1645,11 +1657,12 @@ class Formdata extends \Frontend
 	}
 
 	/**
-	 * Prepare dca options array
+	 * Prepare widget options array
+	 * Used in backend and frontend
 	 * @param array Form field properties
-	 * @return array DCA options
+	 * @return array DCA/widget options
 	 */
-	public function prepareDcaOptions($arrField=false)
+	public function prepareWidgetOptions($arrField=false)
 	{
 
 		if (!is_array($arrField))

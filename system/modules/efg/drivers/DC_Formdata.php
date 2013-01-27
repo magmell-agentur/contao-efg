@@ -701,7 +701,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
 				$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['csv'] : '|';
-
 				$row[$i] = str_replace($strSep, ', ', $row[$i]);
 			}
 
@@ -1299,9 +1298,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
 					}
 
-// TODO: !? support eval csv in Formdata::prepare... methods ?
-// TODO: !? support eval csv in DC_Formdata::show / showAll ?
-// TODO: !? support eval csv in ModuleFormdataListing ?
 					// Convert CSV fields
 					if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']
 						&& isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv']))
@@ -1343,7 +1339,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								}
 							}
 						}
-						//elseif (!is_array($this->varValue))
 						else
 						{
 
@@ -1449,10 +1444,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								asort($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
 							}
 
-							// $arrValues = explode('|', $this->varValue);
 							if (!is_array($this->varValue))
 							{
-								$arrValues = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$arrValues = explode($strSep, $this->varValue);
 							}
 							else
 							{
@@ -1529,7 +1524,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// field type efgLookupSelect
 					elseif ($strInputType == 'efgLookupSelect')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 						$arrNewOptions = array();
 
 						// prepare options array and value
@@ -1549,7 +1544,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -1569,7 +1565,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 						$arrNewOptions = array();
 
 						// prepare options array and value
@@ -1589,7 +1585,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -1609,7 +1606,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 						$arrNewOptions = array();
 
 						// prepare options array and value
@@ -1629,7 +1626,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -2099,7 +2097,8 @@ window.addEvent(\'domready\', function() {
 
 							if (!is_array($this->varValue))
 							{
-								$arrValues = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$arrValues = explode($strSep, $this->varValue);
 							}
 							else
 							{
@@ -2176,7 +2175,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupSelect
 					elseif ($strInputType == 'efgLookupSelect')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -2196,7 +2195,8 @@ window.addEvent(\'domready\', function() {
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -2216,7 +2216,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupCheckbox
 					elseif ($strInputType=='efgLookupCheckbox')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -2236,7 +2236,8 @@ window.addEvent(\'domready\', function() {
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -2256,7 +2257,7 @@ window.addEvent(\'domready\', function() {
 					// field type efgLookupRadio
 					elseif ($strInputType=='efgLookupRadio')
 					{
-						$arrFieldOptions = $this->Formdata->prepareDcaOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
 						// prepare options array and value
 						if (is_array($arrFieldOptions))
@@ -2276,7 +2277,8 @@ window.addEvent(\'domready\', function() {
 						{
 							if (!is_array($this->varValue))
 							{
-								$this->varValue = explode('|', $this->varValue);
+								$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['csv'] : '|';
+								$this->varValue = explode($strSep, $this->varValue);
 							}
 							foreach ($this->varValue as $k => $v)
 							{
@@ -2632,7 +2634,6 @@ window.addEvent(\'domready\', function() {
 					}
 				}
 
-				//$varValue = implode('|', array_values($varValue));
 				$varValue = array_values($varValue);
 			}
 			elseif (!empty($varValue))
@@ -3125,7 +3126,8 @@ window.addEvent(\'domready\', function() {
 					if (in_array($v, $this->arrDetailFields)
 						&& in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'], array('radio', 'efgLookupRadio', 'select', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox', 'efgImageSelect', 'fileTree')))
 					{
-						$row[$v] = str_replace('|', ', ', $row[$v]);
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+						$row[$v] = str_replace($strSep, ', ', $row[$v]);
 					}
 
 					if (in_array($v, $this->arrDetailFields) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
@@ -4377,7 +4379,8 @@ window.addEvent(\'domready\', function() {
 		elseif ($value && in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['inputType'],
 			array('checkbox', 'efgLookupCheckbox', 'select', 'conditionalselect', 'efgLookupSelect','radio')))
 		{
-			$value = str_replace('|', ', ', $value);
+			$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$k]['eval']['csv'] : '|';
+			$value = str_replace($strSep, ', ', $value);
 		}
 
 		// owner fields fd_member, fd_user
@@ -4491,18 +4494,6 @@ window.addEvent(\'domready\', function() {
 		$arrForm = $objForm->row();
 		$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
-		foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $strKey => $arrField)
-		{
-			if (isset($arrFormFields[$strKey]))
-			{
-				$arrFormFields[$strKey] = array_merge($arrFormFields[$strKey], $arrField);
-			}
-			else
-			{
-				$arrFormFields[$strKey] = $arrField;
-			}
-		}
-
 		if (empty($arrForm['confirmationMailSubject']) || (empty($arrForm['confirmationMailText']) && empty($arrForm['confirmationMailTemplate'])))
 		{
 			return '<p class="tl_error">Can not send this form data record.<br>Missing "Subject", "Text of confirmation mail" or "HTML-template for confirmation mail"<br>Please check configuration of form in form generator.</p>';
@@ -4568,7 +4559,8 @@ window.addEvent(\'domready\', function() {
 					unset($arrRecipient);
 				}
 			}
-			$varRecipient = str_replace('|', ',', $varRecipient);
+			$strSep = (isset($arrFormFields[$recipientFieldName]['eval']['csv'])) ? $arrFormFields[$recipientFieldName]['eval']['csv'] : '|';
+			$varRecipient = str_replace($strSep, ',', $varRecipient);
 		}
 
 		if (strlen($varRecipient) || strlen($arrForm['confirmationMailRecipient']))
@@ -4929,18 +4921,6 @@ window.addEvent(\'domready\', function() {
 				if ($objForm !== null)
 				{
 					$arrFormFields = $this->Formdata->getFormfieldsAsArray($objForm->id);
-
-					foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'] as $strKey => $arrField)
-					{
-						if (isset($arrFormFields[$strKey]))
-						{
-							$arrFormFields[$strKey] = array_merge($arrFormFields[$strKey], $arrField);
-						}
-						else
-						{
-							$arrFormFields[$strKey] = $arrField;
-						}
-					}
 				}
 
 				while(($arrRow = @fgetcsv($resFile, null, $strSeparator)) !== false)
@@ -5798,10 +5778,12 @@ var Stylect = {
 					elseif (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'],
 						array('radio', 'efgLookupRadio', 'select', 'conditionalselect', 'efgLookupSelect', 'checkbox', 'efgLookupCheckbox')))
 					{
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], '|') === false)
+							if ((strpos($row[$v], $strSep) === false)
 								&& (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && count($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) > 0))
 							{
 								// handle grouped options
@@ -5847,7 +5829,7 @@ var Stylect = {
 
 									$options = array_flip($arrOptions);
 
-									$tmparr = explode('|', $row[$v]);
+									$tmparr = explode($strSep, $row[$v]);
 									$fieldvalues = array();
 									foreach ($tmparr as $valuedesc)
 									{
@@ -5857,13 +5839,13 @@ var Stylect = {
 								}
 								else
 								{
-									$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+									$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 								}
 							}
 						}
 						else
 						{
-							$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+							$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 						}
 					}
 					else

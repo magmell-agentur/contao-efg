@@ -345,7 +345,7 @@ class ExtendedForm extends \Form
 						}
 
 						// prepare options array
-						$arrData['options'] = $this->Formdata->prepareDcaOptions($arrData);
+						$arrData['options'] = $this->Formdata->prepareWidgetOptions($arrData);
 
 						// set rgxp 'date' for field type 'calendar' if not set
 						if ($arrData['type'] == 'calendar')

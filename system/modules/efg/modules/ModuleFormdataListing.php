@@ -1494,7 +1494,9 @@ class ModuleFormdataListing extends \Module
 
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 					{
-						$v = (is_string($v) && strpos($v, '|') !== false) ? explode('|', $v) : deserialize($v);
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['csv'] : '|';
+
+						$v = (is_string($v) && strpos($v, $strSep) !== false) ? explode($strSep, $v) : deserialize($v);
 					}
 
 					// add CSS class defined in form generator
@@ -1783,10 +1785,12 @@ class ModuleFormdataListing extends \Module
 						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
 						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
 					{
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") === false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
+							if ((strpos($row[$v], $strSep) === false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
@@ -1796,7 +1800,7 @@ class ModuleFormdataListing extends \Module
 								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
-									$tmparr = explode('|', $row[$v]);
+									$tmparr = explode($strSep, $row[$v]);
 									$fieldvalues = array();
 									foreach ($tmparr as $valuedesc)
 									{
@@ -1806,20 +1810,22 @@ class ModuleFormdataListing extends \Module
 								}
 								else
 								{
-									$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+									$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 								}
 							}
 						}
 						else
 						{
-							$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+							$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 						}
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'fileTree')
 					{
-						if (is_string($row[$v]) && strpos($row[$v], '|') !== false)
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+
+						if (is_string($row[$v]) && strpos($row[$v], $strSep) !== false)
 						{
-							$strVal = implode(",\n", explode('|', $row[$v]));
+							$strVal = implode(",\n", explode($strSep, $row[$v]));
 						}
 						else
 						{
@@ -2713,10 +2719,12 @@ class ModuleFormdataListing extends \Module
 						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox'
 						|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'efgLookupCheckbox')
 					{
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+
 						// take the assigned value instead of the user readable output
 						if ($useFormValues == 1)
 						{
-							if ((strpos($row[$v], "|") == false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
+							if ((strpos($row[$v], $strSep) == false) && (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 							{
 								$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
 								$strVal = $options[$row[$v]];
@@ -2726,30 +2734,32 @@ class ModuleFormdataListing extends \Module
 								if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']) && !empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options'])))
 								{
 									$options = array_flip($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['options']);
-									$tmparr = explode('|', $row[$v]);
+									$tmparr = explode($strSep, $row[$v]);
 									$fieldvalues = array();
 									foreach ($tmparr as $valuedesc)
 									{
 										array_push($fieldvalues, $options[$valuedesc]);
 									}
-									$strVal = join(",\n", $fieldvalues);
+									$strVal = implode(",\n", $fieldvalues);
 								}
 								else
 								{
-									$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+									$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 								}
 							}
 						}
 						else
 						{
-							$strVal = strlen($row[$v]) ? str_replace('|', ",\n", $row[$v]) : '';
+							$strVal = strlen($row[$v]) ? str_replace($strSep, ",\n", $row[$v]) : '';
 						}
 					}
 					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'fileTree')
 					{
-						if (is_string($row[$v]) && strpos($row[$v], '|') !== false)
+						$strSep = (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['csv'] : '|';
+
+						if (is_string($row[$v]) && strpos($row[$v], $strSep) !== false)
 						{
-							$strVal = implode(",\n", explode('|', $row[$v]));
+							$strVal = implode(",\n", explode($strSep, $row[$v]));
 						}
 						else
 						{

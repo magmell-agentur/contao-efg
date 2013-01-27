@@ -130,18 +130,6 @@ class FormdataProcessor extends \Frontend
 
 			$arrFormFields = $this->Formdata->getFormfieldsAsArray($arrForm['id']);
 
-			foreach ($GLOBALS['TL_DCA']['tl_formdata']['fields'] as $strKey => $arrField)
-			{
-				if (isset($arrFormFields[$strKey]))
-				{
-					$arrFormFields[$strKey] = array_merge($arrFormFields[$strKey], $arrField);
-				}
-				else
-				{
-					$arrFormFields[$strKey] = $arrField;
-				}
-			}
-
 			$arrBaseFields = array();
 			$arrDetailFields = array();
 			if (!empty($GLOBALS['TL_DCA']['tl_formdata']['tl_formdata']['baseFields']))
@@ -271,9 +259,13 @@ class FormdataProcessor extends \Frontend
 				if (in_array($strType, $arrFFstorable))
 				{
 
-					if ($blnStoreOptionsValue && in_array($strType, array('checkbox', 'radio', 'select')))
+					if ($blnStoreOptionsValue)
 					{
 						$arrField['eval']['efgStoreValues'] = true;
+					}
+					else
+					{
+						$arrField['eval']['efgStoreValues'] = false;
 					}
 
 					// Set rgxp 'date' for field type 'calendar' if not set
