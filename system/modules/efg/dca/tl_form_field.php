@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageSortBy'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageSortBy'],
 	'exclude'                 => true,
 	'inputType'               => 'select',
-	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'meta', 'random'),
+	'options'                 => array('name_asc', 'name_desc', 'date_asc', 'date_desc', 'random'),
 	'reference'               => &$GLOBALS['TL_LANG']['tl_form_field'],
 	'eval'                    => array('tl_class' => 'w50'),
 	'sql'                     => "varchar(32) NOT NULL default ''"
@@ -238,7 +238,6 @@ $GLOBALS['BE_FFL']['efgLookupOptionWizard'] = 'EfgLookupOptionWizard';
 $GLOBALS['BE_FFL']['efgLookupSelect'] = 'EfgFormLookupSelectMenu';
 $GLOBALS['BE_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['BE_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
-//$GLOBALS['BE_FFL']['efgImageSelectWizard'] = 'EfgImageSelectWizard';
 $GLOBALS['BE_FFL']['efgFormPaginator'] = 'EfgFormPaginator';
 
 
