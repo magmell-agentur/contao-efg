@@ -222,7 +222,7 @@ class FormdataBackend extends \Backend
 				}
 			}
 
-			$strFormKey = (!empty($this->arrForm['alias'])) ? $this->arrForm['alias'] : str_replace('-', '_', standardize($this->objForm['title']));
+			$strFormKey = (!empty($this->arrForm['alias'])) ? $this->arrForm['alias'] : str_replace('-', '_', standardize($this->arrForm['title']));
 
 			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
 			$tplDca->strFormKey = $strFormKey;
