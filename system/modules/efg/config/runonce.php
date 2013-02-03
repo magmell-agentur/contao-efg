@@ -38,7 +38,12 @@ class EfgRunonce extends Controller
 			return;
 		}
 
-		$this->exec('updateTables');
+		$this->execute('clearCache');
+		$this->execute('updateTables');
+		$this->execute('updateListingModules');
+		$this->execute('updateMailTemplates');
+		$this->execute('updateFormPaginators');
+		$this->execute('updateConfig');
 
 	}
 
@@ -66,17 +71,275 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 </head>
 <body>
 <div>
-<h1>Updating EFG failed</h1>
+<h1>An error occurred when updating EFG</h1>
 <pre style="white-space:normal">' . $e->getMessage() . '</pre>
 </div>
 </body>
 </html>';
 
 			echo $strReturn;
-
 			exit;
 		}
 
 	}
 
+
+	private function clearCache()
+	{
+
+		// Remove database.sql (in case of manual update)
+		if (is_file(TL_ROOT.'/system/modules/efg/config/database.sql'))
+		{
+			$objFile = new \File('system/modules/efg/config/database.sql');
+			$objFile->delete();
+		}
+
+		// Delete cached sql files
+		$arrFiles = scan(TL_ROOT . '/system/cache/sql', true);
+		foreach ($arrFiles as $strFile)
+		{
+			if (in_array($strFile, array('tl_form.php', 'tl_form_field.php', 'tl_formdata.php', 'tl_formdata_details.php', 'tl_module.php')))
+			{
+				$objFile = new \File('system/cache/sql/' . $strFile);
+				$objFile->delete();
+			}
+		}
+
+	}
+
+	private function updateTables()
+	{
+		// Field tl_formdata_details.ff_type has been removed in r2.0.0
+		if ($this->Database->fieldExists('ff_type', 'tl_formdata_details'))
+		{
+			$this->Database->query("ALTER TABLE tl_formdata_details DROP COLUMN `ff_type`");
+		}
+
+		// Field tl_formdata_details.ff_label has been removed in r2.0.0
+		if ($this->Database->fieldExists('ff_label', 'tl_formdata_details'))
+		{
+			$this->Database->query("ALTER TABLE tl_formdata_details DROP COLUMN `ff_label`");
+		}
+
+	}
+
+
+	private function updateListingModules()
+	{
+		// As of r2.0.0 formKey used for names of dca files and formdata listing modules is created from form alias instead of form title
+
+		if (!$this->Database->fieldExists('storeFormdata', 'tl_form')
+			|| !$this->Database->fieldExists('list_formdata', 'tl_module')
+		)
+		{
+			return;
+		}
+
+		// Update formKey in formdata listing modules
+		$objForms = $this->Database->prepare("SELECT * FROM tl_form WHERE `storeFormdata`=?")
+			->execute('1');
+
+		if ($objForms->numRows)
+		{
+			while ($objForms->next())
+			{
+				$strFormKeyOld = 'fd_' . ((!empty($objForms->formID)) ? str_replace('-', '_', standardize($objForms->formID)) : str_replace('-', '_', standardize($objForms->title)));
+				$strFormKeyNew = 'fd_' . ((!empty($objForms->alias))	? $objForms->alias : str_replace('-', '_', standardize($objForms->title)));
+
+				// Update formdata listing modules
+				$objResult = $this->Database->prepare("UPDATE tl_module %s WHERE `type`=? AND `list_formdata`=?")
+					->set(array('list_formdata' => $strFormKeyNew))
+					->executeUncached('formdatalisting', $strFormKeyOld);
+			}
+		}
+
+	}
+
+
+	private function updateMailTemplates()
+	{
+		// As of Contao 3 tl_form.confirmationMailTemplate and tl_form.formattedMailTemplate use database assisted fileTree
+		// .. these fields normally should have been transformed already by the Contao install routine
+
+		if (!$this->Database->fieldExists('confirmationMailTemplate', 'tl_form')
+			&& !$this->Database->fieldExists('formattedMailTemplate', 'tl_form')
+		)
+		{
+			return;
+		}
+
+		$blnTransform = false;
+		$arrTransformFields = array();
+		$arrFilesDone = array();
+
+		$sql = "SELECT confirmationMailTemplate, formattedMailTemplate FROM tl_form WHERE (confirmationMailTemplate != '' AND confirmationMailTemplate != '0') OR (formattedMailTemplate != '' AND formattedMailTemplate != '0')";
+		$objResult = $this->Database->prepare($sql)->execute();
+
+		if ($objResult->numRows)
+		{
+			while ($objResult->next())
+			{
+				if ($objResult->confirmationMailTemplate != '' && !is_numeric($objResult->confirmationMailTemplate))
+				{
+					$arrTransformFields['confirmationMailTemplate'][$objResult->confirmationMailTemplate] = $objResult->confirmationMailTemplate;
+					$blnTransform = true;
+				}
+				if ($objResult->formattedMailTemplate != '' && !is_numeric($objResult->formattedMailTemplate))
+				{
+					$arrTransformFields['formattedMailTemplate'][$objResult->formattedMailTemplate] = $objResult->formattedMailTemplate;
+					$blnTransform = true;
+				}
+			}
+		}
+
+		if (!$blnTransform)
+		{
+			return;
+		}
+
+		if (!empty($arrTransformFields))
+		{
+			foreach ($arrTransformFields as $strField => $arrFiles)
+			{
+				if (!empty($arrFiles))
+				{
+					foreach ($arrFiles as $strFileOld => $strFile)
+					{
+						if (!isset($arrFilesDone[$strFileOld]))
+						{
+							$objFileModel = \FilesModel::findOneBy('path', $strFileOld);
+
+							if ($objFileModel !== null)
+							{
+								$arrTransformFields[$strField][$strFileOld] = $objFileModel->id;
+							}
+						}
+						else
+						{
+							$arrTransformFields[$strField][$strFileOld] = $arrFilesDone[$strFileOld];
+						}
+						$arrFilesDone[$strFileOld] = $arrTransformFields[$strField][$strFileOld];
+					}
+				}
+			}
+
+			// Update tl_form
+			foreach ($arrTransformFields as $strField => $arrFiles)
+			{
+				if (!empty($arrFiles))
+				{
+					foreach ($arrFiles as $strFileOld => $strFile)
+					{
+						if (is_numeric($strFile))
+						{
+							$objResult = $this->Database->prepare("UPDATE tl_form %s WHERE ".$strField."=?")
+								->set(array($strField => (string) $strFile))
+								->execute((string)$strFileOld);
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+
+	private function updateFormPaginators()
+	{
+		// As of Contao 3 tl_form_field.singleSRC and tl_form_field.efgBackSingleSRC use database assisted fileTree
+		// .. these fields normally should have been transformed already by the Contao install routine
+
+		if (!$this->Database->fieldExists('efgBackSingleSRC', 'tl_form_field')
+		)
+		{
+			return;
+		}
+
+		$blnTransform = false;
+		$arrTransformFields = array();
+		$arrFilesDone = array();
+
+		$sql = "SELECT singleSRC, efgBackSingleSRC FROM tl_form_field WHERE `type`='efgFormPaginator' AND ((singleSRC != '' AND singleSRC != '0') OR (efgBackSingleSRC != '' AND efgBackSingleSRC != '0'))";
+		$objResult = $this->Database->prepare($sql)->execute();
+
+		if ($objResult->numRows)
+		{
+			while ($objResult->next())
+			{
+				if ($objResult->singleSRC != '' && !is_numeric($objResult->singleSRC))
+				{
+					$arrTransformFields['singleSRC'][$objResult->singleSRC] = $objResult->singleSRC;
+					$blnTransform = true;
+				}
+				if ($objResult->efgBackSingleSRC != '' && !is_numeric($objResult->efgBackSingleSRC))
+				{
+					$arrTransformFields['efgBackSingleSRC'][$objResult->efgBackSingleSRC] = $objResult->efgBackSingleSRC;
+					$blnTransform = true;
+				}
+			}
+		}
+
+		if (!$blnTransform)
+		{
+			return;
+		}
+
+		if (!empty($arrTransformFields))
+		{
+			foreach ($arrTransformFields as $strField => $arrFiles)
+			{
+				if (!empty($arrFiles))
+				{
+					foreach ($arrFiles as $strFileOld => $strFile)
+					{
+						if (!isset($arrFilesDone[$strFileOld]))
+						{
+							$objFileModel = \FilesModel::findOneBy('path', $strFileOld);
+
+							if ($objFileModel !== null)
+							{
+								$arrTransformFields[$strField][$strFileOld] = $objFileModel->id;
+							}
+						}
+						else
+						{
+							$arrTransformFields[$strField][$strFileOld] = $arrFilesDone[$strFileOld];
+						}
+						$arrFilesDone[$strFileOld] = $arrTransformFields[$strField][$strFileOld];
+					}
+				}
+			}
+
+			// Update tl_form_field
+			foreach ($arrTransformFields as $strField => $arrFiles)
+			{
+				if (!empty($arrFiles))
+				{
+					foreach ($arrFiles as $strFileOld => $strFile)
+					{
+						if (is_numeric($strFile))
+						{
+							$objResult = $this->Database->prepare("UPDATE tl_form_field %s WHERE `type`='efgFormPaginator' AND ".$strField."=?")
+								->set(array($strField => (string) $strFile))
+								->execute((string)$strFileOld);
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	private function updateConfig()
+	{
+		$this->import('FormdataBackend');
+		$this->FormdataBackend->updateConfig();
+	}
+
 }
+
+/**
+ * Instantiate the controller
+ */
+$objEfgRunonce = new EfgRunonce();
+$objEfgRunonce->run();

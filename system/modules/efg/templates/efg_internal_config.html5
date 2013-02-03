@@ -13,7 +13,7 @@
  */
 
 <?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
-<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . PHP_EOL; ?>
+<?php echo '// last created on ' .date("Y-m-d H:i:s") . PHP_EOL; ?>
 
 
 /**
@@ -43,21 +43,21 @@ array_insert($GLOBALS['BE_MOD'], 1, array('formdata' => array()));
 
 // this is used for the form independent "Feedback" module
 $GLOBALS['BE_MOD']['formdata']['feedback'] = array
-	(
-		'tables'     => array('tl_formdata', 'tl_formdata_details'),
-		'icon'       => 'system/modules/efg/assets/formdata_all.gif',
-		'stylesheet' => 'system/modules/efg/assets/style.css'
-	);
+(
+	'tables'     => array('tl_formdata', 'tl_formdata_details'),
+	'icon'       => 'system/modules/efg/assets/formdata_all.gif',
+	'stylesheet' => 'system/modules/efg/assets/style.css'
+);
 
 // following are used for the form dependent modules
 <?php foreach($this->arrStoringForms as $strKey=>$arrVals): ?>
 $GLOBALS['BE_MOD']['formdata']['fd_<?php echo $strKey; ?>'] = array
-	(
-		'tables'     => array('tl_formdata', 'tl_formdata_details'),
-		'import'     => array('FormdataBackend', 'importCsv'),
-		'icon'       => 'system/modules/efg/assets/formdata.gif',
-		'stylesheet' => 'system/modules/efg/assets/style.css'
-	);
+(
+	'tables'     => array('tl_formdata', 'tl_formdata_details'),
+	'import'     => array('FormdataBackend', 'importCsv'),
+	'icon'       => 'system/modules/efg/assets/formdata.gif',
+	'stylesheet' => 'system/modules/efg/assets/style.css'
+);
 <?php endforeach; ?>
 <?php endif; ?>
 

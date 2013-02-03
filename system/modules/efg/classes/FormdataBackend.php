@@ -39,8 +39,6 @@ class FormdataBackend extends \Backend
 	 */
 	protected $arrData = array();
 
-	protected $arrForm = null;
-
 	// Types of form fields with storable data
 	protected $arrFFstorable = array();
 
@@ -91,10 +89,10 @@ class FormdataBackend extends \Backend
 	public function createFormdataDca(\DataContainer $dc)
 	{
 		$this->intFormId = $dc->id;
-		$this->arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
+		$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
 			->execute($this->intFormId)
 			->fetchAssoc();
-		$this->updateConfig();
+		$this->updateConfig(array($arrForm));
 	}
 
 	/**
@@ -117,9 +115,14 @@ class FormdataBackend extends \Backend
 	/**
 	 * Update efg/config/config.php, dca and language files
 	 */
-	private function updateConfig()
+	public function updateConfig($arrForms = null)
 	{
 		$arrStoringForms = $this->Formdata->arrStoringForms;
+
+		if ($arrForms == null)
+		{
+			$arrForms = $arrStoringForms;
+		}
 
 		// Remove unused dca files
 		$arrFiles = scan(TL_ROOT . '/system/modules/efg/dca', true);
@@ -148,7 +151,6 @@ class FormdataBackend extends \Backend
 
 		// config/config.php
 		$tplConfig = $this->newTemplate('efg_internal_config');
-		$tplConfig->arrForm = $this->arrForm;
 		$tplConfig->arrStoringForms = $arrStoringForms;
 
 		$objConfig = new \File('system/modules/efg/config/config.php');
@@ -189,7 +191,6 @@ class FormdataBackend extends \Backend
 				}
 
 				$tplMod = $this->newTemplate('efg_internal_modules');
-				$tplMod->arrForm = $this->arrForm;
 				$tplMod->arrStoringForms = $arrStoringForms;
 
 				$objMod = new \File('system/modules/efg/languages/'.$strModLang.'/modules.php');
@@ -199,49 +200,58 @@ class FormdataBackend extends \Backend
 		}
 
 		// dca/fd_FORMKEY.php
-		if ($this->arrForm !== null)
+		if (is_array($arrForms) && !empty($arrForms))
 		{
-			$arrFields = array();
-			$arrFieldNamesById = array();
-			// Get all form fields of this form
-			$arrFormFields = $this->Formdata->getFormFieldsAsArray($this->arrForm['id']);
-
-			if (!empty($arrFormFields))
+			foreach ($arrForms as $arrForm)
 			{
-				foreach ($arrFormFields as $strFieldKey => $arrField)
+				if (!empty($arrForm))
 				{
-					// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
-					if (!in_array($arrField['type'], $this->arrFFstorable)
-						|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
+					$arrForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")->execute($arrForm['id'])->fetchAssoc();
+
+					$arrFields = array();
+					$arrFieldNamesById = array();
+					// Get all form fields of this form
+					$arrFormFields = $this->Formdata->getFormFieldsAsArray($arrForm['id']);
+
+					if (!empty($arrFormFields))
 					{
-						continue;
+						foreach ($arrFormFields as $strFieldKey => $arrField)
+						{
+							// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
+							if (!in_array($arrField['type'], $this->arrFFstorable)
+								|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
+							{
+								continue;
+							}
+
+							$arrFields[$strFieldKey] = $arrField;
+							$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+						}
 					}
 
-					$arrFields[$strFieldKey] = $arrField;
-					$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+					$strFormKey = (!empty($arrForm['alias'])) ? $arrForm['alias'] : str_replace('-', '_', standardize($arrForm['title']));
+
+					$tplDca = $this->newTemplate('efg_internal_dca_formdata');
+					$tplDca->strFormKey = $strFormKey;
+					$tplDca->arrForm = $arrForm;
+					$tplDca->arrStoringForms = $arrStoringForms;
+					$tplDca->arrFields = $arrFields;
+					$tplDca->arrFieldNamesById = $arrFieldNamesById;
+
+					// Enable backend confirmation mail
+					$blnBackendMail = false;
+					if ($arrForm['sendConfirmationMail'] || strlen($arrForm['confirmationMailText']))
+					{
+						$blnBackendMail = true;
+					}
+					$tplDca->blnBackendMail = $blnBackendMail;
+
+					$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
+					$objDca->write($tplDca->parse());
+					$objDca->close();
 				}
+
 			}
-
-			$strFormKey = (!empty($this->arrForm['alias'])) ? $this->arrForm['alias'] : str_replace('-', '_', standardize($this->arrForm['title']));
-
-			$tplDca = $this->newTemplate('efg_internal_dca_formdata');
-			$tplDca->strFormKey = $strFormKey;
-			$tplDca->arrForm = $this->arrForm;
-			$tplDca->arrStoringForms = $arrStoringForms;
-			$tplDca->arrFields = $arrFields;
-			$tplDca->arrFieldNamesById = $arrFieldNamesById;
-
-			// Enable backend confirmation mail
-			$blnBackendMail = false;
-			if ($this->arrForm['sendConfirmationMail'] || strlen($this->arrForm['confirmationMailText']))
-			{
-				$blnBackendMail = true;
-			}
-			$tplDca->blnBackendMail = $blnBackendMail;
-
-			$objDca = new \File('system/modules/efg/dca/fd_' . $strFormKey . '.php');
-			$objDca->write($tplDca->parse());
-			$objDca->close();
 		}
 
 		// overall dca/fd_feedback.php

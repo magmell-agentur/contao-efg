@@ -14,7 +14,7 @@
 
 
 <?php echo '// This file is created when saving a form in form generator' . PHP_EOL; ?>
-<?php echo '// last created on ' .date("Y-m-d H:i:s") . ' by saving form "' . $this->arrForm['title'] . '"' . PHP_EOL; ?>
+<?php echo '// last created on ' .date("Y-m-d H:i:s") . PHP_EOL; ?>
 
 
 /**
