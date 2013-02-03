@@ -326,7 +326,7 @@ class Formdata extends \Frontend
 								$domain = (\Environment::get('ssl') ? 'https://' : 'http://') . $objParent->domain . TL_PATH . '/';
 							}
 						}
-						$arrProcessed[$pageId] = $domain . $this->generateFrontendUrl($objParent->row(), '/'.$strFormdataDetailsKey.'/%s');
+						$arrProcessed[$pageId] = $domain . $this->generateFrontendUrl($objParent->row(), '/'.$strFormdataDetailsKey.'/%s', $objParent->language);
 					}
 
 					if ($arrProcessed[$pageId] === false)
