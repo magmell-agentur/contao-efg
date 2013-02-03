@@ -623,12 +623,11 @@ class ExtendedForm extends \Form
 <script>' . $this->getBackButtonJavascriptString() . '
 </script>';
 		}
-
 		if ($blnAddDateJS)
 		{
 			$this->Template->fields .= '
 <script' . ((!$blnIsHtml5) ? ' type="text/javascript"' : '') . '>'
-		. $this->getDateString() . '
+				. $this->getDateString() . '
 </script>';
 		}
 
@@ -639,23 +638,34 @@ class ExtendedForm extends \Form
 
 	protected function getBackButtonJavascriptString()
 	{
-//TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
-		return '
-if(typeof(window.addEvent)=="function"){
-	window.addEvent(\'domready\', function(){
-		var elForm = document.id(\'{$this->Template->formId}\');
-		if (elForm){
-			var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
-			if (elBtnBack){
-				elBtnBack.addEvent(\'click\', function(){
-					elForm.getElements(\'input[required]\').each(function(item){
-						item.removeProperty(\'required\');
-					});
+		global $objPage;
+
+		if ($objPage->hasMooTools)
+		{
+			return '
+window.addEvent(\'domready\', function(){
+	var elForm = document.id(\''.$this->Template->formId.'\');
+	if (elForm){
+		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
+		if (elBtnBack){
+			elBtnBack.addEvent(\'click\', function(){
+				elForm.getElements(\'[required]\').each(function(item){
+					item.removeProperty(\'required\');
 				});
-			}
+			});
 		}
-	});
-}';
+	}
+});
+';
+		}
+		elseif ($objPage->hasJQuery)
+		{
+			return '
+$(\'#'.$this->Template->formId.' input.back\').click(function(){
+	$(\'#'.$this->Template->formId.' [required]\').prop(\'required\', false);
+});
+';
+		}
 
 	}
 
@@ -668,26 +678,22 @@ if(typeof(window.addEvent)=="function"){
 	 */
 	protected function getDateString()
 	{
-//TODO: (window.addEvent requires MooTools) implement solution when using JQuery or other/no JS framework
-		return '
-if(typeof(window.addEvent)=="function"){
-window.addEvent("domready",function(){'
-		. 'Locale.define("en-US","Date",{'
-		. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
-		. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
-		. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
-		. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
-		. '});'
-		. 'Locale.define("en-US","DatePicker",{'
-		. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
-		. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
-		. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
-		. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
-		. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
-		. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
-		. '});'
-		. '});'
-		.'}';
+
+		return 'Locale.define("en-US","Date",{'
+			. 'months:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS']) . '"],'
+			. 'days:["' . implode('","', $GLOBALS['TL_LANG']['DAYS']) . '"],'
+			. 'months_abbr:["' . implode('","', $GLOBALS['TL_LANG']['MONTHS_SHORT']) . '"],'
+			. 'days_abbr:["' . implode('","', $GLOBALS['TL_LANG']['DAYS_SHORT']) . '"]'
+			. '});'
+			. 'Locale.define("en-US","DatePicker",{'
+			. 'select_a_time:"' . $GLOBALS['TL_LANG']['DP']['select_a_time'] . '",'
+			. 'use_mouse_wheel:"' . $GLOBALS['TL_LANG']['DP']['use_mouse_wheel'] . '",'
+			. 'time_confirm_button:"' . $GLOBALS['TL_LANG']['DP']['time_confirm_button'] . '",'
+			. 'apply_range:"' . $GLOBALS['TL_LANG']['DP']['apply_range'] . '",'
+			. 'cancel:"' . $GLOBALS['TL_LANG']['DP']['cancel'] . '",'
+			. 'week:"' . $GLOBALS['TL_LANG']['DP']['week'] . '"'
+			. '});';
+
 	}
 
 }
