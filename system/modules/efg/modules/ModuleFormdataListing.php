@@ -502,6 +502,8 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
+		$page_get = 'page_fd'.$this->id;
+
 		$this->strFormKey = '';
 		$this->strDcaKey = 'tl_formdata';
 		$this->strFormFilterKey = '';
@@ -700,7 +702,7 @@ class ModuleFormdataListing extends \Module
 				{
 					if (strlen($fragment))
 					{
-						if (strncasecmp($fragment, 'file', 5) !== 0 && strncasecmp($fragment, $this->strDetailKey, strlen($this->strDetailKey)) !== 0 && strncasecmp($fragment, 'order_by', 8) !== 0 && strncasecmp($fragment, 'sort', 4) !== 0 && strncasecmp($fragment, 'page', 4) !== 0)
+						if (strncasecmp($fragment, 'file', 5) !== 0 && strncasecmp($fragment, $this->strDetailKey, strlen($this->strDetailKey)) !== 0 && strncasecmp($fragment, 'order_by', 8) !== 0 && strncasecmp($fragment, 'sort', 4) !== 0 && strncasecmp($fragment, $page_get, strlen($page_get)) !== 0)
 						{
 							$strUrlParams .= (!$blnQuery ? '' : '&amp;') . $fragment;
 							$blnQuery = true;
@@ -734,7 +736,6 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		$page_get = 'page_fd'.$this->id;
 		$page = \Input::get($page_get) ? \Input::get($page_get) : 1;
 		$per_page = \Input::get('per_page') ? \Input::get('per_page') : $this->perPage;
 
