@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -23,7 +23,7 @@
  * This file modifies the data container array of table tl_module.
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL

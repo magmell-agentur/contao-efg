@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2012 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Leo Feyer 2005-2012
+ * @copyright  Leo Feyer 2005-2013
  * @author     Leo Feyer <http://www.contao.org>
  * @package    System
  * @license    LGPL
@@ -34,7 +34,7 @@
  * modified version of DC_Table by Leo Feyer
  *
  * Provide methods to modify data stored in tables tl_formdata and tl_formdata_details.
- * @copyright  Thomas Kuhn 2007-2012
+ * @copyright  Thomas Kuhn 2007-2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  */
