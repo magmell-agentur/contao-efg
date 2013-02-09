@@ -1286,8 +1286,7 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 
-					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
-						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'])) ? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
 
 					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
