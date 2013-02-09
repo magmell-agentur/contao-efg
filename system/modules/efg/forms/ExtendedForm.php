@@ -225,7 +225,6 @@ class ExtendedForm extends \Form
 
 		$this->initializeSession($formId);
 		$arrLabels = array();
-		$this->getMaxFileSize();
 
 		// Get all form fields
 		$objFields = \FormFieldModel::findPublishedByPid($this->id);
@@ -307,9 +306,9 @@ class ExtendedForm extends \Form
 					$this->arrWidgetsFailedValidation[$objFields->name] = 0;
 				}
 
-				// unset session values if no FORM_SUBMIT or form page has not been completed
-				// (to avoid wrong validation against session values and to avoid usage of values of other forms)
-				// this behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
+				// Unset session values if no FORM_SUBMIT or form page has not been completed
+				// (to avoid wrong validation against session values and to avoid usage of values of other forms):
+				// This behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
 				if ($strMode != 'reload' && strlen($objFields->name))
 				{
 					if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
@@ -327,7 +326,7 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				// always populate from existing session data if configured
+				// Always populate from existing session data if configured
 				if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
 				{
 					$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
@@ -335,7 +334,7 @@ class ExtendedForm extends \Form
 
 				if ($strMode == 'reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
 				{
-					// frontend editing
+					// Frontend editing
 					if ($this->blnEditform && !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 					{
 
@@ -344,7 +343,7 @@ class ExtendedForm extends \Form
 							$arrData['options'] = $objWidget->options;
 						}
 
-						// prepare options array
+						// Prepare options array
 						$arrData['options'] = $this->Formdata->prepareWidgetOptions($arrData);
 
 						// set rgxp 'date' for field type 'calendar' if not set
@@ -355,7 +354,7 @@ class ExtendedForm extends \Form
 								$arrData['rgxp'] = 'date';
 							}
 						}
-						// set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
+						// Set rgxp 'date' and dateFormat for field type 'xdependentcalendarfields'
 						elseif ($arrData['type'] == 'xdependentcalendarfields')
 						{
 							$arrData['rgxp'] = 'date';
@@ -367,13 +366,13 @@ class ExtendedForm extends \Form
 							unset($_SESSION['FILES'][$objFields->name]);
 						}
 
-						// prepare value
+						// Prepare value
 						$varFieldValue = $this->Formdata->prepareDatabaseValueForWidget($arrEditRecord[$objFields->name], $arrData);
 						$objWidget->value = $varFieldValue;
 					}
 					else
 					{
-						// populate field if page has been completed
+						// Populate field if page has been completed
 						if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true)
 						{
 							$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
@@ -388,7 +387,7 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				// HOOK: load form field callback
+				// HOOK: Load form field callback
 				if (!strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x']))
 				{
 					if (isset($GLOBALS['TL_HOOKS']['loadFormField']) && is_array($GLOBALS['TL_HOOKS']['loadFormField']))
@@ -401,7 +400,7 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				// Validate input
+				// Validate the input
 				if (\Input::post('FORM_SUBMIT') == $formId)
 				{
 					// populate field
@@ -591,6 +590,12 @@ class ExtendedForm extends \Form
 		$strAttributes = '';
 		$arrAttributes = deserialize($this->attributes, true);
 
+		// Add a css class
+		if ($this->blnMultipage)
+		{
+			$arrAttributes[1] = trim($arrAttributes[1] . ' multipage form_page_' . $this->intActivePage);
+		}
+
 		if (strlen($arrAttributes[1]))
 		{
 			$strAttributes .= ' class="' . $arrAttributes[1] . '"';
@@ -601,6 +606,7 @@ class ExtendedForm extends \Form
 		$this->Template->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
 		$this->Template->action = $this->getIndexFreeRequest();
+		$this->Template->maxFileSize = $hasUpload ? $this->objModel->getMaxUploadFileSize() : false;
 
 		// Get target URL
 		if ($this->method == 'GET')
