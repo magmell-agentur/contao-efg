@@ -1287,7 +1287,7 @@ class Formdata extends \Frontend
 					$arrSel = array();
 
 					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
-							? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
 
 					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
@@ -2149,6 +2149,8 @@ class Formdata extends \Frontend
 	public function prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields)
 	{
 
+		$sender = $objMailProperties->sender;
+		$senderName = $objMailProperties->senderName;
 		$subject = $objMailProperties->subject;
 		$arrRecipients = $objMailProperties->recipients;
 		$replyTo = $objMailProperties->replyTo;
@@ -2193,14 +2195,20 @@ class Formdata extends \Frontend
 		{
 			$sender = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $sender);
 		}
+		if (!empty($senderName))
+		{
+			$senderName = preg_replace(array('/\{\{/', '/\}\}/'), array('__BRCL__', '__BRCR__'), $senderName);
+		}
 
+		$blnEvalSender = $this->replaceConditionTags($sender);
+		$blnEvalSenderName = $this->replaceConditionTags($senderName);
 		$blnEvalSubject = $this->replaceConditionTags($subject);
 		$blnEvalMessageText = $this->replaceConditionTags($messageText);
 		$blnEvalMessageHtml = $this->replaceConditionTags($messageHtml);
 
 		// Replace tags in messageText, messageHtml ...
 		$tags = array();
-		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender, $tags);
+		preg_match_all('/__BRCL__.*?__BRCR__/si', $messageText . $messageHtml . $subject . $sender . $senderName, $tags);
 
 		// Replace tags of type {{form::<form field name>}}
 		// .. {{form::uploadfieldname?attachment=true}}
@@ -2367,7 +2375,7 @@ class Formdata extends \Frontend
 							}
 							else
 							{
-								$strVal = $this->prepareDatabaseValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
+								$strVal = $this->preparePostValueForMail($arrSubmitted[$strKey], $arrField, $arrFiles[$strKey]);
 							}
 
 							if (empty($strVal) && $blnSkipEmptyFields)
@@ -2394,6 +2402,12 @@ class Formdata extends \Frontend
 					if (!empty($sender))
 					{
 						$sender = str_replace($tag, $strVal, $sender);
+					}
+
+					// Replace insert tags in senderName
+					if (!empty($senderName))
+					{
+						$senderName = str_replace($tag, $strVal, $senderName);
 					}
 
 					break;
@@ -2438,6 +2452,21 @@ class Formdata extends \Frontend
 		{
 			$sender = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $sender);
 			$sender = trim($this->replaceInsertTags($sender, false));
+			if ($blnEvalSender)
+			{
+				$sender = $this->evalConditionTags($sender, $arrSubmitted, $arrFiles, $arrForm);
+			}
+		}
+
+		// Replace insert tags in senderName
+		if (!empty($senderName))
+		{
+			$senderName = preg_replace(array('/__BRCL__/', '/__BRCR__/'), array('{{', '}}'), $senderName);
+			$senderName = trim($this->replaceInsertTags($senderName, false));
+			if ($blnEvalSenderName)
+			{
+				$senderName = $this->evalConditionTags($senderName, $arrSubmitted, $arrFiles, $arrForm);
+			}
 		}
 
 		// Replace insert tags in replyTo
@@ -2446,6 +2475,8 @@ class Formdata extends \Frontend
 			$replyTo = $this->replaceInsertTags($replyTo, false);
 		}
 
+		$objMailProperties->sender = $sender;
+		$objMailProperties->senderName = $senderName;
 		$objMailProperties->subject = $subject;
 		$objMailProperties->recipients = $arrRecipients;
 		$objMailProperties->replyTo = $replyTo;
