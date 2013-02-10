@@ -581,6 +581,12 @@ class ExtendedForm extends Form
 		$strAttributes = '';
 		$arrAttributes = deserialize($this->attributes, true);
 
+		// Add a css class
+		if ($this->blnMultipage)
+		{
+			$arrAttributes[1] = trim($arrAttributes[1] . ' multipage form_page_' . $this->intActivePage);
+		}
+
 		if (strlen($arrAttributes[1]))
 		{
 			$strAttributes .= ' class="' . $arrAttributes[1] . '"';
