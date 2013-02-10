@@ -37,6 +37,7 @@ $GLOBALS['TL_LANG']['tl_form_field']['date_desc'] = 'Datum (absteigend)';
 $GLOBALS['TL_LANG']['tl_form_field']['meta'] = 'Meta Datei (meta.txt)';
 $GLOBALS['TL_LANG']['tl_form_field']['random'] = 'Zufällige Reihenfolge';
 $GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'] = array('Zurück-Schaltfläche erstellen', 'Eine Schaltfläche erstellen, die zur vorherigen Formular-Seite führt.');
+$GLOBALS['TL_LANG']['tl_form_field']['efgSwitchButtonOrder'] = array('Reihenfolge der Schaltflächen tauschen', 'Die Zurück-Schaltfläche nach bzw. rechts neben der Absende-Schaltfläche positionieren.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'] = array('Formulareingaben bei \'Zurück\' erhalten', 'Eingaben im Frontend-Formular auch bei \'Zurück\' zwischenspeichern für die Vorbelegung bei erneutem Aufruf dieser Formular-Seite.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackSlabel'] = array('Bezeichnung der Zurück-Schaltfläche', 'Bitte geben Sie die Bezeichnung der Zurück-Schaltfläche ein.');
 $GLOBALS['TL_LANG']['tl_form_field']['efgBackImageSubmit'] = $GLOBALS['TL_LANG']['tl_form_field']['imageSubmit'];

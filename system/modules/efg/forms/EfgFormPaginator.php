@@ -73,6 +73,7 @@ class EfgFormPaginator extends \Widget
 
 	/**
 	 * Generate the widget and return it as string
+	 *
 	 * @return string
 	 */
 	public function generate()
@@ -84,7 +85,10 @@ class EfgFormPaginator extends \Widget
 			$blnIsHtml5 = true;
 		}
 
-		$return = '';
+		$blnSwitchOrder = (bool) $this->efgSwitchButtonOrder;
+
+		$strButtonBack = '';
+		$strButtonSubmit = '';
 
 		if ($this->efgAddBackButton && (($this->formTotalPages > 1 && $this->formActivePage > 1) || TL_MODE == 'BE'))
 		{
@@ -92,7 +96,7 @@ class EfgFormPaginator extends \Widget
 			{
 				$objFileModel = \FilesModel::findByPk($this->efgBackSingleSRC);
 
-				$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
+				$strButtonBack .= sprintf('<input type="image"%s src="%s" id="ctrl_%s_back" class="submit back%s" alt="%s" title="%s" value="%s"%s%s',
 					($this->formActivePage ? ' name="FORM_BACK"' : ''),
 					$objFileModel->path,
 					$this->strId,
@@ -105,7 +109,7 @@ class EfgFormPaginator extends \Widget
 			}
 			else
 			{
-				$return .= sprintf('<input type="submit"%s id="ctrl_%s_back" class="submit back%s" value="%s"%s%s',
+				$strButtonBack .= sprintf('<input type="submit"%s id="ctrl_%s_back" class="submit back%s" value="%s"%s%s',
 					($this->formActivePage ? ' name="FORM_BACK"' : ''),
 					$this->strId,
 					(strlen($this->strClass) ? ' ' . $this->strClass : ''),
@@ -120,7 +124,7 @@ class EfgFormPaginator extends \Widget
 		{
 			$objFileModel = \FilesModel::findByPk($this->singleSRC);
 
-			$return .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
+			$strButtonSubmit .= sprintf('<input type="image"%s src="%s" id="ctrl_%s" class="submit next%s" alt="%s" title="%s" value="%s"%s%s',
 				($this->formActivePage ? ' name="FORM_NEXT"' : ''),
 				$objFileModel->path,
 				$this->strId,
@@ -133,7 +137,7 @@ class EfgFormPaginator extends \Widget
 		}
 		else
 		{
-			$return .= sprintf('<input type="submit"%s id="ctrl_%s" class="submit next%s" value="%s"%s%s',
+			$strButtonSubmit .= sprintf('<input type="submit"%s id="ctrl_%s" class="submit next%s" value="%s"%s%s',
 				($this->formActivePage ? ' name="FORM_NEXT"' : ''),
 				$this->strId,
 				(strlen($this->strClass) ? ' ' . $this->strClass : ''),
@@ -142,7 +146,7 @@ class EfgFormPaginator extends \Widget
 				$this->strTagEnding);
 		}
 
-		return $return;
+		return ($blnSwitchOrder) ? $strButtonSubmit . $strButtonBack : $strButtonBack . $strButtonSubmit;
 
 	}
 
