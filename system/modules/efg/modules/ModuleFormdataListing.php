@@ -1197,7 +1197,7 @@ class ModuleFormdataListing extends \Module
 		{
 			if (strlen($fragment))
 			{
-				if (strncasecmp($fragment, 'file', 5) !==0 && strncasecmp($fragment, 'act', 3) !==0 &&  strncasecmp($fragment, 'order_by', 8) !== 0 && strncasecmp($fragment, 'sort', 4) !== 0 && strncasecmp($fragment, $page_key, strlen($page_key)) !== 0)
+				if (strncasecmp($fragment, 'file', 5) !==0 && strncasecmp($fragment, 'act', 3) !==0 &&  strncasecmp($fragment, 'order_by', 8) !== 0 && strncasecmp($fragment, 'sort', 4) !== 0 && strncasecmp($fragment, $page_get, strlen($page_get)) !== 0)
 				{
 					$strUrlParams .= (!$blnQuery ? '' : '&amp;') . $fragment;
 					$blnQuery = true;
@@ -1218,7 +1218,7 @@ class ModuleFormdataListing extends \Module
 
 		$intRowCounter++;
 
-		$ignoreFields = array('id','pid','sorting');
+		$ignoreFields = array('id','pid');
 
 		// THEAD
 		if (!$blnExport)

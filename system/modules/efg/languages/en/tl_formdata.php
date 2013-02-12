@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['tl_formdata']['import_preview'] = array('Preview and field 
 $GLOBALS['TL_LANG']['tl_formdata']['csv_has_header'] = array('File with column labels', 'The first line of the file contains column labels.');
 $GLOBALS['TL_LANG']['tl_formdata']['option_import_ignore'] = "-do not import-";
 $GLOBALS['TL_LANG']['tl_formdata']['published'] = array('Published', 'You can use this option as display condition when using a list module.');
+$GLOBALS['TL_LANG']['tl_formdata']['sorting'] = array('Sorting value', 'The sorting value can be used in a listing module.');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_member'] = array('Member', 'Member as owner of this record');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_user'] = array('User', 'User as owner of this record');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'] = array('Member group', 'Member group as owner of this record');

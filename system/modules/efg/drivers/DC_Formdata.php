@@ -4824,7 +4824,7 @@ window.addEvent(\'domready\', function() {
 
 		if (null === $this->arrImportIgnoreFields)
 		{
-			$this->arrImportIgnoreFields = array('id', 'pid', 'sorting', 'tstamp', 'form', 'ip', 'date', 'confirmationSent', 'confirmationDate', 'import_source' );
+			$this->arrImportIgnoreFields = array('id', 'pid', 'tstamp', 'form', 'ip', 'date', 'confirmationSent', 'confirmationDate', 'import_source' );
 		}
 
 		if (null === $this->arrImportableFields)
@@ -5400,7 +5400,7 @@ var Stylect = {
 		$session = $this->Session->getData();
 
 		$showFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
-		$ignoreFields = array('tstamp', 'sorting');
+		$ignoreFields = array('tstamp');
 
 		if (!empty($this->arrExportIgnoreFields))
 		{

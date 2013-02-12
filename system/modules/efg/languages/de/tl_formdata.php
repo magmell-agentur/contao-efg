@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_formdata']['import_preview'] = array('Vorschau und Feldz
 $GLOBALS['TL_LANG']['tl_formdata']['csv_has_header'] = array('Datei mit Spaltenbeschriftungen', 'Die Datei enthält in der ersten Zeile Feld-/Spaltenbeschriftungen.');
 $GLOBALS['TL_LANG']['tl_formdata']['option_import_ignore'] = '-nicht importieren-';
 $GLOBALS['TL_LANG']['tl_formdata']['published'] = array('Veröffentlicht', 'Dieses Kennzeichen kann als Einschränkung bei Verwendung einer Auflistung verwendet werden.');
+$GLOBALS['TL_LANG']['tl_formdata']['sorting'] = array('Sortierindex', 'Der Sortierindex kann bei einer Auflistung verwendet werden.');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_member'] = array('Mitglied', 'Mitglied als Besitzer des Datensatzes');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_user'] = array('Benutzer', 'Benutzer als Besitzer des Datensatzes');
 $GLOBALS['TL_LANG']['tl_formdata']['fd_member_group'] = array('Mitgliedergruppe', 'Mitgliedergruppe als Besitzer des Datensatzes');
