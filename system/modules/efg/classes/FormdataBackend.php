@@ -92,7 +92,9 @@ class FormdataBackend extends \Backend
 		$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
 			->execute($this->intFormId)
 			->fetchAssoc();
-		$this->updateConfig(array($arrForm));
+
+		$strFormKey = (!empty($arrForm['alias'])) ? $arrForm['alias'] : str_replace('-', '_', standardize($arrForm['title']));
+		$this->updateConfig(array($strFormKey => $arrForm));
 	}
 
 	/**
@@ -126,11 +128,12 @@ class FormdataBackend extends \Backend
 
 		// Remove unused dca files
 		$arrFiles = scan(TL_ROOT . '/system/modules/efg/dca', true);
+
 		foreach ($arrFiles as $strFile)
 		{
-			if (substr($strFile, 0, 3) == 'fd_' && $strFile != 'fd_feedback.php')
+			if (substr($strFile, 0, 3) == 'fd_')
 			{
-				if (!in_array(str_replace('.php', '', substr($strFile, 3)) , array_keys($arrStoringForms)))
+				if (empty($arrStoringForms) || !in_array(str_replace('.php', '', substr($strFile, 3)) , array_keys($arrStoringForms)))
 				{
 					$objFile = new \File('system/modules/efg/dca/' . $strFile);
 					$objFile->delete();
