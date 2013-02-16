@@ -629,7 +629,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 
 	/*
 	* Create List Label for formdata item
-	* This can be used to customize the backend list view for formdata "<?php echo $this->arrForm['title']; ?>"
+	* This can be used to customize the backend list view for formdata
 	*/
 	public function getRowLabel($arrRow)
 	{
@@ -638,7 +638,7 @@ class tl_fd_<?php echo ( strlen($this->strFormKey) ? str_replace('-', '_', $this
 		$strKey = 'unpublished';
 
 		$strRowLabel .= '<div class="fd_wrap">';
-		$strRowLabel .= '<div class="fd_head">' . $arrRow['date'] . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
+		$strRowLabel .= '<div class="fd_head">' . date($GLOBALS['TL_CONFIG']['datimFormat'], $arrRow['date']) . '<span>[' . $arrRow['form'] . ']</span><span>' . $arrRow['alias'] . '</span></div>';
 <?php if (count($this->arrFields) > 10): ?>
 		$strRowLabel .= '<div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block">';
 <?php endif; ?>
