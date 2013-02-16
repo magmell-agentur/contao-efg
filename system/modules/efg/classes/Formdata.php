@@ -250,7 +250,6 @@ class Formdata extends \Frontend
 	 */
 	public function getSearchablePages($arrPages, $intRoot=0)
 	{
-
 		$arrRoot = array();
 
 		if ($intRoot > 0)
@@ -264,7 +263,8 @@ class Formdata extends \Frontend
 
 		if (!empty($this->arrSearchableListingPages))
 		{
-			$this->loadDataContainer('fd_feedback');
+			// $this->loadDataContainer('fd_feedback');
+			@include(TL_ROOT . '/system/modules/efg/dca/fd_feedback.php');
 
 			foreach ($this->arrSearchableListingPages as $pageId => $arrParams)
 			{
