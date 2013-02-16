@@ -624,7 +624,7 @@ class tl_fd_<?php echo (strlen($this->strFormKey)) ? str_replace(array('-','.'),
 
 	/*
 	* Create list label for formdata item
-	* This can be used to customize the backend list view for formdata "<?php echo $this->arrForm['title']; ?>"
+	* This can be used to customize the backend list view for formdata
 	*/
 	public function getRowLabel($arrRow)
 	{
