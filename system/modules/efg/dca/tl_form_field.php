@@ -44,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageMultiple'] = array
 	'sql'                     => "char(1) NOT NULL default ''"
 );
 
-
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageUseHomeDir'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgImageUseHomeDir'],
@@ -104,7 +103,6 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgImageFullsize'] = array
 	'sql'                     => "char(1) NOT NULL default ''"
 );
 
-
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgAddBackButton'] = array
 (
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgAddBackButton'],
@@ -121,6 +119,24 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSlabel'] = array
 	'inputType'               => 'text',
 	'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr'),
 	'sql'                     => "varchar(255) NOT NULL default ''"
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgSwitchButtonOrder'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgSwitchButtonOrder'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50 cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
+);
+
+$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackStoreSessionValues'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array('tl_class'=>'w50 cbx'),
+	'sql'                     => "char(1) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackImageSubmit'] = array
@@ -141,107 +157,68 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
 	'sql'                     => "varchar(255) NOT NULL default ''"
 );
 
-$GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackStoreSessionValues'] = array
-(
-	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['efgBackStoreSessionValues'],
-	'exclude'                 => true,
-	'inputType'               => 'checkbox',
-	'eval'                    => array('tl_class'=>'w50'),
-	'sql'                     => "char(1) NOT NULL default ''"
-);
-
-
-// add palette for field type efgLookupSelect
+// Add palettes
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
 {
+	// Field type efgLookupSelect
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
 		array('efgLookupSelect' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory,multiple;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
-}
-// add field type efgLookupSelect to available form field 'type'
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
-{
-	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('select', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
-		'efgLookupSelect'
-	);
-}
-
-// add palette for field type efgLookupCheckbox
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
-{
+	// Field type efgLookupCheckbox
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
 		array('efgLookupCheckbox' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
-}
-// add field type efgLookupCheckbox to available form field 'type'
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
-{
-	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('checkbox', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
-		'efgLookupCheckbox'
-	);
-}
-
-// add palette for field type efgLookupRadio
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
-{
+	// Field type efgLookupRadio
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
 		array('efgLookupRadio' => '{type_legend},type,name,label;{options_legend},efgLookupOptions;{fconfig_legend},mandatory;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
-}
-// add field type efgLookupRadio to available form field 'type'
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
-{
-	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('radio', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
-		'efgLookupRadio'
-	);
-}
-
-// add palette for field type efgImageSelect
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
-{
+	// Field type efgImageSelect
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
 		array('efgImageSelect' => '{type_legend},type,name,label;{options_legend},efgMultiSRC,efgImageUseHomeDir,efgImageFullsize,efgImageSize,efgImageMargin,efgImagePerRow,efgImageSortBy;{fconfig_legend},mandatory,efgImageMultiple;{expert_legend:hide},accesskey,class;{submit_legend},addSubmit')
 	);
-}
-
-// add field type efgImageSelect to available form field 'type'
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
-{
-	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('upload', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
-		'efgImageSelect'
-	);
-}
-
-// add palette for field type efgFormPaginator
-if (is_array($GLOBALS['TL_DCA']['tl_form_field']['palettes']))
-{
+	// Field type efgFormPaginator
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['palettes'], count($GLOBALS['TL_DCA']['tl_form_field']['palettes']),
 		array('efgFormPaginator' => '{type_legend},type,slabel;{image_legend:hide},imageSubmit;{backbutton_legend},efgAddBackButton;{expert_legend:hide},class,accesskey')
 	);
 	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgAddBackButton';
 	$GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'efgBackImageSubmit';
-	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgAddBackButton'] = 'efgBackStoreSessionValues,efgBackSlabel,efgBackImageSubmit';
+	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgAddBackButton'] = 'efgBackSlabel,efgSwitchButtonOrder,efgBackStoreSessionValues,efgBackImageSubmit';
 	$GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['efgBackImageSubmit'] = 'efgBackSingleSRC';
 }
 
-// add field type efgFormPaginator to available form field 'type'
+// Add field types to type options
 if (is_array($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options']))
 {
+	// Field type efgLookupSelect
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('select', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
+		'efgLookupSelect'
+	);
+	// Field type efgLookupCheckbox
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('checkbox', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
+		'efgLookupCheckbox'
+	);
+	// Field type efgLookupRadio
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('radio', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
+		'efgLookupRadio'
+	);
+	// Field type efgImageSelect
+	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('upload', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
+		'efgImageSelect'
+	);
+	// Field type efgFormPaginator
 	array_insert($GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'], (array_search('submit', $GLOBALS['TL_DCA']['tl_form_field']['fields']['type']['options'])+1),
 		'efgFormPaginator'
 	);
 }
 
-
-// add backend form fields
+// Add backend form fields
 $GLOBALS['BE_FFL']['efgLookupOptionWizard'] = 'EfgLookupOptionWizard';
 $GLOBALS['BE_FFL']['efgLookupSelect'] = 'EfgFormLookupSelectMenu';
 $GLOBALS['BE_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['BE_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
 $GLOBALS['BE_FFL']['efgFormPaginator'] = 'EfgFormPaginator';
 
-
-// add front end form fields
+// Add front end form fields
 $GLOBALS['TL_FFL']['efgLookupSelect'] = 'EfgFormLookupSelectMenu';
 $GLOBALS['TL_FFL']['efgLookupCheckbox'] = 'EfgFormLookupCheckbox';
 $GLOBALS['TL_FFL']['efgLookupRadio'] = 'EfgFormLookupRadio';
