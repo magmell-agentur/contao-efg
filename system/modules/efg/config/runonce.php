@@ -95,13 +95,16 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 		}
 
 		// Delete cached sql files
-		$arrFiles = scan(TL_ROOT . '/system/cache/sql', true);
-		foreach ($arrFiles as $strFile)
+		if (is_dir(TL_ROOT . '/system/cache/sql'))
 		{
-			if (in_array($strFile, array('tl_form.php', 'tl_form_field.php', 'tl_formdata.php', 'tl_formdata_details.php', 'tl_module.php')))
+			$arrFiles = scan(TL_ROOT . '/system/cache/sql', true);
+			foreach ($arrFiles as $strFile)
 			{
-				$objFile = new \File('system/cache/sql/' . $strFile);
-				$objFile->delete();
+				if (in_array($strFile, array('tl_form.php', 'tl_form_field.php', 'tl_formdata.php', 'tl_formdata_details.php', 'tl_module.php')))
+				{
+					$objFile = new \File('system/cache/sql/' . $strFile);
+					$objFile->delete();
+				}
 			}
 		}
 
