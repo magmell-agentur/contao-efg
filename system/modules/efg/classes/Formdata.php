@@ -162,6 +162,10 @@ class Formdata extends \Frontend
 				return $this->getUserGroups();
 				break;
 
+			default:
+				return parent::__get($strKey);
+				break;
+
 		}
 	}
 
