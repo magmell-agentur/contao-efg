@@ -227,6 +227,12 @@ class FormdataBackend extends \Backend
 								continue;
 							}
 
+							// Ignore conditionalforms conditionType 'stop'
+							if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+							{
+								continue;
+							}
+
 							$arrFields[$strFieldKey] = $arrField;
 							$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 						}

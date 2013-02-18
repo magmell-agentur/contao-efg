@@ -1511,6 +1511,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// Modify options to handle Contao 3 new validation in Widget::isValidOption()
 						if (in_array($this->strField, $this->arrDetailFields))
 						{
+							if (!is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+							{
+								$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = array
+								(
+									'1' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['label'][0]
+								);
+							}
 							$strFirstOpt = array_pop($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
 
 							$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][1] = $strFirstOpt;
