@@ -2526,7 +2526,7 @@ class Formdata extends \Frontend
 
 	/**
 	 * Parse Insert tag params
-	 * @param string Insert tag
+	 * @param string $strTag Insert tag
 	 * @return mixed
 	 */
 	public function parseInsertTagParams($strTag='')
