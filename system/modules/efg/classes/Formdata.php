@@ -267,8 +267,7 @@ class Formdata extends \Frontend
 
 		if (!empty($this->arrSearchableListingPages))
 		{
-			// $this->loadDataContainer('fd_feedback');
-			@include(TL_ROOT . '/system/modules/efg/dca/fd_feedback.php');
+			$this->loadDataContainer('fd_feedback');
 
 			foreach ($this->arrSearchableListingPages as $pageId => $arrParams)
 			{
