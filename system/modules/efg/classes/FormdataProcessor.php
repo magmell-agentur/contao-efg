@@ -393,26 +393,15 @@ class FormdataProcessor extends \Frontend
 			$objMailProperties->skipEmptyFields = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			// Set the sender as given in form configuration
-			$sender = $arrForm['confirmationMailSender'];
-			$senderName = '';
-
-			if (!empty($sender))
-			{
-				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-				if (strpos($sender, '<') > 0)
-				{
-					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
-					$sender = $parts[2];
-					$senderName = trim($parts[1]);
-				}
-			}
+			list($senderName, $sender) = $this->splitFriendlyName($arrForm['confirmationMailSender']);
 			$objMailProperties->sender = $sender;
 			$objMailProperties->senderName = $senderName;
 
 			// Set the 'reply to' address, if given in form configuration
 			if (!empty($arrForm['confirmationMailReplyto']))
 			{
-				$objMailProperties->replyTo = $arrForm['confirmationMailReplyto'];
+				list($replyToName, $replyTo) = $this->splitFriendlyName($arrForm['confirmationMailReplyto']);
+				$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 			}
 
 			// Set recipient(s)
@@ -439,16 +428,8 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					$recipient = $this->replaceInsertTags($recipient, false);
-					$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
-					$recipientName = '';
-					if (strpos($recipient, '<') > 0)
-					{
-						preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
-						$recipientName = trim($parts[1]);
-						$recipient = (!empty($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
-					}
-					$arrRecipient[$kR] = $recipient;
+					list($recipientName, $recipient) = $this->splitFriendlyName($this->replaceInsertTags($recipient, false));
+					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
 			$objMailProperties->recipients = $arrRecipient;
@@ -572,21 +553,8 @@ class FormdataProcessor extends \Frontend
 			$objMailProperties->skipEmptyFields = ($arrForm['formattedMailSkipEmpty']) ? true : false;
 
 			// Set the admin e-mail as "from" address
-			$sender = $GLOBALS['TL_ADMIN_EMAIL'];
-			$senderName = '';
-
-			if (!empty($sender))
-			{
-				$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-				if (strpos($sender, '<') > 0)
-				{
-					preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
-					$sender = $parts[2];
-					$senderName = trim($parts[1]);
-				}
-			}
-			$objMailProperties->sender = $sender;
-			$objMailProperties->senderName = $senderName;
+			$objMailProperties->sender = $GLOBALS['TL_ADMIN_EMAIL'];
+			$objMailProperties->senderName = $GLOBALS['TL_ADMIN_NAME'];
 
 			// Get 'reply to' address, if form contains field named 'email'
 			if (isset($arrSubmitted['email']) && !empty($arrSubmitted['email']) && !is_bool(strpos($arrSubmitted['email'], '@')))
@@ -616,16 +584,8 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					$recipient = $this->replaceInsertTags($recipient, false);
-					$recipient = str_replace(array('[', ']'), array('<', '>'), $recipient);
-					$recipientName = '';
-					if (strpos($recipient, '<') > 0)
-					{
-						preg_match('/(.*)?<(\S*)>/si', $recipient, $parts);
-						$recipientName = trim($parts[1]);
-						$recipient = (!empty($recipientName) ? $recipientName.' <'.$parts[2].'>' : $parts[2]);
-					}
-					$arrRecipient[$kR] = $recipient;
+					list($recipientName, $recipient) = $this->splitFriendlyName($this->replaceInsertTags($recipient, false));
+					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
 			$objMailProperties->recipients = $arrRecipient;
