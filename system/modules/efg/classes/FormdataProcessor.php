@@ -112,7 +112,7 @@ class FormdataProcessor extends \Frontend
 				}
 				else
 				{
-					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', __METHOD__s, TL_GENERAL);
+					$this->log('Could not identify record by ID "' . \Input::get($this->strFormdataDetailsKey) . '"', __METHOD__, TL_GENERAL);
 				}
 			}
 		}
