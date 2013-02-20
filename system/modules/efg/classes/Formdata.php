@@ -2170,9 +2170,9 @@ class Formdata extends \Frontend
 		$arrRecipients = $objMailProperties->recipients;
 		$replyTo = $objMailProperties->replyTo;
 		$messageText = $objMailProperties->messageText;
-		$messageHtml= $objMailProperties->messageHtml;
-		$messageHtmlTmpl= $objMailProperties->messageHtmlTmpl;
-		$attachments= $objMailProperties->attachments;
+		$messageHtml = $objMailProperties->messageHtml;
+		$messageHtmlTmpl = $objMailProperties->messageHtmlTmpl;
+		$attachments = $objMailProperties->attachments;
 
 		$blnSkipEmptyFields = $objMailProperties->skipEmptyFields;
 
