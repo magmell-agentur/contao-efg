@@ -84,3 +84,4 @@ $GLOBALS['TL_HOOKS']['processFormData'][] = array('FormdataProcessor', 'processS
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('FormdataProcessor', 'processConfirmationContent');
 $GLOBALS['TL_HOOKS']['listComments'][] = array('FormdataComments', 'listComments');
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = array('Formdata', 'getSearchablePages');
+$GLOBALS['TL_HOOKS']['executePostActions'][] = array('Formdata', 'executePostActions');

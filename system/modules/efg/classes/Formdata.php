@@ -2688,4 +2688,95 @@ class Formdata extends \Frontend
 		return ($objPage->outputFormat == 'xhtml') ? ' />' : '>';
 	}
 
+
+
+	public function executePostActions($strAction, $dc)
+	{
+
+		if ($dc instanceof DC_Formdata)
+		{
+			if (\Input::get('act') == 'editAll')
+			{
+				$this->strAjaxId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', \Input::post('id'));
+				if (in_array(\Input::post('field'), $this->arrBaseFields))
+				{
+					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($this->strAjaxId);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval(\Input::post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $this->strAjaxId,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+							'ff_name' => \Input::post('field'),
+							'value' => $strValue
+						);
+						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+					}
+				}
+
+				if (\Input::post('load'))
+				{
+					echo $dc->editAll($this->strAjaxId, \Input::post('id'));
+				}
+			}
+			else
+			{
+				if (in_array(\Input::post('field'), $this->arrBaseFields))
+				{
+					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($dc->id);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval(\Input::post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $dc->id,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+							'ff_name' => \Input::post('field'),
+							'value' => $strValue
+						);
+						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+					}
+				}
+
+				if (\Input::post('load'))
+				{
+					echo $dc->edit(false, \Input::post('id'));
+				}
+			}
+		}
+
+	}
 }
