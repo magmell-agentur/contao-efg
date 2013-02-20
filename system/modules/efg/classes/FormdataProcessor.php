@@ -452,7 +452,7 @@ class FormdataProcessor extends \Frontend
 								$objFile = new \File($objFileModel->path);
 								if ($objFile->size)
 								{
-									$attachments[TL_ROOT .'/' . $objFile->path] = array
+									$objMailProperties->attachments[TL_ROOT .'/' . $objFile->path] = array
 									(
 										'file' => TL_ROOT . '/' . $objFile->path,
 										'name' => $objFile->basename,
@@ -463,7 +463,6 @@ class FormdataProcessor extends \Frontend
 					}
 				}
 			}
-			$objMailProperties->attachments = $attachments;
 
 			$objMailProperties->subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 			$objMailProperties->messageText = \String::decodeEntities($arrForm['confirmationMailText']);
@@ -608,7 +607,7 @@ class FormdataProcessor extends \Frontend
 								$objFile = new \File($objFileModel->path);
 								if ($objFile->size)
 								{
-									$attachments[TL_ROOT . '/' . $objFile->path] = array
+									$objMailProperties->attachments[TL_ROOT . '/' . $objFile->path] = array
 									(
 										'file' => TL_ROOT . '/' . $objFile->path,
 										'name' => $objFile->basename,
@@ -620,7 +619,6 @@ class FormdataProcessor extends \Frontend
 					}
 				}
 			}
-			$objMailProperties->attachments = $attachments;
 
 			$objMailProperties->subject = \String::decodeEntities($arrForm['formattedMailSubject']);
 			$objMailProperties->messageText = \String::decodeEntities($arrForm['formattedMailText']);
