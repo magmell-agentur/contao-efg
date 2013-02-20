@@ -216,10 +216,27 @@ class FormdataBackend extends \Backend
 					// Get all form fields of this form
 					$arrFormFields = $this->Formdata->getFormFieldsAsArray($arrForm['id']);
 
+					$arrPalettes = array();
+					$strCurrentPalette = '';
+
 					if (!empty($arrFormFields))
 					{
 						foreach ($arrFormFields as $strFieldKey => $arrField)
 						{
+
+							// Set current palette name
+							if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
+							{
+								$strCurrentPalette = $arrField['name'];
+							}
+
+							// Ignore conditionalforms conditionType 'stop', reset palette name
+							if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+							{
+								$strCurrentPalette = '';
+								continue;
+							}
+
 							// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
 							if (!in_array($arrField['type'], $this->arrFFstorable)
 								|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
@@ -229,6 +246,14 @@ class FormdataBackend extends \Backend
 
 							$arrFields[$strFieldKey] = $arrField;
 							$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+
+							// Add field to palette
+							if ($strCurrentPalette != '')
+							{
+								if (! ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start'))
+								$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+							}
+
 						}
 					}
 
@@ -240,6 +265,7 @@ class FormdataBackend extends \Backend
 					$tplDca->arrStoringForms = $arrStoringForms;
 					$tplDca->arrFields = $arrFields;
 					$tplDca->arrFieldNamesById = $arrFieldNamesById;
+					$tplDca->arrPalettes = $arrPalettes;
 
 					// Enable backend confirmation mail
 					$blnBackendMail = false;

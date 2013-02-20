@@ -1511,6 +1511,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// Modify options to handle Contao 3 new validation in Widget::isValidOption()
 						if (in_array($this->strField, $this->arrDetailFields))
 						{
+							if (!is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
+							{
+								$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = array
+								(
+									'1' => $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['label'][0]
+								);
+							}
 							$strFirstOpt = array_pop($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
 
 							$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'][1] = $strFirstOpt;
@@ -1698,6 +1705,10 @@ window.addEvent(\'domready\', function() {
   (inp = $(\''.$this->strTable.'\').getElement(\'input[class^="tl_text"]\')) && inp.focus();
 });
 </script>';
+
+
+		// TODO: find a better solution to handle toggleSubpalette ...
+		$return .= $this->getSubpaletteJavascript();
 
 		// Begin the form (-> DO NOT CHANGE THIS ORDER -> this way the onsubmit attribute of the form can be changed by a field)
 		$return = $version . '
@@ -2317,40 +2328,8 @@ window.addEvent(\'domready\', function() {
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
 					}
 
-//					// input type efgLookupCheckbox: modify DCA to render as CheckboxMenu
-//					if ($strInputType=='efgLookupCheckbox')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
-//					}
-//					// input type efgLookupRadio: modify DCA to render as RadioMenu
-//					elseif ($strInputType=='efgLookupRadio')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'radio';
-//					}
-//					// input type efgLookupSelect: modify DCA to render as SelectMenu
-//					elseif ($strInputType=='efgLookupSelect')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
-//					}
-
 					// Build the current row
 					$blnAjax ? $strAjax .= $this->row() : $return .= $this->row();
-
-//					// input type efgLookupCheckbox: reset DCA inputType
-//					if ($strInputType=='efgLookupCheckbox')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupCheckbox';
-//					}
-//					// input type efgLookupRadio: reset DCA inputType
-//					elseif ($strInputType=='efgLookupRadio')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupRadio';
-//					}
-//					// input type efgLookupSelect: reset DCA inputType
-//					elseif ($strInputType=='efgLookupSelect')
-//					{
-//						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'efgLookupSelect';
-//					}
 
 				}
 
@@ -2401,6 +2380,9 @@ window.addEvent(\'domready\', function() {
 
 </div>
 </form>';
+
+			// TODO: find a better solution to handle toggleSubpalette ...
+			$return .= $this->getSubpaletteJavascript();
 
 			// Set the focus if there is an error
 			if ($this->noReload)
@@ -2764,6 +2746,7 @@ window.addEvent(\'domready\', function() {
 	 */
 	public function getPalette()
 	{
+
 		$palette = 'default';
 		$strPalette = $GLOBALS['TL_DCA'][$this->strTable]['palettes'][$palette];
 
@@ -2773,7 +2756,10 @@ window.addEvent(\'domready\', function() {
 			$sValues = array();
 			$subpalettes = array();
 
-			$objFields = \Database::getInstance()->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
+			$table_alias = ($this->strTable == 'tl_formdata' ? ' f' : '');
+			$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias . " WHERE id=?";
+
+			$objFields = \Database::getInstance()->prepare($sqlQuery)
 				->limit(1)
 				->executeUncached($this->intId);
 
@@ -2823,7 +2809,7 @@ window.addEvent(\'domready\', function() {
 			}
 
 			// Build possible palette names from the selector values
-			if (empty($sValues))
+			if (!count($sValues))
 			{
 				$names = array('default');
 			}
@@ -2860,6 +2846,7 @@ window.addEvent(\'domready\', function() {
 			{
 				$strPalette = preg_replace('/\b'. preg_quote($k, '/').'\b/i', $k.',['.$k.'],'.$v.',[EOF]', $strPalette);
 			}
+
 		}
 
 		return $strPalette;
@@ -6005,6 +5992,72 @@ var Stylect = {
 			}
 		}
 		return $strString;
+	}
+
+
+	private function getSubpaletteJavascript()
+	{
+
+		$strJs = "
+<script>
+	AjaxRequest.toggleEfgSubpalette = function (el, id, field) {
+		el.blur();
+		var item = $(id);
+
+		if (item) {
+			if (!el.value) {
+				el.value = 1;
+				el.checked = 'checked';
+				item.setStyle('display', 'block');
+				new Request.Contao({field:el}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'state':1, 'REQUEST_TOKEN':Contao.request_token});
+			} else {
+				el.value = '';
+				el.checked = '';
+				item.setStyle('display', 'none');
+				new Request.Contao({field:el}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'state':0, 'REQUEST_TOKEN':Contao.request_token});
+			}
+			return;
+		}
+
+		new Request.Contao({
+			field: el,
+			evalScripts: false,
+			onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' …'),
+			onSuccess: function(txt, json) {
+				var div = new Element('div', {
+					'id': id,
+					'html': txt,
+					'styles': {
+						'display': 'block'
+					}
+				}).inject($(el).getParent('div').getParent('div'), 'after');
+
+				// Execute scripts after the DOM has been updated
+				if (json.javascript) $exec(json.javascript);
+
+				el.value = 1;
+				el.checked = 'checked';
+
+				AjaxRequest.hideBox();
+				Backend.addInteractiveHelp();
+				Backend.addColorPicker();
+
+				// HOOK
+				window.fireEvent('subpalette'); // Backwards compatibility
+				window.fireEvent('ajax_change');
+			}
+		}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'load':1, 'state':1, 'REQUEST_TOKEN':Contao.request_token});
+	}
+
+window.addEvent('domready', function(){
+	$$('input[onclick^=AjaxRequest.toggleSubpalette]').each(function(item){
+		item.set('onclick', (item.get('onclick').replace(/toggleSubpalette/, 'toggleEfgSubpalette')))
+	});
+});
+</script>";
+
+		return $strJs;
+
 	}
 
 }

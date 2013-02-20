@@ -74,7 +74,7 @@ class Formdata extends \Frontend
 		(
 			'sessionText', 'sessionOption', 'sessionCalculator',
 			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
-			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
+			'select','efgImageSelect','condition','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
 			'radio','efgLookupRadio',
 			'checkbox','efgLookupCheckbox',
 			'upload', 'fileTree'
@@ -94,6 +94,7 @@ class Formdata extends \Frontend
 			'sessionText' => 'text',
 			'sessionOption' => 'checkbox',
 			'sessionCalculator' => 'text',
+			'condition' => 'checkbox',
 			'conditionalselect' => 'select',
 			'countryselect' => 'select',
 			'fp_preSelectMenu' => 'select',
@@ -708,6 +709,8 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
+
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareWidgetOptions($arrField);
@@ -951,6 +954,7 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 				case 'efgLookupRadio':
 				case 'radio':
 				case 'efgLookupSelect':
@@ -1120,6 +1124,7 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareWidgetOptions($arrField);
@@ -1284,6 +1289,8 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
+
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
 
 					$strVal = '';
@@ -1476,9 +1483,9 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare database value from tl_formdata / tl_formdata_details for widget
-	 * @param mixed Stored value
-	 * @param array|boolean Form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
-	 * @param mixed File
+	 * @param mixed $varValue Stored value
+	 * @param array|boolean $arrField Form field properties (NOTE: set from dca or from tl_form_field, with differences in the structure)
+	 * @param mixed $varFile File
 	 * @return mixed
 	 */
 	public function prepareDatabaseValueForWidget($varValue='', $arrField=false, $varFile=false)
@@ -1506,6 +1513,7 @@ class Formdata extends \Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 				case 'efgLookupRadio':
 				case 'radio':
 				case 'efgLookupSelect':
@@ -2108,6 +2116,11 @@ class Formdata extends \Frontend
 
 				break;
 
+			// conditionalforms
+			case 'condition':
+				$arrOptions = array(array('value' => '1', 'label' => $arrField['label']));
+				break;
+
 			default:
 				if ($arrField['options'])
 				{
@@ -2675,4 +2688,95 @@ class Formdata extends \Frontend
 		return ($objPage->outputFormat == 'xhtml') ? ' />' : '>';
 	}
 
+
+
+	public function executePostActions($strAction, $dc)
+	{
+
+		if ($dc instanceof DC_Formdata)
+		{
+			if (\Input::get('act') == 'editAll')
+			{
+				$this->strAjaxId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', \Input::post('id'));
+				if (in_array(\Input::post('field'), $this->arrBaseFields))
+				{
+					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($this->strAjaxId);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval(\Input::post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $this->strAjaxId,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+							'ff_name' => \Input::post('field'),
+							'value' => $strValue
+						);
+						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+					}
+				}
+
+				if (\Input::post('load'))
+				{
+					echo $dc->editAll($this->strAjaxId, \Input::post('id'));
+				}
+			}
+			else
+			{
+				if (in_array(\Input::post('field'), $this->arrBaseFields))
+				{
+					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($dc->id);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval(\Input::post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $dc->id,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+							'ff_name' => \Input::post('field'),
+							'value' => $strValue
+						);
+						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+					}
+				}
+
+				if (\Input::post('load'))
+				{
+					echo $dc->edit(false, \Input::post('id'));
+				}
+			}
+		}
+
+	}
 }
