@@ -490,18 +490,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 		$this->limit = '';
 		$this->bid = 'tl_buttons';
 
-		// Clean up old tl_undo and tl_log entries
-		if ($this->strTable == 'tl_undo' && strlen($GLOBALS['TL_CONFIG']['undoPeriod']))
-		{
-			$this->Database->prepare("DELETE FROM tl_undo WHERE tstamp<?")
-							->execute(intval(time() - $GLOBALS['TL_CONFIG']['undoPeriod']));
-		}
-		elseif ($this->strTable == 'tl_log' && strlen($GLOBALS['TL_CONFIG']['logPeriod']))
-		{
-			$this->Database->prepare("DELETE FROM tl_log WHERE tstamp<?")
-							->execute(intval(time() - $GLOBALS['TL_CONFIG']['logPeriod']));
-		}
-
 		$this->reviseTable();
 
 		// Add to clipboard
@@ -668,7 +656,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 			{
 				$row[$i] = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $value);
 			}
-			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
+			elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['multiple'])
 			{
 				$row[$i] = strlen($value) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['label'][0] : '-';
 			}
@@ -1223,6 +1211,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 		// Build an array from boxes and rows
 		$this->strPalette = $this->getPalette();
+
 		$boxes = trimsplit(';', $this->strPalette);
 		$legends = array();
 
@@ -1268,6 +1257,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 			{
 				$strAjax = '';
 				$blnAjax = false;
+				$key = '';
+				$cls = '';
 				$legend = '';
 
 				if (isset($legends[$k]))
@@ -1290,6 +1281,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 				// Build rows of the current box
 				foreach ($v as $kk=>$vv)
 				{
+
 					if ($vv == '[EOF]')
 					{
 						if ($blnAjax && $this->Environment->isAjaxRequest)
@@ -1365,9 +1357,15 @@ class DC_Formdata extends DataContainer implements listable, editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'text';
 					}
 
+					// render inputType 'condition' (conditionalforms) as 'checkbox'
+					if ($strInputType == 'condition')
+					{
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
+					}
+
 					// field types radio, select, multi checkbox
 					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
-							|| ($strInputType=='checkbox'  && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
+							|| ($strInputType=='checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
 						{
@@ -1538,8 +1536,9 @@ class DC_Formdata extends DataContainer implements listable, editable
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					elseif ($strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
+					elseif (($strInputType=='checkbox' || $strInputType=='condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
 					{
+
 						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
 						{
 							$arrVals = array_keys($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']);
@@ -1731,6 +1730,8 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 </div>
 </form>';
+		// TODO: find a better solution to handle toggleSubpalette ...
+		$return .= $this->getSubpaletteJavascript();
 
 		// Begin the form (-> DO NOT CHANGE THIS ORDER -> this way the onsubmit attribute of the form can be changed by a field)
 		$return = $version . '
@@ -1915,7 +1916,7 @@ window.addEvent(\'domready\', function() {
 					{
 						$arrBaseFields[] = $strField;
 					}
-					if (in_array($strField, $this->arrDetailFields))
+					elseif (in_array($strField, $this->arrDetailFields))
 					{
 						$arrDetailFields[] = $strField;
 						$arrSqlDetails[] = '(SELECT value FROM tl_formdata_details WHERE ff_name=\'' .$strField. '\' AND pid=f.id) AS `' . $strField .'`';
@@ -2005,6 +2006,12 @@ window.addEvent(\'domready\', function() {
 					if ($strInputType == 'hidden')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'text';
+					}
+
+					// render inputType 'condition' (conditionalforms) as 'checkbox'
+					if ($strInputType == 'condition')
+					{
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 					}
 
 					// field types radio, select, multi checkbox
@@ -2178,7 +2185,7 @@ window.addEvent(\'domready\', function() {
 					} // field types radio, select, multi checkbox
 
 					// field type single checkbox
-					elseif ($strInputType=='checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
+					elseif (($strInputType=='checkbox' || $strInputType=='condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple'])
 					{
 						if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options']))
 						{
@@ -2412,6 +2419,8 @@ window.addEvent(\'domready\', function() {
 </div>
 </form>';
 
+			// TODO: find a better solution to handle toggleSubpalette ...
+			$return .= $this->getSubpaletteJavascript();
 			// Set the focus if there is an error
 			if ($this->noReload)
 			{
@@ -2592,7 +2601,7 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
-		if ($arrField['inputType']=='checkbox' && !$arrField['eval']['multiple'])
+		if (($arrField['inputType']=='checkbox' || $arrField['inputType']=='condition') && !$arrField['eval']['multiple'])
 		{
 			if (is_array($arrField['options']))
 			{
@@ -2734,7 +2743,10 @@ window.addEvent(\'domready\', function() {
 			$sValues = array();
 			$subpalettes = array();
 
-			$objFields = $this->Database->prepare("SELECT * FROM " . $this->strTable . " WHERE id=?")
+			$table_alias = ($this->strTable == 'tl_formdata' ? ' f' : '');
+			$sqlQuery = "SELECT * " .(!empty($this->arrSqlDetails) ? ', '.implode(',' , array_values($this->arrSqlDetails)) : '') ." FROM " . $this->strTable . $table_alias . " WHERE id=?";
+
+			$objFields = $this->Database->prepare($sqlQuery)
 										->limit(1)
 										->executeUncached($this->intId);
 
@@ -2758,7 +2770,7 @@ window.addEvent(\'domready\', function() {
 
 					if ($trigger != '')
 					{
-						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['eval']['multiple'])
+						if (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['eval']['multiple'])
 						{
 							$sValues[] = $name;
 
@@ -2811,7 +2823,6 @@ window.addEvent(\'domready\', function() {
 			{
 				if (strlen($GLOBALS['TL_DCA'][$this->strTable]['palettes'][$paletteName]))
 				{
-					$palette = $paletteName;
 					$strPalette = $GLOBALS['TL_DCA'][$this->strTable]['palettes'][$paletteName];
 
 					break;
@@ -3110,7 +3121,7 @@ window.addEvent(\'domready\', function() {
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
+					elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
 						$args[$k] = strlen($row[$v]) ? $GLOBALS['TL_DCA'][$table]['fields'][$v]['label'][0] : '-';
 						$rowFormatted[$v] = $args[$k];
@@ -5912,7 +5923,7 @@ var Stylect = {
 					{
 						$strVal = ($row[$v] ? date($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '');
 					}
-					elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
+					elseif (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['inputType'] == 'condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['multiple'])
 					{
 						if ($useFormValues == 1)
 						{
@@ -6266,6 +6277,72 @@ var Stylect = {
 			}
 			$this->arrUserGroups = $groups;
 		}
+	}
+
+	private function getSubpaletteJavascript()
+	{
+
+		$strJs = "
+<script>
+	AjaxRequest.toggleEfgSubpalette = function (el, id, field) {
+		el.blur();
+		var item = $(id);
+
+		if (item) {
+			if (!el.value) {
+				el.value = 1;
+				el.checked = 'checked';
+				item.setStyle('display', 'block');
+				new Request.Contao({field:el}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'state':1, 'REQUEST_TOKEN':REQUEST_TOKEN});
+			} else {
+				el.value = '';
+				el.checked = '';
+				item.setStyle('display', 'none');
+				new Request.Contao({field:el}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'state':0, 'REQUEST_TOKEN':REQUEST_TOKEN});
+			}
+			return;
+		}
+
+		new Request.Contao({
+			field: el,
+			evalScripts: false,
+			onRequest: AjaxRequest.displayBox(CONTAO_LOADING + ' …'),
+			onSuccess: function(txt, json) {
+				var div = new Element('div', {
+					'id': id,
+					'html': txt,
+					'styles': {
+						'display': 'block'
+					}
+				}).inject($(el).getParent('div').getParent('div'), 'after');
+
+				// Execute scripts after the DOM has been updated
+				if (json.javascript) $exec(json.javascript);
+
+				el.value = 1;
+				el.checked = 'checked';
+
+				AjaxRequest.hideBox();
+				Backend.hideTreeBody();
+				Backend.addInteractiveHelp();
+				Backend.addColorPicker();
+
+				// HOOK
+				window.fireEvent('subpalette'); // Backwards compatibility
+				window.fireEvent('ajax_change');
+			}
+		}).post({'action':'toggleEfgSubpalette', 'id':id, 'field':field, 'load':1, 'state':1, 'REQUEST_TOKEN':REQUEST_TOKEN});
+	}
+
+window.addEvent('domready', function(){
+	$$('input[onclick^=AjaxRequest.toggleSubpalette]').each(function(item){
+		item.set('onclick', (item.get('onclick').replace(/toggleSubpalette/, 'toggleEfgSubpalette')))
+	});
+});
+</script>";
+
+		return $strJs;
+
 	}
 
 }

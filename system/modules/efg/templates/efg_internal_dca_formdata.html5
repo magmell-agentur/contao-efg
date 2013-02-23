@@ -99,6 +99,15 @@ $arrListDefaults = array(
 		'flag'           => 'null',
 		'eval'           => 'null',
 	),
+	'condition' => array
+	(
+		'exclude'        => 'false',
+		'search'         => 'false',
+		'sorting'        => 'false',
+		'filter'         => 'true',
+		'flag'           => 'null',
+		'eval'           => 'null',
+	),
 	'conditionalselect' => array
 	(
 		'exclude'        => 'false',
@@ -282,7 +291,6 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_formdata']['edit'],
 				'href'                => 'act=edit',
-				//'href'                => 'table=tl_formdata_details',
 				'button_callback'     => array('ModuleFormdata', 'callbackEditButton'),
 				'icon'                => 'edit.gif'
 			),
@@ -310,12 +318,30 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 <?php endif; ?>
 		)
 	),
-
+<?php $arrDefaultPaletteSkipFields = array(); ?>
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => 'form,alias,date,ip,published;{confirmation_legend},confirmationSent,confirmationDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): echo $strSep . $varKey; $strSep=','; endforeach; ?>'
+<?php if (!empty($this->arrPalettes)):
+$arrSelector = array_keys($this->arrPalettes);
+foreach ($this->arrPalettes as $strPal => $arrPalFields):
+	$arrDefaultPaletteSkipFields = array_merge($arrDefaultPaletteSkipFields, $arrPalFields);
+endforeach;
+?>
+		'__selector__'                => array('<?php echo implode("','", $arrSelector); ?>'),
+<?php endif; ?>
+		'default'                     => 'form,alias,date,ip,published,sorting;{confirmation_legend},confirmationSent,confirmationDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): if (in_array($varKey, $arrDefaultPaletteSkipFields)): continue; endif; echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
+<?php if (!empty($this->arrPalettes)): ?>
+
+	// Subpalettes
+	'subpalettes' => array
+	(
+<?php foreach ($this->arrPalettes as $strPaletteName => $arrPaletteFields): ?>
+		'<?php echo $strPaletteName; ?>' => '<?php echo implode(',', $arrPaletteFields); ?>',
+<?php endforeach; ?>
+	),
+<?php endif; ?>
 
 	// Base fields in table tl_formdata
 	'fields' => array
@@ -440,7 +466,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	),
 	'tl_formdata' => array
 	(
-		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate' /*,'importSource'*/),
+		'baseFields'                 => array('id','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate'),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
 echo $strSep . "'" . str_replace("'", "\'", $this->String->decodeEntities($varKey)) . "'"; $strSep = ',';
 endforeach; ?>),
@@ -482,9 +508,13 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default
 	case 'checkbox':
 	case 'radio':
 	case 'select':
+	case 'condition':
 	case 'conditionalselect':
 	case 'countryselect':
 	case 'fp_preSelectMenu': $arrOpts = deserialize($varVals['options']); $blnInGroup=false; $strGroupKey=''; $strGroupLabel=''; ?>
+<?php if (!is_array($arrOpts)): // conditionalforms etc.
+$arrOpts = array(array('value' => '1', 'label' => $varVals['label']));
+endif; ?>
 <?php if (is_array($arrOpts)): ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php  if ($arrOpt['group']): ?>
@@ -549,6 +579,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 <?php
 	break;
 endswitch; ?>
+<?php if ($varVals['type'] == 'condition'): // conditionalforms ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['submitOnChange'] = true;
+<?php endif; ?>
 <?php if ($varVals['conditionField'] && strlen($varVals['conditionField'])): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['conditionField'] = '<?php echo $this->arrFieldNamesById[$varVals['conditionField']]; ?>';
 <?php endif; ?>

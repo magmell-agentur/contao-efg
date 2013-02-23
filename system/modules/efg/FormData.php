@@ -68,7 +68,7 @@ class FormData extends Frontend
 		$this->arrFFstorable = array(
 			'sessionText', 'sessionOption', 'sessionCalculator',
 			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
-			'select','efgImageSelect','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
+			'select','efgImageSelect','condition','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
 			'radio','efgLookupRadio',
 			'checkbox','efgLookupCheckbox',
 			'upload', 'fileTree'
@@ -513,6 +513,7 @@ class FormData extends Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareDcaOptions($arrField);
@@ -522,7 +523,7 @@ class FormData extends Frontend
 					{
 						$arrSel[] = $varSubmitted;
 					}
-					if (is_array($varSubmitted))
+					elseif (is_array($varSubmitted))
 					{
 						$arrSel = $varSubmitted;
 					}
@@ -531,7 +532,6 @@ class FormData extends Frontend
 					{
 						if (in_array($mxVal['value'], $arrSel))
 						{
-							//$strVal .= $strSep . $arrOptions[$o]['label'];
 							if ($strType=='checkbox' && $arrField['eval']['efgStoreValues'])
 							{
 								$strVal .= $strSep . $arrOptions[$o]['value'];
@@ -561,7 +561,6 @@ class FormData extends Frontend
 					{
 						if ($mxVal['value'] == $varSubmitted)
 						{
-							//$strVal = $arrOptions[$o]['label'];
 							if ($strType=='radio' && $arrField['eval']['efgStoreValues'])
 							{
 								$strVal = $arrOptions[$o]['value'];
@@ -590,7 +589,6 @@ class FormData extends Frontend
 						{
 							if (in_array($mxVal['value'], $varSubmitted))
 							{
-								//$strVal .= $strSep . $arrOptions[$o]['label'];
 								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
 								{
 									$strVal .= $strSep . $arrOptions[$o]['value'];
@@ -611,7 +609,6 @@ class FormData extends Frontend
 						{
 							if ($mxVal['value'] == $varSubmitted)
 							{
-								//$strVal = $arrOptions[$o]['label'];
 								if ($arrField['eval']['efgStoreValues'] && ($strType=='select' || $strType=='conditionalselect' || $strType=='countryselect' || $strType=='fp_preSelectMenu') )
 								{
 									$strVal = $arrOptions[$o]['value'];
@@ -707,7 +704,6 @@ class FormData extends Frontend
 		} // if in_array arrFFstorable
 		else
 		{
-			//return (is_array($varSubmitted) ? implode('|', $varSubmitted) : $varSubmitted);
 			return (is_array($varSubmitted) ? serialize($varSubmitted) : $varSubmitted);
 		}
 
@@ -737,6 +733,7 @@ class FormData extends Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 				case 'efgLookupRadio':
 				case 'radio':
 				case 'efgLookupSelect':
@@ -774,11 +771,6 @@ class FormData extends Frontend
 						elseif (is_string($strVal) && strlen($strVal) )
 						{
 							$strFormat = $GLOBALS['TL_CONFIG'][$arrField['eval']['rgxp'] . 'Format'];
-//							if (!empty($arrField['eval']['dateFormat']))
-//							{
-//								$strFormat = $arrField['eval']['dateFormat'];
-//							}
-
 							$objDate = new Date($strVal, $strFormat);
 							$strVal = $objDate->tstamp;
 						}
@@ -837,6 +829,7 @@ class FormData extends Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareDcaOptions($arrField);
@@ -988,6 +981,7 @@ class FormData extends Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 					$blnEfgStoreValues = ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['efgStoreValues'] ? true : false);
 
 					$strVal = '';
@@ -1052,7 +1046,7 @@ class FormData extends Frontend
 							{
 								if (isset($varOpts[$strVal]))
 								{
-									$strVal = $varOpts[$vSel];
+									$strVal = $varOpts[$strVal];
 									break;
 								}
 							}
@@ -1193,6 +1187,7 @@ class FormData extends Frontend
 			{
 				case 'efgLookupCheckbox':
 				case 'checkbox':
+				case 'condition': // conditionalforms
 					if ($arrField['options'])
 					{
 						$arrOptions = deserialize($arrField['options']);
@@ -1975,4 +1970,97 @@ class FormData extends Frontend
 
 	}
 
+	public function executePostActions($strAction, $dc)
+	{
+
+		if ($dc instanceof DC_Formdata)
+		{
+			if ($this->Input->get('act') == 'editAll')
+			{
+				$this->strAjaxId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $this->Input->post('id'));
+				if (in_array($this->Input->post('field'), $this->arrBaseFields))
+				{
+					$this->Database->prepare("UPDATE tl_formdata SET " . $this->Input->post('field') . "='" . (intval($this->Input->post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($this->strAjaxId);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval($this->Input->post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = $this->Database->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, $this->Input->post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $this->strAjaxId,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['f_id'],
+							'ff_type' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['inputType'],
+							'ff_name' => $this->Input->post('field'),
+							'ff_label' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['label'][0],
+							'value' => $strValue
+						);
+						$this->Database->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						$this->Database->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, $this->Input->post('field'));
+					}
+				}
+
+				if ($this->Input->post('load'))
+				{
+					echo $dc->editAll($this->strAjaxId, $this->Input->post('id'));
+				}
+			}
+			else
+			{
+				if (in_array($this->Input->post('field'), $this->arrBaseFields))
+				{
+					$this->Database->prepare("UPDATE tl_formdata SET " . $this->Input->post('field') . "='" . (intval($this->Input->post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($dc->id);
+				}
+				else
+				{
+					$strValue = '';
+					if (intval($this->Input->post('state')) == 1)
+					{
+						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['options']);
+						if (!empty($option))
+						{
+							$strValue = $option;
+						}
+					}
+					$objResult = $this->Database->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($dc->id, $this->Input->post('field'));
+					if ($objResult->numRows < 1)
+					{
+						$arrFieldSet = array(
+							'pid' => $dc->id,
+							'tstamp' => time(),
+							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['f_id'],
+							'ff_type' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['inputType'],
+							'ff_name' => $this->Input->post('field'),
+							'ff_label' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->post('field')]['label'][0],
+							'value' => $strValue
+						);
+						$this->Database->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+					}
+					else
+					{
+						$this->Database->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($dc->id, $this->Input->post('field'));
+					}
+				}
+
+				if ($this->Input->post('load'))
+				{
+					echo $dc->edit(false, $this->Input->post('id'));
+				}
+			}
+		}
+
+	}
 }

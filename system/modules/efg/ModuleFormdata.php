@@ -176,6 +176,10 @@ class ModuleFormdata extends Backend
 		{
 			$arrFields = array();
 			$arrFieldNamesById = array();
+
+			$arrPalettes = array();
+			$strCurrentPalette = '';
+
 			// Get all form fields of this form
 			$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 								->execute($this->objForm['id']);
@@ -187,6 +191,21 @@ class ModuleFormdata extends Backend
 					$strFieldKey = (strlen($arrField['name'])) ? $arrField['name'] : $arrField['id'];
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
+
+						// Set current palette name
+						if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
+						{
+							$strCurrentPalette = $arrField['name'];
+						}
+
+						// Ignore conditionalforms conditionType 'stop', reset palette name
+						if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+						{
+							$strCurrentPalette = '';
+							continue;
+						}
+
+
 						// ignore some special fields like checkbox CC, fields of type password ...
 						if (($arrField['type']=='checkbox' && $strFieldKey=='cc') || $arrField['type']=='password' )
 						{
@@ -194,6 +213,14 @@ class ModuleFormdata extends Backend
 						}
 						$arrFields[$strFieldKey] = $arrField;
 						$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+
+						// Add field to palette
+						if ($strCurrentPalette != '')
+						{
+							if (! ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start'))
+							$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+						}
+
 					}
 				}
 			}
@@ -206,6 +233,7 @@ class ModuleFormdata extends Backend
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
+			$tplDca->arrPalettes = $arrPalettes;
 
 			$blnBackendMail = false;
 			if ($this->objForm['sendConfirmationMail'] || strlen($this->objForm['confirmationMailText']) )
