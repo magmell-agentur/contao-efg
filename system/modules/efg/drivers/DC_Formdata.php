@@ -4505,26 +4505,15 @@ window.addEvent(\'domready\', function() {
 		$blnStoreOptionsValues = ($arrForm['efgStoreValues']) ? true : false;
 
 		// Set the sender as given in form configuration
-		$sender = $arrForm['confirmationMailSender'];
-		$senderName = '';
-
-		if (!empty($sender))
-		{
-			$sender = str_replace(array('[', ']'), array('<', '>'), $sender);
-			if (strpos($sender, '<') > 0)
-			{
-				preg_match('/(.*)?<(\S*)>/si', $sender, $parts);
-				$sender = $parts[2];
-				$senderName = trim($parts[1]);
-			}
-		}
+		list($senderName, $sender) = $this->splitFriendlyName($arrForm['confirmationMailSender']);
 		$objMailProperties->sender = $sender;
 		$objMailProperties->senderName = $senderName;
 
 		// Set the 'reply to' address, if given in form configuration
 		if (!empty($arrForm['confirmationMailReplyto']))
 		{
-			$objMailProperties->replyTo = $arrForm['confirmationMailReplyto'];
+			list($replyToName, $replyTo) = $this->splitFriendlyName($arrForm['confirmationMailReplyto']);
+			$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 		}
 
 		// Set recipient(s)
@@ -4596,7 +4585,7 @@ window.addEvent(\'domready\', function() {
 							$objFile = new \File($objFileModel->path);
 							if ($objFile->size)
 							{
-								$attachments[TL_ROOT . '/' . $objFile->path] = array
+								$objMailProperties->attachments[TL_ROOT . '/' . $objFile->path] = array
 								(
 									'file' => TL_ROOT . '/' . $objFile->path,
 									'name' => $objFile->basename,
@@ -4608,7 +4597,6 @@ window.addEvent(\'domready\', function() {
 				}
 			}
 		}
-		$objMailProperties->attachments = $attachments;
 
 		$objMailProperties->subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
 		$objMailProperties->messageText = \String::decodeEntities($arrForm['confirmationMailText']);
