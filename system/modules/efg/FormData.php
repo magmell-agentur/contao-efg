@@ -81,6 +81,8 @@ class FormData extends Frontend
 
 		$this->getStoreForms();
 
+		$this->arrBaseFields = array_filter(array_diff($this->Database->getFieldNames('tl_formdata'), array('PRIMARY')));
+
 	}
 
 	/**
