@@ -177,6 +177,7 @@ class ModuleFormdata extends Backend
 			$arrFields = array();
 			$arrFieldNamesById = array();
 
+			$arrSelectors = array();
 			$arrPalettes = array();
 			$strCurrentPalette = '';
 
@@ -192,32 +193,53 @@ class ModuleFormdata extends Backend
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
 
-						// Set current palette name
+						// Set current palette name ('conditionalforms')
 						if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
 						{
+							$arrSelectors[] = $arrField['name'];
 							$strCurrentPalette = $arrField['name'];
 						}
-
 						// Ignore conditionalforms conditionType 'stop', reset palette name
-						if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+						elseif ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
 						{
 							$strCurrentPalette = '';
 							continue;
 						}
 
+						// Set current palette name ('cm_alternativeforms')
+						if ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+						{
+							$arrSelectors[] = $arrField['name'];
+							$strCurrentPalette = $arrField['name'].'_0';
+							$arrField['options'] = array(array('value' => '', 'label' => '-'), array('value' => '0', 'label' => $arrField['cm_alternativelabel']), array('value' => '1', 'label' => $arrField['cm_alternativelabelelse']));
+							$arrField['value'] = $arrField['cm_alternativelabel'];
+						}
+						elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else')
+						{
+							$strCurrentPalette = $arrField['name'].'_1';
+							continue;
+						}
+						// Ignore cm_alternativeforms cm_alternativeType 'cm_stop', reset palette name
+						elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_stop')
+						{
+							$strCurrentPalette = '';
+							continue;
+						}
 
 						// ignore some special fields like checkbox CC, fields of type password ...
 						if (($arrField['type']=='checkbox' && $strFieldKey=='cc') || $arrField['type']=='password' )
 						{
 							continue;
 						}
+
 						$arrFields[$strFieldKey] = $arrField;
 						$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 
 						// Add field to palette
 						if ($strCurrentPalette != '')
 						{
-							if (! ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start'))
+							if (!($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
+								&& !($arrField['type'] == 'cm_alternative' && in_array($arrField['cm_alternativeType'], array('cm_start', 'cm_else', 'cm_stop'))))
 							$arrPalettes[$strCurrentPalette][] = $arrField['name'];
 						}
 
@@ -233,6 +255,7 @@ class ModuleFormdata extends Backend
 			$tplDca->arrStoreForms = $arrStoreForms;
 			$tplDca->arrFields = $arrFields;
 			$tplDca->arrFieldNamesById = $arrFieldNamesById;
+			$tplDca->arrSelectors = $arrSelectors;
 			$tplDca->arrPalettes = $arrPalettes;
 
 			$blnBackendMail = false;

@@ -108,7 +108,6 @@ class Efp extends Frontend
 
 		$arrFormFields = array();
 
-// NOTE: maybe use form alias instead in upcoming release
 		$this->strFdDcaKey = 'fd_' . (strlen($arrForm['formID']) ? $arrForm['formID'] : str_replace('-', '_', standardize($arrForm['title'])) );
 
 		$this->import('FormData');
@@ -238,7 +237,7 @@ class Efp extends Frontend
 		// Formdata storage
 		if ($arrForm['storeFormdata'] && count($arrSubmitted)>0 )
 		{
-			$blnStoreOptionsValue = ($arrForm['efgStoreValues']=="1" ? true : false);
+			$blnStoreOptionsValue = ($arrForm['efgStoreValues'] == "1" ? true : false);
 
 			// if frontend editing, get old record
 			if ($intOldId > 0)
@@ -302,7 +301,7 @@ class Efp extends Frontend
 				$arrSet['fd_user_group'] = $arrOldFormdata['fd_user_group'];
 
 				// set published to value of old record, if NO default value is defined
-				if ( !isset($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default']) )
+				if (!isset($GLOBALS['TL_DCA']['tl_formdata']['fields']['published']['default']))
 				{
 					$arrSet['published'] = $arrOldFormdata['published'];
 				}
@@ -337,7 +336,7 @@ class Efp extends Frontend
 				$strType = $arrField['type'];
 				$strVal = '';
 
-				if ( in_array($strType, $arrFFstorable) )
+				if (in_array($strType, $arrFFstorable))
 				{
 
 					if ($blnStoreOptionsValue && in_array($strType, array('checkbox', 'radio', 'select')))

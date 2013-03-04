@@ -499,7 +499,7 @@ class ModuleFormdataListing extends Module
 		// get names of detail fields
 		$objFF = $this->Database->prepare("SELECT ff.name, ff.label, ff.type, ff.rgxp FROM tl_form_field ff, tl_form f WHERE (ff.pid=f.id) AND ff.name != '' AND f.storeFormdata=?")
 											->execute("1");
-		if ( $objFF->numRows)
+		if ($objFF->numRows)
 		{
 			$this->arrFF = array();
 			$this->arrFFNames = array();
@@ -599,7 +599,7 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->editable = true;
 				}
-				elseif ( ($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_edit_access == 'member' || $this->efg_fe_edit_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->editable = true;
 				}
@@ -612,7 +612,7 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->deletable = true;
 				}
-				elseif ( ($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_delete_access == 'member' || $this->efg_fe_delete_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->deletable = true;
 				}
@@ -625,7 +625,7 @@ class ModuleFormdataListing extends Module
 				{
 					$this->Template->exportable = true;
 				}
-				elseif ( ($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id)>0 )
+				elseif (($this->efg_fe_export_access == 'member' || $this->efg_fe_export_access == 'groupmembers') && intval($this->Member->id) > 0)
 				{
 					$this->Template->exportable = true;
 				}
@@ -723,25 +723,25 @@ class ModuleFormdataListing extends Module
 				$this->redirect($strRed);
 			}
 
-			if ($this->Input->get('act') == 'edit' && intval($this->intRecordId) > 0 )
+			if ($this->Input->get('act') == 'edit' && intval($this->intRecordId) > 0)
 			{
 				$this->editSingleRecord();
 				return;
 			}
 
-			elseif ($this->Input->get('act') == 'delete' && intval($this->intRecordId) > 0 )
+			elseif ($this->Input->get('act') == 'delete' && intval($this->intRecordId) > 0)
 			{
 				$this->deleteSingleRecord();
 				return;
 			}
 
-			elseif ($this->Input->get('act') == 'export' && intval($this->intRecordId) > 0 )
+			elseif ($this->Input->get('act') == 'export' && intval($this->intRecordId) > 0)
 			{
 				$this->exportSingleRecord($strExportMode);
 				return;
 			}
 
-			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0 )
+			elseif (!is_null($this->intRecordId) && intval($this->intRecordId) > 0)
 			{
 				$this->listSingleRecord();
 				return;
@@ -758,7 +758,7 @@ class ModuleFormdataListing extends Module
 		$varKeyword = '';
 		$strOptions = '';
 
-		if (count($this->arrAllowedOwnerIds)>0)
+		if (count($this->arrAllowedOwnerIds) > 0)
 		{
 			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . "fd_member IN (" . implode(',', $this->arrAllowedOwnerIds).")";
 		}
@@ -829,7 +829,7 @@ class ModuleFormdataListing extends Module
 							}
 						}
 
-						if (count($arrConds)>0)
+						if (count($arrConds) > 0)
 						{
 							$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . '(' . implode(" OR ", $arrConds) .')';
 							$varKeyword = array_fill(0, count($arrConds), '%' . $this->Input->get('for') . '%');
@@ -924,7 +924,7 @@ class ModuleFormdataListing extends Module
 
 				case 'dropdown':
 				default:
-					if ( strlen($this->Input->get('search')) && strlen($this->Input->get('for')) )
+					if (strlen($this->Input->get('search')) && strlen($this->Input->get('for')))
 					{
 						$varKeyword = '%' . $this->Input->get('for') . '%';
 
@@ -968,7 +968,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (in_array($field, $this->arrBaseFields))
 						{
-							if ( strlen($this->strFormKey) && $field == 'form')
+							if (strlen($this->strFormKey) && $field == 'form')
 							{
 								continue;
 							}
@@ -977,7 +977,7 @@ class ModuleFormdataListing extends Module
 								$strOptions .= '  <option value="' . $field . '"' . (($field == $this->Input->get('search')) ? ' selected="selected"' : '') . '>' . htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) . '</option>' . "\n";
 							}
 						}
-						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields) )
+						elseif (is_array($this->arrDetailFields) && count($this->arrDetailFields) && in_array($field, $this->arrDetailFields))
 						{
 							$strOptions .= '  <option value="' . $field . '"' . (($field == $this->Input->get('search')) ? ' selected="selected"' : '') . '>' . ( $GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0] ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$field]['label'][0]) : $field ) . '</option>' . "\n";
 						}
@@ -1156,7 +1156,7 @@ class ModuleFormdataListing extends Module
 				}
 			}
 
-			if (count($arrSort)>0)
+			if (count($arrSort) > 0)
 			{
 				$strListSort = 'ORDER BY ' . implode(',', $arrSort);
 			}
@@ -1172,7 +1172,7 @@ class ModuleFormdataListing extends Module
 		// Limit
 		if (!$blnExport)
 		{
-			if (intval($this->Input->get('per_page'))>0)
+			if (intval($this->Input->get('per_page')) > 0)
 			{
 				$objDataStmt->limit($this->Input->get('per_page'), (($page - 1) * $per_page));
 			}
@@ -1392,7 +1392,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnEditAllowed = true;
 				}
-				elseif (strlen($this->efg_fe_edit_access) )
+				elseif (strlen($this->efg_fe_edit_access))
 				{
 					if (in_array(intval($arrRows[$i]['fd_member']), $this->arrAllowedEditOwnerIds))
 					{
@@ -1410,7 +1410,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnDeleteAllowed = true;
 				}
-				elseif (strlen($this->efg_fe_delete_access) )
+				elseif (strlen($this->efg_fe_delete_access))
 				{
 					if (in_array(intval($arrRows[$i]['fd_member']), $this->arrAllowedDeleteOwnerIds))
 					{
@@ -1428,7 +1428,7 @@ class ModuleFormdataListing extends Module
 				{
 					$blnExportAllowed = true;
 				}
-				elseif (strlen($this->efg_fe_export_access) )
+				elseif (strlen($this->efg_fe_export_access))
 				{
 					if (in_array(intval($arrRows[$i]['fd_member']), $this->arrAllowedExportOwnerIds))
 					{
@@ -1665,7 +1665,8 @@ class ModuleFormdataListing extends Module
 			}
 
 			$strTotalNumberOfItems = number_format((int) $intTotalcount, 0, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']);
-			$this->Template->totalNumberOfItems = array(
+			$this->Template->totalNumberOfItems = array
+			(
 				'raw' => (int) $intTotalcount,
 				'formatted' => $strTotalNumberOfItems,
 				'content' => sprintf($GLOBALS['TL_LANG']['MSC']['efgTotalNumberOfItems'], $strTotalNumberOfItems)
@@ -1683,7 +1684,7 @@ class ModuleFormdataListing extends Module
 			/**
 			 * Pagination
 			 */
-			if (intval($per_page)>0)
+			if (intval($per_page) > 0)
 			{
 				$objPagination = new Pagination($intTotalcount, $per_page);
 				$this->Template->pagination = $objPagination->generate("\n  ");
@@ -1704,7 +1705,6 @@ class ModuleFormdataListing extends Module
 			$this->Template->for = $this->Input->get('for');
 			$this->Template->order_by = $this->Input->get('order_by');
 			$this->Template->sort = $this->Input->get('sort');
-			//$this->Template->col_last = 'col_' . $j;
 			$this->Template->col_last = 'col_' . $intLastCol;
 
 		} // !$blnExport
@@ -2011,7 +2011,7 @@ class ModuleFormdataListing extends Module
 		{
 			$blnEditAllowed = false;
 		}
-		elseif($this->efg_fe_edit_access == 'public')
+		elseif ($this->efg_fe_edit_access == 'public')
 		{
 			$blnEditAllowed = true;
 		}
@@ -2032,7 +2032,7 @@ class ModuleFormdataListing extends Module
 		{
 			$blnDeleteAllowed = false;
 		}
-		elseif($this->efg_fe_delete_access == 'public')
+		elseif ($this->efg_fe_delete_access == 'public')
 		{
 			$blnDeleteAllowed = true;
 		}
@@ -2053,7 +2053,7 @@ class ModuleFormdataListing extends Module
 		{
 			$blnExportAllowed = false;
 		}
-		elseif($this->efg_fe_export_access == 'public')
+		elseif ($this->efg_fe_export_access == 'public')
 		{
 			$blnExportAllowed = true;
 		}

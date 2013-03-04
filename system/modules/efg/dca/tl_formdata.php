@@ -267,6 +267,9 @@ class tl_formdata extends Backend
 		// fix config for xdependentcalendarfields
 		$GLOBALS['BE_FFL']['xdependentcalendarfields'] = 'TextField';
 
+		// add backend widget for 'cm_alernativeforms'
+		$GLOBALS['BE_FFL']['cm_alternative'] = 'SelectMenu';
+
 		if ($varFormKey != '' && is_string($varFormKey))
 		{
 			$strFileName = $varFormKey;

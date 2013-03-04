@@ -681,7 +681,10 @@ class DC_Formdata extends DataContainer implements listable, editable
 			}
 			elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['isAssociative'] || array_is_assoc($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options']))
 			{
-				$row[$i] = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options'][$row[$i]];
+				if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options'][$row[$i]]))
+				{
+					$row[$i] = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['options'][$row[$i]];
+				}
 			}
 
 			if (in_array($i, $this->arrBaseFields) || in_array($i, $this->arrOwnerFields))
@@ -1203,7 +1206,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Formdata edit()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$this->objActiveRecord = $objRow;
@@ -1363,8 +1366,14 @@ class DC_Formdata extends DataContainer implements listable, editable
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
 					}
 
+					// render inputType 'cm_alternative' as 'select'
+					if ($strInputType == 'cm_alternative')
+					{
+	//					$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
+					}
+
 					// field types radio, select, multi checkbox
-					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'))
+					if (in_array($strInputType, array('radio', 'select', 'conditionalselect', 'countryselect'/*, 'cm_alternative'*/))
 							|| ($strInputType=='checkbox' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['eval']['multiple']) )
 					{
 						if (in_array($this->strField, $this->arrBaseFields) && in_array($this->strField, $this->arrOwnerFields))
@@ -1519,7 +1528,7 @@ class DC_Formdata extends DataContainer implements listable, editable
 											}
 										}
 
-										// add saved option to avaliable options if not exists
+										// add saved option to available options if it does not exist
 										if ($strK === false)
 										{
 											$strK = preg_replace('/(.*?\[)(.*?)(\])/si', '$2', $vVal);
@@ -1681,6 +1690,11 @@ class DC_Formdata extends DataContainer implements listable, editable
 
 					} // field type efgLookupRadio
 
+					elseif ($strInputType == 'cm_alternative')
+					{
+						$this->varValue = $this->FormData->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
+					}
+
 					else
 					{
 						$this->varValue = $this->FormData->prepareDbValForWidget($this->varValue, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
@@ -1711,7 +1725,6 @@ class DC_Formdata extends DataContainer implements listable, editable
 				$return .= "\n" . '</fieldset>';
 			}
 		}
-
 
 		$version = '';
 
@@ -2012,6 +2025,12 @@ window.addEvent(\'domready\', function() {
 					if ($strInputType == 'condition')
 					{
 						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'checkbox';
+					}
+
+					// render inputType 'cm_alternative' as 'select'
+					if ($strInputType == 'cm_alternative')
+					{
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] = 'select';
 					}
 
 					// field types radio, select, multi checkbox
@@ -2622,6 +2641,13 @@ window.addEvent(\'domready\', function() {
 			}
 		}
 
+		if ($arrField['inputType'] == 'cm_alternative')
+		{
+			if (is_array($arrField['options']) && isset($arrField['options'][$varValue]))
+			{
+				$varValue = $arrField['options'][$varValue];
+			}
+		}
 
 		// Make sure unique fields are unique
 		if (strlen($varValue) && $arrField['eval']['unique'])
@@ -2646,8 +2672,9 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Save the value if there was no error
-		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
+		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue !== $varValue || $arrField['eval']['alwaysSave']))
 		{
+
 			// If the field is a fallback field, empty all other columns
 			if ($arrField['eval']['fallback'] && $varValue != '')
 			{
@@ -2725,6 +2752,7 @@ window.addEvent(\'domready\', function() {
 				}
 			}
 		}
+
 	}
 
 
@@ -2749,7 +2777,7 @@ window.addEvent(\'domready\', function() {
 			$objFields = $this->Database->prepare($sqlQuery)
 										->limit(1)
 										->executeUncached($this->intId);
-
+// TODO: selector/key/subpalettes for cm_alternative
 			// Get selector values from DB
 			if ($objFields->numRows > 0)
 			{
@@ -2760,11 +2788,18 @@ window.addEvent(\'domready\', function() {
 					// Overwrite the trigger
 					if ($this->Input->post('FORM_SUBMIT') == $this->strTable)
 					{
-						$key = ($this->Input->get('act') == 'editAll') ? $name.'_'.$this->intId : $name;
+
+						$key = ($this->Input->get('act') == 'editAll') ? $name . '_' . $this->intId : $name;
 
 						if (isset($_POST[$key]))
 						{
-							$trigger = $this->Input->post($key);
+							$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name];
+							if (!isset($arrField['type']))
+							{
+								$arrField['type'] = $arrField['inputType'];
+							}
+							//###$trigger = $this->Input->post($key);
+							$trigger = $this->FormData->preparePostValForDb($this->Input->post($key), $arrField);
 						}
 					}
 
@@ -2783,7 +2818,8 @@ window.addEvent(\'domready\', function() {
 						else
 						{
 							$sValues[] = $trigger;
-							$key = $name .'_'. $trigger;
+							//###$key = $name . '_' . $trigger;
+							$key = $name .'_' .array_search($trigger, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['options']);
 
 							// Look for a subpalette
 							if (strlen($GLOBALS['TL_DCA'][$this->strTable]['subpalettes'][$key]))
@@ -4423,7 +4459,7 @@ window.addEvent(\'domready\', function() {
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record ID "'.$this->intId.'" of table "'.$this->strTable.'"!', 'DC_Table edit()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$arrSubmitted = $objRow->fetchAssoc();
@@ -4458,7 +4494,7 @@ window.addEvent(\'domready\', function() {
 		if ($objForm->numRows < 1)
 		{
 			$this->log('Could not load form by ID ' . $intFormId . ' or title "'.$arrSubmitted['form'].'" of table "tl_form"!', 'DC_Formdata mail()', TL_ERROR);
-			$this->redirect('typolight/main.php?act=error');
+			$this->redirect('contao/main.php?act=error');
 		}
 
 		$arrForm = $objForm->fetchAssoc();

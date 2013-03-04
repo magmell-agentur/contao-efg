@@ -67,10 +67,10 @@ class FormData extends Frontend
 		// Types of form fields with storable data
 		$this->arrFFstorable = array(
 			'sessionText', 'sessionOption', 'sessionCalculator',
-			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
-			'select','efgImageSelect','condition','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
-			'radio','efgLookupRadio',
-			'checkbox','efgLookupCheckbox',
+			'hidden', 'text','calendar', 'xdependentcalendarfields', 'password', 'textarea',
+			'select', 'efgImageSelect', 'condition', 'conditionalselect', 'countryselect', 'fp_preSelectMenu', 'efgLookupSelect',
+			'radio', 'efgLookupRadio', 'cm_alternative',
+			'checkbox', 'efgLookupCheckbox',
 			'upload', 'fileTree'
 		);
 
@@ -471,6 +471,16 @@ class FormData extends Frontend
 
 			while ($objFormFields->next())
 			{
+				// Skip some fields
+				if ($objFormFields->type == 'cm_alternative' && in_array($objFormFields->cm_alternativeType, array('cm_else', 'cm_stop')))
+				{
+					continue;
+				}
+				elseif ($objFormFields->type == 'condition' && $objFormFields->conditionType == 'stop')
+				{
+					continue;
+				}
+
 				if (strlen($objFormFields->name)) {
 					$varKey = $objFormFields->name;
 				}
@@ -534,7 +544,7 @@ class FormData extends Frontend
 					{
 						if (in_array($mxVal['value'], $arrSel))
 						{
-							if ($strType=='checkbox' && $arrField['eval']['efgStoreValues'])
+							if ($strType == 'checkbox' && $arrField['eval']['efgStoreValues'])
 							{
 								$strVal .= $strSep . $arrOptions[$o]['value'];
 							}
@@ -579,6 +589,7 @@ class FormData extends Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+				case 'cm_alternative':
 					$strSep = '';
 					$strVal = '';
 
@@ -744,6 +755,7 @@ class FormData extends Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+				case 'cm_alternative':
 					$strVal = '';
 					if ($arrField['eval']['multiple'])
 					{
@@ -881,6 +893,7 @@ class FormData extends Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+				case 'cm_alternative':
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareDcaOptions($arrField);
@@ -1299,6 +1312,33 @@ class FormData extends Frontend
 						}
 					}
 				break;
+
+				case 'cm_alternative':
+					if ($arrField['options'])
+					{
+						$arrOptions = deserialize($arrField['options']);
+					}
+					else
+					{
+						$arrOptions = $this->prepareDcaOptions($arrField);
+					}
+
+					foreach ($arrOptions as $sK => $mxVal)
+					{
+						if (is_array($mxVal) && $mxVal['label'] == $varVal)
+						{
+							$varVal = $mxVal['value'];
+							break;
+						}
+						elseif ($mxVal == $varVal)
+						{
+							//$varVal[$sK] = $sK;
+							$varVal = $sK;
+							break;
+						}
+					}
+				break;
+
 				case 'efgImageSelect':
 				case 'fileTree':
 					if (is_string($varVal) && strpos($varVal, '|') !== false)
@@ -1809,8 +1849,8 @@ class FormData extends Frontend
 				$arrOptions = $arrTempOptions;
 
 			break; // strType efgLookupCheckbox, efgLookupRadio or efgLookupSelect
-			// countryselectmenu
-			case 'countryselect':
+
+			case 'countryselect': // countryselectmenu
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
 				foreach($arrCountries as $strKey => $strVal)
@@ -1819,6 +1859,26 @@ class FormData extends Frontend
 				}
 				$arrOptions = $arrTempOptions;
 			break;
+
+			case 'condition':
+				if (!is_array($arrField['options']))
+				{
+					$arrOptions = array(array('value'=>'', 'label'=>''), array('value'=>'1', 'label'=>$arrField['label']));
+				}
+				break;
+
+			case 'cm_alternative': // cm_alternativeforms
+				$arrTempOptions = array();
+				if (!is_array($arrField['options']))
+				{
+					$arrField['options'] = array($arrField['cm_alternativelabel'], $arrField['cm_alternativelabelelse']);
+				}
+				foreach ($arrField['options'] as $strKey => $strVal)
+				{
+					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
+				}
+				$arrOptions = $arrTempOptions;
+				break;
 
 			default:
 				if ($arrField['options'])
