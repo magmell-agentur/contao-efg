@@ -214,6 +214,12 @@ class ModuleFormdata extends Backend
 
 								$arrField['options'] = array(array('value' => '', 'label' => '-'), array('value' => '0', 'label' => $arrField['cm_alternativelabel']), array('value' => '1', 'label' => $arrField['cm_alternativelabelelse']));
 								$arrField['value'] = $arrField['cm_alternativelabel'];
+
+								// Add field to palette if we are inside a palette
+								if ($strPreviousPalette != '')
+								{
+									$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+								}
 							}
 							elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else')
 							{
@@ -233,6 +239,12 @@ class ModuleFormdata extends Backend
 									$strPreviousPalette = $strCurrentPalette;
 								}
 								$strCurrentPalette = $arrField['name'];
+
+								// Add field to palette if we are inside a palette
+								if ($strPreviousPalette != '')
+								{
+									$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+								}
 							}
 						}
 
