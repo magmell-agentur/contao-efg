@@ -180,70 +180,116 @@ class ModuleFormdata extends Backend
 			$arrSelectors = array();
 			$arrPalettes = array();
 			$strCurrentPalette = '';
+			$strPreviousPalette = '';
 
 			// Get all form fields of this form
 			$objFields = $this->Database->prepare("SELECT * FROM tl_form_field WHERE pid=? ORDER BY sorting ASC")
 								->execute($this->objForm['id']);
+
 			if ($objFields->numRows)
 			{
 				while ($objFields->next())
 				{
 					$arrField = $objFields->row();
+
 					$strFieldKey = (strlen($arrField['name'])) ? $arrField['name'] : $arrField['id'];
+
 					if (in_array($arrField['type'], $this->arrFFstorable))
 					{
 
 						// Set current palette name ('conditionalforms')
-						if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
+						if (($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
+							|| ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+							|| ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else'))
 						{
 							$arrSelectors[] = $arrField['name'];
-							$strCurrentPalette = $arrField['name'];
+
+							if ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+							{
+								if ($strCurrentPalette != '')
+								{
+									$strPreviousPalette = $strCurrentPalette;
+								}
+								$strCurrentPalette = $arrField['name'].'_0';
+
+								$arrField['options'] = array(array('value' => '', 'label' => '-'), array('value' => '0', 'label' => $arrField['cm_alternativelabel']), array('value' => '1', 'label' => $arrField['cm_alternativelabelelse']));
+								$arrField['value'] = $arrField['cm_alternativelabel'];
+
+								// Add field to palette if we are inside a palette
+								if ($strPreviousPalette != '')
+								{
+									$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+								}
+							}
+							elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else')
+							{
+								if ($strCurrentPalette != '')
+								{
+									if ($strCurrentPalette != $arrField['name'].'_0')
+									{
+										$strPreviousPalette = $strCurrentPalette;
+									}
+								}
+								$strCurrentPalette = $arrField['name'].'_1';
+							}
+							else
+							{
+								if ($strCurrentPalette != '')
+								{
+									$strPreviousPalette = $strCurrentPalette;
+								}
+								$strCurrentPalette = $arrField['name'];
+
+								// Add field to palette if we are inside a palette
+								if ($strPreviousPalette != '')
+								{
+									$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+								}
+							}
 						}
-						// Ignore conditionalforms conditionType 'stop', reset palette name
-						elseif ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+
+						// Ignore conditionalforms conditionType 'stop' and cm_alternativeforms cm_alternativeType 'cm_stop', reset palette name
+						if (($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
+							/* || ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else') */
+							|| ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_stop'))
 						{
-							$strCurrentPalette = '';
+
+							if ($strPreviousPalette != '')
+							{
+								$strCurrentPalette = $strPreviousPalette;
+								$strPreviousPalette = '';
+							}
+							else
+							{
+								$strCurrentPalette = '';
+							}
+
 							continue;
 						}
 
-						// Set current palette name ('cm_alternativeforms')
-						if ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+						if (!in_array($strFieldKey, array_keys($arrFields)))
 						{
-							$arrSelectors[] = $arrField['name'];
-							$strCurrentPalette = $arrField['name'].'_0';
-							$arrField['options'] = array(array('value' => '', 'label' => '-'), array('value' => '0', 'label' => $arrField['cm_alternativelabel']), array('value' => '1', 'label' => $arrField['cm_alternativelabelelse']));
-							$arrField['value'] = $arrField['cm_alternativelabel'];
-						}
-						elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else')
-						{
-							$strCurrentPalette = $arrField['name'].'_1';
-							continue;
-						}
-						// Ignore cm_alternativeforms cm_alternativeType 'cm_stop', reset palette name
-						elseif ($arrField['type'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_stop')
-						{
-							$strCurrentPalette = '';
-							continue;
-						}
+							$arrFields[$strFieldKey] = $arrField;
+							$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 
-						// ignore some special fields like checkbox CC, fields of type password ...
-						if (($arrField['type']=='checkbox' && $strFieldKey=='cc') || $arrField['type']=='password' )
-						{
-							continue;
 						}
-
-						$arrFields[$strFieldKey] = $arrField;
-						$arrFieldNamesById[$arrField['id']] = $strFieldKey;
 
 						// Add field to palette
 						if ($strCurrentPalette != '')
 						{
 							if (!($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
 								&& !($arrField['type'] == 'cm_alternative' && in_array($arrField['cm_alternativeType'], array('cm_start', 'cm_else', 'cm_stop'))))
-							$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+							{
+								$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+							}
 						}
 
 					}
+				}
+
+				if (!empty($arrSelectors))
+				{
+					$arrSelectors = array_unique($arrSelectors);
 				}
 			}
 
