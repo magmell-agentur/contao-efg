@@ -641,7 +641,7 @@ class ExtendedForm extends Form
 		return '
 if(typeof(window.addEvent)=="function"){
 	window.addEvent(\'domready\', function(){
-		var elForm = document.id(\'{$this->Template->formId}\');
+		var elForm = document.id(\''.$this->Template->formId.'\');
 		if (elForm){
 			var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
 			if (elBtnBack){
