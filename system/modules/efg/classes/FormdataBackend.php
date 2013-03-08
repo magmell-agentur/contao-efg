@@ -209,33 +209,23 @@ class FormdataBackend extends \Backend
 			{
 				if (!empty($arrForm))
 				{
-					$arrForm = $this->Database->prepare("SELECT * FROM tl_form WHERE id=?")->execute($arrForm['id'])->fetchAssoc();
+					$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")->execute($arrForm['id'])->fetchAssoc();
 
 					$arrFields = array();
 					$arrFieldNamesById = array();
-					// Get all form fields of this form
-					$arrFormFields = $this->Formdata->getFormFieldsAsArray($arrForm['id']);
 
+					$arrSelectors = array();
 					$arrPalettes = array();
 					$strCurrentPalette = '';
+					$strPreviousPalette = '';
+
+					// Get all form fields of this form
+					$arrFormFields = $this->Formdata->getFormFieldsAsArray($arrForm['id']);
 
 					if (!empty($arrFormFields))
 					{
 						foreach ($arrFormFields as $strFieldKey => $arrField)
 						{
-
-							// Set current palette name
-							if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start')
-							{
-								$strCurrentPalette = $arrField['name'];
-							}
-
-							// Ignore conditionalforms conditionType 'stop', reset palette name
-							if ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'stop')
-							{
-								$strCurrentPalette = '';
-								continue;
-							}
 
 							// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
 							if (!in_array($arrField['type'], $this->arrFFstorable)
@@ -244,17 +234,98 @@ class FormdataBackend extends \Backend
 								continue;
 							}
 
-							$arrFields[$strFieldKey] = $arrField;
-							$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+							// Set current palette name (for 'conditionalforms' and 'cm_alternativeforms')
+							if (($arrField['formfieldType'] == 'condition' && $arrField['conditionType'] == 'start')
+								|| ($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+								|| ($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else'))
+							{
+								$arrSelectors[] = $arrField['name'];
+
+								if ($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_start')
+								{
+									if ($strCurrentPalette != '')
+									{
+										$strPreviousPalette = $strCurrentPalette;
+									}
+									$strCurrentPalette = $arrField['name'].'_0';
+
+									$arrField['options'] = array(array('value' => '', 'label' => '-'), array('value' => '0', 'label' => $arrField['cm_alternativelabel']), array('value' => '1', 'label' => $arrField['cm_alternativelabelelse']));
+									$arrField['value'] = $arrField['cm_alternativelabel'];
+
+									// Add field to palette if we are inside a palette
+									if ($strPreviousPalette != '')
+									{
+										$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+									}
+								}
+								elseif ($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else')
+								{
+									if ($strCurrentPalette != '')
+									{
+										if ($strCurrentPalette != $arrField['name'].'_0')
+										{
+											$strPreviousPalette = $strCurrentPalette;
+										}
+									}
+									$strCurrentPalette = $arrField['name'].'_1';
+								}
+								else
+								{
+									if ($strCurrentPalette != '')
+									{
+										$strPreviousPalette = $strCurrentPalette;
+									}
+									$strCurrentPalette = $arrField['name'];
+
+									// Add field to palette if we are inside a palette
+									if ($strPreviousPalette != '')
+									{
+										$arrPalettes[$strPreviousPalette][] = $arrField['name'];
+									}
+								}
+							}
+
+							// Ignore conditionalforms conditionType 'stop' and cm_alternativeforms cm_alternativeType 'cm_stop', reset palette name
+							if (($arrField['formfieldType'] == 'condition' && $arrField['conditionType'] == 'stop')
+								|| ($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_stop'))
+							{
+
+								if ($strPreviousPalette != '')
+								{
+									$strCurrentPalette = $strPreviousPalette;
+									$strPreviousPalette = '';
+								}
+								else
+								{
+									$strCurrentPalette = '';
+								}
+
+								continue;
+							}
+
+							if (!in_array($strFieldKey, array_keys($arrFields))
+								&& !($arrField['formfieldType'] == 'cm_alternative' && $arrField['cm_alternativeType'] == 'cm_else'))
+							{
+								$arrFields[$strFieldKey] = $arrField;
+								$arrFieldNamesById[$arrField['id']] = $strFieldKey;
+							}
 
 							// Add field to palette
 							if ($strCurrentPalette != '')
 							{
-								if (! ($arrField['type'] == 'condition' && $arrField['conditionType'] == 'start'))
-								$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+								if (!($arrField['formfieldType'] == 'condition' && $arrField['conditionType'] == 'start')
+									&& !($arrField['formfieldType'] == 'cm_alternative' && in_array($arrField['cm_alternativeType'], array('cm_start', 'cm_else', 'cm_stop'))))
+								{
+									$arrPalettes[$strCurrentPalette][] = $arrField['name'];
+								}
 							}
 
 						}
+					}
+
+					if (!empty($arrSelectors))
+					{
+						$arrSelectors = array_unique($arrSelectors);
 					}
 
 					$strFormKey = (!empty($arrForm['alias'])) ? $arrForm['alias'] : str_replace('-', '_', standardize($arrForm['title']));
@@ -265,6 +336,7 @@ class FormdataBackend extends \Backend
 					$tplDca->arrStoringForms = $arrStoringForms;
 					$tplDca->arrFields = $arrFields;
 					$tplDca->arrFieldNamesById = $arrFieldNamesById;
+					$tplDca->arrSelectors = $arrSelectors;
 					$tplDca->arrPalettes = $arrPalettes;
 
 					// Enable backend confirmation mail
@@ -300,8 +372,10 @@ class FormdataBackend extends \Backend
 					foreach ($arrFormFields as $strFieldKey => $arrField)
 					{
 						// Ignore not storable fields and some special fields like checkbox CC, fields of type password ...
-						if (!in_array($arrField['type'], $this->arrFFstorable)
-							|| ($arrField['type'] == 'checkbox' && $strFieldKey == 'cc'))
+						if (!in_array($arrField['formfieldType'], $this->arrFFstorable)
+							|| ($arrField['formfieldType'] == 'checkbox' && $strFieldKey == 'cc')
+							|| ($arrField['formfieldType'] == 'condition' && $arrField['conditionType'] == 'stop')
+							|| ($arrField['formfieldType'] == 'cm_alternative' && in_array($arrField['cm_alternativeType'], array('cm_else', 'cm_stop'))))
 						{
 							continue;
 						}

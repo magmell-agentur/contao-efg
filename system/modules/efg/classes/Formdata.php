@@ -75,7 +75,7 @@ class Formdata extends \Frontend
 			'sessionText', 'sessionOption', 'sessionCalculator',
 			'hidden','text','calendar','xdependentcalendarfields','password','textarea',
 			'select','efgImageSelect','condition','conditionalselect', 'countryselect', 'fp_preSelectMenu','efgLookupSelect',
-			'radio','efgLookupRadio',
+			'radio','efgLookupRadio','cm_alternative',
 			'checkbox','efgLookupCheckbox',
 			'upload', 'fileTree'
 		);
@@ -534,7 +534,7 @@ class Formdata extends \Frontend
 
 			while ($objFormFields->next())
 			{
-				$varKey = (!empty($objFormFields->name)) ? $objFormFields->name : $objFormFields->id;
+				$varKey = (!empty($objFormFields->name) && !in_array($objFormFields->name, array_keys($varReturn))) ? $objFormFields->name : $objFormFields->id;
 				$arrField = $objFormFields->row();
 
 				// Set type of frontend widget
@@ -776,6 +776,7 @@ class Formdata extends \Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+				case 'cm_alternative':
 					$strSep = '';
 					$strVal = '';
 
@@ -1177,6 +1178,7 @@ class Formdata extends \Frontend
 				case 'countryselect':
 				case 'fp_preSelectMenu':
 				case 'select':
+				case 'cm_alternative': // cm_alternativeforms
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareWidgetOptions($arrField);
@@ -1469,6 +1471,21 @@ class Formdata extends \Frontend
 				case 'textarea':
 				default:
 					$strVal = $varValue;
+
+					if ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'date')
+					{
+						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $strVal);
+					}
+					elseif ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'time')
+					{
+						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $strVal);
+					}
+					elseif ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'datim'
+						|| in_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['flag'], array(5, 6, 7, 8, 9, 10)))
+					{
+						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $strVal);
+					}
+
 					break;
 			}
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
@@ -1601,6 +1618,32 @@ class Formdata extends \Frontend
 									$varVal = $objFileModel->id;
 								}
 							}
+						}
+					}
+					break;
+
+				case 'cm_alternative': // cm_alternativeforms
+					if ($arrField['options'])
+					{
+						$arrOptions = deserialize($arrField['options']);
+					}
+					else
+					{
+						$arrOptions = $this->prepareWidgetOptions($arrField);
+					}
+
+					foreach ($arrOptions as $sK => $mxVal)
+					{
+						if (is_array($mxVal) && $mxVal['label'] == $varVal)
+						{
+							$varVal = $mxVal['value'];
+							break;
+						}
+						elseif ($mxVal == $varVal)
+						{
+							//$varVal[$sK] = $sK;
+							$varVal = $sK;
+							break;
 						}
 					}
 					break;
@@ -2104,8 +2147,7 @@ class Formdata extends \Frontend
 
 				break;
 
-			// countryselectmenu
-			case 'countryselect':
+			case 'countryselect': // countryselectmenu
 				$arrCountries = $this->getCountries();
 				$arrTempOptions = array();
 				foreach ($arrCountries as $strKey => $strVal)
@@ -2116,9 +2158,21 @@ class Formdata extends \Frontend
 
 				break;
 
-			// conditionalforms
-			case 'condition':
+			case 'condition': // conditionalforms
 				$arrOptions = array(array('value' => '1', 'label' => $arrField['label']));
+				break;
+
+			case 'cm_alternative': // cm_alternativeforms
+				$arrTempOptions = array();
+				if (!is_array($arrField['options']))
+				{
+					$arrField['options'] = array($arrField['cm_alternativelabel'], $arrField['cm_alternativelabelelse']);
+				}
+				foreach ($arrField['options'] as $strKey => $strVal)
+				{
+					$arrTempOptions[] = array('value'=>$strKey, 'label'=>$strVal);
+				}
+				$arrOptions = $arrTempOptions;
 				break;
 
 			default:

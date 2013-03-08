@@ -304,13 +304,13 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	// Palettes
 	'palettes' => array
 	(
+<?php if (!empty($this->arrSelectors)): ?>
+		'__selector__'               => array('<?php echo implode("','", $this->arrSelectors); ?>'),
+<?php endif; ?>
 <?php if (!empty($this->arrPalettes)):
-$arrSelector = array_keys($this->arrPalettes);
 foreach ($this->arrPalettes as $strPal => $arrPalFields):
-	$arrDefaultPaletteSkipFields = array_merge($arrDefaultPaletteSkipFields, $arrPalFields);
-endforeach;
-?>
-		'__selector__'                => array('<?php echo implode("','", $arrSelector); ?>'),
+$arrDefaultPaletteSkipFields = array_merge($arrDefaultPaletteSkipFields, $arrPalFields);
+endforeach;	?>
 <?php endif; ?>
 		'default'                     => 'form,alias,date,ip,published,sorting;{confirmation_legend},confirmationSent,confirmationDate;{fdNotes_legend:hide},be_notes;{fdOwner_legend:hide},fd_member,fd_user,fd_member_group,fd_user_group;{fdDetails_legend},<?php $strSep=''; foreach ($this->arrFields as $varKey => $varVals): if (in_array($varKey, $arrDefaultPaletteSkipFields)): continue; endif; echo $strSep . $varKey; $strSep=','; endforeach; ?>'
 	),
@@ -500,6 +500,7 @@ case 'select':
 case 'condition':
 case 'conditionalselect':
 case 'countryselect':
+case 'cm_alternative':
 case 'fp_preSelectMenu': $arrOpts = deserialize($varVals['options']); $blnInGroup=false; $strGroupKey=''; $strGroupLabel=''; ?>
 <?php if (!is_array($arrOpts)): // conditionalforms etc.
 $arrOpts = array(array('value' => '1', 'label' => $varVals['label']));
@@ -570,6 +571,10 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval'][
 <?php endif; ?>
 <?php break;
 endswitch; ?>
+<?php if ($varVals['type'] == 'cm_alternative' && $varVals['cm_alternativeType'] == 'cm_start'): // cm_alternativeforms ?>
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['submitOnChange'] = true;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['isAssociative'] = true;
+<?php endif; ?>
 <?php if ($varVals['type'] == 'condition'): // conditionalforms ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['submitOnChange'] = true;
 <?php endif; ?>

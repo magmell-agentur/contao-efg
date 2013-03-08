@@ -2633,6 +2633,14 @@ window.addEvent(\'domready\', function() {
 
 		}
 
+		if ($arrField['inputType'] == 'cm_alternative')
+		{
+			if (is_array($arrField['options']) && isset($arrField['options'][$varValue]))
+			{
+				$varValue = $arrField['options'][$varValue];
+			}
+		}
+
 		// Make sure unique fields are unique
 		if (!is_array($varValue) && strlen($varValue) && $arrField['eval']['unique'])
 		{
@@ -2667,7 +2675,7 @@ window.addEvent(\'domready\', function() {
 		}
 
 		// Save the value if there was no error
-		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue != $varValue || $arrField['eval']['alwaysSave']))
+		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue !== $varValue || $arrField['eval']['alwaysSave']))
 		{
 			$arrValues = $this->values;
 			$arrProcedures = $this->procedure;
@@ -2777,13 +2785,18 @@ window.addEvent(\'domready\', function() {
 
 						if (isset($_POST[$key]))
 						{
-							$trigger = \Input::post($key);
+							$arrField = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name];
+							if (!isset($arrField['type']))
+							{
+								$arrField['type'] = $arrField['inputType'];
+							}
+							$trigger = $this->Formdata->preparePostValueForDatabase(\Input::post($key), $arrField);
 						}
 					}
 
 					if ($trigger != '')
 					{
-						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'checkbox' && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['eval']['multiple'])
+						if (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'checkbox' || $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['inputType'] == 'condition') && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['eval']['multiple'])
 						{
 							$sValues[] = $name;
 
@@ -2796,7 +2809,8 @@ window.addEvent(\'domready\', function() {
 						else
 						{
 							$sValues[] = $trigger;
-							$key = $name .'_'. $trigger;
+
+							$key = $name .'_' .array_search($trigger, $GLOBALS['TL_DCA'][$this->strTable]['fields'][$name]['options']);
 
 							// Look for a subpalette
 							if (strlen($GLOBALS['TL_DCA'][$this->strTable]['subpalettes'][$key]))
@@ -2804,6 +2818,7 @@ window.addEvent(\'domready\', function() {
 								$subpalettes[$name] = $GLOBALS['TL_DCA'][$this->strTable]['subpalettes'][$key];
 							}
 						}
+
 					}
 				}
 			}

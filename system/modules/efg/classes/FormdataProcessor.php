@@ -145,7 +145,7 @@ class FormdataProcessor extends \Frontend
 			$arrToSave = array();
 			foreach($arrSubmitted as $k => $varVal)
 			{
-				if (in_array($k, array('id')) )
+				if (in_array($k, array('id')))
 				{
 					continue;
 				}
@@ -301,7 +301,7 @@ class FormdataProcessor extends \Frontend
 						}
 					}
 
-					if ($arrSubmitted[$k] || ($strType == 'upload' && strlen($strVal)))
+					if (isset($arrSubmitted[$k]) || ($strType == 'upload' && strlen($strVal)))
 					{
 						// Prepare data
 						$arrFieldSet = array(
@@ -367,9 +367,7 @@ class FormdataProcessor extends \Frontend
 		}
 		$_SESSION['EFP']['FORMDATA']['_formId_'] = $arrForm['id'];
 
-
 		// Confirmation Mail
-
 		if ($blnFEedit && !$arrForm['sendConfirmationMailOnFrontendEditing'])
 		{
 			$arrForm['sendConfirmationMail'] = false;
@@ -377,7 +375,6 @@ class FormdataProcessor extends \Frontend
 
 		if ($arrForm['sendConfirmationMail'])
 		{
-
 			$objMailProperties = new \stdClass();
 			$objMailProperties->subject = '';
 			$objMailProperties->sender = '';
@@ -528,7 +525,6 @@ class FormdataProcessor extends \Frontend
 		}
 
 		// Information (formatted) Mail
-
 		if ($blnFEedit && !$arrForm['sendFormattedMailOnFrontendEditing'])
 		{
 			$arrForm['sendFormattedMail'] = false;
@@ -536,7 +532,6 @@ class FormdataProcessor extends \Frontend
 
 		if ($arrForm['sendFormattedMail'])
 		{
-
 			$objMailProperties = new \stdClass();
 			$objMailProperties->subject = '';
 			$objMailProperties->sender = '';
