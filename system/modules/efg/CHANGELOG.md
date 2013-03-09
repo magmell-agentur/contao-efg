@@ -1,6 +1,12 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
+Version 1.16.4 (2013-03-09)
+---------------------------
+
+### Fixed
+Using foreign tables in 'condition' of module 'Listing form data' could result in invalid SQL statement
+
 Version 1.16.3 (2013-03-04)
 ---------------------------
 
