@@ -1000,10 +1000,11 @@ class ModuleFormdataListing extends \Module
 				else
 				{
 					$arrListCond = preg_split('/([\s!=><]+)/', $strListCond, -1, PREG_SPLIT_DELIM_CAPTURE);
-					$strCondField = $arrListCond[0];
-					unset($arrListCond[0]);
-					if (in_array($strCondField, $this->arrDetailFields))
+
+					if (in_array($arrListCond[0], $this->arrDetailFields))
 					{
+						$strCondField = $arrListCond[0];
+						unset($arrListCond[0]);
 						// handle numeric values
 						if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp'] == 'digit')
 						{
@@ -1014,9 +1015,15 @@ class ModuleFormdataListing extends \Module
 							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id) ' . implode('', $arrListCond);
 						}
 					}
-					if (in_array($strCondField, $this->arrBaseFields))
+					elseif (in_array($arrListCond[0], $this->arrBaseFields))
 					{
+						$strCondField = $arrListCond[0];
+						unset($arrListCond[0]);
 						$arrListWhere[] = $strCondField . implode('', $arrListCond);
+					}
+					else
+					{
+						$arrListWhere[] = implode('', $arrListCond);
 					}
 				}
 			}
