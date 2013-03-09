@@ -377,7 +377,7 @@ class Efp extends Frontend
 						}
 					}
 
-					if ($arrSubmitted[$k] || ($strType == 'upload' && strlen($strVal)) )
+					if (isset($arrSubmitted[$k]) || ($strType == 'upload' && strlen($strVal)) )
 					{
 						// prepare data
 						$arrFieldSet = array(
