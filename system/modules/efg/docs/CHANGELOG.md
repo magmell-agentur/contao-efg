@@ -1,11 +1,16 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.0.0 rc3 (2013-03-09)
+Version 2.0.0 stable (2013-03-09)
 ------------------------------
 
 ### Added
 Support extension 'cm_alternativeforms'
+
+### Fixed
+Using foreign tables in 'condition' of module 'Listing form data'
+could result in invalid SQL statement
+
 
 Version 2.0.0 rc2 (2013-02-23)
 ------------------------------
