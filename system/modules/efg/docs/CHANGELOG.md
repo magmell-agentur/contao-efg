@@ -1,6 +1,12 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
+Version 2.0.1 stable (XXXX-XX-XX)
+---------------------------------
+
+### Fixed
+Backend filter menu did not keep search field after performing search
+
 Version 2.0.0 stable (2013-03-09)
 ------------------------------
 
