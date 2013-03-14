@@ -3235,7 +3235,7 @@ window.addEvent(\'domready\', function() {
 
 				if ($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] > 0 && $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] < strlen(strip_tags($label)))
 				{
-					$label = trim(\String::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
+					$label = trim(\String::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' â€Œ';
 				}
 
 				// Build the sorting groups
@@ -3491,7 +3491,7 @@ window.addEvent(\'domready\', function() {
 		foreach ($searchFields as $field)
 		{
 			$option_label = strlen($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0]) ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['label'][0] : $GLOBALS['TL_LANG']['MSC'][$field];
-			$options_sorter[utf8_romanize($option_label).'_'.$field] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$this->strTable]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';
+			$options_sorter[utf8_romanize($option_label).'_'.$field] = '  <option value="'.specialchars($field).'"'.(($field == $session['search'][$strSessionKey]['field']) ? ' selected="selected"' : '').'>'.$option_label.'</option>';
 		}
 
 		// Sort by option values
@@ -6025,7 +6025,7 @@ var Stylect = {
 		new Request.Contao({
 			field: el,
 			evalScripts: false,
-			onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' …'),
+			onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' â€Œ'),
 			onSuccess: function(txt, json) {
 				var div = new Element('div', {
 					'id': id,
