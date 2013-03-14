@@ -7,6 +7,9 @@ Version 1.16.5 (XXXX-XX-XX)
 ### Fixed
 Backend filter menu did not keep search field after performing search
 
+### Fixed
+Frontend modul 'Listing form data' did not show '0' values
+
 Version 1.16.4 (2013-03-09)
 ---------------------------
 
