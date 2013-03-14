@@ -1519,7 +1519,7 @@ class ModuleFormdataListing extends \Module
 					(
 						'id' => $arrRows[$i]['id'],
 						'alias' => $arrRows[$i]['alias'],
-						'content' => ($value ? $value : '&nbsp;'),
+						'content' => ($value != '') ? $value : '&nbsp;',
 						'raw' => $v,
 						'class' => 'col_' . $j . $ff_class . (($j == 0) ? ' col_first' : '') . (($j == $intLastCol) ? ' col_last' : ''),
 						'link_details' => $strLinkDetails,
@@ -1534,7 +1534,7 @@ class ModuleFormdataListing extends \Module
 						'alias' => $arrRows[$i]['alias'],
 						'name' => $k,
 						'label' => strlen($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) ? htmlspecialchars($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['label'][0]) : htmlspecialchars($k),
-						'content' => ($value ? $value : '&nbsp;'),
+						'content' => ($value != '') ? $value : '&nbsp;',
 						'raw' => $v,
 						'class' => 'field_' . $j . $ff_class . (($j == 0) ? ' field_first' : '') . (($j == ($intLastCol - 1)) ? ' field_last' : ''),
 						'record_class' => str_replace('row_', 'record_', $class),
