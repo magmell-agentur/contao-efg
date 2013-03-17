@@ -1,8 +1,8 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2013 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -22,11 +22,10 @@
  *
  *
  * PHP version 5
- * @copyright  Thomas Kuhn 2007 - 2010
+ * @copyright  Thomas Kuhn 2007 - 2013
  * @author     Thomas Kuhn <mail@th-kuhn.de>
  * @package    efg
  * @license    LGPL
- * @filesource
  */
 
 /**
