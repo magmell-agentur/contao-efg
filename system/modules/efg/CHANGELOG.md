@@ -5,10 +5,14 @@ Version 1.16.5 (XXXX-XX-XX)
 ---------------------------------
 
 ### Fixed
+Editing or deleting form data in module 'Listing form data' did not work when using foreign tables in 'condition'
+
+### Fixed
 Backend filter menu did not keep search field after performing search
 
 ### Fixed
 Frontend modul 'Listing form data' did not show '0' values
+
 
 Version 1.16.4 (2013-03-09)
 ---------------------------
@@ -19,11 +23,13 @@ Using foreign tables in 'condition' of module 'Listing form data' could result i
 ### Fixed
 Given value '0' in a frontend form field did not create a record in table tl_formdata_details
 
+
 Version 1.16.3 (2013-03-04)
 ---------------------------
 
 ### Added
 Support extension 'cm_alternativeforms'
+
 
 Version 1.16.2 (2013-02-23)
 ---------------------------
