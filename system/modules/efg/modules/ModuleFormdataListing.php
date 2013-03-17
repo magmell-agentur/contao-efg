@@ -643,35 +643,9 @@ class ModuleFormdataListing extends \Module
 			// check details record
 			$strQuery = "SELECT id FROM tl_formdata f";
 			$strWhere = " WHERE (id=? OR alias=?)";
-			if ($this->list_where)
-			{
-				$arrListWhere = array();
-				$arrListConds = preg_split('/(\sAND\s|\sOR\s)/si', $this->list_where, -1, PREG_SPLIT_DELIM_CAPTURE);
+			$strListWhere = $this->prepareListWhere();
+			$strWhere .= (strlen($strListWhere) ? ' AND ' . $strListWhere : '');
 
-				foreach ($arrListConds as $strListCond)
-				{
-					if (preg_match('/\sAND\s|\sOR\s/si', $strListCond))
-					{
-						$arrListWhere[] = $strListCond;
-					}
-					else
-					{
-						$arrListCond = preg_split('/([\s!=><]+)/', $strListCond, -1, PREG_SPLIT_DELIM_CAPTURE);
-						$strCondField = $arrListCond[0];
-						unset($arrListCond[0]);
-						if (in_array($strCondField, $this->arrDetailFields))
-						{
-							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id ) ' . implode('', $arrListCond);
-						}
-						if (in_array($strCondField, $this->arrBaseFields))
-						{
-							$arrListWhere[] = $strCondField . implode('', $arrListCond);
-						}
-					}
-				}
-				$strListWhere = (!empty($arrListWhere)) ? '(' . implode('', $arrListWhere) .')' : '';
-				$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
-			}
 			if (strlen($this->strFormKey))
 			{
 				$strWhere .= (strlen($strWhere) ? " AND " : " WHERE "). $this->strFormFilterKey . "='" . $this->strFormFilterValue . "'";
@@ -986,48 +960,10 @@ class ModuleFormdataListing extends \Module
 		 * Get total number of records
 		 */
 		$strQuery = "SELECT COUNT(*) AS count FROM " . $this->list_table ." f";
-		if ($this->list_where)
+		$strListWhere = $this->prepareListWhere();
+
+		if (strlen($strListWhere))
 		{
-			$arrListWhere = array();
-			$arrListConds = preg_split('/(\sAND\s|\sOR\s)/si', $this->list_where, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-			foreach ($arrListConds as $strListCond)
-			{
-				if (preg_match('/\sAND\s|\sOR\s/si', $strListCond))
-				{
-					$arrListWhere[] = $strListCond;
-				}
-				else
-				{
-					$arrListCond = preg_split('/([\s!=><]+)/', $strListCond, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-					if (in_array($arrListCond[0], $this->arrDetailFields))
-					{
-						$strCondField = $arrListCond[0];
-						unset($arrListCond[0]);
-						// handle numeric values
-						if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp'] == 'digit')
-						{
-							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id)+0.0 ' . implode('', $arrListCond);
-						}
-						else
-						{
-							$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id) ' . implode('', $arrListCond);
-						}
-					}
-					elseif (in_array($arrListCond[0], $this->arrBaseFields))
-					{
-						$strCondField = $arrListCond[0];
-						unset($arrListCond[0]);
-						$arrListWhere[] = $strCondField . implode('', $arrListCond);
-					}
-					else
-					{
-						$arrListWhere[] = implode('', $arrListCond);
-					}
-				}
-			}
-			$strListWhere = (!empty($arrListWhere)) ? '(' . implode('', $arrListWhere) . ')' : '';
 			$strWhere .= (strlen($strWhere) ? " AND " : " WHERE ") . $strListWhere;
 		}
 		if (strlen($this->strFormKey))
@@ -3297,6 +3233,67 @@ class ModuleFormdataListing extends \Module
 		}
 		return $strString;
 	}
+
+
+	protected function prepareListWhere()
+	{
+
+		$strReturn = '';
+
+		if (empty($this->list_where))
+		{
+			return $strReturn;
+		}
+
+		$arrListWhere = array();
+		$arrListConds = preg_split('/(\sAND\s|\sOR\s)/si', $this->list_where, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+		foreach ($arrListConds as $strListCond)
+		{
+			if (preg_match('/\sAND\s|\sOR\s/si', $strListCond))
+			{
+				$arrListWhere[] = $strListCond;
+			}
+			else
+			{
+				$arrListCond = preg_split('/([\s!=><]+)/', $strListCond, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+				if (in_array($arrListCond[0], $this->arrDetailFields))
+				{
+					$strCondField = $arrListCond[0];
+					unset($arrListCond[0]);
+					// handle numeric values
+					if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$strCondField]['eval']['rgxp'] == 'digit')
+					{
+						$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id)+0.0 ' . implode('', $arrListCond);
+					}
+					else
+					{
+						$arrListWhere[] = '(SELECT value FROM tl_formdata_details WHERE ff_name="'.$strCondField.'" AND pid=f.id) ' . implode('', $arrListCond);
+					}
+				}
+				elseif (in_array($arrListCond[0], $this->arrBaseFields))
+				{
+					$strCondField = $arrListCond[0];
+					unset($arrListCond[0]);
+					$arrListWhere[] = $strCondField . implode('', $arrListCond);
+				}
+				else
+				{
+					$arrListWhere[] = implode('', $arrListCond);
+				}
+			}
+		}
+
+		if (!empty($arrListWhere))
+		{
+			$strReturn = '(' . implode('', $arrListWhere) .')';
+		}
+
+		return $strReturn;
+
+	}
+
 
 	protected function replaceWhereTags($strBuffer)
 	{
