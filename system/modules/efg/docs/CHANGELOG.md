@@ -1,7 +1,7 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.0.1 stable (2013-XX-XX)
+Version 2.0.2 stable (2013-XX-XX)
 ---------------------------------
 
 ### Fixed
