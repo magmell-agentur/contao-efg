@@ -425,7 +425,7 @@ class ExtendedForm extends \Form
 							// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
 							if (!$objWidget->storeFile)
 							{
-								if ($this->intActivePage < $this->intTotalPages)
+								if ($this->intActivePage <= $this->intTotalPages)
 								{
 									// unset file in session, if this page has not been completed
 									if (! $_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
@@ -472,7 +472,7 @@ class ExtendedForm extends \Form
 
 					if ($objWidget->hasErrors())
 					{
-						if($objWidget->required)
+						if ($objWidget->required)
 						{
 							$this->arrWidgetsFailedValidation[$objFields->name] = 1;
 						}
