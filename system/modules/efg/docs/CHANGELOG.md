@@ -1,6 +1,13 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
+Version 2.0.1 stable (2013-XX-XX)
+---------------------------------
+
+### Fixed
+File uploads have not been validated on last page of a multi-page form
+
+
 Version 2.0.1 stable (2013-03-17)
 ---------------------------------
 
