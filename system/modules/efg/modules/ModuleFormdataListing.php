@@ -1125,7 +1125,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// Correctly handle the "index" alias
-		if ($objPage->alias == 'index' && ($strUrl == '' || $strUrl ==  || (! $GLOBALS['TL_CONFIG']['rewriteURL'] && preg_match('/index\.php\/?/', $strUrl))))
+		if ($objPage->alias == 'index' && ($strUrl == '' || (! $GLOBALS['TL_CONFIG']['rewriteURL'] && preg_match('/index\.php\/?/', $strUrl))))
 		{
 			$strUrl = ($GLOBALS['TL_CONFIG']['rewriteURL'] ? 'index' : 'index.php/index');
 		}
