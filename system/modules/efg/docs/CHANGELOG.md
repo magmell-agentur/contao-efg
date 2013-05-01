@@ -5,6 +5,10 @@ Version 2.0.2 stable (2013-XX-XX)
 ---------------------------------
 
 ### Fixed
+Details view of frontend module 'listing form data' did not work
+on page with alias 'index'
+
+### Fixed
 File uploads have not been validated on last page of a multi-page form
 
 

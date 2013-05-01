@@ -1118,12 +1118,16 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Prepare URL
 		 */
-
-		//$strUrl = preg_replace('/\?.*$/', '', urldecode(\Environment::get('request')));
 		$strUrl = $this->generateFrontendUrl($objPage->row());
 		if ($strUrl == '/' || $strUrl == '//')
 		{
 			$strUrl = '';
+		}
+
+		// Correctly handle the "index" alias
+		if ($objPage->alias == 'index' && ($strUrl == '' || $strUrl ==  || (! $GLOBALS['TL_CONFIG']['rewriteURL'] && preg_match('/index\.php\/?/', $strUrl))))
+		{
+			$strUrl = ($GLOBALS['TL_CONFIG']['rewriteURL'] ? 'index' : 'index.php/index');
 		}
 
 		$strUrlParams = '';
