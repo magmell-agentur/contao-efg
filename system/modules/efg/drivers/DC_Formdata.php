@@ -5064,7 +5064,7 @@ window.addEvent(\'domready\', function() {
 									->set($arrDetailSet)
 									->execute();
 							}
-							catch(Exception $ee)
+							catch(\Exception $ee)
 							{
 								$blnSaved = false;
 							}

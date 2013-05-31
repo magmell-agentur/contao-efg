@@ -234,7 +234,7 @@ class Formdata extends \Frontend
 		// Check whether the alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
 		{
-			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+			throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
 		}
 
 		// Add ID to alias
@@ -2721,7 +2721,7 @@ class Formdata extends \Frontend
 		// Throw an exception if there is an eval() error
 		if ($blnEval === false)
 		{
-			throw new Exception("Error eval() in Formdata::evalConditionTags ($strReturn)");
+			throw new \Exception("Error eval() in Formdata::evalConditionTags ($strReturn)");
 		}
 
 		// Return the evaled code
