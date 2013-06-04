@@ -141,7 +141,7 @@ class EfgLookupOptionWizard extends \Widget
 		{
 			while ($objForms->next())
 			{
-				$varKey = 'fd_' . (!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title));
+				$varKey = 'fd_' . ((!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title)));
 
 				if (!in_array($varKey, $this->arrIgnoreTables))
 				{
