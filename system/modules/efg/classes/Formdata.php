@@ -109,9 +109,7 @@ class Formdata extends \Frontend
 		}
 
 		$this->getStoringForms();
-
 		$this->arrBaseFields = array_filter(array_diff(\Database::getInstance()->getFieldNames('tl_formdata'), array('PRIMARY')));
-
 	}
 
 	/**
@@ -166,7 +164,6 @@ class Formdata extends \Frontend
 			default:
 				return parent::__get($strKey);
 				break;
-
 		}
 	}
 
@@ -187,7 +184,7 @@ class Formdata extends \Frontend
 		{
 			return '';
 		}
-		if (intval($intRecId)==0)
+		if (intval($intRecId) == 0)
 		{
 			return '';
 		}
@@ -393,7 +390,6 @@ class Formdata extends \Frontend
 		}
 
 		return $arrPages;
-
 	}
 
 
@@ -509,7 +505,6 @@ class Formdata extends \Frontend
 			}
 
 			return $varReturn;
-
 		}
 		else
 		{
@@ -710,7 +705,6 @@ class Formdata extends \Frontend
 				case 'efgLookupCheckbox':
 				case 'checkbox':
 				case 'condition': // conditionalforms
-
 					$strSep = '';
 					$strVal = '';
 					$arrOptions = $this->prepareWidgetOptions($arrField);
@@ -779,7 +773,6 @@ class Formdata extends \Frontend
 				case 'cm_alternative':
 					$strSep = '';
 					$strVal = '';
-
 					$arrOptions = $this->prepareWidgetOptions($arrField);
 
 					// select multiple
@@ -920,7 +913,6 @@ class Formdata extends \Frontend
 		{
 			return (is_array($varSubmitted) ? serialize($varSubmitted) : $varSubmitted);
 		}
-
 	}
 
 
@@ -1058,7 +1050,6 @@ class Formdata extends \Frontend
 			}
 
 			$varValue = $strVal;
-
 		}
 
 		if (is_array($varValue))
@@ -1082,7 +1073,6 @@ class Formdata extends \Frontend
 		}
 
 		return $varValue;
-
 	}
 
 
@@ -1249,13 +1239,11 @@ class Formdata extends \Frontend
 			}
 
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
-
 		}
 		else
 		{
 			return (is_string($varSubmitted) && strlen($varSubmitted)) ? \String::decodeEntities($varSubmitted) : $varSubmitted;
 		}
-
 	}
 
 	/**
@@ -1267,7 +1255,6 @@ class Formdata extends \Frontend
 	 */
 	public function prepareDatabaseValueForMail($varValue='', $arrField=false, $varFile=false)
 	{
-
 		if (!is_array($arrField))
 		{
 			return false;
@@ -1297,7 +1284,6 @@ class Formdata extends \Frontend
 
 					$strVal = '';
 					$arrSel = array();
-
 					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'])) ? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
 
 					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
@@ -1385,7 +1371,6 @@ class Formdata extends \Frontend
 
 					$strVal = '';
 					$arrSel = array();
-
 					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
 						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
 
@@ -1489,13 +1474,11 @@ class Formdata extends \Frontend
 					break;
 			}
 			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
-
 		}
 		else
 		{
 			return (is_string($varValue) && strlen($varValue)) ? \String::decodeEntities($varValue) : $varValue;
 		}
-
 	}
 
 	/**
@@ -1700,13 +1683,11 @@ class Formdata extends \Frontend
 			}
 
 			return $varVal;
-
 		}
 		else
 		{
 			return $varVal;
 		}
-
 	}
 
 	/**
@@ -1717,7 +1698,6 @@ class Formdata extends \Frontend
 	 */
 	public function prepareWidgetOptions($arrField=false)
 	{
-
 		if (!is_array($arrField))
 		{
 			return false;
@@ -1817,7 +1797,6 @@ class Formdata extends \Frontend
 					{
 						$sqlLookupOrder = '(SELECT value FROM tl_formdata_details fd WHERE (fd.pid=f.id AND ff_name=\''.$arrLookupField[1].'\'))';
 					}
-
 				}
 
 				// Handle lookup calendar events
@@ -1877,7 +1856,6 @@ class Formdata extends \Frontend
 							$strEvents = str_replace('.html', '', $strEvents);
 							$sqlLookupWhere .= (!empty($sqlLookupWhere) ? " AND " : "") . " tl_calendar_events.alias='".$strEvents."' ";
 						}
-
 					}
 
 					$sqlLookup = "SELECT tl_calendar_events.* FROM tl_calendar_events, tl_calendar WHERE (tl_calendar.id=tl_calendar_events.pid) " . (!empty($sqlLookupWhere) ? " AND (" . $sqlLookupWhere . ")" : "") . (strlen($sqlLookupOrder) ? " ORDER BY " . $sqlLookupOrder  : "");
@@ -1891,12 +1869,9 @@ class Formdata extends \Frontend
 						while ($arrEvent = $objEvents->fetchAssoc())
 						{
 							$intDate = $arrEvent['startDate'];
-
 							$intStart = time();
 							$intEnd = time() + 60*60*24*178 ; // max. half year
-
 							$span = \Calendar::calculateSpan($arrEvent['startTime'], $arrEvent['endTime']);
-
 							$strTime = '';
 							$strTime .= date($GLOBALS['TL_CONFIG']['dateFormat'], $arrEvent['startDate']);
 
@@ -1970,12 +1945,10 @@ class Formdata extends \Frontend
 								$count = 0;
 								$arrRepeat = deserialize($arrEvent['repeatEach']);
 								$blnSummer = date('I', $arrEvent['startTime']);
-
 								$intEnd = time() + 60*60*24*178; // max. 1/2 Year
 
 								while ($arrEvent['endTime'] < $intEnd)
 								{
-
 									if ($arrEvent['recurrences'] > 0 && $count++ >= $arrEvent['recurrences'])
 									{
 										break;
@@ -2040,12 +2013,9 @@ class Formdata extends \Frontend
 												$arrEvents[$arrEvent[$arrSortKeys[0]['field']]][$arrEvent['startTime']][] = array('value' => $arrEvent[$sqlLookupValField].'@'.$strTime, 'label' => $arrEvent[$arrLookupField[1]] . (strlen($strTime) ? ', ' . $strTime : ''));
 											}
 										}
-
 									}
 								}
-
 							}
-
 						}
 
 						// Sort events
@@ -2094,11 +2064,9 @@ class Formdata extends \Frontend
 								array_unshift($arrOptions, array('value'=>'', 'label'=>'-'));
 							}
 						}
-
 					}
 
 					return $arrOptions;
-
 				}
 
 				// Normal lookup table or formdata lookup table
@@ -2125,7 +2093,6 @@ class Formdata extends \Frontend
 							}
 						}
 					}
-
 				}
 
 				$arrTempOptions = array();
@@ -2199,7 +2166,6 @@ class Formdata extends \Frontend
 									$objWidget = $this->$callback[0]->$callback[1]($objWidget, $arrField['pid'], array());
 								}
 							}
-
 							$arrOptions = $objWidget->options;
 						}
 					}
@@ -2211,7 +2177,6 @@ class Formdata extends \Frontend
 		$arrOptions = $this->decodeSpecialChars($arrOptions);
 
 		return $arrOptions;
-
 	}
 
 
@@ -2624,7 +2589,6 @@ class Formdata extends \Frontend
 		}
 
 		return $arrReturn;
-
 	}
 
 
@@ -2643,7 +2607,7 @@ class Formdata extends \Frontend
 		$blnEval = false;
 		$strReturn = '';
 
-		$arrTags = preg_split("/(\{[^}]+\})/sim", $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+		$arrTags = preg_split('/(\{[^}]+\})/sim', $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
 
 		if (!empty($arrTags))
 		{
@@ -2726,7 +2690,6 @@ class Formdata extends \Frontend
 
 		// Return the evaled code
 		return $strReturn;
-
 	}
 
 
@@ -2746,7 +2709,6 @@ class Formdata extends \Frontend
 
 	public function executePostActions($strAction, $dc)
 	{
-
 		if ($dc instanceof DC_Formdata)
 		{
 			if (\Input::get('act') == 'editAll')
@@ -2831,6 +2793,5 @@ class Formdata extends \Frontend
 				}
 			}
 		}
-
 	}
 }
