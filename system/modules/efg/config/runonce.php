@@ -43,6 +43,7 @@ class EfgRunonce extends Controller
 		$this->execute('updateListingModules');
 		$this->execute('updateMailTemplates');
 		$this->execute('updateFormPaginators');
+		$this->execute('updateFormFieldEfgLookupOptions');
 		$this->execute('updateConfig');
 
 	}
@@ -252,8 +253,7 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 		// As of Contao 3 tl_form_field.singleSRC and tl_form_field.efgBackSingleSRC use database assisted fileTree
 		// .. these fields normally should have been transformed already by the Contao install routine
 
-		if (!$this->Database->fieldExists('efgBackSingleSRC', 'tl_form_field')
-		)
+		if (!$this->Database->fieldExists('efgBackSingleSRC', 'tl_form_field'))
 		{
 			return;
 		}
@@ -332,6 +332,59 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 		}
 
 	}
+
+
+	private function updateFormFieldEfgLookupOptions()
+	{
+
+		// Update form data 'table name' in form fields of type EfgFormLookupCheckbox, EfgFormLookupRadio, EfgFormLookupSelectMenu
+		// .. as of version 2.0.0 EFG creates dca file names and form keys based on form alias,
+		// .. like fd_term-paper-submission (former fd_term_paper_submission)
+
+		$this->import('Formdata');
+
+		// Get all form data storing forms
+		$arrStoringForms = $this->Formdata->arrStoringForms;
+
+		// Get all form fields having efgLookupOptions
+		$arrFormFields = $this->Database->prepare("SELECT id, efgLookupOptions FROM tl_form_field WHERE efgLookupOptions != ''")->execute()->fetchAllAssoc();
+
+		if (count($arrFormFields) >= 1 && count($arrStoringForms) >= 1)
+		{
+			$arrMapFormDcaKey = array();
+
+			// Build mapping, old form key => new form key
+			foreach ($arrStoringForms as $strFormKey => $arrFormConfig)
+			{
+				$strOldKey = 'fd_' . ( (!empty($arrFormConfig['formID'])) ? $arrFormConfig['formID'] : str_replace('-', '_', standardize($arrFormConfig['title'])));
+				$strNewKey = 'fd_' . ( (!empty($arrFormConfig['alias'])) ? $arrFormConfig['alias'] : str_replace('-', '_', standardize($arrFormConfig['title'])));
+				$arrMapFormDcaKey[$strOldKey] = $strNewKey;
+			}
+
+			foreach ($arrFormFields as $arrFormField)
+			{
+				$arrLookupOptions = deserialize($arrFormField['efgLookupOptions']);
+				{
+
+					// Replace old form data 'table name' by new form 'table name' if lookup table is form data 'table'
+					if (substr($arrLookupOptions['lookup_field'], 0, 3) == 'fd_')
+					{
+						$arrLookupFieldParams = explode('.', $arrLookupOptions['lookup_field']);
+
+						if (in_array($arrLookupFieldParams[0], array_keys($arrMapFormDcaKey)))
+						{
+							$arrLookupOptions['lookup_field'] = $arrMapFormDcaKey[$arrLookupFieldParams[0]] . '.' . $arrLookupFieldParams[1];
+
+							$objFormFieldModel = \FormFieldModel::findBy('id', $arrFormField['id']);
+							$objFormFieldModel->efgLookupOptions = serialize($arrLookupOptions);
+							$objFormFieldModel->save();
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 	private function updateConfig()
 	{

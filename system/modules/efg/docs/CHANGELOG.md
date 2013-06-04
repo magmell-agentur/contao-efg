@@ -11,6 +11,10 @@ on page with alias 'index'
 ### Fixed
 File uploads have not been validated on last page of a multi-page form
 
+### Fixed
+Form fields of type 'Select menu (DB)', 'Checkbox menu (DB)' and 'Radio button menu (DB)'
+did not work if using form data as source table (see #26)
+
 
 Version 2.0.1 stable (2013-03-17)
 ---------------------------------
