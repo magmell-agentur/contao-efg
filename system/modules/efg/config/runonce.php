@@ -364,6 +364,8 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 			foreach ($arrFormFields as $arrFormField)
 			{
 				$arrLookupOptions = deserialize($arrFormField['efgLookupOptions']);
+
+				if (!empty($arrLookupOptions['lookup_field']))
 				{
 
 					// Replace old form data 'table name' by new form 'table name' if lookup table is form data 'table'
