@@ -136,19 +136,12 @@ class EfgLookupOptionWizard extends \Widget
 		unset ($arrFields);
 
 		// get all forms marked to store data
-		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID FROM tl_form WHERE storeFormdata=?")->execute("1");
+		$objForms = \Database::getInstance()->prepare("SELECT id,title,formID,alias FROM tl_form WHERE storeFormdata=?")->execute("1");
 		if ($objForms->numRows)
 		{
 			while ($objForms->next())
 			{
-				if (strlen($objForms->formID))
-				{
-					$varKey = 'fd_' . $objForms->formID;
-				}
-				else
-				{
-					$varKey = 'fd_' . str_replace('-', '_', standardize($objForms->title));
-				}
+				$varKey = 'fd_' . (!empty($objForms->alias)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title));
 
 				if (!in_array($varKey, $this->arrIgnoreTables))
 				{
