@@ -5,6 +5,9 @@ Version 2.0.2 stable (2013-XX-XX)
 ---------------------------------
 
 ### Fixed
+Do not strip tags from listing condition (see #28)s
+
+### Fixed
 Details view of frontend module 'listing form data' did not work
 on page with alias 'index'
 
