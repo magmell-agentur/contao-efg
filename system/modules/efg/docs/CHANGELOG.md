@@ -5,7 +5,10 @@ Version 2.0.2 stable (2013-XX-XX)
 ---------------------------------
 
 ### Fixed
-Do not strip tags from listing condition (see #28)s
+Handle field labels containing % (see #25)
+
+### Fixed
+Do not strip tags from listing condition (see #28)
 
 ### Fixed
 Details view of frontend module 'listing form data' did not work

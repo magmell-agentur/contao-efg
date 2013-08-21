@@ -403,7 +403,7 @@ class Formdata extends \Frontend
 		{
 			// Get all forms marked to store data
 			$objForms = \Database::getInstance()->prepare("SELECT id,title,alias,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
-				->execute("1");
+				->executeUncached("1");
 
 			while ($objForms->next())
 			{

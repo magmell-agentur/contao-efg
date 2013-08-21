@@ -143,6 +143,7 @@ class FormdataBackend extends \Backend
 
 		// Remove cached dca files
 		$arrFiles = scan(TL_ROOT . '/system/cache/dca', true);
+
 		foreach ($arrFiles as $strFile)
 		{
 			if (substr($strFile, 0, 3) == 'fd_' || $strFile == 'tl_formdata.php')
