@@ -445,6 +445,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				return $this->arrFieldConfig;
 				break;
 
+			case 'arrBaseFields':
+			case 'baseFields':
+				return $this->arrBaseFields;
+				break;
+
+			case 'arrDetailFields':
+			case 'detailFields':
+				return $this->arrDetailFields;
+				break;
 		}
 
 		return parent::__get($strKey);
@@ -1709,6 +1718,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		// TODO: find a better solution to handle toggleSubpalette ...
 		$return .= $this->getSubpaletteJavascript();
+		$return .= $this->getFilepickerJavascript();
 
 		// Begin the form (-> DO NOT CHANGE THIS ORDER -> this way the onsubmit attribute of the form can be changed by a field)
 		$return = $version . '
@@ -2383,6 +2393,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			// TODO: find a better solution to handle toggleSubpalette ...
 			$return .= $this->getSubpaletteJavascript();
+			$return .= $this->getFilepickerJavascript();
 
 			// Set the focus if there is an error
 			if ($this->noReload)
@@ -6082,7 +6093,7 @@ var Stylect = {
 		new Request.Contao({
 			field: el,
 			evalScripts: false,
-			onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' â€Œ'),
+			onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' …'),
 			onSuccess: function(txt, json) {
 				var div = new Element('div', {
 					'id': id,
@@ -6113,6 +6124,77 @@ window.addEvent('domready', function(){
 	$$('input[onclick^=AjaxRequest.toggleSubpalette]').each(function(item){
 		item.set('onclick', (item.get('onclick').replace(/toggleSubpalette/, 'toggleEfgSubpalette')))
 	});
+});
+</script>";
+
+		return $strJs;
+
+	}
+
+
+	private function getFilepickerJavascript()
+	{
+
+		$strJs = "
+<script>
+function handleEfgFileselectorButton(){
+	$$('a[href*=contao/file.php]').addEvent('click', function(e){
+		var el = e.target;
+		var elHidden = el.getParent('div.selector_container').getPrevious('input[type=hidden]');
+		var opt = { 'id': elHidden.get('name'), 'url': e.target.get('href') };
+
+		$$('div#simple-modal div.simple-modal-footer a.btn.primary').removeEvents('click').addEvent('click', function() {
+			var val = [],
+				frm = null,
+				frms = window.frames;
+			for (var i=0; i<frms.length; i++) {
+				if (frms[i].name == 'simple-modal-iframe') {
+					frm = frms[i];
+					break;
+				}
+			}
+			if (frm === null) {
+				alert('Could not find the SimpleModal frame');
+				return;
+			}
+			if (frm.document.location.href.indexOf('contao/main.php') != -1) {
+				alert(Contao.lang.picker);
+				return; // see #5704
+			}
+			var inp = frm.document.getElementById('tl_listing').getElementsByTagName('input');
+			for (var i=0; i<inp.length; i++) {
+				if (!inp[i].checked || inp[i].id.match(/^check_all_/)) continue;
+				if (!inp[i].id.match(/^reset_/)) val.push(inp[i].get('value'));
+			}
+			if (opt.tag) {
+				$(opt.tag).value = val.join(',');
+				if (opt.url.match(/page\.php/)) {
+					$(opt.tag).value = '{{link_url::' + $(opt.tag).value + '}}';
+				}
+				opt.self.set('href', opt.self.get('href').replace(/&value=[^&]*/, '&value='+val.join(',')));
+			} else {
+				$('ctrl_'+opt.id).value = val.join(\"\t\");
+				var act = (opt.url.indexOf('contao/page.php') != -1) ? 'reloadPagetree' : 'reloadEfgFiletree';
+				new Request.Contao({
+					field: $('ctrl_'+opt.id),
+					evalScripts: false,
+					onRequest: AjaxRequest.displayBox(Contao.lang.loading + ' …'),
+					onSuccess: function(txt, json) {
+						$('ctrl_'+opt.id).getParent('div').set('html', json.content);
+						json.javascript && Browser.exec(json.javascript);
+						AjaxRequest.hideBox();
+					}
+				}).post({'action':act, 'name':opt.id, 'value':$('ctrl_'+opt.id).value, 'REQUEST_TOKEN':Contao.request_token});
+			}
+			$('simple-modal').hide();
+			$('simple-modal-overlay').hide();
+			document.body.setStyle('overflow', 'auto');
+		});
+	});
+}
+
+window.addEvent('domready', function(){
+	handleEfgFileselectorButton();
 });
 </script>";
 

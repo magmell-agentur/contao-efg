@@ -2706,92 +2706,178 @@ class Formdata extends \Frontend
 	}
 
 
-
+	/**
+	 *
+	 * Handle ajax post actions
+	 * @param $strAction
+	 * @param $dc
+	 */
 	public function executePostActions($strAction, $dc)
 	{
-		if ($dc instanceof DC_Formdata)
+
+		switch ($strAction)
 		{
-			if (\Input::get('act') == 'editAll')
-			{
-				$this->strAjaxId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', \Input::post('id'));
-				if (in_array(\Input::post('field'), $this->arrBaseFields))
+			case 'toggleEfgSubpalette':
+
+				if ($dc instanceof DC_Formdata)
 				{
-					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($this->strAjaxId);
-				}
-				else
-				{
-					$strValue = '';
-					if (intval(\Input::post('state')) == 1)
+					if (\Input::get('act') == 'editAll')
 					{
-						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
-						if (!empty($option))
+						$this->strAjaxId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', \Input::post('id'));
+						if (in_array(\Input::post('field'), $this->arrBaseFields))
 						{
-							$strValue = $option;
+							\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($this->strAjaxId);
 						}
-					}
-					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
-					if ($objResult->numRows < 1)
-					{
-						$arrFieldSet = array(
-							'pid' => $this->strAjaxId,
-							'tstamp' => time(),
-							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
-							'ff_name' => \Input::post('field'),
-							'value' => $strValue
-						);
-						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+						else
+						{
+							$strValue = '';
+							if (intval(\Input::post('state')) == 1)
+							{
+								$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+								if (!empty($option))
+								{
+									$strValue = $option;
+								}
+							}
+							$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+							if ($objResult->numRows < 1)
+							{
+								$arrFieldSet = array(
+									'pid' => $this->strAjaxId,
+									'tstamp' => time(),
+									'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+									'ff_name' => \Input::post('field'),
+									'value' => $strValue
+								);
+								\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+							}
+							else
+							{
+								\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
+							}
+						}
+
+						if (\Input::post('load'))
+						{
+							echo $dc->editAll($this->strAjaxId, \Input::post('id'));
+						}
 					}
 					else
 					{
-						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($this->strAjaxId, \Input::post('field'));
-					}
-				}
-
-				if (\Input::post('load'))
-				{
-					echo $dc->editAll($this->strAjaxId, \Input::post('id'));
-				}
-			}
-			else
-			{
-				if (in_array(\Input::post('field'), $this->arrBaseFields))
-				{
-					\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($dc->id);
-				}
-				else
-				{
-					$strValue = '';
-					if (intval(\Input::post('state')) == 1)
-					{
-						$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
-						if (!empty($option))
+						if (in_array(\Input::post('field'), $this->arrBaseFields))
 						{
-							$strValue = $option;
+							\Database::getInstance()->prepare("UPDATE tl_formdata SET " . \Input::post('field') . "='" . (intval(\Input::post('state')) == 1 ? 1 : '') . "' WHERE id=?")->execute($dc->id);
+						}
+						else
+						{
+							$strValue = '';
+							if (intval(\Input::post('state')) == 1)
+							{
+								$option = array_pop($GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['options']);
+								if (!empty($option))
+								{
+									$strValue = $option;
+								}
+							}
+							$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+							if ($objResult->numRows < 1)
+							{
+								$arrFieldSet = array(
+									'pid' => $dc->id,
+									'tstamp' => time(),
+									'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
+									'ff_name' => \Input::post('field'),
+									'value' => $strValue
+								);
+								\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+							}
+							else
+							{
+								\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+							}
+						}
+
+						if (\Input::post('load'))
+						{
+							echo $dc->edit(false, \Input::post('id'));
 						}
 					}
-					$objResult = \Database::getInstance()->prepare("SELECT * FROM tl_formdata_details WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
-					if ($objResult->numRows < 1)
+				}
+				break;
+
+
+			case 'reloadEfgFiletree':
+				$intId = \Input::get('id');
+				$strField = $strFieldName = \Input::post('name');
+
+				// Handle the keys in "edit multiple" mode
+				if (\Input::get('act') == 'editAll')
+				{
+					$intId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $strField);
+					$strField = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $strField);
+				}
+
+				// Validate the request data
+				if (\Database::getInstance()->tableExists($dc->table))
+				{
+					// The field does not exist
+					if (!in_array($strField, $dc->arrBaseFields) && !in_array($strField, $dc->arrDetailFields))
 					{
-						$arrFieldSet = array(
-							'pid' => $dc->id,
-							'tstamp' => time(),
-							'ff_id' => $GLOBALS['TL_DCA']['tl_formdata']['fields'][\Input::post('field')]['f_id'],
-							'ff_name' => \Input::post('field'),
-							'value' => $strValue
-						);
-						\Database::getInstance()->prepare("INSERT INTO tl_formdata_details %s")->set($arrFieldSet)->execute();
+						$this->log('Field "' . $strField . '" does not belong to form data table', 'Formdata executePostActions()', TL_ERROR);
+						header('HTTP/1.1 400 Bad Request');
+						die('Bad Request');
 					}
-					else
+
+					$objRow = \Database::getInstance()->prepare("SELECT * FROM " . $dc->table . " WHERE id=?")
+						->execute($intId);
+
+					// The record does not exist
+					if ($objRow->numRows < 1)
 					{
-						\Database::getInstance()->prepare("UPDATE tl_formdata_details SET `value`='" . $strValue . "' WHERE pid=? AND ff_name=?")->execute($dc->id, \Input::post('field'));
+						$this->log('A record with the ID "' . $intId . '" does not exist in table "' . $dc->table . '"', 'Ajax executePostActions()', TL_ERROR);
+						header('HTTP/1.1 400 Bad Request');
+						die('Bad Request');
 					}
 				}
 
-				if (\Input::post('load'))
+				$varValue = \Input::post('value');
+				$strKey = 'fileTree';
+
+				// Convert the selected values
+				if ($varValue != '')
 				{
-					echo $dc->edit(false, \Input::post('id'));
+					$varValue = trimsplit("\t", $varValue);
+
+					// Automatically add resources to the DBAFS
+					if ($strKey == 'fileTree')
+					{
+						foreach ($varValue as $k=>$v)
+						{
+							$varValue[$k] = \Dbafs::addResource($v)->id;
+						}
+					}
+
+					$varValue = serialize($varValue);
 				}
-			}
+
+				// Set the new value
+				if (in_array($strField, $dc->arrBaseFields) || in_array($strField, $dc->arrDetailFields))
+				{
+					$objRow->$strField = $varValue;
+					$arrAttribs['activeRecord'] = $objRow;
+				}
+
+				$arrAttribs['id'] = $strFieldName;
+				$arrAttribs['name'] = $strFieldName;
+				$arrAttribs['value'] = $varValue;
+				$arrAttribs['strTable'] = $dc->table;
+				$arrAttribs['strField'] = $strField;
+
+				$objWidget = new $GLOBALS['BE_FFL'][$strKey]($arrAttribs);
+				echo $objWidget->generate() . '<script>handleEfgFileselectorButton();</script>';
+
+				break; exit;
+
 		}
 	}
 }
