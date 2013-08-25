@@ -161,7 +161,7 @@ class ExtendedForm extends \Form
 		$intActivePage = 1;
 
 		$this->Template = new \FrontendTemplate($this->strTemplate);
-		$this->loadLanguageFile('tl_form');
+		\System::loadLanguageFile('tl_form');
 
 		// render a previous completed page
 		if (strlen($_SESSION['EFP'][$formId]['render_page']))
