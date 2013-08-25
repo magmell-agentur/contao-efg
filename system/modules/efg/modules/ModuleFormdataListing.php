@@ -530,7 +530,7 @@ class ModuleFormdataListing extends \Module
 
 		// load dca-config into $GLOBALS['TL_DCA']['tl_formdata']
 		$this->loadDataContainer($this->strDcaKey);
-		$this->loadLanguageFile('tl_formdata');
+		\System::loadLanguageFile('tl_formdata');
 
 		// Export
 		if (\Input::get('act') == 'export')

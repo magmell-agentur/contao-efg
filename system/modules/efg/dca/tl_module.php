@@ -330,7 +330,7 @@ class tl_module_efg extends \Backend
 				$this->arrFormdataFields[$varKey][$arrField['name']] = $arrField['label'];
 			}
 		}
-		$this->loadLanguageFile('tl_formdata', null, true);
+		\System::loadLanguageFile('tl_formdata', null, true);
 		if (strlen($dc->value))
 		{
 			$this->loadDataContainer($dc->value, true);
