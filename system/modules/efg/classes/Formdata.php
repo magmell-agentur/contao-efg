@@ -2878,6 +2878,41 @@ class Formdata extends \Frontend
 
 				break; exit;
 
+			case 'reloadEfgImportSource':
+				$intId = \Input::get('id');
+				$strField = $strFieldName = \Input::post('name');
+
+				$varValue = \Input::post('value');
+				$strKey = 'fileTree';
+
+				// Convert the selected values
+				if ($varValue != '')
+				{
+					$varValue = trimsplit("\t", $varValue);
+
+					// Automatically add resources to the DBAFS
+					if ($strKey == 'fileTree')
+					{
+						foreach ($varValue as $k=>$v)
+						{
+							$varValue[$k] = \Dbafs::addResource($v)->id;
+						}
+					}
+
+					$varValue = serialize($varValue);
+				}
+
+				$arrAttribs['id'] = $strFieldName;
+				$arrAttribs['name'] = $strFieldName;
+				$arrAttribs['value'] = $varValue;
+				$arrAttribs['strTable'] = $dc->table;
+				$arrAttribs['strField'] = $strField;
+
+				$objWidget = new $GLOBALS['BE_FFL'][$strKey]($arrAttribs);
+				echo $objWidget->generate() . '<script>handleEfgFileselectorButton();</script>';
+
+				break; exit;
+
 		}
 	}
 }

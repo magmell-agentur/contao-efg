@@ -211,9 +211,9 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 			'fields'                  => array('date', 'form', 'alias', 'be_notes' <?php foreach ($this->arrFields as $varKey => $varVals): echo ', \'' . $varKey . '\''; endforeach; ?>),
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
 			'format'                  => '<div class="fd_wrap">
-    <div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
+	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
-    <div class="fd_notes">%s</div>
+	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \String::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
@@ -224,9 +224,9 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 <?php if ($this->arrForm['key'] == 'feedback'): ?>
 			/*
 			'format'                  => '<div class="fd_wrap">
-    <div class="fd_head">%s<span>[%s]</span></div>
+	<div class="fd_head">%s<span>[%s]</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
-    <div class="fd_notes">%s</div>
+	<div class="fd_notes">%s</div>
 	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \String::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',

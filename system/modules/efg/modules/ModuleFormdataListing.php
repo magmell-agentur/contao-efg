@@ -3148,12 +3148,12 @@ class ModuleFormdataListing extends \Module
 			$value = $this->parseDate($objPage->datimFormat, $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'checkbox'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupCheckbox'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'select'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'conditionalselect'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupSelect'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'radio'
-			|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupCheckbox'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'select'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'conditionalselect'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupSelect'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'radio'
+				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree')
 		)
 		{
 			$value = str_replace('|', ', ', $value);
