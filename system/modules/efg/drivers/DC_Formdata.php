@@ -1718,7 +1718,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		// TODO: find a better solution to handle toggleSubpalette ...
 		$return .= $this->getSubpaletteJavascript();
-		$return .= $this->getFilepickerJavascript();
+		$return .= $this->getFilepickerJavascript('reloadEfgFiletree');
 
 		// Begin the form (-> DO NOT CHANGE THIS ORDER -> this way the onsubmit attribute of the form can be changed by a field)
 		$return = $version . '
@@ -2393,7 +2393,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			// TODO: find a better solution to handle toggleSubpalette ...
 			$return .= $this->getSubpaletteJavascript();
-			$return .= $this->getFilepickerJavascript();
+			$return .= $this->getFilepickerJavascript('reloadEfgFiletree');
 
 			// Set the focus if there is an error
 			if ($this->noReload)
@@ -5201,6 +5201,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		$objTree = new \FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
 
+
+		$objFileSelector = new \FileTree(\Widget::getAttributesFromDca($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
+
 		// Return form
 		return '
 <div id="tl_buttons">
@@ -5233,10 +5236,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
   <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_formdata']['csv_has_header'][1].'</p>
   </div>
 
-  <div class="clr">
-  <h3><label for="import_source">'.$GLOBALS['TL_LANG']['tl_formdata']['import_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>
-'.$objTree->generate().(strlen($GLOBALS['TL_LANG']['tl_formdata']['import_source'][1]) ? '
-  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_formdata']['import_source'][1].'</p>' : '').'
+  <div class="clr">'
+		. $objFileSelector->parse() . (strlen($GLOBALS['TL_LANG']['tl_formdata']['import_source'][1]) ? '
+  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_formdata']['import_source'][1].'</p>' : '') . '
+
   </div>
 </div>
 
@@ -5249,7 +5252,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 </div>
 
 </div>
-</form>';
+</form>' . $this->getFilepickerJavascript('reloadEfgImportSource');
 
 	}
 
@@ -6132,7 +6135,7 @@ window.addEvent('domready', function(){
 	}
 
 
-	private function getFilepickerJavascript()
+	private function getFilepickerJavascript($strReload)
 	{
 
 		$strJs = "
@@ -6174,7 +6177,7 @@ function handleEfgFileselectorButton(){
 				opt.self.set('href', opt.self.get('href').replace(/&value=[^&]*/, '&value='+val.join(',')));
 			} else {
 				$('ctrl_'+opt.id).value = val.join(\"\t\");
-				var act = (opt.url.indexOf('contao/page.php') != -1) ? 'reloadPagetree' : 'reloadEfgFiletree';
+				var act = (opt.url.indexOf('contao/page.php') != -1) ? 'reloadPagetree' : '" . $strReload . "';
 				new Request.Contao({
 					field: $('ctrl_'+opt.id),
 					evalScripts: false,

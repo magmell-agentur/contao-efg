@@ -1,8 +1,11 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.0.2 stable (2013-XX-XX)
+Version 2.1.0 stable (2013-08-25)
 ---------------------------------
+
+### Changed
+Adapted backend file selector to Contao 3.1
 
 ### Fixed
 Handle field labels containing % (see #25)
