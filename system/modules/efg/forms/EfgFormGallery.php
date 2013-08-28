@@ -124,7 +124,7 @@ class EfgFormGallery extends \ContentElement
 	{
 
 		// Use the home directory of the current user as file source
-		if ($this->useHomeDir && FE_USER_LOGGED_IN)
+		if ($this->efgImageUseHomeDir && FE_USER_LOGGED_IN)
 		{
 			$this->import('FrontendUser', 'User');
 
