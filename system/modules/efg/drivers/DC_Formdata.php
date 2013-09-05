@@ -5199,9 +5199,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 	{
 		$arrSessionData = $this->Session->get('EFG');
 
-		$objTree = new \FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
-
-
 		$objFileSelector = new \FileTree(\Widget::getAttributesFromDca($GLOBALS['TL_DCA']['tl_formdata']['fields']['import_source'], 'import_source', null, 'import_source', 'tl_formdata'));
 
 		// Return form
