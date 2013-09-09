@@ -22,7 +22,7 @@ class EfgRunonce extends Controller
 		parent::__construct();
 
 		// Fix potential Exception on line 0 because of __destruct method (see http://dev.contao.org/issues/2236)
-		$this->import((TL_MODE=='BE' ? 'BackendUser' : 'FrontendUser'), 'User');
+		$this->import((TL_MODE == 'BE' ? 'BackendUser' : 'FrontendUser'), 'User');
 		$this->import('Database');
 	}
 
@@ -99,12 +99,16 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 		if (is_dir(TL_ROOT . '/system/cache/sql'))
 		{
 			$arrFiles = scan(TL_ROOT . '/system/cache/sql', true);
-			foreach ($arrFiles as $strFile)
+
+			if (!empty($arrFiles))
 			{
-				if (in_array($strFile, array('tl_form.php', 'tl_form_field.php', 'tl_formdata.php', 'tl_formdata_details.php', 'tl_module.php')))
+				foreach ($arrFiles as $strFile)
 				{
-					$objFile = new \File('system/cache/sql/' . $strFile);
-					$objFile->delete();
+					if (in_array($strFile, array('tl_form.php', 'tl_form_field.php', 'tl_formdata.php', 'tl_formdata_details.php', 'tl_module.php')))
+					{
+						$objFile = new \File('system/cache/sql/' . $strFile);
+						$objFile->delete();
+					}
 				}
 			}
 		}
