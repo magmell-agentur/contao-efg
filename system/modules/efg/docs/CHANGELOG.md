@@ -4,6 +4,9 @@ EFG - Extended From Generator for Contao Open Source CMS Changelog
 Version 2.1.0 stable (2013-09-XX)
 ---------------------------------
 
+### Fixed
+Ignore invisible form fields when checking for multipage form
+
 ### Changed
 Adapted backend file selector to Contao 3.1
 
@@ -36,7 +39,7 @@ when using foreign tables in 'condition'
 Backend filter menu did not keep search field after performing search
 
 ### Fixed
-Frontend modul 'Listing form data' did not show '0' values
+Frontend module 'Listing form data' did not show '0' values
 
 
 Version 2.0.0 stable (2013-03-09)
