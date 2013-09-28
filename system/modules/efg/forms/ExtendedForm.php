@@ -121,9 +121,11 @@ class ExtendedForm extends \Form
 			$this->import('Formdata');
 		}
 
-		// Check multipage
-		$objPaginators = \Database::getInstance()->prepare("SELECT id,pid,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=? ORDER BY `sorting`")
+		// Check if the form is a multipage form
+		$objPaginators = \Database::getInstance()
+			->prepare("SELECT id,pid,invisible,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=?" . ((!BE_USER_LOGGED_IN) ? " AND invisible=''" : "") . " ORDER BY `sorting`")
 			->execute($this->id, 'efgFormPaginator');
+
 		if ($objPaginators->numRows)
 		{
 			$this->blnMultipage = true;
