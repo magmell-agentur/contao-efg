@@ -1,7 +1,7 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 1.16.6 (2013-XX-XX)
+Version 1.16.6 (2013-11-17)
 
 ### Fixed
 Order by numeric values in frontend module 'Listing form data' did not
