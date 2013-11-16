@@ -1,8 +1,16 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.1.0 stable (2013-09-XX)
+Version 2.1.0 stable (2013-XX-XX)
 ---------------------------------
+
+### Fixed
+Order by numeric values in frontend module 'Listing form data' did not
+work with decimal values
+
+### Fixed
+Check if the folder system/cache/dca exists before scanning a non existing folder.
+(Thanks to David Maack)
 
 ### Fixed
 Ignore invisible form fields when checking for multipage form
