@@ -1053,7 +1053,7 @@ class ModuleFormdataListing extends Module
 			{
 				if (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']) && $GLOBALS['TL_DCA']['tl_formdata']['fields'][$this->Input->get('order_by')]['eval']['rgxp']=='digit')
 				{
-					$strQuery .= " ORDER BY CAST(`" . $this->Input->get('order_by') . '` AS DECIMAL) ' . $this->Input->get('sort');
+					$strQuery .= " ORDER BY CAST(`" . $this->Input->get('order_by') . '` AS DECIMAL(10,5)) ' . $this->Input->get('sort');
 				}
 				else
 				{
@@ -1079,7 +1079,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (in_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrMatch[1][0]]['eval']['rgxp'], $arrSortSigned))
 						{
-							$arrSort[] = preg_replace('/\b'.$arrMatch[1][0].'\b/i', 'CAST((SELECT value FROM tl_formdata_details WHERE ff_name="' .$arrMatch[1][0]. '" AND pid=f.id) AS DECIMAL)', $strSort);
+							$arrSort[] = preg_replace('/\b'.$arrMatch[1][0].'\b/i', 'CAST((SELECT value FROM tl_formdata_details WHERE ff_name="' .$arrMatch[1][0]. '" AND pid=f.id) AS DECIMAL(10,5))', $strSort);
 						}
 						else
 						{
@@ -1090,7 +1090,7 @@ class ModuleFormdataListing extends Module
 					{
 						if (in_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrMatch[1][0]]['eval']['rgxp'], $arrSortSigned))
 						{
-							$arrSort[] = preg_replace('/\b'.$arrMatch[1][0].'\b/i', 'CAST('.$arrMatch[1][0].' AS DECIMAL)', $strSort);
+							$arrSort[] = preg_replace('/\b'.$arrMatch[1][0].'\b/i', 'CAST('.$arrMatch[1][0].' AS DECIMAL(10,5))', $strSort);
 						}
 						else
 						{
