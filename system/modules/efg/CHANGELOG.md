@@ -2,6 +2,7 @@ EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
 Version 1.16.6 (2013-11-17)
+---------------------------
 
 ### Fixed
 Order by numeric values in frontend module 'Listing form data' did not
@@ -9,7 +10,7 @@ work with decimal values
 
 
 Version 1.16.5 (2013-03-17)
----------------------------------
+---------------------------
 
 ### Fixed
 Editing or deleting form data in module 'Listing form data' did not work when using foreign tables in 'condition'
