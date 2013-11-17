@@ -3466,7 +3466,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 
 			$return .= '
-<div class="tl_panel">'.$submit.$panels.'
+<div class="tl_panel">' . $submit . $arrPanels[$i] . '
 
 <div class="clear"></div>
 
