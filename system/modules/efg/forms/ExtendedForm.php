@@ -137,7 +137,7 @@ class ExtendedForm extends \Form
 			}
 		}
 
-		// use core class Form if this is not a multi page form and not frontend edit form
+		// Use the core class Form if this is not a multi page form and not frontend edit form
 		if ((!$this->blnMultipage && !$this->blnEditform) || $this->method == 'GET' || TL_MODE == 'BE')
 		{
 			// unset files in session to avoid wrong validation and submission of file uploads
@@ -480,16 +480,17 @@ class ExtendedForm extends \Form
 						}
 						$doNotSubmit = true;
 					}
-					// Store current value in the session
+					// Store the current value in the session
 					elseif ($objWidget->submitInput() || $strMode == 'back')
 					{
-						$arrSubmitted[$objFields->name] = $objWidget->value;
-						$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
+						if ($objWidget->submitInput())
+						{
+							$arrSubmitted[$objFields->name] = $objWidget->value;
+							$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
+							unset($_POST[$objFields->name]); // see #5474
+						}
 					}
-
-					unset($_POST[$objFields->name]);
 				}
-
 
 				if ($objWidget instanceof \FormHidden)
 				{
@@ -503,7 +504,7 @@ class ExtendedForm extends \Form
 
 					if ($this->blnMultipage || $this->blnEditform)
 					{
-						// save file info in session in frontend edit mode
+						// Save file info in the session in frontend edit mode
 						if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name])))
 						{
 							$objFile = new \File($arrEditRecord[$objFields->name]);
@@ -520,7 +521,7 @@ class ExtendedForm extends \Form
 							}
 						}
 
-						// add info about uploaded file to upload input
+						// Add info about uploaded file to upload input
 						if (isset($_SESSION['FILES'][$objFields->name]) && $_SESSION['FILES'][$objFields->name]['uploaded'])
 						{
 							$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
@@ -582,6 +583,7 @@ class ExtendedForm extends \Form
 						unset($_SESSION['FORM_DATA']['FORM_NEXT']);
 						unset($_SESSION['FORM_DATA']['FORM_BACK']);
 
+						// Populate arrSubmitted from session
 						$arrSubmitted = $_SESSION['FORM_DATA'];
 						$this->processFormData($arrSubmitted, $arrLabels);
 					}
@@ -609,20 +611,14 @@ class ExtendedForm extends \Form
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
 		$this->Template->action = $this->getIndexFreeRequest();
 		$this->Template->maxFileSize = $hasUpload ? $this->objModel->getMaxUploadFileSize() : false;
+		$this->Template->novalidate = $this->novalidate ? ' novalidate' : '';
 
-		// Get target URL
-		if ($this->method == 'GET')
+
+		// Get the target URL
+		if ($this->method == 'GET' && $this->jumpTo && ($objTarget = $this->objModel->getRelated('jumpTo')) !== null)
 		{
-			$objNextPage = \Database::getInstance()->prepare("SELECT id, alias FROM tl_page WHERE id=?")
-				->limit(1)
-				->execute($this->jumpTo);
-
-			if ($objNextPage->numRows)
-			{
-				$this->Template->action = $this->generateFrontendUrl($objNextPage->fetchAssoc());
-			}
+			$this->Template->action = $this->generateFrontendUrl($objTarget->row());
 		}
-
 
 		// add Javascript to handle html5 input attribute 'required' on back button
 		if ($blnIsHtml5)
