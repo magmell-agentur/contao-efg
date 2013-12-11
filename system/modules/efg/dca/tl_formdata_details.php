@@ -44,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		'sorting' => array
 		(
 			'mode'                    => 4,
-//			'fields'                  => array('ff_name','ff_label','value'),
 			'panelLayout'             => 'search,filter',
 			'headerFields'            => array('form', 'date', 'ip', 'be_notes'),
 			'child_record_callback'   => array('tl_formdata_details', 'listFormdata')
@@ -92,9 +91,7 @@ $GLOBALS['TL_DCA']['tl_formdata_details'] = array
 		),
 		'pid' => array
 		(
-			//	'foreignKey'              => 'tl_formdata.alias',
 			'sql'                     => "int(10) unsigned NOT NULL default '0'",
-			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
 		),
 		'sorting' => array
 		(
