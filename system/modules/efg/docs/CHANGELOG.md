@@ -1,8 +1,30 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.1.0 stable (2013-09-XX)
+Version 2.1.0 stable (2013-12-28)
 ---------------------------------
+
+### Fixed
+Backend filter menu could generate invalid SQL when filtering on form data details field
+
+### Changed
+Internal cache is rebuilt when updating form data config and dca files (on saving form in form generator)
+
+### Fixed
+Fixed path of icons folder used in frontend module 'listing form data'
+
+### Fixed
+Removed invalid relation definition causing a fatal error in Contao 3.2.x
+
+### Fixed
+Fixed issue with unwanted data stored in $_SESSION['FORM_DATA'] and $arrSubmitted (see #34)
+
+### Fixed
+Fixed wrong (double) backend filter panel
+
+### Fixed
+Order by numeric values in frontend module 'Listing form data' did not
+work with decimal values (see #40)
 
 ### Fixed
 Check if the folder system/cache/dca exists before scanning a non existing folder.
