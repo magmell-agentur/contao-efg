@@ -11,6 +11,9 @@ Removed invalid relation definition causing a fatal error in Contao 3.2.x
 Fixed issue with unwanted data stored in $_SESSION['FORM_DATA'] and $arrSubmitted (see #34)
 
 ### Fixed
+Fixed wrong (double) backend filter panel
+
+### Fixed
 Order by numeric values in frontend module 'Listing form data' did not
 work with decimal values (see #40)
 
