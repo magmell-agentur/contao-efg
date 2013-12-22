@@ -5,6 +5,9 @@ Version 2.1.0 stable (2013-XX-XX)
 ---------------------------------
 
 ### Fixed
+Fixed path of icons folder used in frontend module 'listing form data'
+
+### Fixed
 Removed invalid relation definition causing a fatal error in Contao 3.2.x
 
 ### Fixed
