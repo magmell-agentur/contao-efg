@@ -32,7 +32,7 @@ class ModuleFormdataListing extends \Module
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'list_default';
+	protected $strTemplate = 'list_fd_table_default';
 
 	protected $strTable = 'tl_formdata';
 
@@ -176,9 +176,9 @@ class ModuleFormdataListing extends \Module
 		}
 
 		// Fallback template
-		if (!strlen($this->list_layout))
+		if ($this->list_layout == '')
 		{
-			$this->list_layout = 'list_default';
+			$this->list_layout = 'list_fd_table_default';
 		}
 
 		$this->import('FrontendUser', 'Member');
@@ -2009,9 +2009,9 @@ class ModuleFormdataListing extends \Module
 		$allowedDownload = trimsplit(',', strtolower($GLOBALS['TL_CONFIG']['allowedDownload']));
 
 		// Fallback template
-		if (!strlen($this->list_info_layout))
+		if ($this->list_info_layout == '')
 		{
-			$this->list_info_layout = 'info_default';
+			$this->list_info_layout = 'info_fd_table_default';
 		}
 
 		$this->Template = new \FrontendTemplate($this->list_info_layout);
