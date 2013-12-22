@@ -36,6 +36,8 @@ class ModuleFormdataListing extends \Module
 
 	protected $strTable = 'tl_formdata';
 
+	protected $strIconFolder = null;
+
 	/**
 	 * Related form, like fd_frm_contact
 	 * @param string
@@ -120,6 +122,7 @@ class ModuleFormdataListing extends \Module
 	 * Fields to ignore on export
 	 */
 	protected $arrExportIgnoreFields = null;
+
 
 	/**
 	 * Display a wildcard in the back end
@@ -480,6 +483,8 @@ class ModuleFormdataListing extends \Module
 			$strSearchFormType = $this->efg_list_searchtype;
 		}
 
+		$this->strIconFolder = (strlen($this->efg_iconfolder) ? $this->efg_iconfolder : 'system/modules/efg/assets');
+
 		$this->import('FrontendUser', 'Member');
 
 		$this->list_table = 'tl_formdata';
@@ -579,7 +584,7 @@ class ModuleFormdataListing extends \Module
 			$this->Template->textlink_delete = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_delete'];
 			$this->Template->text_confirmDelete = $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'];
 			$this->Template->textlink_export = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export'];
-			$this->Template->iconFolder = (strlen($this->efg_iconfolder) ? $this->efg_iconfolder : 'system/modules/efg/assets');
+			$this->Template->iconFolder = $this->strIconFolder;
 
 			$this->Template->details = strlen($this->list_info) ? true : false;
 
@@ -1525,13 +1530,13 @@ class ModuleFormdataListing extends \Module
 									$arrTd[$class][count($arrTd[$class])-1]['size'] = $size;
 									$arrTd[$class][count($arrTd[$class])-1]['href'] = $href;
 									$arrTd[$class][count($arrTd[$class])-1]['linkTitle'] = basename($objFile->basename);
-									$arrTd[$class][count($arrTd[$class])-1]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/assets/') . $objFile->icon;
+									$arrTd[$class][count($arrTd[$class])-1]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 
 									$arrListItems[$i][$k]['display'] = 'download';
 									$arrListItems[$i][$k]['size'] = $size;
 									$arrListItems[$i][$k]['href'] = $href;
 									$arrListItems[$i][$k]['linkTitle'] = basename($objFile->basename);
-									$arrListItems[$i][$k]['icon'] = (strlen($this->efg_iconfolder)? $this->efg_iconfolder.'/' : 'system/modules/efg/assets/') . $objFile->icon;
+									$arrListItems[$i][$k]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 								}
 							}
 						}
@@ -1576,7 +1581,7 @@ class ModuleFormdataListing extends \Module
 											$arrTemp[$keyTemp]['size'] = $size;
 											$arrTemp[$keyTemp]['href'] = $href;
 											$arrTemp[$keyTemp]['linkTitle'] = basename($objFile->basename);
-											$arrTemp[$keyTemp]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+											$arrTemp[$keyTemp]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 
 										}
 									}
@@ -1641,7 +1646,6 @@ class ModuleFormdataListing extends \Module
 			$this->Template->for = \Input::get('for');
 			$this->Template->order_by = \Input::get('order_by');
 			$this->Template->sort = \Input::get('sort');
-			//$this->Template->col_last = 'col_' . $j;
 			$this->Template->col_last = 'col_' . $intLastCol;
 
 		}
@@ -2017,6 +2021,7 @@ class ModuleFormdataListing extends \Module
 		$this->Template->textlink_delete = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_delete'];
 		$this->Template->text_confirmDelete = $GLOBALS['TL_LANG']['tl_formdata']['fe_deleteConfirm'];
 		$this->Template->textlink_export = $GLOBALS['TL_LANG']['tl_formdata']['fe_link_export'];
+		$this->Template->iconFolder = $this->strIconFolder;
 
 		$this->Template->editAllowed = $blnEditAllowed;
 		$this->Template->deleteAllowed = $blnDeleteAllowed;
@@ -2203,13 +2208,13 @@ class ModuleFormdataListing extends \Module
 							$arrFields[$class]['size'] = $size;
 							$arrFields[$class]['href'] = $href;
 							$arrFields[$class]['linkTitle'] = basename($objFile->basename);
-							$arrFields[$class]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+							$arrFields[$class]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 
 							$arrItem[$k]['display'] = 'download';
 							$arrItem[$k]['size'] = $size;
 							$arrItem[$k]['href'] = $href;
 							$arrItem[$k]['linkTitle'] = basename($objFile->basename);
-							$arrItem[$k]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+							$arrItem[$k]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 						}
 					}
 				}
@@ -2255,7 +2260,7 @@ class ModuleFormdataListing extends \Module
 									$arrTemp[$keyTemp]['size'] = $size;
 									$arrTemp[$keyTemp]['href'] = $href;
 									$arrTemp[$keyTemp]['linkTitle'] = basename($objFile->basename);
-									$arrTemp[$keyTemp]['icon'] = 'system/themes/' . $this->getTheme() . '/images/' . $objFile->icon;
+									$arrTemp[$keyTemp]['icon'] = $this->strIconFolder . '/' . $objFile->icon;
 
 								}
 							}
