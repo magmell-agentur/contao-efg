@@ -3873,17 +3873,24 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				if (isset($session['filter'][$filter][$field]))
 				{
+					$strProcField = $field;
+
+					if (in_array($field, $this->arrDetailFields))
+					{
+						$strProcField = "(SELECT `value` FROM tl_formdata_details WHERE ff_name='" . $field . "' AND pid=f.id)";
+					}
+
 					// Sort by day
 					if (in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['flag'], array(5, 6)))
 					{
 						if ($session['filter'][$filter][$field] == '')
 						{
-							$this->procedure[] = $field . "=''";
+							$this->procedure[] = $strProcField . "=''";
 						}
 						else
 						{
 							$objDate = new \Date($session['filter'][$filter][$field]);
-							$this->procedure[] = $field . ' BETWEEN ? AND ?';
+							$this->procedure[] = $strProcField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->dayBegin;
 							$this->values[] = $objDate->dayEnd;
 						}
@@ -3894,12 +3901,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					{
 						if ($session['filter'][$filter][$field] == '')
 						{
-							$this->procedure[] = $field . "=''";
+							$this->procedure[] = $strProcField . "=''";
 						}
 						else
 						{
 							$objDate = new \Date($session['filter'][$filter][$field]);
-							$this->procedure[] = $field . ' BETWEEN ? AND ?';
+							$this->procedure[] = $strProcField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->monthBegin;
 							$this->values[] = $objDate->monthEnd;
 						}
@@ -3910,12 +3917,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					{
 						if ($session['filter'][$filter][$field] == '')
 						{
-							$this->procedure[] = $field . "=''";
+							$this->procedure[] = $strProcField . "=''";
 						}
 						else
 						{
 							$objDate = new \Date($session['filter'][$filter][$field]);
-							$this->procedure[] = $field . ' BETWEEN ? AND ?';
+							$this->procedure[] = $strProcField . ' BETWEEN ? AND ?';
 							$this->values[] = $objDate->yearBegin;
 							$this->values[] = $objDate->yearEnd;
 						}
@@ -3927,12 +3934,21 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						// CSV lists (see #2890)
 						if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['csv']))
 						{
-							$this->procedure[] = \Database::getInstance()->findInSet('?', $field, true);
-							$this->values[] = $session['filter'][$filter][$field];
+							if (in_array($field, $this->arrDetailFields))
+							{
+								$this->procedure[] = \Database::getInstance()
+									->findInSet('?', "(SELECT REPLACE(`value`, '".$GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['csv']."', ',') FROM tl_formdata_details WHERE ff_name='".$field."' AND pid=f.id)", true);
+								$this->values[] = $session['filter'][$filter][$field];
+							}
+							else
+							{
+								$this->procedure[] = \Database::getInstance()->findInSet('?', $strProcField, true);
+								$this->values[] = $session['filter'][$filter][$field];
+							}
 						}
 						else
 						{
-							$this->procedure[] = $field . ' LIKE ?';
+							$this->procedure[] = $strProcField . ' LIKE ?';
 							$this->values[] = '%"' . $session['filter'][$filter][$field] . '"%';
 						}
 					}
@@ -3940,7 +3956,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// Other sort algorithm
 					else
 					{
-						$this->procedure[] = $field . '=?';
+						$this->procedure[] = $strProcField . '=?';
 						$this->values[] = $session['filter'][$filter][$field];
 					}
 				}

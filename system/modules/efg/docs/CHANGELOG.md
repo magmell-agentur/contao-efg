@@ -4,6 +4,9 @@ EFG - Extended From Generator for Contao Open Source CMS Changelog
 Version 2.1.0 stable (2013-XX-XX)
 ---------------------------------
 
+### Fixed
+Backend filter menu could generate invalid SQL when filtering on form data details field
+
 ### Changed
 Internal cache is rebuilt when updating form data config and dca files (on saving form in form generator)
 
