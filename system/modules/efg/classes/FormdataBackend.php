@@ -148,7 +148,7 @@ class FormdataBackend extends \Backend
 
 			foreach ($arrFiles as $strFile)
 			{
-				if (substr($strFile, 0, 3) == 'fd_' || $strFile == 'tl_formdata.php')
+				if (substr($strFile, 0, 3) == 'fd_' || $strFile == 'tl_formdata.php' || $strFile == 'tl_formdata_details.php')
 				{
 					$objFile = new \File('system/cache/dca/' . $strFile);
 					$objFile->delete();
@@ -405,6 +405,15 @@ class FormdataBackend extends \Backend
 
 		}
 
+		// Rebuild internal cache
+		if (!$GLOBALS['TL_CONFIG']['bypassCache'])
+		{
+			$this->import('Automator');
+
+			$this->Automator->generateConfigCache();
+			$this->Automator->generateDcaCache();
+			$this->Automator->generateDcaExtracts();
+		}
 
 	}
 
