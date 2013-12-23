@@ -4,6 +4,9 @@ EFG - Extended From Generator for Contao Open Source CMS Changelog
 Version 2.1.0 stable (2013-XX-XX)
 ---------------------------------
 
+### Changed
+Internal cache is rebuilt when updating form data config and dca files (on saving form in form generator)
+
 ### Fixed
 Fixed path of icons folder used in frontend module 'listing form data'
 
