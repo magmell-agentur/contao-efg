@@ -1372,7 +1372,8 @@ class Formdata extends \Frontend
 					$strVal = '';
 					$arrSel = array();
 					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
-						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']
+						: '|';
 
 					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
@@ -1425,7 +1426,8 @@ class Formdata extends \Frontend
 					$arrSel = array();
 
 					$strSep = (isset($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']))
-						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv'] : '|';
+						? $GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['csv']
+						: '|';
 
 					if (is_string($varValue) && strpos($varValue, $strSep) !== false)
 					{
@@ -1459,16 +1461,16 @@ class Formdata extends \Frontend
 
 					if ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'date')
 					{
-						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $strVal);
+						$strVal = \Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $strVal);
 					}
 					elseif ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'time')
 					{
-						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $strVal);
+						$strVal = \Date::parse($GLOBALS['TL_CONFIG']['timeFormat'], $strVal);
 					}
 					elseif ($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['eval']['rgxp'] == 'datim'
 						|| in_array($GLOBALS['TL_DCA']['tl_formdata']['fields'][$arrField['name']]['flag'], array(5, 6, 7, 8, 9, 10)))
 					{
-						$strVal = $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $strVal);
+						$strVal = \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $strVal);
 					}
 
 					break;
@@ -1624,7 +1626,6 @@ class Formdata extends \Frontend
 						}
 						elseif ($mxVal == $varVal)
 						{
-							//$varVal[$sK] = $sK;
 							$varVal = $sK;
 							break;
 						}
@@ -1659,15 +1660,15 @@ class Formdata extends \Frontend
 						{
 							if ($arrField['rgxp'] == 'date')
 							{
-								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
+								$varVal = \Date::parse((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['dateFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'datim')
 							{
-								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat']), $varVal);
+								$varVal = \Date::parse((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['datimFormat']), $varVal);
 							}
 							elseif ($arrField['rgxp'] == 'time')
 							{
-								$varVal = $this->parseDate((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['timeFormat']), $varVal);
+								$varVal = \Date::parse((!empty($arrField['dateFormat']) ? $arrField['dateFormat'] : $GLOBALS['TL_CONFIG']['timeFormat']), $varVal);
 							}
 						}
 					}

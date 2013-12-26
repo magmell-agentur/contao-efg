@@ -399,7 +399,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		// Store the current referer
-		if (!empty($this->ctable) && !\Input::get('act') && !\Input::get('key') && !\Input::get('token'))
+		if (!empty($this->ctable) && !\Input::get('act') && !\Input::get('key') && !\Input::get('token') && \Environment::get('script') == 'contao/main.php' && !\Environment::get('isAjaxRequest'))
 		{
 			$session = $this->Session->get('referer');
 			$session[TL_REFERER_ID][$this->strTable] = substr(\Environment::get('requestUri'), strlen(TL_PATH) + 1);
@@ -589,7 +589,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Show all allowed fields
 		foreach ($fields as $i)
 		{
-
 			if (!in_array($i, $allowedFields)
 				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['inputType'] == 'password'
 				|| $GLOBALS['TL_DCA'][$this->strTable]['fields'][$i]['eval']['doNotShow']
@@ -607,7 +606,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$value = deserialize($row[$i]);
 			$class = (($count++ % 2) == 0) ? ' class="tl_bg"' : '';
 
-			// Ignore empty detail fields if this is overall "feedback"
+			// Ignore empty detail fields if this is overall 'feedback'
 			if (empty($this->strFormKey) && in_array($i, $this->arrDetailFields) && empty($value))
 			{
 				continue;
@@ -1579,7 +1578,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					}
 
 					// field type efgLookupCheckbox
-					elseif ($strInputType=='efgLookupCheckbox')
+					elseif ($strInputType == 'efgLookupCheckbox')
 					{
 						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 						$arrNewOptions = array();
@@ -1620,7 +1619,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					}
 
 					// field type efgLookupRadio
-					elseif ($strInputType=='efgLookupRadio')
+					elseif ($strInputType == 'efgLookupRadio')
 					{
 						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 						$arrNewOptions = array();
@@ -1752,7 +1751,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				}
 			}
 
-			// Set the current timestamp (-> DO NOT CHANGE ORDER version - timestamp)
+			// Set the current timestamp
 			\Database::getInstance()->prepare("UPDATE " . $this->strTable . " SET tstamp=? WHERE " . implode(' AND ', $this->procedure))
 				->execute($arrValues);
 
@@ -2011,7 +2010,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								}
 							}
 						}
-						// elseif (!is_array($this->varValue))
 						else
 						{
 							// foreignKey fields
@@ -2235,7 +2233,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					}
 
 					// field type efgLookupCheckbox
-					elseif ($strInputType=='efgLookupCheckbox')
+					elseif ($strInputType == 'efgLookupCheckbox')
 					{
 						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -2276,7 +2274,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					}
 
 					// field type efgLookupRadio
-					elseif ($strInputType=='efgLookupRadio')
+					elseif ($strInputType == 'efgLookupRadio')
 					{
 						$arrFieldOptions = $this->Formdata->prepareWidgetOptions($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]);
 
@@ -3171,17 +3169,17 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					{
 						if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'date')
 						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '';
+							$args[$k] = strlen($row[$v]) ? \Date::parse($GLOBALS['TL_CONFIG']['dateFormat'], $row[$v]) : '-';
 							$rowFormatted[$v] = $args[$k];
 						}
 						elseif ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$v]['eval']['rgxp'] == 'time')
 						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '';
+							$args[$k] = strlen($row[$v]) ? \Date::parse($GLOBALS['TL_CONFIG']['timeFormat'], $row[$v]) : '-';
 							$rowFormatted[$v] = $args[$k];
 						}
 						else
 						{
-							$args[$k] = strlen($row[$v]) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '';
+							$args[$k] = strlen($row[$v]) ? \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $row[$v]) : '-';
 							$rowFormatted[$v] = $args[$k];
 						}
 					}
@@ -3801,7 +3799,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				return '';
 			}
 
-			$fields .= '
+			$fields = '
 <select name="tl_limit" class="tl_select' . (($session['filter'][$filter]['limit'] != 'all' && $total > $GLOBALS['TL_CONFIG']['resultsPerPage']) ? ' active' : '') . '" onchange="this.form.submit()">
   <option value="tl_limit">'.$GLOBALS['TL_LANG']['MSC']['filterRecords'].'</option>'.$options.'
 </select> ';
@@ -3942,7 +3940,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 							}
 							else
 							{
-								$this->procedure[] = \Database::getInstance()->findInSet('?', $strProcField, true);
+								$this->procedure[] = \Database::getInstance()
+									->findInSet('?', $strProcField, true);
 								$this->values[] = $session['filter'][$filter][$field];
 							}
 						}
