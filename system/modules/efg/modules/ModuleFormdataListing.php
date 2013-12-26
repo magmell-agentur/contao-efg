@@ -3138,19 +3138,19 @@ class ModuleFormdataListing extends \Module
 		// Date and time
 		elseif ($value && $rgxp == 'date')
 		{
-			$value = $this->parseDate((!empty($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat']) ? $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat'] : $objPage->dateFormat), $value);
+			$value = \Date::parse((!empty($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat']) ? $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['dateFormat'] : $objPage->dateFormat), $value);
 		}
 
 		// Time
 		elseif ($value && $rgxp == 'time')
 		{
-			$value = $this->parseDate($objPage->timeFormat, $value);
+			$value = \Date::parse($objPage->timeFormat, $value);
 		}
 
 		// Date and time
 		elseif ($value && $rgxp == 'datim')
 		{
-			$value = $this->parseDate($objPage->datimFormat, $value);
+			$value = \Date::parse($objPage->datimFormat, $value);
 		}
 		elseif ($value && ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'checkbox'
 				|| $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'efgLookupCheckbox'
