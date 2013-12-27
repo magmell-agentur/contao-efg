@@ -390,14 +390,14 @@ class FormdataProcessor extends \Frontend
 			$objMailProperties->skipEmptyFields = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			// Set the sender as given in form configuration
-			list($senderName, $sender) = $this->splitFriendlyName($arrForm['confirmationMailSender']);
+			list($senderName, $sender) = \String::splitFriendlyEmail($arrForm['confirmationMailSender']);
 			$objMailProperties->sender = $sender;
 			$objMailProperties->senderName = $senderName;
 
 			// Set the 'reply to' address, if given in form configuration
 			if (!empty($arrForm['confirmationMailReplyto']))
 			{
-				list($replyToName, $replyTo) = $this->splitFriendlyName($arrForm['confirmationMailReplyto']);
+				list($replyToName, $replyTo) = \String::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
 				$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 			}
 
@@ -425,7 +425,7 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					list($recipientName, $recipient) = $this->splitFriendlyName($this->replaceInsertTags($recipient, false));
+					list($recipientName, $recipient) = \String::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
 					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
@@ -578,7 +578,7 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					list($recipientName, $recipient) = $this->splitFriendlyName($this->replaceInsertTags($recipient, false));
+					list($recipientName, $recipient) = \String::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
 					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
@@ -676,7 +676,7 @@ class FormdataProcessor extends \Frontend
 			if (!empty($strRedirectTo))
 			{
 				$strRed = preg_replace(array('/\/' . $this->strFormdataDetailsKey . '\/' . \Input::get($this->strFormdataDetailsKey) . '/i', '/' . $this->strFormdataDetailsKey . '=' . \Input::get($this->strFormdataDetailsKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (!empty($strUrlParams) ? '?'.$strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 		}
 

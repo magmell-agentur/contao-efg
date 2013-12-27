@@ -99,7 +99,7 @@ class FormdataBackend extends \Backend
 
 	/**
 	 * Callback edit button
-	 * @return array
+	 * @return string
 	 */
 	public function callbackEditButton($row, $href, $label, $title, $icon, $attributes, $strTable, $arrRootIds, $arrChildRecordIds, $blnCircularReference, $strPrevious, $strNext)
 	{
@@ -108,7 +108,7 @@ class FormdataBackend extends \Backend
 		$strDcaKey = array_search($row['form'], $this->Formdata->arrFormsDcaKey);
 		if ($strDcaKey)
 		{
-			$return .= '<a href="'.$this->addToUrl($href.'&amp;do=fd_'.$strDcaKey.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+			$return .= '<a href="' . \Backend::addToUrl($href . '&amp;do=fd_' . $strDcaKey . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes.'>' . \Image::getHtml($icon, $label) . '</a> ';
 		}
 
 		return $return;

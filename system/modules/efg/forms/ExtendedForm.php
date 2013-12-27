@@ -198,12 +198,12 @@ class ExtendedForm extends \Form
 				if ($intGoto < $intActivePage)
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = ($intGoto < 1 ? 1 : $intGoto);
-					$this->reload();
+					\Controller::reload();
 				}
 				elseif ($intGoto > $intActivePage && $_SESSION['EFP'][$formId]['completed']['page_'.$intGoto])
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = $intGoto;
-					$this->reload();
+					\Controller::reload();
 				}
 			}
 
@@ -562,7 +562,7 @@ class ExtendedForm extends \Form
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] + 1);
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
-					$this->reload();
+					\Controller::reload();
 				}
 				// if posted 'back'
 				elseif ($strMode == 'back' && $this->intActivePage <= $this->intTotalPages
@@ -570,7 +570,7 @@ class ExtendedForm extends \Form
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] - 1);
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
-					$this->reload();
+					\Controller::reload();
 				}
 				// last page completed, process form
 				else
@@ -609,7 +609,7 @@ class ExtendedForm extends \Form
 		$this->Template->attributes = $strAttributes;
 		$this->Template->enctype = $hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$this->Template->formId = strlen($arrAttributes[0]) ? $arrAttributes[0] : 'f' . $this->id;
-		$this->Template->action = $this->getIndexFreeRequest();
+		$this->Template->action = \Environment::get('indexFreeRequest');
 		$this->Template->maxFileSize = $hasUpload ? $this->objModel->getMaxUploadFileSize() : false;
 		$this->Template->novalidate = $this->novalidate ? ' novalidate' : '';
 

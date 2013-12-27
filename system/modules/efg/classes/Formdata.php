@@ -320,7 +320,7 @@ class Formdata extends \Frontend
 						if (intval($pageId) > 0)
 						{
 							$domain = \Environment::get('base');
-							$objParent = $this->getPageDetails($pageId);
+							$objParent = \PageModel::findWithDetails($pageId);
 
 							if (!empty($objParent->domain))
 							{
