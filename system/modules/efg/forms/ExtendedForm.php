@@ -663,9 +663,13 @@ window.addEvent(\'domready\', function(){
 		elseif ($objPage->hasJQuery)
 		{
 			return '
-$(\'#'.$this->Template->formId.' input.back\').click(function(){
-	$(\'#'.$this->Template->formId.'\').attr(\'novalidate\', true);
-});
+(function($){
+	$(document).ready(function(){
+		$(\'#'.$this->Template->formId.' input.back\').click(function(){
+			$(\'#'.$this->Template->formId.'\').attr(\'novalidate\', true);
+		});
+	});
+})(jQuery);
 ';
 		}
 
