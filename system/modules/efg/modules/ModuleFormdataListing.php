@@ -690,7 +690,7 @@ class ModuleFormdataListing extends \Module
 				}
 
 				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?'.$strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 
 			if (\Input::get('act') == 'edit' && intval($this->intRecordId) > 0)
@@ -1926,7 +1926,7 @@ class ModuleFormdataListing extends \Module
 		if (intval($this->intRecordId) < 1)
 		{
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 
 		// check access
@@ -1939,7 +1939,7 @@ class ModuleFormdataListing extends \Module
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
 				$strRed = preg_replace(array('/\/'.$this->strDetailKey.'\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 		}
 
@@ -2398,7 +2398,7 @@ class ModuleFormdataListing extends \Module
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
 				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 		}
 
@@ -2864,7 +2864,7 @@ class ModuleFormdataListing extends \Module
 			unset($_GET['act']);
 
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i'), array('',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 
 		// Check Owner and Alias
@@ -2879,7 +2879,7 @@ class ModuleFormdataListing extends \Module
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
 				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 		}
 
@@ -2903,7 +2903,7 @@ class ModuleFormdataListing extends \Module
 		if ($blnEditAllowed == false)
 		{
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 
 		$intListingId = 0;
@@ -2947,7 +2947,7 @@ class ModuleFormdataListing extends \Module
 			$this->log("Could not find a ContentElement containing the form \"".$strForm."\"", __METHOD__, 'ERROR');
 
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=edit/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 
 		$this->Template = new \FrontendTemplate($this->list_edit_layout);
@@ -3027,7 +3027,7 @@ class ModuleFormdataListing extends \Module
 			unset($_GET['act']);
 
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', 'act=delete'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 
 		// Check Owner and Alias
@@ -3042,7 +3042,7 @@ class ModuleFormdataListing extends \Module
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
 			{
 				$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-				$this->redirect($strRed);
+				\Controller::redirect($strRed);
 			}
 		}
 
@@ -3069,7 +3069,7 @@ class ModuleFormdataListing extends \Module
 		if ($blnDeleteAllowed == false)
 		{
 			$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-			$this->redirect($strRed);
+			\Controller::redirect($strRed);
 		}
 		else
 		{
@@ -3083,7 +3083,7 @@ class ModuleFormdataListing extends \Module
 
 		// redirect to list
 		$strRed = preg_replace(array('/\/' . $this->strDetailKey . '\/' . \Input::get($this->strDetailKey) . '/i', '/' . $this->strDetailKey . '=' . \Input::get($this->strDetailKey) . '/i', '/act=delete/i'), array('','',''), $strUrl) . (strlen($strUrlParams) ? '?' . $strUrlParams : '');
-		$this->redirect($strRed);
+		\Controller::redirect($strRed);
 
 	}
 

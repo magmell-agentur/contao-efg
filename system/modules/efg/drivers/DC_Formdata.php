@@ -203,7 +203,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			if (!isset($_GET['rt']) || !\RequestToken::validate(\Input::get('rt')))
 			{
 				$this->Session->set('INVALID_TOKEN_URL', \Environment::get('request'));
-				$this->redirect('contao/confirm.php');
+				\Controller::redirect('contao/confirm.php');
 			}
 		}
 
@@ -213,7 +213,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if (isset($_GET['clipboard']))
 		{
 			$this->Session->set('CLIPBOARD', array());
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 
 		$this->loadDataContainer('tl_form_field');
@@ -285,7 +285,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			if (!is_array($ids) || empty($ids))
 			{
-				$this->reload();
+				\Controller::reload();
 			}
 
 			$session = $this->Session->getData();
@@ -294,15 +294,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			if (isset($_POST['edit']))
 			{
-				$this->redirect(str_replace('act=select', 'act=editAll', \Environment::get('request')));
+				\Controller::redirect(str_replace('act=select', 'act=editAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['delete']))
 			{
-				$this->redirect(str_replace('act=select', 'act=deleteAll', \Environment::get('request')));
+				\Controller::redirect(str_replace('act=select', 'act=deleteAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['override']))
 			{
-				$this->redirect(str_replace('act=select', 'act=overrideAll', \Environment::get('request')));
+				\Controller::redirect(str_replace('act=select', 'act=overrideAll', \Environment::get('request')));
 			}
 			elseif (isset($_POST['cut']) || isset($_POST['copy']))
 			{
@@ -315,7 +315,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				);
 
 				$this->Session->set('CLIPBOARD', $arrClipboard);
-				$this->redirect($this->getReferer());
+				\Controller::redirect($this->getReferer());
 			}
 		}
 
@@ -866,11 +866,11 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				// Add a log entry
 				$this->log('A new entry in table "'.$this->strTable.'" has been created (ID: '.$insertID.')', __METHOD__, TL_GENERAL);
-				$this->redirect($this->switchToEdit($insertID).$s2e);
+				\Controller::redirect($this->switchToEdit($insertID).$s2e);
 			}
 		}
 
-		$this->redirect($this->getReferer());
+		\Controller::redirect($this->getReferer());
 	}
 
 
@@ -895,12 +895,12 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notDeletable'])
 		{
 			$this->log('Table "'.$this->strTable.'" is not deletable', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		if (!$this->intId)
 		{
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 
 		$data = array();
@@ -913,7 +913,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				->limit(1)
 				->execute($this->intId);
 
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 
 		// If there is a PID field but no parent table
@@ -1003,7 +1003,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (!$blnDoNotRedirect)
 		{
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 	}
 
@@ -1016,7 +1016,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notDeletable'])
 		{
 			$this->log('Table "'.$this->strTable.'" is not deletable', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		$session = $this->Session->getData();
@@ -1031,7 +1031,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 		}
 
-		$this->redirect($this->getReferer());
+		\Controller::redirect($this->getReferer());
 	}
 
 
@@ -1088,7 +1088,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Check whether there is a record
 		if ($objRecords->numRows < 1)
 		{
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 
 		$error = false;
@@ -1097,7 +1097,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (!is_array($data))
 		{
-			$this->redirect($this->getReferer());
+			\Controller::redirect($this->getReferer());
 		}
 
 		// Restore the data
@@ -1134,7 +1134,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				->execute($this->intId);
 		}
 
-		$this->redirect($this->getReferer());
+		\Controller::redirect($this->getReferer());
 	}
 
 
@@ -1157,7 +1157,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notEditable'])
 		{
 			$this->log('Table "' . $this->strTable . '" is not editable', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		if ($intID != '')
@@ -1186,7 +1186,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		$this->objActiveRecord = $objRow;
@@ -1418,7 +1418,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 										unset($arrForeignRecords);
 									}
 
-									// unset dca 'foreignKey': prevents Controller->prepareForWidget to read options from table instead handle as normal select
+									// unset dca 'foreignKey': prevents \Widget::getAttributesFromDca to read options from table instead handle as normal select
 									unset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
 									unset($objForeignFd);
 								}
@@ -1444,7 +1444,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 										unset($arrForeignRecords);
 									}
 
-									// unset dca 'foreignKey': prevents Controller->prepareForWidget to read options from table instead handle as normal select
+									// unset dca 'foreignKey': prevents \Widget::getAttributesFromDca to read options from table instead handle as normal select
 									unset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
 									unset($objForeign);
 								}
@@ -1760,25 +1760,25 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				\Message::reset();
 				\System::setCookie('BE_PAGE_OFFSET', 0, 0);
-				$this->redirect($this->getReferer());
+				\Controller::redirect($this->getReferer());
 			}
 			elseif (isset($_POST['saveNedit']))
 			{
 				\Message::reset();
 				\System::setCookie('BE_PAGE_OFFSET', 0, 0);
-				$strUrl = $this->addToUrl($GLOBALS['TL_DCA'][$this->strTable]['list']['operations']['edit']['href']);
+				$strUrl = \Backend::addToUrl($GLOBALS['TL_DCA'][$this->strTable]['list']['operations']['edit']['href']);
 
 				$strUrl = preg_replace('/(&amp;)?s2e=[^&]*/i', '', $strUrl);
 				$strUrl = preg_replace('/(&amp;)?act=[^&]*/i', '', $strUrl);
 
-				$this->redirect($strUrl);
+				\Controller::redirect($strUrl);
 			}
 			elseif (isset($_POST['saveNback']))
 			{
 				\Message::reset();
 				\System::setCookie('BE_PAGE_OFFSET', 0, 0);
 
-				$this->redirect(\Environment::get('script') . '?do=' . \Input::get('do'));
+				\Controller::redirect(\Environment::get('script') . '?do=' . \Input::get('do'));
 			}
 
 			elseif (isset($_POST['saveNcreate']))
@@ -1794,10 +1794,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				$strUrl .= strlen($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) ? '&amp;act=create&amp;mode=2&amp;pid=' . CURRENT_ID : '&amp;act=create';
 
-				$this->redirect($strUrl . '&amp;rt=' . REQUEST_TOKEN);
+				\Controller::redirect($strUrl . '&amp;rt=' . REQUEST_TOKEN);
 			}
 
-			$this->reload();
+			\Controller::reload();
 		}
 
 		// Set the focus if there is an error
@@ -1827,7 +1827,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($GLOBALS['TL_DCA'][$this->strTable]['config']['notEditable'])
 		{
 			$this->log('Table "' . $this->strTable . '" is not editable', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		$return = '';
@@ -2080,7 +2080,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 										unset($arrForeignRecords);
 									}
 
-									// unset dca 'foreignKey': prevents Controller->prepareForWidget to read options from table instead handle as normal select
+									// unset dca 'foreignKey': prevents \Widget::getAttributesFromDca to read options from table instead handle as normal select
 									unset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
 									unset($objForeignFd);
 								}
@@ -2106,7 +2106,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 										unset($arrForeignRecords);
 									}
 
-									// unset dca 'foreignKey': prevents Controller->prepareForWidget to read options from table instead handle as normal select
+									// unset dca 'foreignKey': prevents \Widget::getAttributesFromDca to read options from table instead handle as normal select
 									unset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['foreignKey']);
 									unset($objForeign);
 								}
@@ -2411,10 +2411,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				if (\Input::post('saveNclose'))
 				{
 					\System::setCookie('BE_PAGE_OFFSET', 0, 0);
-					$this->redirect($this->getReferer());
+					\Controller::redirect($this->getReferer());
 				}
 
-				$this->reload();
+				\Controller::reload();
 			}
 		}
 
@@ -2964,7 +2964,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Reload the page
 		if ($reload)
 		{
-			$this->reload();
+			\Controller::reload();
 		}
 	}
 
@@ -3059,7 +3059,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div id="'.$this->bid.'">'.((\Input::get('act') == 'select' || $this->ptable) ? '
 <a href="'.$this->getReferer(true, $this->ptable).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a> ' : (isset($GLOBALS['TL_DCA'][$this->strTable]['config']['backlink']) ? '
 <a href="contao/main.php?'.$GLOBALS['TL_DCA'][$this->strTable]['config']['backlink'].'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBTTitle']).'" accesskey="b" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a> ' : '')) . ((\Input::get('act') != 'select') ? '
-'.(!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<a href="'.(($this->ptable != '') ? $this->addToUrl('act=create' . (($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] < 4) ? '&amp;mode=2' : '') . '&amp;pid=' . $this->intId) : $this->addToUrl('act=create')).'" class="header_new" title="'.specialchars($GLOBALS['TL_LANG'][$this->strTable]['new'][1]).'" accesskey="n" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG'][$this->strTable]['new'][0].'</a> ' : '') . $this->generateGlobalButtons() : '') . '
+'.(!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<a href="'.(($this->ptable != '') ? \Backend::addToUrl('act=create' . (($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] < 4) ? '&amp;mode=2' : '') . '&amp;pid=' . $this->intId) : \Backend::addToUrl('act=create')).'" class="header_new" title="'.specialchars($GLOBALS['TL_LANG'][$this->strTable]['new'][1]).'" accesskey="n" onclick="Backend.getScrollOffset()">'.$GLOBALS['TL_LANG'][$this->strTable]['new'][0].'</a> ' : '') . $this->generateGlobalButtons() : '') . '
 </div>' . \Message::generate(true);
 		}
 
@@ -3443,7 +3443,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		if (\Input::post('FORM_SUBMIT') == 'tl_filters')
 		{
-			$this->reload();
+			\Controller::reload();
 		}
 
 		$return = '';
@@ -3706,7 +3706,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			if (\Input::post('FORM_SUBMIT') == 'tl_filters_limit')
 			{
-				$this->reload();
+				\Controller::reload();
 			}
 		}
 
@@ -4541,7 +4541,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($objRow->numRows < 1)
 		{
 			$this->log('Could not load record "'.$this->strTable.'.id='.$this->intId.'"', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		$arrSubmitted = $objRow->fetchAssoc();
@@ -4577,7 +4577,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		if ($objForm == null)
 		{
 			$this->log('Could not load record "tl_form.id='.$intFormId.'" / "tl_form.title='.$arrSubmitted['form'].'"', __METHOD__, TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
+			\Controller::redirect('contao/main.php?act=error');
 		}
 
 		$arrForm = $objForm->row();
@@ -4607,14 +4607,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$blnStoreOptionsValues = ($arrForm['efgStoreValues']) ? true : false;
 
 		// Set the sender as given in form configuration
-		list($senderName, $sender) = $this->splitFriendlyName($arrForm['confirmationMailSender']);
+		list($senderName, $sender) = \String::splitFriendlyEmail($arrForm['confirmationMailSender']);
 		$objMailProperties->sender = $sender;
 		$objMailProperties->senderName = $senderName;
 
 		// Set the 'reply to' address, if given in form configuration
 		if (!empty($arrForm['confirmationMailReplyto']))
 		{
-			list($replyToName, $replyTo) = $this->splitFriendlyName($arrForm['confirmationMailReplyto']);
+			list($replyToName, $replyTo) = \String::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
 			$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 		}
 
@@ -4930,7 +4930,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			if (intval(\Input::post('import_source')) == 0)
 			{
 				\Message::addError($GLOBALS['TL_LANG']['tl_formdata']['error_select_source']);
-				$this->reload();
+				\Controller::reload();
 			}
 
 			$objFileModel = \FilesModel::findByPk(\Input::post('import_source'));
@@ -4940,7 +4940,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				\Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['filetype'], $objFile->extension));
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-				$this->reload();
+				\Controller::reload();
 			}
 
 			// Get separator
@@ -5189,7 +5189,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$this->log('Imported file "'.$objFile->filename.'" into form data "'.$strFormTitle.'", created '.$intValid.' new records', __METHOD__, TL_GENERAL);
 
 				setcookie('BE_PAGE_OFFSET', 0, 0, '/');
-				$this->reload();
+				\Controller::reload();
 
 			}
 
