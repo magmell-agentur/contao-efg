@@ -2298,7 +2298,7 @@ class ModuleFormdataListing extends \Module
 		/**
 		 * Comments
 		 */
-		if (!$this->efg_com_allow_comments || !in_array('comments', $this->Config->getActiveModules()))
+		if (!$this->efg_com_allow_comments || !in_array('comments', \ModuleLoader::getActive()))
 		{
 			$this->Template->allowComments = false;
 			return;

@@ -241,7 +241,7 @@ class FormdataProcessor extends \Frontend
 				$intNewId = $objNewFormdata->insertId;
 
 				// Update related comments
-				if (in_array('comments', $this->Config->getActiveModules()))
+				if (in_array('comments', \ModuleLoader::getActive()))
 				{
 					\Database::getInstance()->prepare("UPDATE tl_comments %s WHERE `source` = 'tl_formdata' AND parent=?")
 						->set(array('parent' => $intNewId))
