@@ -114,7 +114,7 @@ class Formdata extends \Frontend
 
 	/**
 	 * Return an object property
-	 * @param string
+	 * @param string $strKey
 	 * @return mixed
 	 */
 	public function __get($strKey)
@@ -169,11 +169,15 @@ class Formdata extends \Frontend
 
 	/**
 	 * Autogenerate an alias if it has not been set yet
-	 * if no form field is configured to be used as alias field
+	 *
+	 * If no form field is configured to be used as alias field
 	 * first form field of type text not using rgxp=email/date/datim/time will be used
-	 * @param mixed
-	 * @param object
+	 *
+	 * @param string $varValue Optional given alias
+	 * @param string $strFormTitle The title of the form
+	 * @param integer $intRecId ID of the formdata record
 	 * @return string
+	 * @throws \Exception
 	 */
 	public function generateAlias($varValue=null, $strFormTitle=null, $intRecId=null)
 	{
@@ -246,8 +250,8 @@ class Formdata extends \Frontend
 
 	/**
 	 * Add formdata details to the indexer
-	 * @param array
-	 * @param integer
+	 * @param array $arrPages Array of URLs
+	 * @param integer $intRoot ID of root page
 	 * @return array
 	 */
 	public function getSearchablePages($arrPages, $intRoot=0)
@@ -476,7 +480,7 @@ class Formdata extends \Frontend
 
 	/**
 	 * Return record from tl_formdata as Array('fd_base' => base fields from tl_formdata, 'fd_details' => detail fields from tl_formdata_details)
-	 * @param integer ID of tl_formdata record
+	 * @param integer $intId ID of tl_formdata record
 	 * @return mixed
 	 */
 	public function getFormdataAsArray($intId=0)
@@ -515,7 +519,7 @@ class Formdata extends \Frontend
 
 	/**
 	 * Return form fields as associative array
-	 * @param integer ID of tl_form record
+	 * @param integer $intId ID of tl_form record
 	 * @return mixed
 	 */
 	public function getFormfieldsAsArray($intId=0)
@@ -558,7 +562,7 @@ class Formdata extends \Frontend
 
 
 	/**
-	 * get all members (FE)
+	 * Get all members (FE)
 	 */
 	public function getMembers()
 	{
@@ -585,7 +589,7 @@ class Formdata extends \Frontend
 
 
 	/**
-	 * get all users (BE)
+	 * Get all users (BE)
 	 */
 	public function getUsers()
 	{
@@ -614,7 +618,7 @@ class Formdata extends \Frontend
 
 
 	/**
-	 * get all member groups (FE)
+	 * Get all member groups (FE)
 	 */
 	public function getMemberGroups()
 	{
@@ -643,7 +647,7 @@ class Formdata extends \Frontend
 
 
 	/**
-	 * get all user groups (BE)
+	 * Get all user groups (BE)
 	 */
 	public function getUserGroups()
 	{
@@ -673,9 +677,9 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare post value for tl_formdata / tl_formdata_details DB record
-	 * @param mixed Post value
-	 * @param array Form field properties
-	 * @param mixed File
+	 * @param string|array $varSubmitted Post value
+	 * @param array|boolean $arrField Form field properties
+	 * @param boolean $varFile File
 	 * @return mixed
 	 */
 	public function preparePostValueForDatabase($varSubmitted='', $arrField=false, $varFile=false)
@@ -918,8 +922,8 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare value from CSV for tl_formdata / tl_formdata_details DB record
-	 * @param string Field value from csv file
-	 * @param array Form field properties
+	 * @param mixed $varValue Field value from csv file
+	 * @param array|boolean $arrField Form field properties
 	 * @return mixed
 	 */
 	public function prepareImportValueForDatabase($varValue='', $arrField=false)
@@ -1079,10 +1083,10 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare post value for mail / text
-	 * @param mixed Post value
-	 * @param array Form field properties
-	 * @param mixed File
-	 * @param boolean Skip empty values (do not return label of selected option if its value is empty)
+	 * @param string|array $varSubmitted Post value
+	 * @param array|boolean $arrField Form field properties
+	 * @param array|boolean $varFile File
+	 * @param boolean $blnSkipEmptyFields Skip empty values (do not return label of selected option if its value is empty)
 	 * @return mixed
 	 */
 	public function preparePostValueForMail($varSubmitted='', $arrField=false, $varFile=false, $blnSkipEmptyFields=false)
@@ -1248,9 +1252,9 @@ class Formdata extends \Frontend
 
 	/**
 	 * Prepare database value for Mail / Text
-	 * @param mixed Database value
-	 * @param array Form field properties
-	 * @param mixed File
+	 * @param mixed $varValue Database value
+	 * @param array|boolean $arrField  Form field properties
+	 * @param array|boolean $varFile File
 	 * @return mixed
 	 */
 	public function prepareDatabaseValueForMail($varValue='', $arrField=false, $varFile=false)
@@ -1694,7 +1698,7 @@ class Formdata extends \Frontend
 	/**
 	 * Prepare widget options array
 	 * Used in backend and frontend
-	 * @param array Form field properties
+	 * @param array|boolean $arrField Form field properties
 	 * @return array DCA/widget options
 	 */
 	public function prepareWidgetOptions($arrField=false)
@@ -2181,6 +2185,14 @@ class Formdata extends \Frontend
 	}
 
 
+	/**
+	 * @param object $objMailProperties Mail properties
+	 * @param array $arrSubmitted Submitted data
+	 * @param array $arrFiles Array of files
+	 * @param array $arrForm Form configuration data
+	 * @param array $arrFormFields Form fields
+	 * @return object
+	 */
 	public function prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields)
 	{
 
@@ -2559,7 +2571,7 @@ class Formdata extends \Frontend
 	/**
 	 * Parse Insert tag params
 	 * @param string $strTag Insert tag
-	 * @return mixed
+	 * @return array|null
 	 */
 	public function parseInsertTagParams($strTag='')
 	{
@@ -2668,6 +2680,17 @@ class Formdata extends \Frontend
 	}
 
 
+	/**
+	 * Eval code
+	 *
+	 * @param string $strBuffer
+	 * @param array|null $arrSubmitted
+	 * @param array|null $arrFiles
+	 * @param array|null $arrForm
+	 *
+	 * @return mixed|string
+	 * @throws \Exception
+	 */
 	public function evalConditionTags($strBuffer, $arrSubmitted = null, $arrFiles = null, $arrForm = null)
 	{
 		if (!strlen($strBuffer))
@@ -2694,6 +2717,10 @@ class Formdata extends \Frontend
 	}
 
 
+	/**
+	 * Get the empty tag closing tag
+	 * @return string
+	 */
 	public function getEmptyTagEnd()
 	{
 		if (TL_MODE == 'BE')
@@ -2708,7 +2735,6 @@ class Formdata extends \Frontend
 
 
 	/**
-	 *
 	 * Handle ajax post actions
 	 * @param $strAction
 	 * @param $dc
