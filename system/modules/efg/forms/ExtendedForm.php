@@ -653,9 +653,7 @@ window.addEvent(\'domready\', function(){
 		var elBtnBack =	elForm.getElement(\'input[name=FORM_BACK]\');
 		if (elBtnBack){
 			elBtnBack.addEvent(\'click\', function(){
-				elForm.getElements(\'[required]\').each(function(item){
-					item.removeProperty(\'required\');
-				});
+				elForm.setProperty(\'novalidate\', true);
 			});
 		}
 	}
@@ -666,7 +664,7 @@ window.addEvent(\'domready\', function(){
 		{
 			return '
 $(\'#'.$this->Template->formId.' input.back\').click(function(){
-	$(\'#'.$this->Template->formId.' [required]\').prop(\'required\', false);
+	$(\'#'.$this->Template->formId.'\').attr(\'novalidate\', true);
 });
 ';
 		}
