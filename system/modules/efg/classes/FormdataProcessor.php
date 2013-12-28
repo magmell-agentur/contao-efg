@@ -623,7 +623,7 @@ class FormdataProcessor extends \Frontend
 			$objMailProperties = $this->Formdata->prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields);
 
 			// Send Mail
-			$blnConfirmationSent = false;
+			$blnInformationSent = false;
 
 			if (!empty($objMailProperties->recipients))
 			{
