@@ -47,8 +47,9 @@ class EfgFormGallery extends \ContentElement
 
 	/**
 	 * Initialize the object
-	 * @param object
-	 * @return string
+	 *
+	 * @param \Efg\Widget|\Widget $objWidget
+	 * @param array               $arrConfig
 	 */
 	public function __construct(\Widget $objWidget, $arrConfig)
 	{
@@ -66,7 +67,12 @@ class EfgFormGallery extends \ContentElement
 		$this->arrData = $arrConfig;
 	}
 
-
+	/**
+	 * Set an object property
+	 *
+	 * @param $strKey
+	 * @param $varValue
+	 */
 	public function __set($strKey, $varValue)
 	{
 
@@ -144,17 +150,16 @@ class EfgFormGallery extends \ContentElement
 			return '';
 		}
 
-		// Check for version 3 format
-		if (!is_numeric($this->multiSRC[0]))
-		{
-			return '<p class="error">'.$GLOBALS['TL_LANG']['ERR']['version2format'].'</p>';
-		}
-
 		// Get the file entries from the database
-		$this->objFiles = \FilesModel::findMultipleByIds($this->multiSRC);
+		$this->objFiles = \FilesModel::findMultipleByUuids($this->multiSRC);
 
 		if ($this->objFiles === null)
 		{
+			if (!\Validator::isUuid($this->multiSRC[0]))
+			{
+				return '<p class="error">'.$GLOBALS['TL_LANG']['ERR']['version2format'].'</p>';
+			}
+
 			return '';
 		}
 
@@ -187,7 +192,7 @@ class EfgFormGallery extends \ContentElement
 			// Single files
 			if ($objFiles->type == 'file')
 			{
-				$objFile = new \File($objFiles->path);
+				$objFile = new \File($objFiles->path, true);
 
 				if (!$objFile->isGdImage)
 				{
@@ -199,13 +204,14 @@ class EfgFormGallery extends \ContentElement
 				// Use the file name as title if none is given
 				if ($arrMeta['title'] == '')
 				{
-					$arrMeta['title'] = specialchars(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)));
+					$arrMeta['title'] = specialchars(str_replace('_', ' ', $objFile->filename));
 				}
 
 				// Add the image
 				$images[$objFiles->path] = array
 				(
 					'id'        => $objFiles->id,
+					'uuid'      => $objFiles->uuid,
 					'name'      => $objFile->basename,
 					'singleSRC' => $objFiles->path,
 					'alt'       => $arrMeta['title'],
@@ -220,7 +226,7 @@ class EfgFormGallery extends \ContentElement
 			// Folders
 			else
 			{
-				$objSubfiles = \FilesModel::findByPid($objFiles->id);
+				$objSubfiles = \FilesModel::findByPid($objFiles->uuid);
 
 				if ($objSubfiles === null)
 				{
@@ -235,7 +241,7 @@ class EfgFormGallery extends \ContentElement
 						continue;
 					}
 
-					$objFile = new \File($objSubfiles->path);
+					$objFile = new \File($objSubfiles->path, true);
 
 					if (!$objFile->isGdImage)
 					{
@@ -247,13 +253,14 @@ class EfgFormGallery extends \ContentElement
 					// Use the file name as title if none is given
 					if ($arrMeta['title'] == '')
 					{
-						$arrMeta['title'] = specialchars(str_replace('_', ' ', preg_replace('/^[0-9]+_/', '', $objFile->filename)));
+						$arrMeta['title'] = specialchars(str_replace('_', ' ', $objFile->filename));
 					}
 
 					// Add the image
 					$images[$objSubfiles->path] = array
 					(
 						'id'        => $objSubfiles->id,
+						'uuid'      => $objSubfiles->uuid,
 						'name'      => $objFile->basename,
 						'singleSRC' => $objSubfiles->path,
 						'alt'       => $arrMeta['title'],
@@ -291,42 +298,40 @@ class EfgFormGallery extends \ContentElement
 			case 'custom':
 				if ($this->orderSRC != '')
 				{
-					// Turn the order string into an array
-					$arrOrder = array_flip(array_map('intval', explode(',', $this->orderSRC)));
+					$tmp = deserialize($this->orderSRC);
 
-					// Move the matching elements to their position in $arrOrder
-					foreach ($images as $k=>$v)
+					if (!empty($tmp) && is_array($tmp))
 					{
-						if (isset($arrOrder[$v['id']]))
+						// Remove all values
+						$arrOrder = array_map(function(){}, array_flip($tmp));
+
+						// Move the matching elements to their position in $arrOrder
+						foreach ($images as $k=>$v)
 						{
-							$arrOrder[$v['id']] = $v;
-							unset($images[$k]);
+							if (array_key_exists($v['uuid'], $arrOrder))
+							{
+								$arrOrder[$v['uuid']] = $v;
+								unset($images[$k]);
+							}
 						}
-					}
 
-					// Append the left-over images at the end
-					if (!empty($images))
-					{
-						$arrOrder = array_merge($arrOrder, $images);
-					}
-
-					// Remove empty or numeric (not replaced) entries
-					foreach ($arrOrder as $k=>$v)
-					{
-						if ($v == '' || is_numeric($v))
+						// Append the left-over images at the end
+						if (!empty($images))
 						{
-							unset($arrOrder[$k]);
+							$arrOrder = array_merge($arrOrder, array_values($images));
 						}
-					}
 
-					$images = $arrOrder;
-					unset($arrOrder);
+						// Remove empty (unreplaced) entries
+						$images = array_values(array_filter($arrOrder));
+						unset($arrOrder);
+					}
 				}
 				break;
 
 			case 'random':
 				shuffle($images);
 				break;
+
 		}
 
 		$images = array_values($images);
@@ -364,7 +369,7 @@ class EfgFormGallery extends \ContentElement
 			$offset = ($page - 1) * $this->perPage;
 			$limit = min($this->perPage + $offset, $total);
 
-			$objPagination = new \Pagination($total, $this->perPage, 7, $id);
+			$objPagination = new \Pagination($total, $this->perPage, $GLOBALS['TL_CONFIG']['maxPaginationLinks'], $id);
 			$this->Template->pagination = $objPagination->generate("\n  ");
 		}
 

@@ -2605,7 +2605,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		}
 
-		// Convert fileTree IDs to file paths
+		// Convert fileTree IDs or UUIDs to file paths
 		if ($arrField['inputType'] == 'fileTree')
 		{
 			$varValue = deserialize($varValue);
@@ -2614,9 +2614,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				foreach ($varValue as $key => $varFile)
 				{
-					if (is_numeric($varFile))
+					if (\Validator::isUuid($varFile) || is_numeric($varFile))
 					{
-						$objFileModel = \FilesModel::findByPk($varFile);
+						$objFileModel = \FilesModel::findById($varFile);
 
 						if ($objFileModel !== null)
 						{
@@ -2629,9 +2629,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 			elseif (!empty($varValue))
 			{
-				if (is_numeric($varValue))
+				if (\Validator::isUuid($varValue) || is_numeric($varValue))
 				{
-					$objFileModel = \FilesModel::findByPk($varValue);
+					$objFileModel = \FilesModel::findById($varValue);
 
 					if ($objFileModel !== null)
 					{
@@ -4677,13 +4677,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				if (!empty($arrCustomAttachments))
 				{
-					foreach ($arrCustomAttachments as $intFileId)
+					foreach ($arrCustomAttachments as $varFile)
 					{
-						$objFileModel = \FilesModel::findByPk($intFileId);
+						$objFileModel = \FilesModel::findById($varFile);
 
 						if ($objFileModel !== null)
 						{
-							$objFile = new \File($objFileModel->path);
+							$objFile = new \File($objFileModel->path, true);
 							if ($objFile->size)
 							{
 								$objMailProperties->attachments[TL_ROOT . '/' . $objFile->path] = array
@@ -4933,8 +4933,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				\Controller::reload();
 			}
 
-			$objFileModel = \FilesModel::findByPk(\Input::post('import_source'));
-			$objFile = new \File($objFileModel->path);
+			$objFileModel = \FilesModel::findById(\Input::post('import_source'));
+			$objFile = new \File($objFileModel->path, true);
 
 			if ($objFile->extension != 'csv')
 			{
@@ -5182,8 +5182,6 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					\Message::addInfo(sprintf($GLOBALS['TL_LANG']['tl_formdata']['import_invalid'], $intInvalid));
 				}
-
-				$objFile->close();
 
 				// Add a log entry
 				$this->log('Imported file "'.$objFile->filename.'" into form data "'.$strFormTitle.'", created '.$intValid.' new records', __METHOD__, TL_GENERAL);

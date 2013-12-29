@@ -440,9 +440,9 @@ class FormdataProcessor extends \Frontend
 
 					if (!empty($arrCustomAttachments))
 					{
-						foreach ($arrCustomAttachments as $intFileId)
+						foreach ($arrCustomAttachments as $varFile)
 						{
-							$objFileModel = \FilesModel::findByPk($intFileId);
+							$objFileModel = \FilesModel::findById($varFile);
 
 							if ($objFileModel !== null)
 							{
@@ -593,9 +593,9 @@ class FormdataProcessor extends \Frontend
 
 					if (is_array($arrCustomAttachments))
 					{
-						foreach ($arrCustomAttachments as $intFileId)
+						foreach ($arrCustomAttachments as $varFile)
 						{
-							$objFileModel = \FilesModel::findByPk($intFileId);
+							$objFileModel = \FilesModel::findById($varFile);
 
 							if ($objFileModel !== null)
 							{

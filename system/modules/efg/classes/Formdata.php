@@ -838,7 +838,7 @@ class Formdata extends \Frontend
 					{
 						if ($arrField['storeFile'])
 						{
-							$intUploadFolder = $arrField['uploadFolder'];
+							$varUploadFolder = $arrField['uploadFolder'];
 
 							if ($arrField['useHomeDir'])
 							{
@@ -848,17 +848,17 @@ class Formdata extends \Frontend
 									$this->import('FrontendUser', 'User');
 									if ($this->User->assignDir && $this->User->homeDir)
 									{
-										$intUploadFolder = $this->User->homeDir;
+										$varUploadFolder = $this->User->homeDir;
 									}
 								}
 							}
 
-							$objUploadFolder = \FilesModel::findByPk($intUploadFolder);
+							$objUploadFolder = \FilesModel::findById($varUploadFolder);
 
 							// The upload folder could not be found
 							if ($objUploadFolder === null)
 							{
-								$this->log('Invalid upload folder ID ' . $intUploadFolder . ', file "'.$varFile['name'].'" could not been saved in file manager', __METHOD__, 'ERROR');
+								$this->log('Invalid upload folder ID ' . $varUploadFolder . ', file "'.$varFile['name'].'" could not been saved in file manager', __METHOD__, 'ERROR');
 							}
 							else
 							{
@@ -1009,9 +1009,9 @@ class Formdata extends \Frontend
 							{
 								foreach ($arrVal as $kVal => $mxVal)
 								{
-									if (is_numeric($mxVal))
+									if (\Validator::isUuid($mxVal) || is_numeric($mxVal))
 									{
-										$objFileModel = \FilesModel::findByPk($mxVal);
+										$objFileModel = \FilesModel::findById($mxVal);
 
 										if ($objFileModel->path)
 										{
@@ -1029,9 +1029,9 @@ class Formdata extends \Frontend
 					}
 					else
 					{
-						if (is_numeric($varValue))
+						if (\Validator::isUuid($varValue) || is_numeric($varValue))
 						{
-							$objFileModel = \FilesModel::findByPk($varValue);
+							$objFileModel = \FilesModel::findById($varValue);
 
 							if ($objFileModel->path)
 							{
@@ -1585,27 +1585,41 @@ class Formdata extends \Frontend
 					{
 						if (is_array($varVal))
 						{
-							foreach ($varVal as $key => $strFile)
+							foreach ($varVal as $key => $varFile)
 							{
-								if (!is_numeric($strFile))
+								$objFileModel = null;
+
+								if (\Validator::isUuid($varFile) || is_numeric($varFile))
 								{
-									$objFileModel = \FilesModel::findOneBy('path', $strFile);
-									if ($objFileModel !== null)
-									{
-										$varVal[$key] = $objFileModel->id;
-									}
+									$objFileModel = \FilesModel::findById($varFile);
+								}
+								else
+								{
+									$objFileModel = \FilesModel::findOneBy('path', $varFile);
+								}
+
+								if ($objFileModel !== null)
+								{
+									$varVal[$key] = $objFileModel->uuid;
 								}
 							}
 						}
 						elseif (is_string($varVal))
 						{
-							if (!is_numeric($varVal))
+							$objFileModel = null;
+
+							if (\Validator::isUuid($varVal) || is_numeric($varVal))
+							{
+								$objFileModel = \FilesModel::findById($varVal);
+							}
+							else
 							{
 								$objFileModel = \FilesModel::findOneBy('path', $varVal);
-								if ($objFileModel !== null)
-								{
-									$varVal = $objFileModel->id;
-								}
+							}
+
+							if ($objFileModel !== null)
+							{
+								$varVal = $objFileModel->uuid;
 							}
 						}
 					}
@@ -2208,9 +2222,9 @@ class Formdata extends \Frontend
 
 		$blnSkipEmptyFields = $objMailProperties->skipEmptyFields;
 
-		if (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0)
+		if (\Validator::isUuid($messageHtmlTmpl) || (is_numeric($messageHtmlTmpl) && $messageHtmlTmpl > 0))
 		{
-			$objFileModel = \FilesModel::findByPk($messageHtmlTmpl);
+			$objFileModel = \FilesModel::findById($messageHtmlTmpl);
 			if ($objFileModel !== null)
 			{
 				$messageHtmlTmpl = $objFileModel->path;
@@ -2880,7 +2894,7 @@ class Formdata extends \Frontend
 					{
 						foreach ($varValue as $k=>$v)
 						{
-							$varValue[$k] = \Dbafs::addResource($v)->id;
+							$varValue[$k] = \Dbafs::addResource($v)->uuid;
 						}
 					}
 
@@ -2922,7 +2936,7 @@ class Formdata extends \Frontend
 					{
 						foreach ($varValue as $k=>$v)
 						{
-							$varValue[$k] = \Dbafs::addResource($v)->id;
+							$varValue[$k] = \Dbafs::addResource($v)->uuid;
 						}
 					}
 

@@ -5,8 +5,8 @@ Version 2.2.0 stable (2013-12-29)
 ---------------------------------
 
 ### Changed
-Adapted runonce.php to Contao 3.2, convert fileTree database fields
-
+Adapted runonce.php to Contao 3.2, convert fileTree database fields,
+changes related to Contao 3.2's UUID in the database assisted file system
 
 Version 2.1.0 stable (2013-12-28)
 ---------------------------------
