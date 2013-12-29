@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgMultiSRC'] = array
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
 	'eval'                    => array('fieldType'=>'checkbox', 'multiple'=>true, 'files'=>true, 'mandatory'=>true, 'extensions' => 'gif,jpg,png'),
-	'sql'                     => "text NULL"
+	'sql'                     => "blob NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['mandatory']['eval']['tl_class'] = 'w50 cbx';
@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['efgBackSingleSRC'] = array
 	'exclude'                 => true,
 	'inputType'               => 'fileTree',
 	'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true,'extensions' => 'gif,jpg,png', 'mandatory'=>true, 'tl_class'=>'clr'),
-	'sql'                     => "varchar(255) NOT NULL default ''"
+	'sql'                     => "binary(16) NULL"
 );
 
 // Add palettes

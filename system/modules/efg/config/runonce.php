@@ -44,6 +44,7 @@ class EfgRunonce extends Controller
 		$this->execute('updateMailTemplates');
 		$this->execute('updateFormPaginators');
 		$this->execute('updateFormFieldEfgLookupOptions');
+		$this->execute('updateDbafsUuid');
 		$this->execute('updateConfig');
 
 	}
@@ -390,6 +391,59 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 			}
 		}
 	}
+
+
+	private function updateDbafsUuid()
+	{
+
+		// As of Contao 3.2 assisted fileTree widgets store tl_files.uuid instead of tl_files.id
+
+		$arrConvertFields = array
+		(
+			'single' => array
+			(
+				'tl_form' => array
+				(
+					'confirmationMailTemplate',
+					'formattedMailTemplate'
+				),
+				'tl_form_field' => array
+				(
+					'efgBackSingleSRC'
+				)
+			),
+			'multiple' => array
+			(
+				'tl_form' => array
+				(
+					'confirmationMailAttachments',
+					'formattedMailAttachments'
+				),
+				'tl_form_field' => array
+				(
+					'efgMultiSRC'
+				)
+			)
+		);
+
+		foreach ($arrConvertFields['single'] as $strTable => $arrFields)
+		{
+			foreach ($arrFields as $strField)
+			{
+				\Contao\Database\Updater::convertSingleField($strTable, $strField);
+			}
+		}
+
+		foreach ($arrConvertFields['multiple'] as $strTable => $arrFields)
+		{
+			foreach ($arrFields as $strField)
+			{
+				\Contao\Database\Updater::convertMultiField($strTable, $strField);
+			}
+		}
+
+	}
+
 
 
 	private function updateConfig()

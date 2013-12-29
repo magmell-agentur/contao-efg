@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailTemplate'] = array
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
 	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl'),
-	'sql'                     => "varchar(255) NOT NULL default ''"
+	'sql'                     => "binary(16) NULL"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['confirmationMailSkipEmpty'] = array
 (
@@ -195,7 +195,7 @@ $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailTemplate'] = array
 	'filter'                  => false,
 	'inputType'               => 'fileTree',
 	'eval'                    => array('helpwizard'=>false,'files'=>true, 'fieldType'=>'radio', 'extensions' => 'htm,html,txt,tpl'),
-	'sql'                     => "varchar(255) NOT NULL default ''"
+	'sql'                     => "binary(16) NULL"
 );
 $GLOBALS['TL_DCA']['tl_form']['fields']['formattedMailSkipEmpty'] = array
 (
