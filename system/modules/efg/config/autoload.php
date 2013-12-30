@@ -56,14 +56,14 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'edit_fd_default'           => 'system/modules/efg/templates',
-	'efg_internal_config'       => 'system/modules/efg/templates',
-	'efg_internal_dca_formdata' => 'system/modules/efg/templates',
-	'efg_internal_modules'      => 'system/modules/efg/templates',
-	'form_efg_imageselect'      => 'system/modules/efg/templates',
-	'form_paginator'            => 'system/modules/efg/templates',
-	'info_fd_simple_default'    => 'system/modules/efg/templates',
-	'info_fd_table_default'     => 'system/modules/efg/templates',
-	'list_fd_simple_default'    => 'system/modules/efg/templates',
-	'list_fd_table_default'     => 'system/modules/efg/templates',
+	'efg_internal_config'       => 'system/modules/efg/templates/internal',
+	'efg_internal_dca_formdata' => 'system/modules/efg/templates/internal',
+	'efg_internal_modules'      => 'system/modules/efg/templates/internal',
+	'edit_fd_default'           => 'system/modules/efg/templates/forms',
+	'form_efg_imageselect'      => 'system/modules/efg/templates/forms',
+	'form_paginator'            => 'system/modules/efg/templates/forms',
+	'info_fd_simple_default'    => 'system/modules/efg/templates/listing/info',
+	'info_fd_table_default'     => 'system/modules/efg/templates/listing/info',
+	'list_fd_simple_default'    => 'system/modules/efg/templates/listing/list',
+	'list_fd_table_default'     => 'system/modules/efg/templates/listing/list',
 ));
