@@ -557,12 +557,14 @@ case 'upload': ?>
 <?php if ($varVals['storeFile']): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['storeFile'] = true;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['files'] = true;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['filesOnly'] = true;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['extensions'] = '<?php echo $varVals['extensions']?>';
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['fieldType'] = 'radio';
 <?php endif; ?>
 <?php break;
 case 'efgImageSelect': ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['files'] = true;
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['filesOnly'] = true;
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['extensions'] = 'gif,jpg,png';
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['fieldType'] = '<?php echo ($varVals['efgImageMultiple']) ? 'checkbox' : 'radio'; ?>';
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['multiple'] = <?php if ($varVals['efgImageMultiple']): ?>true<?php else: ?>false<?php endif; ?>;
