@@ -2846,6 +2846,25 @@ class Formdata extends \Frontend
 				}
 				break;
 
+			// Load nodes of the file tree
+			case 'loadFiletree':
+				$arrData['strTable'] = $dc->table;
+				$arrData['id'] = $this->strAjaxName ?: $dc->id;
+				$arrData['name'] = \Input::post('name');
+
+				$objWidget = new $GLOBALS['BE_FFL']['fileSelector']($arrData, $dc);
+
+				// Load a particular node
+				if (\Input::post('folder', true) != '')
+				{
+					echo $objWidget->generateAjax(\Input::post('folder', true), \Input::post('field'), intval(\Input::post('level')));
+				}
+				else
+				{
+					echo $objWidget->generate();
+				}
+				exit; break;
+
 
 			case 'reloadEfgFiletree':
 				$intId = \Input::get('id');
