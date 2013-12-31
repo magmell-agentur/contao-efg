@@ -1,4 +1,4 @@
-EFG - Extended From Generator for Contao Open Source CMS Changelog
+EFG - Extended Form Generator for Contao Open Source CMS Changelog
 ==================================================================
 
 Version 2.2.0 stable (2013-12-31)
