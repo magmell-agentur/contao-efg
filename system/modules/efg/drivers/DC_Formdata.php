@@ -2686,6 +2686,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Save the value if there was no error
 		if (($varValue != '' || !$arrField['eval']['doNotSaveEmpty']) && ($this->varValue !== $varValue || $arrField['eval']['alwaysSave']))
 		{
+
+			// Set the correct empty value (see #6284, #6373)
+			if ($varValue === '')
+			{
+				$varValue = \Widget::getEmptyValueByFieldType($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strTargetField]['sql']);
+			}
+
 			$arrValues = $this->values;
 			$arrProcedures = $this->procedure;
 
