@@ -11,6 +11,9 @@ changes related to Contao 3.2's UUID in the database assisted file system
 ### Changed
 Changed templates folder structure
 
+### Changed
+Use Database\Statement::execute() instead of deprecated Database\Statement::executeUncached()
+
 
 Version 2.1.0 stable (2013-12-28)
 ---------------------------------

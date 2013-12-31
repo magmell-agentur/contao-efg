@@ -230,7 +230,7 @@ class Formdata extends \Frontend
 		}
 
 		$objAlias = \Database::getInstance()->prepare("SELECT id FROM tl_formdata WHERE alias=? AND id != ?")
-			->executeUncached($varValue, $intRecId);
+			->execute($varValue, $intRecId);
 
 		// Check whether the alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
@@ -407,7 +407,7 @@ class Formdata extends \Frontend
 		{
 			// Get all forms marked to store data
 			$objForms = \Database::getInstance()->prepare("SELECT id,title,alias,formID,useFormValues,useFieldNames FROM tl_form WHERE storeFormdata=?")
-				->executeUncached("1");
+				->execute("1");
 
 			while ($objForms->next())
 			{
@@ -490,7 +490,7 @@ class Formdata extends \Frontend
 		if ($intId > 0)
 		{
 			$objFormdata = \Database::getInstance()->prepare("SELECT * FROM tl_formdata WHERE id=?")
-				->executeUncached($intId);
+				->execute($intId);
 			if ($objFormdata->numRows == 1)
 			{
 				$varReturn['fd_base'] = $objFormdata->fetchAssoc();

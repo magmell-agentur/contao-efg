@@ -1180,7 +1180,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 		$objRow = \Database::getInstance()->prepare($sqlQuery)
 			->limit(1)
-			->executeUncached($this->intId);
+			->execute($this->intId);
 
 		// Redirect if there is no record with the given ID
 		if ($objRow->numRows < 1)
@@ -1915,7 +1915,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				// Get the field values
 				$objRow = \Database::getInstance()->prepare("SELECT " . $strSqlFields . " FROM " . $this->strTable . " f WHERE id=?")
 					->limit(1)
-					->executeUncached($this->intId);
+					->execute($this->intId);
 
 				// Store the active record
 				$this->objActiveRecord = $objRow;
@@ -2784,7 +2784,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			$objFields = \Database::getInstance()->prepare($sqlQuery)
 				->limit(1)
-				->executeUncached($this->intId);
+				->execute($this->intId);
 
 			// Get selector values from DB
 			if ($objFields->numRows > 0)

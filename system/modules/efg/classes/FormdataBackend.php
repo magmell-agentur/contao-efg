@@ -90,7 +90,7 @@ class FormdataBackend extends \Backend
 	{
 		$this->intFormId = $dc->id;
 		$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
-			->executeUncached($this->intFormId)
+			->execute($this->intFormId)
 			->fetchAssoc();
 
 		$strFormKey = (!empty($arrForm['alias'])) ? $arrForm['alias'] : str_replace('-', '_', standardize($arrForm['title']));
@@ -213,7 +213,9 @@ class FormdataBackend extends \Backend
 			{
 				if (!empty($arrForm))
 				{
-					$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")->executeUncached($arrForm['id'])->fetchAssoc();
+					$arrForm = \Database::getInstance()->prepare("SELECT * FROM tl_form WHERE id=?")
+						->execute($arrForm['id'])
+						->fetchAssoc();
 
 					$arrFields = array();
 					$arrFieldNamesById = array();

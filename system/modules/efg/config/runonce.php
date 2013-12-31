@@ -153,12 +153,12 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 			while ($objForms->next())
 			{
 				$strFormKeyOld = 'fd_' . ((!empty($objForms->formID)) ? str_replace('-', '_', standardize($objForms->formID)) : str_replace('-', '_', standardize($objForms->title)));
-				$strFormKeyNew = 'fd_' . ((!empty($objForms->alias))	? $objForms->alias : str_replace('-', '_', standardize($objForms->title)));
+				$strFormKeyNew = 'fd_' . ((!empty($objForms->aliass)) ? $objForms->alias : str_replace('-', '_', standardize($objForms->title)));
 
 				// Update formdata listing modules
 				$objResult = $this->Database->prepare("UPDATE tl_module %s WHERE `type`=? AND `list_formdata`=?")
 					->set(array('list_formdata' => $strFormKeyNew))
-					->executeUncached('formdatalisting', $strFormKeyOld);
+					->execute('formdatalisting', $strFormKeyOld);
 			}
 		}
 
