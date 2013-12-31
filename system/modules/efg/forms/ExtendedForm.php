@@ -99,6 +99,7 @@ class ExtendedForm extends \Form
 	 */
 	protected function compile()
 	{
+
 		$hasUpload = false;
 		$doNotSubmit = false;
 		$arrSubmitted = array();
@@ -113,7 +114,7 @@ class ExtendedForm extends \Form
 			unset($_SESSION['FORM_DATA'][$strKey]);
 		}
 
-		// form used to edit existing formdata record
+		// Form is used to edit existing formdata record
 		if ($this->objEditRecord instanceof \Database\Result)
 		{
 			$arrEditRecord = $this->objEditRecord->row();
@@ -229,25 +230,40 @@ class ExtendedForm extends \Form
 		$arrLabels = array();
 
 		// Get all form fields
+		$arrFields = array();
 		$objFields = \FormFieldModel::findPublishedByPid($this->id);
 
 		if ($objFields !== null)
 		{
-			$row = 0;
-			$max_row = $objFields->count();
-
 			while ($objFields->next())
 			{
+				$arrFields[] = $objFields->current();
+			}
+		}
 
-				if ($objFields->name != '')
-				{
-					$arrLabels[$objFields->name] = $objFields->label;
-				}
+		// HOOK: compile form fields
+		if (isset($GLOBALS['TL_HOOKS']['compileFormFields']) && is_array($GLOBALS['TL_HOOKS']['compileFormFields']))
+		{
+			foreach ($GLOBALS['TL_HOOKS']['compileFormFields'] as $callback)
+			{
+				$this->import($callback[0]);
+				$arrFields = $this->$callback[0]->$callback[1]($arrFields, $formId, $this);
+			}
+		}
 
+		// Process the fields
+		if (!empty($arrFields) && is_array($arrFields))
+		{
+			$row = 0;
+			$max_row = count($arrFields);
+
+			foreach ($arrFields as $objField)
+			{
+
+				// Skip fields outside range of active page
 				if ($this->intTotalPages > 1 && ($this->blnMultipage || $this->blnEditform))
 				{
-					// skip fields outside range of active page
-					$intFieldSorting = (int) $objFields->sorting;
+					$intFieldSorting = (int) $objField->sorting;
 					if ($this->intActivePage <= 1 && $intFieldSorting > (int) $this->arrPaginators[($this->intActivePage - 1)]['sorting'])
 					{
 						continue;
@@ -263,7 +279,7 @@ class ExtendedForm extends \Form
 					}
 				}
 
-				$strClass = $GLOBALS['TL_FFL'][$objFields->type];
+				$strClass = $GLOBALS['TL_FFL'][$objField->type];
 
 				// Continue if the class is not defined
 				if (!class_exists($strClass))
@@ -271,7 +287,7 @@ class ExtendedForm extends \Form
 					continue;
 				}
 
-				$arrData = $objFields->row();
+				$arrData = $objField->row();
 
 				$arrData['decodeEntities'] = true;
 				$arrData['allowHtml'] = $this->allowTags;
@@ -286,7 +302,7 @@ class ExtendedForm extends \Form
 				}
 
 				// Increase the row count if it is a password field
-				if ($objFields->type == 'password')
+				if ($objField->type == 'password')
 				{
 					++$row;
 					++$max_row;
@@ -295,43 +311,43 @@ class ExtendedForm extends \Form
 				}
 
 				// Submit buttons do not use the name attribute
-				if ($objFields->type == 'submit')
+				if ($objField->type == 'submit')
 				{
 					$arrData['name'] = '';
 				}
 
 				$objWidget = new $strClass($arrData);
-				$objWidget->required = $objFields->mandatory ? true : false;
+				$objWidget->required = $objField->mandatory ? true : false;
 
 				if ($objWidget->required)
 				{
-					$this->arrWidgetsFailedValidation[$objFields->name] = 0;
+					$this->arrWidgetsFailedValidation[$objField->name] = 0;
 				}
 
 				// Unset session values if no FORM_SUBMIT or form page has not been completed
 				// (to avoid wrong validation against session values and to avoid usage of values of other forms):
 				// This behaviour can be deactivated by setting: $GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] = true;
-				if ($strMode != 'reload' && strlen($objFields->name))
+				if ($strMode != 'reload' && strlen($objField->name))
 				{
 					if (!strlen($_POST['FORM_SUBMIT']) || !$_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 					{
 						if (!$GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'])
 						{
-							unset($_SESSION['FORM_DATA'][$objFields->name]);
+							unset($_SESSION['FORM_DATA'][$objField->name]);
 						}
 
 						if ($objWidget instanceof \uploadable)
 						{
-							unset($_SESSION['FILES'][$objFields->name]);
+							unset($_SESSION['FILES'][$objField->name]);
 						}
 
 					}
 				}
 
 				// Always populate from existing session data if configured
-				if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objFields->name]))
+				if ($GLOBALS['EFP'][$formId]['doNotCleanStoredSessionData'] == true && isset($_SESSION['FORM_DATA'][$objField->name]))
 				{
-					$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+					$objWidget->value = $_SESSION['FORM_DATA'][$objField->name];
 				}
 
 				if ($strMode == 'reload' || ($this->blnEditform && !strlen($_POST['FORM_BACK']) && !strlen($_POST['FORM_BACK_x'])))
@@ -348,7 +364,7 @@ class ExtendedForm extends \Form
 						// Prepare options array
 						$arrData['options'] = $this->Formdata->prepareWidgetOptions($arrData);
 
-						// set rgxp 'date' for field type 'calendar' if not set
+						// Set rgxp 'date' for field type 'calendar' if not set
 						if ($arrData['type'] == 'calendar')
 						{
 							if (!isset($arrData['rgxp']))
@@ -365,11 +381,12 @@ class ExtendedForm extends \Form
 
 						if ($objWidget instanceof \uploadable)
 						{
-							unset($_SESSION['FILES'][$objFields->name]);
+							unset($_SESSION['FILES'][$objField->name]);
 						}
 
 						// Prepare value
-						$varFieldValue = $this->Formdata->prepareDatabaseValueForWidget($arrEditRecord[$objFields->name], $arrData);
+						$varFieldValue = $this->Formdata->prepareDatabaseValueForWidget($arrEditRecord[$objField->name], $arrData);
+
 						$objWidget->value = $varFieldValue;
 					}
 					else
@@ -377,13 +394,13 @@ class ExtendedForm extends \Form
 						// Populate field if page has been completed
 						if ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true)
 						{
-							$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
+							$objWidget->value = $_SESSION['FORM_DATA'][$objField->name];
 						}
 						else
 						{
 							if ($objWidget instanceof \uploadable)
 							{
-								unset($_SESSION['FILES'][$objFields->name]);
+								unset($_SESSION['FILES'][$objField->name]);
 							}
 						}
 					}
@@ -405,18 +422,18 @@ class ExtendedForm extends \Form
 				// Validate the input
 				if (\Input::post('FORM_SUBMIT') == $formId)
 				{
-					// populate field
+					// Populate field
 					if (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x']))
 					{
 						if ($strMode == 'back' && strlen($this->arrPaginators[($this->intActivePage-1)]['efgBackStoreSessionValues']))
 						{
-							unset($_SESSION['FORM_DATA'][$objFields->name]);
-							$objWidget->value = \Input::post($objFields->name);
+							unset($_SESSION['FORM_DATA'][$objField->name]);
+							$objWidget->value = \Input::post($objField->name);
 						}
 						elseif ($_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage] == true )
 						{
-							$objWidget->value = $_SESSION['FORM_DATA'][$objFields->name];
-							unset($_SESSION['FORM_DATA'][$objFields->name]);
+							$objWidget->value = $_SESSION['FORM_DATA'][$objField->name];
+							unset($_SESSION['FORM_DATA'][$objField->name]);
 						}
 					}
 
@@ -424,28 +441,28 @@ class ExtendedForm extends \Form
 					{
 						if ($objWidget instanceof \uploadable)
 						{
-							// if widget does not store the file, store it in tmp folder and session to make it available for mails etc.
+							// If the widget does not store the file, store it in tmp folder and session to make it available for mails etc.
 							if (!$objWidget->storeFile)
 							{
 								if ($this->intActivePage <= $this->intTotalPages)
 								{
-									// unset file in session, if this page has not been completed
+									// Unset the file in session, if this page has not been completed
 									if (! $_SESSION['EFP'][$formId]['completed']['page_'.$this->intActivePage])
 									{
-										unset($_SESSION['FILES'][$objFields->name]);
+										unset($_SESSION['FILES'][$objField->name]);
 									}
 
 									$objWidget->validate();
 
-									// file has been uploaded, store it in temp folder
-									if (is_uploaded_file($_SESSION['FILES'][$objFields->name]['tmp_name']))
+									// File has been uploaded, store it in temp folder
+									if (is_uploaded_file($_SESSION['FILES'][$objField->name]['tmp_name']))
 									{
 										$this->import('Files');
-										$strDstFile = TL_ROOT. '/system/tmp/' .md5_file($_SESSION['FILES'][$objFields->name]['tmp_name']);
-										if (@copy($_SESSION['FILES'][$objFields->name]['tmp_name'], $strDstFile))
+										$strDstFile = TL_ROOT. '/system/tmp/' .md5_file($_SESSION['FILES'][$objField->name]['tmp_name']);
+										if (@copy($_SESSION['FILES'][$objField->name]['tmp_name'], $strDstFile))
 										{
-											$_SESSION['FILES'][$objFields->name]['tmp_name'] = $strDstFile;
-											$_SESSION['FILES'][$objFields->name]['uploaded'] = true;
+											$_SESSION['FILES'][$objField->name]['tmp_name'] = $strDstFile;
+											$_SESSION['FILES'][$objField->name]['uploaded'] = true;
 											$this->Files->chmod($strDstFile, 0644);
 										}
 									}
@@ -476,7 +493,7 @@ class ExtendedForm extends \Form
 					{
 						if ($objWidget->required)
 						{
-							$this->arrWidgetsFailedValidation[$objFields->name] = 1;
+							$this->arrWidgetsFailedValidation[$objField->name] = 1;
 						}
 						$doNotSubmit = true;
 					}
@@ -485,9 +502,9 @@ class ExtendedForm extends \Form
 					{
 						if ($objWidget->submitInput())
 						{
-							$arrSubmitted[$objFields->name] = $objWidget->value;
-							$_SESSION['FORM_DATA'][$objFields->name] = $objWidget->value;
-							unset($_POST[$objFields->name]); // see #5474
+							$arrSubmitted[$objField->name] = $objWidget->value;
+							$_SESSION['FORM_DATA'][$objField->name] = $objWidget->value;
+							unset($_POST[$objField->name]); // see #5474
 						}
 					}
 				}
@@ -505,13 +522,13 @@ class ExtendedForm extends \Form
 					if ($this->blnMultipage || $this->blnEditform)
 					{
 						// Save file info in the session in frontend edit mode
-						if ($this->blnEditform && strlen($arrEditRecord[$objFields->name]) && (!isset($_SESSION['FILES'][$objFields->name]) || empty($_SESSION['FILES'][$objFields->name])))
+						if ($this->blnEditform && strlen($arrEditRecord[$objField->name]) && (!isset($_SESSION['FILES'][$objField->name]) || empty($_SESSION['FILES'][$objField->name])))
 						{
-							$objFile = new \File($arrEditRecord[$objFields->name]);
+							$objFile = new \File($arrEditRecord[$objField->name]);
 
 							if ($objFile->size)
 							{
-								$_SESSION['FILES'][$objFields->name] = array(
+								$_SESSION['FILES'][$objField->name] = array(
 									'name' => $objFile->basename,
 									'type' => $objFile->mime,
 									'tmp_name' => TL_ROOT . '/' . $objFile->value,
@@ -522,9 +539,9 @@ class ExtendedForm extends \Form
 						}
 
 						// Add info about uploaded file to upload input
-						if (isset($_SESSION['FILES'][$objFields->name]) && $_SESSION['FILES'][$objFields->name]['uploaded'])
+						if (isset($_SESSION['FILES'][$objField->name]) && $_SESSION['FILES'][$objField->name]['uploaded'])
 						{
-							$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objFields->name]['name']).'</p>$2$3', $objWidget->parse());
+							$this->Template->fields .= preg_replace('/(.*?)(<input.*?>)(.*?)/sim', '$1<p class="upload_info">'.sprintf($GLOBALS['TL_LANG']['MSC']['fileUploaded'], $_SESSION['FILES'][$objField->name]['name']).'</p>$2$3', $objWidget->parse());
 
 							++$row;
 							continue;
@@ -532,6 +549,11 @@ class ExtendedForm extends \Form
 
 					}
 
+				}
+
+				if ($objWidget->name != '' && $objWidget->label != '')
+				{
+					$arrLabels[$objWidget->name] = $this->replaceInsertTags($objWidget->label);
 				}
 
 				$this->Template->fields .= $objWidget->parse();
@@ -557,14 +579,14 @@ class ExtendedForm extends \Form
 			}
 			else
 			{
-				// if not last page but page is completed, render next page
+				// If not last page but page is completed, render next page
 				if ($this->intActivePage < $this->intTotalPages && (strlen($_POST['FORM_NEXT']) || strlen($_POST['FORM_NEXT_x'])))
 				{
 					$_SESSION['EFP'][$formId]['render_page'] = ((int) $_POST['FORM_PAGE'] + 1);
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
 					\Controller::reload();
 				}
-				// if posted 'back'
+				// If posted 'back'
 				elseif ($strMode == 'back' && $this->intActivePage <= $this->intTotalPages
 					&& (strlen($_POST['FORM_BACK']) || strlen($_POST['FORM_BACK_x'])))
 				{
@@ -572,7 +594,7 @@ class ExtendedForm extends \Form
 					$_SESSION['EFP'][$formId]['completed']['page_'.$_POST['FORM_PAGE']] = true;
 					\Controller::reload();
 				}
-				// last page completed, process form
+				// Last page completed, process form
 				else
 				{
 					if ((int) $_POST['FORM_PAGE'] == $this->intTotalPages && (strlen($_POST['FORM_NEXT']) || strlen($_POST['FORM_NEXT_x'])))
@@ -620,7 +642,7 @@ class ExtendedForm extends \Form
 			$this->Template->action = $this->generateFrontendUrl($objTarget->row());
 		}
 
-		// add Javascript to handle html5 input attribute 'required' on back button
+		// Add Javascript to handle html5 input attribute 'required' on back button
 		if ($blnIsHtml5)
 		{
 			$this->Template->fields .= '
