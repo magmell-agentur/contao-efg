@@ -214,9 +214,9 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(!empty($arrGroups))
+						if (!empty($arrGroups))
 						{
-							foreach($arrGroups as $group)
+							foreach ($arrGroups as $group)
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
@@ -254,7 +254,7 @@ class ModuleFormdataListing extends \Module
 		if (strlen($this->efg_fe_edit_access))
 		{
 			$arrAllowedOwnerIds = array();
-			switch($this->efg_fe_edit_access)
+			switch ($this->efg_fe_edit_access)
 			{
 				case 'member': // edit own records only
 					if (intval($this->Member->id) > 0)
@@ -273,9 +273,9 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(!empty($arrGroups))
+						if (!empty($arrGroups))
 						{
-							foreach($arrGroups as $group)
+							foreach ($arrGroups as $group)
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
@@ -313,7 +313,7 @@ class ModuleFormdataListing extends \Module
 		if (strlen($this->efg_fe_delete_access))
 		{
 			$arrAllowedOwnerIds = array();
-			switch($this->efg_fe_delete_access)
+			switch ($this->efg_fe_delete_access)
 			{
 				case 'member': // delete own records only
 					if (intval($this->Member->id) > 0)
@@ -332,9 +332,9 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(!empty($arrGroups))
+						if (!empty($arrGroups))
 						{
-							foreach($arrGroups as $group)
+							foreach ($arrGroups as $group)
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
@@ -371,7 +371,7 @@ class ModuleFormdataListing extends \Module
 		if (strlen($this->efg_fe_export_access))
 		{
 			$arrAllowedOwnerIds = array();
-			switch($this->efg_fe_export_access)
+			switch ($this->efg_fe_export_access)
 			{
 				case 'member': // export own records only
 					if (intval($this->Member->id) > 0)
@@ -390,9 +390,9 @@ class ModuleFormdataListing extends \Module
 						$arrAllowedOwnerIds[] = intval($this->Member->id);
 						$arrGroups = $this->Member->groups;
 						$arrGroupsWhere = array();
-						if(!empty($arrGroups))
+						if (!empty($arrGroups))
 						{
-							foreach($arrGroups as $group)
+							foreach ($arrGroups as $group)
 							{
 								$arrGroupsWhere[] = ' groups LIKE \'%"' . intval($group) . '"%\'';
 							}
@@ -1528,7 +1528,7 @@ class ModuleFormdataListing extends \Module
 								$arrTd[$class][count($arrTd[$class])-1]['src'] = $this->urlEncode($value);
 								$arrListItems[$i][$k]['type'] = 'file';
 								$arrListItems[$i][$k]['src'] = $this->urlEncode($value);
-								if ( substr($objFile->mime, 0, 6) == 'image/' )
+								if (substr($objFile->mime, 0, 6) == 'image/')
 								{
 									$arrTd[$class][count($arrTd[$class])-1]['display'] = 'image';
 									$arrListItems[$i][$k]['display'] = 'image';
@@ -1614,9 +1614,7 @@ class ModuleFormdataListing extends \Module
 
 							unset($arrTemp);
 						}
-
 					}
-
 					$j++;
 				}
 			}
@@ -1671,7 +1669,6 @@ class ModuleFormdataListing extends \Module
 			// Process result and format values
 			foreach ($arrRows as $row)
 			{
-
 				$args = array();
 
 				$strExpEncl = '"';
@@ -1685,7 +1682,7 @@ class ModuleFormdataListing extends \Module
 				{
 					$blnExportAllowed = false;
 				}
-				elseif($this->efg_fe_export_access == 'public')
+				elseif ($this->efg_fe_export_access == 'public')
 				{
 					$blnExportAllowed = true;
 				}
@@ -1964,7 +1961,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnEditAllowed = false;
 		}
-		elseif($this->efg_fe_edit_access == 'public')
+		elseif ($this->efg_fe_edit_access == 'public')
 		{
 			$blnEditAllowed = true;
 		}
@@ -1985,7 +1982,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnDeleteAllowed = false;
 		}
-		elseif($this->efg_fe_delete_access == 'public')
+		elseif ($this->efg_fe_delete_access == 'public')
 		{
 			$blnDeleteAllowed = true;
 		}
@@ -2006,7 +2003,7 @@ class ModuleFormdataListing extends \Module
 		{
 			$blnExportAllowed = false;
 		}
-		elseif($this->efg_fe_export_access == 'public')
+		elseif ($this->efg_fe_export_access == 'public')
 		{
 			$blnExportAllowed = true;
 		}
@@ -2056,7 +2053,7 @@ class ModuleFormdataListing extends \Module
 		if ($arrListFields[0] == '*')
 		{
 			$arrTempFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
-			foreach($arrListFields as $field)
+			foreach ($arrListFields as $field)
 			{
 				if (substr($field,0,1) == '-')
 				{
@@ -2073,7 +2070,7 @@ class ModuleFormdataListing extends \Module
 		$strQuery = "SELECT ";
 		$strWhere = '';
 
-		foreach($arrListFields as $field)
+		foreach ($arrListFields as $field)
 		{
 			if (in_array($field, $this->arrBaseFields))
 			{
@@ -2397,13 +2394,13 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		// check record
+		// Check record
 		if (null === $this->intRecordId || intval($this->intRecordId) < 1)
 		{
 			return;
 		}
 
-		// check access
+		// Check access
 		if (strlen($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			$objOwner = \Database::getInstance()->prepare("SELECT fd_member FROM tl_formdata WHERE id=?")
@@ -2418,13 +2415,13 @@ class ModuleFormdataListing extends \Module
 		}
 
 
-		// check export access
+		// Check export access
 		$blnExportAllowed = false;
 		if ($this->efg_fe_export_access == 'none')
 		{
 			$blnExportAllowed = false;
 		}
-		elseif($this->efg_fe_export_access == 'public')
+		elseif ($this->efg_fe_export_access == 'public')
 		{
 			$blnExportAllowed = true;
 		}
@@ -2450,7 +2447,7 @@ class ModuleFormdataListing extends \Module
 		if ($arrListFields[0] == '*')
 		{
 			$arrTempFields = array_merge($this->arrBaseFields, $this->arrDetailFields);
-			foreach($arrListFields as $field)
+			foreach ($arrListFields as $field)
 			{
 				if (substr($field,0,1) == '-')
 				{
@@ -2467,7 +2464,7 @@ class ModuleFormdataListing extends \Module
 		$strQuery = "SELECT ";
 		$strWhere = '';
 
-		foreach($arrListFields as $field)
+		foreach ($arrListFields as $field)
 		{
 			if (in_array($field, $this->arrBaseFields))
 			{
@@ -2872,7 +2869,7 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		// check record
+		// Check record
 		if ($this->intRecordId === null || intval($this->intRecordId) < 1)
 		{
 			unset($_GET[$this->strDetailKey]);
@@ -2888,7 +2885,7 @@ class ModuleFormdataListing extends \Module
 
 		$varOwner = $objOwner->fetchAssoc();
 
-		// check access
+		// Check access
 		if (!empty($this->efg_list_access) && $this->efg_list_access != 'public')
 		{
 			if (!in_array(intval($varOwner['fd_member']), $this->arrAllowedOwnerIds))
@@ -2898,13 +2895,13 @@ class ModuleFormdataListing extends \Module
 			}
 		}
 
-		// check edit access
+		// Check edit access
 		$blnEditAllowed = false;
 		if ($this->efg_fe_edit_access == 'none')
 		{
 			$blnEditAllowed = false;
 		}
-		elseif($this->efg_fe_edit_access == 'public')
+		elseif ($this->efg_fe_edit_access == 'public')
 		{
 			$blnEditAllowed = true;
 		}
@@ -2922,7 +2919,7 @@ class ModuleFormdataListing extends \Module
 		}
 
 		$intListingId = 0;
-		if($this->id)
+		if ($this->id)
 		{
 			$intListingId = intval($this->id);
 		}
@@ -2936,7 +2933,7 @@ class ModuleFormdataListing extends \Module
 			$this->list_edit_layout = 'edit_fd_default';
 		}
 
-		// get the form
+		// Get the form
 		$objCheckRecord = \Database::getInstance()->prepare("SELECT form FROM tl_formdata WHERE id=?")
 			->limit(1)
 			->execute($this->intRecordId);
@@ -2946,7 +2943,7 @@ class ModuleFormdataListing extends \Module
 			$strForm = $objCheckRecord->form;
 		}
 
-		// get ContentElement holding the form
+		// Get the ContentElement holding the form
 		if (strlen($strForm))
 		{
 			$objForm = \FormModel::findOneBy('title', $strForm);
@@ -2973,7 +2970,7 @@ class ModuleFormdataListing extends \Module
 		$strWhere = '';
 		$strSep = '';
 
-		foreach($arrRecordFields as $field)
+		foreach ($arrRecordFields as $field)
 		{
 			if (in_array($field, $this->arrBaseFields))
 			{
