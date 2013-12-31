@@ -1600,7 +1600,7 @@ class Formdata extends \Frontend
 
 								if ($objFileModel !== null)
 								{
-									$varVal[$key] = $objFileModel->uuid;
+									$varVal[$key] = (TL_MODE == 'FE' ? $objFileModel->path : $objFileModel->uuid);
 								}
 							}
 						}
@@ -1619,7 +1619,7 @@ class Formdata extends \Frontend
 
 							if ($objFileModel !== null)
 							{
-								$varVal = $objFileModel->uuid;
+								$varVal = (TL_MODE == 'FE' ? $objFileModel->path : $objFileModel->uuid);
 							}
 						}
 					}

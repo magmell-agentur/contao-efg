@@ -150,6 +150,17 @@ class EfgFormGallery extends \ContentElement
 			return '';
 		}
 
+		foreach ($this->multiSRC as $k => $v)
+		{
+			if (\Validator::isUuid($v))
+			{
+				if (strlen($v) == 16)
+				{
+					$this->multiSRC[$k] = \String::binToUuid($v);
+				}
+			}
+		}
+
 		// Get the file entries from the database
 		$this->objFiles = \FilesModel::findMultipleByUuids($this->multiSRC);
 
