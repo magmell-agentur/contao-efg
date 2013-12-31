@@ -1,7 +1,7 @@
 EFG - Extended From Generator for Contao Open Source CMS Changelog
 ==================================================================
 
-Version 2.2.0 stable (2013-12-30)
+Version 2.2.0 stable (2013-12-31)
 ---------------------------------
 
 ### Changed
@@ -13,6 +13,13 @@ Changed templates folder structure
 
 ### Changed
 Use Database\Statement::execute() instead of deprecated Database\Statement::executeUncached()
+
+### Added
+The target charset for converting from UTF-8 when exporting form data can now be given by configuration setting
+$GLOBALS['EFG']['exportConvertToCharset'] = 'TARGET_CHARSET'; // default is 'CP1252'
+
+NB: The conversion can be deactivated by configuration setting
+$GLOBALS['EFG']['exportUTF8Decode'] = false;
 
 
 Version 2.1.0 stable (2013-12-28)

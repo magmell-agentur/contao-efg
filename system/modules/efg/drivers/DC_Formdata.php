@@ -185,8 +185,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 	protected $arrUserGroups = null;
 
-	// convert UTF8 to cp1251 on CSV-/XLS-Export
+	// Decode UTF8 on CSV-/XLS-Export
+	// This can be deactivated by configuration setting: $GLOBALS['EFG']['exportUTF8Decode'] = false
 	protected $blnExportUTF8Decode = true;
+
+	// Target charset when converting from UTF8 on CSV-/XLS-Export
+	// This can be changed by configuration setting: $GLOBALS['EFG']['exportConvertToCharset'] = 'TARGET_CHARSET'
+	protected $strExportConvertToCharset = 'CP1252';
 
 	/**
 	 * Initialize the object
@@ -241,9 +246,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		}
 
 		$this->blnExportUTF8Decode = true;
+		$this->strExportConvertToCharset = 'CP1252';
 		if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
 		{
 			$this->blnExportUTF8Decode = false;
+		}
+		if (isset($GLOBALS['EFG']['exportConvertToCharset']))
+		{
+			$this->strExportConvertToCharset = $GLOBALS['EFG']['exportConvertToCharset'];
 		}
 
 		if (isset($GLOBALS['EFG']['exportIgnoreFields']))
@@ -5658,7 +5668,7 @@ var Stylect = {
 
 		if ($strMode=='csv')
 		{
-			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
+			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? $this->strExportConvertToCharset : 'utf-8'));
 			header('Content-Transfer-Encoding: binary');
 			header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") .'.csv"');
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -5756,7 +5766,7 @@ var Stylect = {
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
 						{
-							$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+							$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 						}
 
 						if ($strMode=='csv')
@@ -5984,7 +5994,7 @@ var Stylect = {
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
 						{
-							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 						}
 					}
 
@@ -6066,6 +6076,11 @@ var Stylect = {
 	 */
 	public function convertEncoding($strString, $from, $to)
 	{
+		if ($from == $to)
+		{
+			return $strString;
+		}
+
 		if (USE_MBSTRING)
 		{
 			@mb_substitute_character('none');

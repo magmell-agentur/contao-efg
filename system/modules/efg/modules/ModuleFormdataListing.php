@@ -115,8 +115,13 @@ class ModuleFormdataListing extends \Module
 
 	protected $arrDetailKeys = array();
 
-	// convert UTF8 to cp1251 on CSV-/XLS-Export
+	// Decode UTF8 on CSV-/XLS-Export
+	// This can be deactivated by configuration setting: $GLOBALS['EFG']['exportUTF8Decode'] = false
 	protected $blnExportUTF8Decode = true;
+
+	// Target charset when converting from UTF8 on CSV-/XLS-Export
+	// This can be changed by configuration setting: $GLOBALS['EFG']['exportConvertToCharset'] = 'TARGET_CHARSET'
+	protected $strExportConvertToCharset = 'CP1252';
 
 	/**
 	 * Fields to ignore on export
@@ -149,9 +154,14 @@ class ModuleFormdataListing extends \Module
 		}
 
 		$this->blnExportUTF8Decode = true;
+		$this->strExportConvertToCharset = 'CP1252';
 		if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
 		{
 			$this->blnExportUTF8Decode = false;
+		}
+		if (isset($GLOBALS['EFG']['exportConvertToCharset']))
+		{
+			$this->strExportConvertToCharset = $GLOBALS['EFG']['exportConvertToCharset'];
 		}
 
 		if (isset($GLOBALS['EFG']['exportIgnoreFields']))
@@ -559,9 +569,14 @@ class ModuleFormdataListing extends \Module
 			$useFieldNames = $this->Formdata->arrStoringForms[substr($this->strFormKey, 3)]['useFieldNames'];
 
 			$this->blnExportUTF8Decode = true;
+			$this->strExportConvertToCharset = 'CP1252';
 			if (isset($GLOBALS['EFG']['exportUTF8Decode']) && $GLOBALS['EFG']['exportUTF8Decode'] == false)
 			{
 				$this->blnExportUTF8Decode = false;
+			}
+			if (isset($GLOBALS['EFG']['exportConvertToCharset']))
+			{
+				$this->strExportConvertToCharset = $GLOBALS['EFG']['exportConvertToCharset'];
 			}
 
 			if ($strExportMode=='xls')
@@ -1240,7 +1255,7 @@ class ModuleFormdataListing extends \Module
 			}
 			else // defaults to csv
 			{
-				header('Content-Type: appplication/csv; charset=' . ($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
+				header('Content-Type: appplication/csv; charset=' . ($this->blnExportUTF8Decode ? $this->strExportConvertToCharset : 'utf-8'));
 				header('Content-Transfer-Encoding: binary');
 				header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") . '.csv"');
 				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -1287,7 +1302,7 @@ class ModuleFormdataListing extends \Module
 
 				if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
 				{
-					$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+					$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 				}
 
 				if ($strExportMode=='csv')
@@ -1850,7 +1865,7 @@ class ModuleFormdataListing extends \Module
 
 						if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
 						{
-							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 						}
 					}
 
@@ -2529,7 +2544,7 @@ class ModuleFormdataListing extends \Module
 		}
 		else // defaults to csv
 		{
-			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? 'CP1252' : 'utf-8'));
+			header('Content-Type: appplication/csv; charset='.($this->blnExportUTF8Decode ? $this->strExportConvertToCharset : 'utf-8'));
 			header('Content-Transfer-Encoding: binary');
 			header('Content-Disposition: attachment; filename="export_' . $this->strFormKey . '_' . date("Ymd_His") . '.csv"');
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -2595,7 +2610,7 @@ class ModuleFormdataListing extends \Module
 
 							if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
 							{
-								$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+								$strName = $this->convertEncoding($strName, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 							}
 						}
 
@@ -2787,7 +2802,7 @@ class ModuleFormdataListing extends \Module
 
 						if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
 						{
-							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], 'CP1252');
+							$strVal = $this->convertEncoding($strVal, $GLOBALS['TL_CONFIG']['characterSet'], $this->strExportConvertToCharset);
 						}
 					}
 
