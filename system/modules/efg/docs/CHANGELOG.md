@@ -1,6 +1,14 @@
 EFG - Extended Form Generator for Contao Open Source CMS Changelog
 ==================================================================
 
+
+Version 2.2.1 stable (2014-XX-XX)
+---------------------------------
+
+### Fixed
+Generating alias in mode 'edit all' did not use the configured field
+
+
 Version 2.2.0 stable (2013-12-31)
 ---------------------------------
 
