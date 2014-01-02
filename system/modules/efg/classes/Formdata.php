@@ -223,9 +223,28 @@ class Formdata extends \Frontend
 		{
 			if (!empty($strAliasField))
 			{
-				// Get value from post
 				$autoAlias = true;
-				$varValue = standardize(\Input::post($strAliasField));
+				$strAliasFieldSuffix = '';
+
+				// Additional key in mode editAll
+				if (\Input::get('act') == 'editAll')
+				{
+					$strAliasFieldSuffix = '_' . $intRecId;
+				}
+
+				// Get value from post
+				if (isset($_POST[$strAliasField . $strAliasFieldSuffix]))
+				{
+					$varValue = standardize(\Input::post($strAliasField . $strAliasFieldSuffix));
+				}
+				else
+				{
+					$objValue = \Database::getInstance()->prepare("SELECT `value` FROM tl_formdata_details WHERE pid=? AND ff_name=?")
+						->limit(1)
+						->execute($intRecId, $strAliasField);
+
+					$varValue = standardize($objValue->value);
+				}
 			}
 		}
 
