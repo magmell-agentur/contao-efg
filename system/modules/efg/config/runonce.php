@@ -38,6 +38,14 @@ class EfgRunonce extends Controller
 			return;
 		}
 
+		if (\Config::get('coreOnlyMode'))
+		{
+			if (is_file(TL_ROOT . '/system/modules/efg/config/autoload.php'))
+			{
+				include TL_ROOT . '/system/modules/efg/config/autoload.php';
+			}
+		}
+
 		$this->execute('clearCache');
 		$this->execute('updateTables');
 		$this->execute('updateListingModules');
@@ -46,7 +54,6 @@ class EfgRunonce extends Controller
 		$this->execute('updateFormFieldEfgLookupOptions');
 		$this->execute('updateDbafsUuid');
 		$this->execute('updateConfig');
-
 	}
 
 
@@ -90,7 +97,7 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 	{
 
 		// Remove database.sql (in case of manual update)
-		if (is_file(TL_ROOT.'/system/modules/efg/config/database.sql'))
+		if (is_file(TL_ROOT . '/system/modules/efg/config/database.sql'))
 		{
 			$objFile = new \File('system/modules/efg/config/database.sql');
 			$objFile->delete();
@@ -136,7 +143,6 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 	private function updateListingModules()
 	{
 		// As of r2.0.0 formKey used for names of dca files and formdata listing modules is created from form alias instead of form title
-
 		if (!$this->Database->fieldExists('storeFormdata', 'tl_form')
 			|| !$this->Database->fieldExists('list_formdata', 'tl_module')
 		)
