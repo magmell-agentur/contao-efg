@@ -291,7 +291,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Set IDs and redirect
 		if (\Input::post('FORM_SUBMIT') == 'tl_select')
 		{
-			$ids = deserialize(\Input::post('IDS'));
+			$ids = \Input::post('IDS');
 
 			if (!is_array($ids) || empty($ids))
 			{
@@ -299,7 +299,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 
 			$session = $this->Session->getData();
-			$session['CURRENT']['IDS'] = deserialize(\Input::post('IDS'));
+			$session['CURRENT']['IDS'] = \Input::post('IDS');
 			$this->Session->setData($session);
 
 			if (isset($_POST['edit']))
@@ -1855,7 +1855,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		// Save field selection in session
 		if (\Input::post('FORM_SUBMIT') == $this->strTable.'_all' && \Input::get('fields'))
 		{
-			$session['CURRENT'][$this->strTable] = deserialize(\Input::post('all_fields'));
+			$session['CURRENT'][$this->strTable] = \Input::post('all_fields');
 			$this->Session->setData($session);
 		}
 
@@ -4096,7 +4096,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					$moptions = array();
 
-					foreach($options as $option)
+					foreach ($options as $option)
 					{
 						// CSV lists (see #2890)
 						if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['eval']['csv']))

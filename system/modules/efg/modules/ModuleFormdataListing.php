@@ -1479,7 +1479,6 @@ class ModuleFormdataListing extends \Module
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 					{
 						$strSep = (isset($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['csv'])) ? $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['csv'] : '|';
-
 						$v = (is_string($v) && strpos($v, $strSep) !== false) ? explode($strSep, $v) : deserialize($v);
 					}
 
