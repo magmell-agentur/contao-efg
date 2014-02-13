@@ -372,6 +372,11 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					$this->import($callback[0]);
 					$this->$callback[0]->$callback[1]($this);
 				}
+				elseif (is_callable($callback))
+				{
+					$callback($this);
+				}
+
 			}
 		}
 
@@ -869,8 +874,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				{
 					foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['oncreate_callback'] as $callback)
 					{
-						$this->import($callback[0]);
-						$this->$callback[0]->$callback[1]($this->strTable, $insertID, $this->set, $this);
+						if (is_array($callback))
+						{
+							$this->import($callback[0]);
+							$this->$callback[0]->$callback[1]($this->strTable, $insertID, $this->set, $this);
+						}
+						elseif (is_callable($callback))
+						{
+							$callback($this->strTable, $insertID, $this->set, $this);
+						}
 					}
 				}
 
@@ -988,8 +1000,13 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (is_array($callback))
 					{
 						$this->import($callback[0]);
-						$this->$callback[0]->$callback[1]($this);
+						$this->$callback[0]->$callback[1]($this, $objUndoStmt->insertId);
 					}
+					elseif (is_callable($callback))
+					{
+						$callback($this, $objUndoStmt->insertId);
+					}
+
 				}
 			}
 
@@ -1334,6 +1351,11 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->import($callback[0]);
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
+							elseif (is_callable($callback))
+							{
+								$this->varValue = $callback($this->varValue, $this);
+							}
+
 						}
 
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
@@ -1686,6 +1708,11 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->import($callback[0]);
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
+							elseif (is_callable($callback))
+							{
+								$this->varValue = $callback($this->varValue, $this);
+							}
+
 						}
 
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
@@ -1700,8 +1727,48 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 		}
 
-
 		$version = '';
+
+		// Submit buttons
+		$arrButtons = array();
+		$arrButtons['save'] = '<input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">';
+
+		if (!\Input::get('nb'))
+		{
+			$arrButtons['saveNclose'] = '<input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'">';
+		}
+
+		if (!\Input::get('popup') && !$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] && !$GLOBALS['TL_DCA'][$this->strTable]['config']['notCreatable'])
+		{
+			$arrButtons['saveNcreate'] = '<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'">';
+		}
+
+		if (\Input::get('s2e'))
+		{
+			$arrButtons['saveNedit'] = '<input type="submit" name="saveNedit" id="saveNedit" class="tl_submit" accesskey="e" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNedit']).'">';
+		}
+		elseif (!\Input::get('popup') && ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['mode'] == 4 || strlen($this->ptable) || $GLOBALS['TL_DCA'][$this->strTable]['config']['switchToEdit']))
+		{
+			$arrButtons['saveNback'] = '<input type="submit" name="saveNback" id="saveNback" class="tl_submit" accesskey="g" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNback']).'">';
+		}
+
+		// Call the buttons_callback (see #4691)
+		if (is_array($GLOBALS['TL_DCA'][$this->strTable]['edit']['buttons_callback']))
+		{
+			foreach ($GLOBALS['TL_DCA'][$this->strTable]['edit']['buttons_callback'] as $callback)
+			{
+				if (is_array($callback))
+				{
+					$this->import($callback[0]);
+					$arrButtons = $this->$callback[0]->$callback[1]($arrButtons, $this);
+				}
+				elseif (is_callable($callback))
+				{
+					$arrButtons = $callback($arrButtons, $this);
+				}
+			}
+		}
+
 
 		// Add some buttons and end the form
 		$return .= '
@@ -1710,10 +1777,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div class="tl_formbody_submit">
 
 <div class="tl_submit_container">
-<input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">
-<input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'"> '
-			. (!$GLOBALS['TL_DCA'][$this->strTable]['config']['closed'] ? '<input type="submit" name="saveNcreate" id="saveNcreate" class="tl_submit" accesskey="n" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNcreate']).'"> ' : '')
-			.'</div>
+  ' . implode(' ', $arrButtons) . '
+</div>
 
 </div>
 </form>
@@ -1756,8 +1821,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] as $callback)
 				{
-					$this->import($callback[0]);
-					$this->$callback[0]->$callback[1]($this);
+					if (is_array($callback))
+					{
+						$this->import($callback[0]);
+						$this->$callback[0]->$callback[1]($this);
+					}
+					elseif (is_callable($callback))
+					{
+						$callback($this);
+					}
 				}
 			}
 
@@ -2341,6 +2413,11 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 								$this->import($callback[0]);
 								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
 							}
+							elseif (is_callable($callback))
+							{
+								$this->varValue = $callback($this->varValue, $this);
+							}
+
 						}
 
 						$this->objActiveRecord->{$this->strField} = $this->varValue;
@@ -2364,8 +2441,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					{
 						foreach ($GLOBALS['TL_DCA'][$this->strTable]['config']['onsubmit_callback'] as $callback)
 						{
-							$this->import($callback[0]);
-							$this->$callback[0]->$callback[1]($this);
+							if (is_array($callback))
+							{
+								$this->import($callback[0]);
+								$this->$callback[0]->$callback[1]($this);
+							}
+							elseif (is_callable($callback))
+							{
+								$callback($this);
+							}
 						}
 					}
 
@@ -2374,6 +2458,29 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						->execute(time(), $this->intId);
 				}
 			}
+
+			// Submit buttons
+			$arrButtons = array();
+			$arrButtons['save'] = '<input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">';
+			$arrButtons['saveNclose'] = '<input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'">';
+
+			// Call the buttons_callback (see #4691)
+			if (is_array($GLOBALS['TL_DCA'][$this->strTable]['edit']['buttons_callback']))
+			{
+				foreach ($GLOBALS['TL_DCA'][$this->strTable]['edit']['buttons_callback'] as $callback)
+				{
+					if (is_array($callback))
+					{
+						$this->import($callback[0]);
+						$arrButtons = $this->$callback[0]->$callback[1]($arrButtons, $this);
+					}
+					elseif (is_callable($callback))
+					{
+						$arrButtons = $callback($arrButtons, $this);
+					}
+				}
+			}
+
 
 			// Add the form
 			$return = '
@@ -2392,8 +2499,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 <div class="tl_formbody_submit">
 
 <div class="tl_submit_container">
-<input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['save']).'">
-<input type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c" value="'.specialchars($GLOBALS['TL_LANG']['MSC']['saveNclose']).'">
+  ' . implode(' ', $arrButtons) . '
 </div>
 
 </div>
@@ -2688,8 +2794,15 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			foreach ($arrField['save_callback'] as $callback)
 			{
-				$this->import($callback[0]);
-				$varValue = $this->$callback[0]->$callback[1]($varValue, $this);
+				if (is_array($callback))
+				{
+					$this->import($callback[0]);
+					$varValue = $this->$callback[0]->$callback[1]($varValue, $this);
+				}
+				elseif (is_callable($callback))
+				{
+					$varValue = $callback($varValue, $this);
+				}
 			}
 		}
 
@@ -2909,8 +3022,17 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		{
 			foreach ($GLOBALS['TL_HOOKS']['reviseTable'] as $callback)
 			{
-				$this->import($callback[0]);
-				$status = $this->$callback[0]->$callback[1]($this->strTable, $new_records[$this->strTable], $ptable, $ctable);
+				$status = null;
+
+				if (is_array($callback))
+				{
+					$this->import($callback[0]);
+					$status = $this->$callback[0]->$callback[1]($this->strTable, $new_records[$this->strTable], $ptable, $ctable);
+				}
+				elseif (is_callable($callback))
+				{
+					$status = $callback($this->strTable, $new_records[$this->strTable], $ptable, $ctable);
+				}
 
 				if ($status === true)
 				{
@@ -3311,14 +3433,21 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				$colspan = 1;
 
-				// Call the label callback ($row, $label, $this)
-				if (is_array($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']))
+				// Call the label_callback ($row, $label, $this)
+				if (is_array($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']) || is_callable($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']))
 				{
-					$strClass = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][0];
-					$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][1];
+					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']))
+					{
+						$strClass = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][0];
+						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][1];
 
-					$this->import($strClass);
-					$args = $this->$strClass->$strMethod($row, $label, $this, $args);
+						$this->import($strClass);
+						$args = $this->$strClass->$strMethod($row, $label, $this, $args);
+					}
+					elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']))
+					{
+						$args = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']($row, $label, $this, $args);
+					}
 
 					// Handle strings and arrays (backwards compatibility)
 					if (!$GLOBALS['TL_DCA'][$this->strTable]['list']['label']['showColumns'])
@@ -3436,6 +3565,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					{
 						$this->import($arrCallback[0]);
 						$panel = $this->$arrCallback[0]->$arrCallback[1]($this);
+					}
+					elseif (is_callable($arrCallback))
+					{
+						$panel = $arrCallback($this);
 					}
 				}
 
@@ -4120,14 +4253,21 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$options = array_unique($options);
 				$options_callback = array();
 
-				// Load options callback
-				if ($field != 'form' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']) && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['reference'])
+				// Call the options_callback
+				if ((is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']) || is_callable($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'])) && !$GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['reference'])
 				{
-					$strClass = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][0];
-					$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][1];
+					if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']))
+					{
+						$strClass = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][0];
+						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][1];
 
-					$this->import($strClass);
-					$options_callback = $this->$strClass->$strMethod($this);
+						$this->import($strClass);
+						$options_callback = $this->$strClass->$strMethod($this);
+					}
+					elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']))
+					{
+						$options_callback = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']($this);
+					}
 
 					// Sort options according to the keys of the callback array
 					$options = array_intersect(array_keys($options_callback), $options);
@@ -4395,6 +4535,10 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 			$this->import($strClass);
 			$group = $this->$strClass->$strMethod($group, $mode, $field, $row, $this);
+		}
+		elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['group_callback']))
+		{
+			$group = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['group_callback']($group, $mode, $field, $row, $this);
 		}
 
 		return $group;
