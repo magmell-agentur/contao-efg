@@ -2,8 +2,17 @@ EFG - Extended Form Generator for Contao Open Source CMS Changelog
 ==================================================================
 
 
-Version 2.2.1 stable (2014-XX-XX)
+Version 2.2.1 stable (2014-02-13)
 ---------------------------------
+
+### Changed
+Support using closures as DCA callbacks
+
+### Changed
+Do not pass POST data to the 'deserialize()' function
+
+### Fixed
+Installing or updating EFG when running Contao in 'coreOnlyMode' did throw a fatal error 'Class Formdata not found'
 
 ### Changed
 Changed .htaccess in ./assets for Apache 2.4 (see #49)
