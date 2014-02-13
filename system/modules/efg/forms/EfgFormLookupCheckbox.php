@@ -104,7 +104,7 @@ class EfgFormLookupCheckbox extends \Widget
 	public function validate()
 	{
 		$mandatory = $this->mandatory;
-		$options = deserialize($this->getPost($this->strName));
+		$options = $this->getPost($this->strName);
 
 		// Check if there is at least one value
 		if ($mandatory && is_array($options))
@@ -133,7 +133,7 @@ class EfgFormLookupCheckbox extends \Widget
 		}
 
 		// Clear result if nothing has been submitted
-		if (!array_key_exists($this->strName, $_POST))
+		if (!isset($_POST[$this->strName]))
 		{
 			$this->varValue = '';
 		}
