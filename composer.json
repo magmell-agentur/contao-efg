@@ -19,7 +19,7 @@
   "extra":{
     "contao": {
       "sources":{
-        "": ""
+        "": "system/modules/efg"
       }
     }
   }
