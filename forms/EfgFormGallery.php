@@ -156,7 +156,7 @@ class EfgFormGallery extends \ContentElement
 			{
 				if (strlen($v) == 16)
 				{
-					$this->multiSRC[$k] = \String::binToUuid($v);
+					$this->multiSRC[$k] = \StringUtil::binToUuid($v);
 				}
 			}
 		}

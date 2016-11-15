@@ -1297,7 +1297,7 @@ class ModuleFormdataListing extends \Module
 
 				if (strlen($strName))
 				{
-					$strName = \String::decodeEntities($strName);
+					$strName = \StringUtil::decodeEntities($strName);
 				}
 
 				if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
@@ -1474,7 +1474,7 @@ class ModuleFormdataListing extends \Module
 					}
 
 					$value = $this->formatValue($k, $v);
-					$v = \String::decodeEntities($v);
+					$v = \StringUtil::decodeEntities($v);
 
 					if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 					{
@@ -1859,7 +1859,7 @@ class ModuleFormdataListing extends \Module
 
 					if (strlen($strVal))
 					{
-						$strVal = \String::decodeEntities($strVal);
+						$strVal = \StringUtil::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strExportMode=='xls' && !$blnCustomXlsExport))
@@ -2163,7 +2163,7 @@ class ModuleFormdataListing extends \Module
 			$v = $arrRow[$k];
 
 			$value = $this->formatValue($k, $v);
-			$v = deserialize(\String::decodeEntities($v));
+			$v = deserialize(\StringUtil::decodeEntities($v));
 
 			if ($GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->list_table]['fields'][$k]['eval']['multiple'] == true)
 			{
@@ -2605,7 +2605,7 @@ class ModuleFormdataListing extends \Module
 
 						if (strlen($strName))
 						{
-							$strName = \String::decodeEntities($strName);
+							$strName = \StringUtil::decodeEntities($strName);
 
 							if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
 							{
@@ -2796,7 +2796,7 @@ class ModuleFormdataListing extends \Module
 
 					if (strlen($strVal))
 					{
-						$strVal = \String::decodeEntities($strVal);
+						$strVal = \StringUtil::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strExportMode == 'xls' && !$blnCustomXlsExport))
@@ -3221,14 +3221,14 @@ class ModuleFormdataListing extends \Module
 		// E-mail addresses
 		if ($value && ($rgxp == 'email' || strpos($this->arrFF[$k]['name'], 'mail') !== false || strpos($k, 'mail') !== false ))
 		{
-			$value = \String::encodeEmail($value);
+			$value = \StringUtil::encodeEmail($value);
 			$value = '<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;' . $value . '">' . $value . '</a>';
 			return $value;
 		}
 
 		if (strlen($value))
 		{
-			$value = \String::decodeEntities($value);
+			$value = \StringUtil::decodeEntities($value);
 			$value = ampersand($value);
 
 			if (!is_bool(strpos($value, "\n")))

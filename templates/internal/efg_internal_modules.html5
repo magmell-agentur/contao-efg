@@ -20,13 +20,13 @@
 /**
  * Back end modules
  */
-$GLOBALS['TL_LANG']['MOD']['formdata'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdata'])); ?>';
-$GLOBALS['TL_LANG']['MOD']['efg'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['efg'])); ?>';
-$GLOBALS['TL_LANG']['MOD']['feedback'] = array('<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['feedback'][0])); ?>', '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['feedback'][1])); ?>');
-<?php foreach($this->arrStoringForms as $strKey=>$arrVals): ?>$GLOBALS['TL_LANG']['MOD']['fd_<?php echo $strKey; ?>'] = array('<?php echo str_replace("'", "\'", \String::decodeEntities($arrVals['title'])); ?>', '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdata_from'])); ?> "<?php echo str_replace("'", "\'", \String::decodeEntities($arrVals['title'])); ?>".');
+$GLOBALS['TL_LANG']['MOD']['formdata'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdata'])); ?>';
+$GLOBALS['TL_LANG']['MOD']['efg'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['MOD']['efg'])); ?>';
+$GLOBALS['TL_LANG']['MOD']['feedback'] = array('<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['MOD']['feedback'][0])); ?>', '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['MOD']['feedback'][1])); ?>');
+<?php foreach($this->arrStoringForms as $strKey=>$arrVals): ?>$GLOBALS['TL_LANG']['MOD']['fd_<?php echo $strKey; ?>'] = array('<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrVals['title'])); ?>', '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['MOD']['formdata_from'])); ?> "<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrVals['title'])); ?>".');
 <?php endforeach; ?>
 
 /**
  * Front end modules
  */
-$GLOBALS['TL_LANG']['FMD']['formdatalisting'] = array('<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['FMD']['formdatalisting'][0])); ?>', '<?php echo str_replace("'", "\'", \String::decodeEntities($GLOBALS['TL_LANG']['FMD']['formdatalisting'][1])); ?>');
+$GLOBALS['TL_LANG']['FMD']['formdatalisting'] = array('<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['FMD']['formdatalisting'][0])); ?>', '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($GLOBALS['TL_LANG']['FMD']['formdatalisting'][1])); ?>');

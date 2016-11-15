@@ -921,13 +921,13 @@ class Formdata extends \Frontend
 			{
 				foreach ($strVal as $k => $value)
 				{
-					$strVal[$k] = \String::decodeEntities($value);
+					$strVal[$k] = \StringUtil::decodeEntities($value);
 				}
 				$strVal = serialize($strVal);
 			}
 			else
 			{
-				$strVal = \String::decodeEntities($strVal);
+				$strVal = \StringUtil::decodeEntities($strVal);
 			}
 
 			return $strVal;
@@ -1092,7 +1092,7 @@ class Formdata extends \Frontend
 		}
 		else
 		{
-			$varValue = \String::decodeEntities($varValue);
+			$varValue = \StringUtil::decodeEntities($varValue);
 		}
 
 		return $varValue;
@@ -1261,11 +1261,11 @@ class Formdata extends \Frontend
 					break;
 			}
 
-			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
+			return (is_string($strVal) && strlen($strVal)) ? \StringUtil::decodeEntities($strVal) : $strVal;
 		}
 		else
 		{
-			return (is_string($varSubmitted) && strlen($varSubmitted)) ? \String::decodeEntities($varSubmitted) : $varSubmitted;
+			return (is_string($varSubmitted) && strlen($varSubmitted)) ? \StringUtil::decodeEntities($varSubmitted) : $varSubmitted;
 		}
 	}
 
@@ -1498,11 +1498,11 @@ class Formdata extends \Frontend
 
 					break;
 			}
-			return (is_string($strVal) && strlen($strVal)) ? \String::decodeEntities($strVal) : $strVal;
+			return (is_string($strVal) && strlen($strVal)) ? \StringUtil::decodeEntities($strVal) : $strVal;
 		}
 		else
 		{
-			return (is_string($varValue) && strlen($varValue)) ? \String::decodeEntities($varValue) : $varValue;
+			return (is_string($varValue) && strlen($varValue)) ? \StringUtil::decodeEntities($varValue) : $varValue;
 		}
 	}
 
@@ -1764,7 +1764,7 @@ class Formdata extends \Frontend
 				$strLookupField = $arrLookupOptions['lookup_field'];
 				$strLookupValField = (strlen($arrLookupOptions['lookup_val_field'])) ? $arrLookupOptions['lookup_val_field'] : null;
 
-				$strLookupWhere = \String::decodeEntities($arrLookupOptions['lookup_where']);
+				$strLookupWhere = \StringUtil::decodeEntities($arrLookupOptions['lookup_where']);
 				if (!empty($strLookupWhere))
 				{
 					$strLookupWhere = $this->replaceInsertTags($strLookupWhere, false);
@@ -2623,7 +2623,7 @@ class Formdata extends \Frontend
 		if (isset($arrTag[1]) && strlen($arrTag[1]))
 		{
 			$arrTag[1] = str_replace('[&]', '__AMP__', $arrTag[1]);
-			$strParams = \String::decodeEntities($arrTag[1]);
+			$strParams = \StringUtil::decodeEntities($arrTag[1]);
 			$arrParams = preg_split('/&/sim', $strParams);
 
 			$arrReturn = array();

@@ -390,14 +390,14 @@ class FormdataProcessor extends \Frontend
 			$objMailProperties->skipEmptyFields = ($arrForm['confirmationMailSkipEmpty']) ? true : false;
 
 			// Set the sender as given in form configuration
-			list($senderName, $sender) = \String::splitFriendlyEmail($arrForm['confirmationMailSender']);
+			list($senderName, $sender) = \StringUtil::splitFriendlyEmail($arrForm['confirmationMailSender']);
 			$objMailProperties->sender = $sender;
 			$objMailProperties->senderName = $senderName;
 
 			// Set the 'reply to' address, if given in form configuration
 			if (!empty($arrForm['confirmationMailReplyto']))
 			{
-				list($replyToName, $replyTo) = \String::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
+				list($replyToName, $replyTo) = \StringUtil::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
 				$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 			}
 
@@ -425,7 +425,7 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					list($recipientName, $recipient) = \String::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
+					list($recipientName, $recipient) = \StringUtil::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
 					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
@@ -461,8 +461,8 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			$objMailProperties->subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
-			$objMailProperties->messageText = \String::decodeEntities($arrForm['confirmationMailText']);
+			$objMailProperties->subject = \StringUtil::decodeEntities($arrForm['confirmationMailSubject']);
+			$objMailProperties->messageText = \StringUtil::decodeEntities($arrForm['confirmationMailText']);
 			$objMailProperties->messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 
 			// Replace Insert tags and conditional tags
@@ -578,7 +578,7 @@ class FormdataProcessor extends \Frontend
 			{
 				foreach ($arrRecipient as $kR => $recipient)
 				{
-					list($recipientName, $recipient) = \String::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
+					list($recipientName, $recipient) = \StringUtil::splitFriendlyEmail($this->replaceInsertTags($recipient, false));
 					$arrRecipient[$kR] = (strlen($recipientName) ? $recipientName . ' <' . $recipient . '>' : $recipient);
 				}
 			}
@@ -615,8 +615,8 @@ class FormdataProcessor extends \Frontend
 				}
 			}
 
-			$objMailProperties->subject = \String::decodeEntities($arrForm['formattedMailSubject']);
-			$objMailProperties->messageText = \String::decodeEntities($arrForm['formattedMailText']);
+			$objMailProperties->subject = \StringUtil::decodeEntities($arrForm['formattedMailSubject']);
+			$objMailProperties->messageText = \StringUtil::decodeEntities($arrForm['formattedMailText']);
 			$objMailProperties->messageHtmlTmpl = $arrForm['formattedMailTemplate'];
 
 			// Replace Insert tags and conditional tags

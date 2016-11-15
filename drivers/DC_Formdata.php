@@ -3401,7 +3401,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 				if ($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] > 0 && $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'] < strlen(strip_tags($label)))
 				{
-					$label = trim(\String::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
+					$label = trim(\StringUtil::substrHtml($label, $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['maxCharacters'])) . ' …';
 				}
 
 				// Build the sorting groups
@@ -4768,14 +4768,14 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 		$blnStoreOptionsValues = ($arrForm['efgStoreValues']) ? true : false;
 
 		// Set the sender as given in form configuration
-		list($senderName, $sender) = \String::splitFriendlyEmail($arrForm['confirmationMailSender']);
+		list($senderName, $sender) = \StringUtil::splitFriendlyEmail($arrForm['confirmationMailSender']);
 		$objMailProperties->sender = $sender;
 		$objMailProperties->senderName = $senderName;
 
 		// Set the 'reply to' address, if given in form configuration
 		if (!empty($arrForm['confirmationMailReplyto']))
 		{
-			list($replyToName, $replyTo) = \String::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
+			list($replyToName, $replyTo) = \StringUtil::splitFriendlyEmail($arrForm['confirmationMailReplyto']);
 			$objMailProperties->replyTo = (strlen($replyToName) ? $replyToName . ' <' . $replyTo . '>' : $replyTo);
 		}
 
@@ -4860,8 +4860,8 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			}
 		}
 
-		$objMailProperties->subject = \String::decodeEntities($arrForm['confirmationMailSubject']);
-		$objMailProperties->messageText = \String::decodeEntities($arrForm['confirmationMailText']);
+		$objMailProperties->subject = \StringUtil::decodeEntities($arrForm['confirmationMailSubject']);
+		$objMailProperties->messageText = \StringUtil::decodeEntities($arrForm['confirmationMailText']);
 		$objMailProperties->messageHtmlTmpl = $arrForm['confirmationMailTemplate'];
 
 		// Replace Insert tags and conditional tags
@@ -5905,7 +5905,7 @@ var Stylect = {
 
 						if (strlen($strName))
 						{
-							$strName = \String::decodeEntities($strName);
+							$strName = \StringUtil::decodeEntities($strName);
 						}
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))
@@ -6133,7 +6133,7 @@ var Stylect = {
 
 					if (strlen($strVal))
 					{
-						$strVal = \String::decodeEntities($strVal);
+						$strVal = \StringUtil::decodeEntities($strVal);
 						$strVal = preg_replace(array('/<br.*\/*>/si'), array("\n"), $strVal);
 
 						if ($this->blnExportUTF8Decode || ($strMode == 'xls' && !$blnCustomXlsExport))

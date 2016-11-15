@@ -214,7 +214,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	<div class="fd_head">%s<span>[%s]</span><span>%s</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
-	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \String::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
+	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \StringUtil::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			/*
@@ -227,7 +227,7 @@ $GLOBALS['TL_DCA']['tl_formdata'] = array
 	<div class="fd_head">%s<span>[%s]</span></div>
 	<?php if (count($this->arrFields) > 10): ?><div class="limit_height' . (!$GLOBALS['TL_CONFIG']['doNotCollapse'] ? ' h64' : '') . ' block"><?php endif; ?>
 	<div class="fd_notes">%s</div>
-	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \String::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
+	<?php foreach ($this->arrFields as $varKey => $varVals): ?><div class="fd_row <?php echo 'field_'.$varKey; ?>"><div class="fd_label"><?php echo (strlen($varVals['label']) ? str_replace("'", "\'", preg_replace('/%([^%]|$)/', '%%', \StringUtil::decodeEntities($varVals['label']))) : $varKey); ?>: </div><div class="fd_value">%s </div></div>
 	<?php endforeach; ?>
 	<?php if (count($this->arrFields) > 10): ?></div><?php endif; ?></div>',
 			*/
@@ -458,7 +458,7 @@ endforeach;	?>
 	(
 		'baseFields'                 => array('id','sorting','tstamp','form','ip','date','fd_member','fd_user','fd_member_group','fd_user_group','published','alias','be_notes','confirmationSent','confirmationDate'),
 		'detailFields'               => array(<?php $strSep = ''; foreach ($this->arrFields as $varKey => $varVals):
-	echo $strSep . "'" . str_replace("'", "\'", \String::decodeEntities($varKey)) . "'"; $strSep = ',';
+	echo $strSep . "'" . str_replace("'", "\'", \StringUtil::decodeEntities($varKey)) . "'"; $strSep = ',';
 endforeach; ?>),
 <?php if ($this->arrForm['key'] != 'feedback'): ?>
 		'formFilterKey'              => 'form',
@@ -469,9 +469,9 @@ endforeach; ?>),
 
 // Detail fields in table tl_formdata_details
 <?php foreach ($this->arrFields as $varKey => $varVals): ?>
-<?php $strField = str_replace("'", "\'", \String::decodeEntities($varKey)); ?>
+<?php $strField = str_replace("'", "\'", \StringUtil::decodeEntities($varKey)); ?>
 // '<?php echo $strField; ?>'
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", \String::decodeEntities($varVals['label'])) : $strField); ?>', '<?php echo '[' . $strField .'] ' .str_replace("'", "\'", \String::decodeEntities($varVals['label'])); ?>');
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['label'] = array('<?php echo (strlen($varVals['label']) ? str_replace("'", "\'", \StringUtil::decodeEntities($varVals['label'])) : $strField); ?>', '<?php echo '[' . $strField .'] ' .str_replace("'", "\'", \StringUtil::decodeEntities($varVals['label'])); ?>');
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['inputType'] = '<?php echo $varVals['inputType']; ?>';
 <?php if ($varVals['type'] == 'countryselect'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options'] = $this->getCountries();
@@ -488,9 +488,9 @@ $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['sorting
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['filter'] = <?php echo (isset($arrListDefaults[$varVals['type']]['filter']) ? $arrListDefaults[$varVals['type']]['filter'] : 'false'); ?>;
 <?php if (strlen($varVals['value'])): ?>
 <?php if ($varVals['type']=='countryselect'): $arrCountries = $this->getCountries(); ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($arrCountries[$varVals['value']])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrCountries[$varVals['value']])); ?>';
 <?php else: ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($varVals['value'])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($varVals['value'])); ?>';
 <?php endif; ?>
 <?php endif; ?>
 <?php switch($varVals['type']):
@@ -508,11 +508,11 @@ endif; ?>
 <?php if (is_array($arrOpts)): ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php if ($arrOpt['group']): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo \String::decodeEntities($strField); ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo \String::decodeEntities($strField); ?>'];
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo \StringUtil::decodeEntities($strField); ?>']['reference'] = &$GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo \StringUtil::decodeEntities($strField); ?>'];
 <?php break; endif; ?>
 <?php endforeach; ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
-<?php if ($arrOpt['group']): $blnInGroup = true; $strGroupKey = \String::decodeEntities($arrOpt['value']); $strGroupLabel = \String::decodeEntities($arrOpt['label']); ?>
+<?php if ($arrOpt['group']): $blnInGroup = true; $strGroupKey = \StringUtil::decodeEntities($arrOpt['value']); $strGroupLabel = \StringUtil::decodeEntities($arrOpt['label']); ?>
 <?php if ($varVals['type'] == 'conditionalselect'): ?>
 $GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>']['<?php echo $strGroupKey; ?>'] = '<?php echo str_replace("'", "\'", $strGroupKey); ?>';
 <?php else: ?>
@@ -521,14 +521,14 @@ $GLOBALS['TL_LANG']['tl_formdata']['_optgroups_']['<?php echo $strField; ?>']['<
 <?php endif; ?>
 <?php if ($blnInGroup && strlen($strGroupKey)): ?>
 <?php if ($arrOpt['group']): continue; endif; ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo $strGroupKey; ?>']['<?php echo str_replace("'", "\'", \String::decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($arrOpt['label'])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo $strGroupKey; ?>']['<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrOpt['label'])); ?>';
 <?php else: ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo str_replace("'", "\'", \String::decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($arrOpt['label'])); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['options']['<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrOpt['value']));?>'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrOpt['label'])); ?>';
 <?php endif; ?>
 <?php endforeach; ?>
 <?php foreach ($arrOpts as $kOpt => $arrOpt): ?>
 <?php if ($arrOpt['default']): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'][] = '<?php echo str_replace("'", "\'", \String::decodeEntities($arrOpt['label']))?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['default'][] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($arrOpt['label']))?>';
 <?php endif; ?>
 <?php endforeach; ?>
 <?php endif; ?>
@@ -545,7 +545,7 @@ case 'efgLookupRadio':
 case 'efgLookupSelect':
 $arrOpts = deserialize($varVals['efgLookupOptions']); ?>
 <?php if (!empty($arrOpts)): foreach ($arrOpts as $kOpt => $valOpt): ?>
-$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['efgLookupOptions']['<?php echo str_replace("'", "\'", $kOpt);?>'] = '<?php echo str_replace("'", "\'", \String::decodeEntities($valOpt)); ?>';
+$GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['efgLookupOptions']['<?php echo str_replace("'", "\'", $kOpt);?>'] = '<?php echo str_replace("'", "\'", \StringUtil::decodeEntities($valOpt)); ?>';
 <?php endforeach; ?>
 <?php if ($varVals['type'] == 'efgLookupCheckbox'): ?>
 $GLOBALS['TL_DCA']['tl_formdata']['fields']['<?php echo $strField; ?>']['eval']['multiple'] = true;
@@ -677,7 +677,7 @@ class tl_fd_<?php echo (strlen($this->strFormKey)) ? str_replace(array('-','.'),
 		$strRowLabel .= '<div class="fd_notes">' . $arrRow['be_notes'] . '</div>';
 		$strRowLabel .= '<div class="mark_links">';
 <?php foreach ($this->arrFields as $varKey => $varVals): ?>
-<?php $strField = str_replace("'", "\'", \String::decodeEntities($varKey)); ?>
+<?php $strField = str_replace("'", "\'", \StringUtil::decodeEntities($varKey)); ?>
 		if (strlen($arrRow['<?php echo $strField; ?>']))
 		{
 			$strRowLabel .= '<div class="fd_row field_<?php echo $varKey; ?>">';
