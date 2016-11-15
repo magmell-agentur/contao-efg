@@ -79,7 +79,7 @@ class FormdataBackend extends \Backend
 		else
 		{
 			$act = \Input::get('act');
-			return $this->objDc->$act();
+			return $this->objDc->{$act}();
 		}
 	}
 

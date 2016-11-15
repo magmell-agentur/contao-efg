@@ -322,7 +322,7 @@ class tl_formdata extends \Backend
 							foreach ($GLOBALS['TL_HOOKS']['loadDataContainer'] as $callback)
 							{
 								$this->import($callback[0]);
-								$this->$callback[0]->$callback[1]('tl_formdata');
+								$this->{$callback[0]}->{$callback[1]}('tl_formdata');
 							}
 						}
 
@@ -355,7 +355,7 @@ class tl_formdata extends \Backend
 						foreach ($GLOBALS['TL_HOOKS']['loadDataContainer'] as $callback)
 						{
 							$this->import($callback[0]);
-							$this->$callback[0]->$callback[1]('tl_formdata');
+							$this->{$callback[0]}->{$callback[1]}('tl_formdata');
 						}
 					}
 

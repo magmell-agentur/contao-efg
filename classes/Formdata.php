@@ -2201,7 +2201,7 @@ class Formdata extends \Frontend
 								foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
 								{
 									$this->import($callback[0]);
-									$objWidget = $this->$callback[0]->$callback[1]($objWidget, $arrField['pid'], array());
+									$objWidget = $this->{$callback[0]}->{$callback[1]}($objWidget, $arrField['pid'], array());
 								}
 							}
 							$arrOptions = $objWidget->options;
@@ -2942,7 +2942,7 @@ class Formdata extends \Frontend
 				// Set the new value
 				if (in_array($strField, $dc->arrBaseFields) || in_array($strField, $dc->arrDetailFields))
 				{
-					$objRow->$strField = $varValue;
+					$objRow->{$strField} = $varValue;
 					$arrAttribs['activeRecord'] = $objRow;
 				}
 

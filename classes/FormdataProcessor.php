@@ -161,7 +161,7 @@ class FormdataProcessor extends \Frontend
 				foreach ($GLOBALS['TL_HOOKS']['processEfgFormData'] as $key => $callback)
 				{
 					$this->import($callback[0]);
-					$arrResult = $this->$callback[0]->$callback[1]($arrToSave, $arrFiles, $intOldId, $arrForm, $arrLabels);
+					$arrResult = $this->{$callback[0]}->{$callback[1]}($arrToSave, $arrFiles, $intOldId, $arrForm, $arrLabels);
 					if (!empty($arrResult))
 					{
 						$arrSubmitted = $arrResult;

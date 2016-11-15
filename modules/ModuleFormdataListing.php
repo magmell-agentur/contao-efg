@@ -1911,7 +1911,7 @@ class ModuleFormdataListing extends \Module
 					foreach ($GLOBALS['TL_HOOKS']['efgExportXls'] as $key => $callback)
 					{
 						$this->import($callback[0]);
-						$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData);
+						$res = $this->{$callback[0]}->{$callback[1]}($arrHookDataColumns, $arrHookData);
 					}
 				}
 			}
@@ -2849,7 +2849,7 @@ class ModuleFormdataListing extends \Module
 				foreach ($GLOBALS['TL_HOOKS']['efgExportXls'] as $key => $callback)
 				{
 					$this->import($callback[0]);
-					$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData);
+					$res = $this->{$callback[0]}->{$callback[1]}($arrHookDataColumns, $arrHookData);
 				}
 			}
 		}

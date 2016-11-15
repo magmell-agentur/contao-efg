@@ -62,7 +62,7 @@ class EfgRunonce extends Controller
 
 		try
 		{
-			$this->$method();
+			$this->{$method}();
 		}
 		catch(Exception $e)
 		{

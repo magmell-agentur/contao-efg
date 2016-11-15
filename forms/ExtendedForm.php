@@ -247,7 +247,7 @@ class ExtendedForm extends \Form
 			foreach ($GLOBALS['TL_HOOKS']['compileFormFields'] as $callback)
 			{
 				$this->import($callback[0]);
-				$arrFields = $this->$callback[0]->$callback[1]($arrFields, $formId, $this);
+				$arrFields = $this->{$callback[0]}->{$callback[1]}($arrFields, $formId, $this);
 			}
 		}
 
@@ -414,7 +414,7 @@ class ExtendedForm extends \Form
 						foreach ($GLOBALS['TL_HOOKS']['loadFormField'] as $callback)
 						{
 							$this->import($callback[0]);
-							$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
+							$objWidget = $this->{$callback[0]}->{$callback[1]}($objWidget, $formId, $this->arrData);
 						}
 					}
 				}
@@ -484,7 +484,7 @@ class ExtendedForm extends \Form
 							foreach ($GLOBALS['TL_HOOKS']['validateFormField'] as $callback)
 							{
 								$this->import($callback[0]);
-								$objWidget = $this->$callback[0]->$callback[1]($objWidget, $formId, $this->arrData);
+								$objWidget = $this->{$callback[0]}->{$callback[1]}($objWidget, $formId, $this->arrData);
 							}
 						}
 					}

@@ -370,7 +370,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				if (is_array($callback))
 				{
 					$this->import($callback[0]);
-					$this->$callback[0]->$callback[1]($this);
+					$this->{$callback[0]}->{$callback[1]}($this);
 				}
 				elseif (is_callable($callback))
 				{
@@ -715,7 +715,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						->execute($row[$i]);
 					if ($objKey->numRows)
 					{
-						$row[$i] = $objKey->$chunks[1];
+						$row[$i] = $objKey->{$chunks[1]};
 					}
 				}
 			}
@@ -877,7 +877,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						if (is_array($callback))
 						{
 							$this->import($callback[0]);
-							$this->$callback[0]->$callback[1]($this->strTable, $insertID, $this->set, $this);
+							$this->{$callback[0]}->{$callback[1]}($this->strTable, $insertID, $this->set, $this);
 						}
 						elseif (is_callable($callback))
 						{
@@ -1000,7 +1000,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (is_array($callback))
 					{
 						$this->import($callback[0]);
-						$this->$callback[0]->$callback[1]($this, $objUndoStmt->insertId);
+						$this->{$callback[0]}->{$callback[1]}($this, $objUndoStmt->insertId);
 					}
 					elseif (is_callable($callback))
 					{
@@ -1314,7 +1314,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 					$this->strField = $vv;
 					$this->strInputName = $vv;
-					$this->varValue = $objRow->$vv;
+					$this->varValue = $objRow->{$vv};
 
 					// Autofocus the first text field
 					if ($blnIsFirst && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['inputType'] == 'text')
@@ -1330,7 +1330,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][1];
 
 						$this->import($strClass);
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->{$strClass}->{$strMethod}($this);
 					}
 
 					// Convert CSV fields
@@ -1349,7 +1349,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 							if (is_array($callback))
 							{
 								$this->import($callback[0]);
-								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
+								$this->varValue = $this->{$callback[0]}->{$callback[1]}($this->varValue, $this);
 							}
 							elseif (is_callable($callback))
 							{
@@ -1706,7 +1706,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 							if (is_array($callback))
 							{
 								$this->import($callback[0]);
-								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
+								$this->varValue = $this->{$callback[0]}->{$callback[1]}($this->varValue, $this);
 							}
 							elseif (is_callable($callback))
 							{
@@ -1760,7 +1760,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				if (is_array($callback))
 				{
 					$this->import($callback[0]);
-					$arrButtons = $this->$callback[0]->$callback[1]($arrButtons, $this);
+					$arrButtons = $this->{$callback[0]}->{$callback[1]}($arrButtons, $this);
 				}
 				elseif (is_callable($callback))
 				{
@@ -1824,7 +1824,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (is_array($callback))
 					{
 						$this->import($callback[0]);
-						$this->$callback[0]->$callback[1]($this);
+						$this->{$callback[0]}->{$callback[1]}($this);
 					}
 					elseif (is_callable($callback))
 					{
@@ -2045,9 +2045,9 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					// Set the default value and try to load the current value from DB
 					$this->varValue = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['default'] ? $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['default'] : '';
 
-					if ($objRow->$v !== false)
+					if ($objRow->{$v} !== false)
 					{
-						$this->varValue = $objRow->$v;
+						$this->varValue = $objRow->{$v};
 					}
 
 					// Autofocus the first field
@@ -2064,7 +2064,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options_callback'][1];
 
 						$this->import($strClass);
-						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->$strClass->$strMethod($this);
+						$GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['options'] = $this->{$strClass}->{$strMethod}($this);
 					}
 
 					// Convert CSV fields
@@ -2411,7 +2411,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 							if (is_array($callback))
 							{
 								$this->import($callback[0]);
-								$this->varValue = $this->$callback[0]->$callback[1]($this->varValue, $this);
+								$this->varValue = $this->{$callback[0]}->{$callback[1]}($this->varValue, $this);
 							}
 							elseif (is_callable($callback))
 							{
@@ -2444,7 +2444,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 							if (is_array($callback))
 							{
 								$this->import($callback[0]);
-								$this->$callback[0]->$callback[1]($this);
+								$this->{$callback[0]}->{$callback[1]}($this);
 							}
 							elseif (is_callable($callback))
 							{
@@ -2472,7 +2472,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (is_array($callback))
 					{
 						$this->import($callback[0]);
-						$arrButtons = $this->$callback[0]->$callback[1]($arrButtons, $this);
+						$arrButtons = $this->{$callback[0]}->{$callback[1]}($arrButtons, $this);
 					}
 					elseif (is_callable($callback))
 					{
@@ -2797,7 +2797,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				if (is_array($callback))
 				{
 					$this->import($callback[0]);
-					$varValue = $this->$callback[0]->$callback[1]($varValue, $this);
+					$varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
 				}
 				elseif (is_callable($callback))
 				{
@@ -2914,7 +2914,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			{
 				foreach ($GLOBALS['TL_DCA'][$this->strTable]['palettes']['__selector__'] as $name)
 				{
-					$trigger = $objFields->$name;
+					$trigger = $objFields->{$name};
 
 					// Overwrite the trigger
 					if (\Input::post('FORM_SUBMIT') == $this->strTable)
@@ -3027,7 +3027,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				if (is_array($callback))
 				{
 					$this->import($callback[0]);
-					$status = $this->$callback[0]->$callback[1]($this->strTable, $new_records[$this->strTable], $ptable, $ctable);
+					$status = $this->{$callback[0]}->{$callback[1]}($this->strTable, $new_records[$this->strTable], $ptable, $ctable);
 				}
 				elseif (is_callable($callback))
 				{
@@ -3246,7 +3246,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						->limit(1)
 						->execute($v['pid']);
 
-					$result[$k]['pid'] = $objField->$showFields[0];
+					$result[$k]['pid'] = $objField->{$showFields[0]};
 				}
 
 				$aux = array();
@@ -3442,7 +3442,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback'][1];
 
 						$this->import($strClass);
-						$args = $this->$strClass->$strMethod($row, $label, $this, $args);
+						$args = $this->{$strClass}->{$strMethod}($row, $label, $this, $args);
 					}
 					elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['label_callback']))
 					{
@@ -3498,7 +3498,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					foreach ($GLOBALS['TL_DCA'][$this->strTable]['edit']['buttons_callback'] as $callback)
 					{
 						$this->import($callback[0]);
-						$callbacks .= $this->$callback[0]->$callback[1]($this);
+						$callbacks .= $this->{$callback[0]}->{$callback[1]}($this);
 					}
 				}
 
@@ -3564,7 +3564,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 					if (is_array($arrCallback))
 					{
 						$this->import($arrCallback[0]);
-						$panel = $this->$arrCallback[0]->$arrCallback[1]($this);
+						$panel = $this->{$arrCallback[0]}->{$arrCallback[1]}($this);
 					}
 					elseif (is_callable($arrCallback))
 					{
@@ -4262,7 +4262,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 						$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][1];
 
 						$this->import($strClass);
-						$options_callback = $this->$strClass->$strMethod($this);
+						$options_callback = $this->{$strClass}->{$strMethod}($this);
 					}
 					elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback']))
 					{
@@ -4325,7 +4325,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 
 						if ($objShowFields->numRows)
 						{
-							$vv = $objShowFields->$showFields[0];
+							$vv = $objShowFields->{$showFields[0]};
 						}
 					}
 
@@ -4502,7 +4502,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 				$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$field]['options_callback'][1];
 
 				$this->import($strClass);
-				$lookup[$field] = $this->$strClass->$strMethod($this);
+				$lookup[$field] = $this->{$strClass}->{$strMethod}($this);
 			}
 
 			$group = $lookup[$field][$value];
@@ -4534,7 +4534,7 @@ class DC_Formdata extends \DataContainer implements \listable, \editable
 			$strMethod = $GLOBALS['TL_DCA'][$this->strTable]['list']['label']['group_callback'][1];
 
 			$this->import($strClass);
-			$group = $this->$strClass->$strMethod($group, $mode, $field, $row, $this);
+			$group = $this->{$strClass}->{$strMethod}($group, $mode, $field, $row, $this);
 		}
 		elseif (is_callable($GLOBALS['TL_DCA'][$this->strTable]['list']['label']['group_callback']))
 		{
@@ -5844,7 +5844,7 @@ var Stylect = {
 					$objField = \Database::getInstance()->prepare("SELECT " . $showFields[0] . " FROM " . $this->ptable . " WHERE id=?")
 						->limit(1)
 						->execute($v['pid']);
-					$result[$k]['pid'] = $objField->$showFields[0];
+					$result[$k]['pid'] = $objField->{$showFields[0]};
 				}
 
 				$aux = array();
@@ -6189,7 +6189,7 @@ var Stylect = {
 				foreach ($GLOBALS['TL_HOOKS']['efgExportXls'] as $key => $callback)
 				{
 					$this->import($callback[0]);
-					$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData);
+					$res = $this->{$callback[0]}->{$callback[1]}($arrHookDataColumns, $arrHookData);
 				}
 			}
 		}
@@ -6198,7 +6198,7 @@ var Stylect = {
 			foreach ($GLOBALS['TL_HOOKS']['efgExport'] as $key => $callback)
 			{
 				$this->import($callback[0]);
-				$res = $this->$callback[0]->$callback[1]($arrHookDataColumns, $arrHookData, $strMode);
+				$res = $this->{$callback[0]}->{$callback[1]}($arrHookDataColumns, $arrHookData, $strMode);
 			}
 		}
 		exit;
