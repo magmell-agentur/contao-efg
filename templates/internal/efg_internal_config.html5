@@ -1,4 +1,7 @@
-<?php echo '<?php'; ?>
+<?php
+  // Disable the debug mode (see #2)
+  \Config::set('debugMode', false);
+  echo '<?php'; ?>
 
 
 /**
