@@ -124,7 +124,7 @@ class ExtendedForm extends \Form
 
 		// Check if the form is a multipage form
 		$objPaginators = \Database::getInstance()
-			->prepare("SELECT id,pid,invisible,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`singleSRC`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=?" . ((!BE_USER_LOGGED_IN) ? " AND invisible=''" : "") . " ORDER BY `sorting`")
+			->prepare("SELECT id,pid,invisible,`sorting`,`type`,`name`,`label`,`value`,`imageSubmit`,`sLabel`,`efgAddBackButton`,`efgBackStoreSessionValues`,`efgBackSlabel`,`efgBackImageSubmit`,`efgBackSingleSRC` FROM tl_form_field WHERE pid=? AND `type`=?" . ((!BE_USER_LOGGED_IN) ? " AND invisible=''" : "") . " ORDER BY `sorting`")
 			->execute($this->id, 'efgFormPaginator');
 
 		if ($objPaginators->numRows)

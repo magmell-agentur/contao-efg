@@ -264,7 +264,7 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 		// As of Contao 3 tl_form_field.singleSRC and tl_form_field.efgBackSingleSRC use database assisted fileTree
 		// .. these fields normally should have been transformed already by the Contao install routine
 
-		if (!$this->Database->fieldExists('efgBackSingleSRC', 'tl_form_field'))
+		if (!$this->Database->fieldExists('efgBackSingleSRC', 'tl_form_field') || !$this->Database->fieldExists('singleSRC', 'tl_form_field'))
 		{
 			return;
 		}

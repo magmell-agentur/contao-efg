@@ -410,13 +410,8 @@ class FormdataBackend extends \Backend
 		// Rebuild internal cache
 		if (!$GLOBALS['TL_CONFIG']['bypassCache'])
 		{
-			$this->import('Automator');
-
-			$this->Automator->generateConfigCache();
-			$this->Automator->generateDcaCache();
-			$this->Automator->generateDcaExtracts();
+            (new \Automator())->generateInternalCache();
 		}
-
 	}
 
 	/**
